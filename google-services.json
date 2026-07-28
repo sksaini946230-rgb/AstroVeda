@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "330378380471",
+    "project_id": "astroveda-7126b",
+    "storage_bucket": "astroveda-7126b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:330378380471:android:b8222d26248f936bcd3932",
+        "android_client_info": {
+          "package_name": "com.aistudio.astroveda.kpvqzm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "330378380471-33febajj6e2as812d4a69v9j17mr6i2n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aistudio.astroveda.kpvqzm",
+            "certificate_hash": "be60fc75a525d0df412db21929cbc0834249bb7b"
+          }
+        },
+        {
+          "client_id": "330378380471-8ja4r1sn7i7ru6tbmov96s0kbmcsifuh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDs5nop_KAX-fI51LgoCbMbmfApAHtISio"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "330378380471-8ja4r1sn7i7ru6tbmov96s0kbmcsifuh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

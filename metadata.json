@@ -1,0 +1,6 @@
+{
+  "name": "AstroVeda",
+  "description": "Premium Vedic Astrology, Panchang & Kundali app with Swiss astronomical precision and offline-first design.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
