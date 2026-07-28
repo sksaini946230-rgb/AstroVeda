@@ -2,15 +2,21 @@ package com.example.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.example.R
 
-// Default safe system font families for AstroVeda (Roboto / Noto Sans Devanagari)
-val OutfitFontFamily = FontFamily.SansSerif
-val NotoSansDevanagariFontFamily = FontFamily.SansSerif
+// Outfit → primary Latin/English typeface (res/font/outfit.xml)
+// Noto Sans Devanagari → Hindi/Sanskrit script ke liye (res/font/noto_sans_devanagari.xml)
+// PEHLE: dono FontFamily.SansSerif (system Roboto) pe point kar rahe the — fonts
+// res/font/ me bundled the par kabhi wire hi nahi hue, isliye pura app default
+// Android typography me render ho raha tha.
+val OutfitFontFamily = FontFamily(Font(R.font.outfit))
+val NotoSansDevanagariFontFamily = FontFamily(Font(R.font.noto_sans_devanagari))
 
-// Primary typography scale for AstroVeda using clean, system-safe font families
+// Primary typography scale for AstroVeda
 val Typography = Typography(
     displayLarge = TextStyle(
         fontFamily = OutfitFontFamily,

@@ -3,43 +3,56 @@ package com.example.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // ============================================================================
-// AstroVeda Color Token System
+// AstroVeda Color Token System — STRICT 3-Color Brand Palette
+// Gold #C9A84C · Deep Navy #1A1F35 · Emerald #2ABF6E
+// Sabhi tokens inhi 3 hues ke tints/shades hain — koi extra hue nahi.
 // ============================================================================
 
-// --- Background Tokens ---
-val CosmicDeepNavy = Color(0xFF0D1117)       // Deep Midnight Background
-val CosmicCardSurface = Color(0xFF161B22)    // Subtle Card Surface
-val CelestialCream = Color(0xFFFFFBF0)       // Soft Ivory Background for Light Mode
+// --- Canonical Base ---
+val PremiumGold = Color(0xFFC9A84C)
+val DeepNavy = Color(0xFF1A1F35)
+val EmeraldGreen = Color(0xFF2ABF6E)
 
-// --- Text Tokens ---
-val TextPrimaryDark = Color(0xFFF8FAFC)      // Slate 50 - High Emphasis Text
-val TextSecondaryDark = Color(0xFF94A3B8)    // Slate 400 - Medium Emphasis Text
-val TextGold = Color(0xFFD4A84B)             // Premium Gold Text Accent
+// --- Navy Tints (backgrounds/surfaces — sab Navy ke shades) ---
+val CosmicDeepNavy = Color(0xFF1A1F35)          // Base background
+val CosmicCardSurface = Color(0xFF232A47)       // Navy +8% lighter — card surface
+val CosmicSurfaceVariant = Color(0xFF272E4D)    // Navy +10% — variant surface
+val CosmicPrimaryContainer = Color(0xFF303761)  // Navy +18% — container
+val CosmicOutline = Color(0xFF3A4270)           // Navy +22% — borders
 
-// --- Primary & Gold Tokens ---
-val PremiumGold = Color(0xFFD4A84B)          // Premium Gold for PRO badges, highlights & buttons #D4A84B
-val GoldPrimary = Color(0xFFE67E22)          // Primary Saffron Brand Accent
-val GoldSecondary = Color(0xFFD4AF37)        // Classic Gold Secondary Accent
-val GoldGlow = Color(0xFFFFD700)             // Bright Gold Glow
-val SacredSaffron = Color(0xFFF39C12)        // Spiritual Orange-Gold
-val MinimalistGold = Color(0xFFD4A84B)       // Minimalist Gold Token Alias
+// --- Light mode (Navy tinted toward white, not a new hue) ---
+val CelestialCream = Color(0xFFF5F3EC)
+val CelestialSurfaceVariant = Color(0xFFEDEBE2)
+val CelestialOutline = Color(0xFFD9D6C8)
+val CelestialPrimaryContainer = Color(0xFFEDE0BC)
+val CelestialOnPrimaryContainer = Color(0xFF1A1F35)
 
-// --- Navigation & Auspicious Green Tokens ---
-val AuspiciousGreen = Color(0xFF10B981)      // Emerald Green - Auspicious Status
-val NavigationGreen = Color(0xFF10B981)      // Navigation & Success Accent Token Alias
+// --- Text (Navy-tinted whites/grays, no new hue) ---
+val TextPrimaryDark = Color(0xFFF3F1EA)
+val TextSecondaryDark = Color(0xFF9CA3C0)
+val TextGold = Color(0xFFC9A84C)
+val TextPrimaryLight = Color(0xFF1A1F35)
+val TextSecondaryLight = Color(0xFF5C6178)
 
-// --- Date & Orange Tokens ---
-val DateOrange = Color(0xFFE67E22)           // Distinct Date & Calendar Orange Token
-val NeutralOrange = Color(0xFFF59E0B)        // Warm Neutral Orange Token
+// --- Gold Tints (all references collapse to single Gold identity) ---
+val GoldPrimary = Color(0xFFC9A84C)
+val GoldSecondary = Color(0xFFB8934A)
+val GoldGlow = Color(0xFFE0C177)
+val SacredSaffron = Color(0xFFC9A84C)
+val MinimalistGold = Color(0xFFC9A84C)
+val DateOrange = Color(0xFFC9A84C)
+val NeutralOrange = Color(0xFFB8934A)
 
-// --- Status & Warning Red Tokens ---
-val InauspiciousRed = Color(0xFFEF4444)      // Crimson Red - Inauspicious Status
-val StatusRed = Color(0xFFEF4444)            // Warning & Error Status Token Alias
+// --- Emerald Tints ---
+val AuspiciousGreen = Color(0xFF2ABF6E)
+val NavigationGreen = Color(0xFF2ABF6E)
 
-// --- Secondary Accents ---
-val AccentCyan = Color(0xFF38BDF8)           // Cosmic Cyan
-val AccentPurple = Color(0xFFA855F7)         // Mystic Purple
+// --- Removed hues, aliased to nearest of the 3 (no cyan/purple/red family) ---
+val AccentCyan = Color(0xFF2ABF6E)
+val AccentPurple = Color(0xFFC9A84C)
+val InauspiciousRed = Color(0xFF11142A)
+val StatusRed = Color(0xFF11142A)
 
-// --- Glassmorphism Tokens ---
-val GlassBorder = Color(0x1FFFFFFF)          // Glassmorphism Border rgba(255, 255, 255, 0.12)
-val GlassWhite = Color(0x0DFFFFFF)           // Glassmorphism Surface Background rgba(255, 255, 255, 0.05)
+// --- Glassmorphism (Gold-tinted, not a new hue) ---
+val GlassBorder = Color(0x26C9A84C)
+val GlassWhite = Color(0x0DFFFFFF)
