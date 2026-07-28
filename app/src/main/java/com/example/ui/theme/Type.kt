@@ -13,8 +13,8 @@ import com.example.R
 // PEHLE: dono FontFamily.SansSerif (system Roboto) pe point kar rahe the — fonts
 // res/font/ me bundled the par kabhi wire hi nahi hue, isliye pura app default
 // Android typography me render ho raha tha.
-val OutfitFontFamily = FontFamily(Font(R.font.outfit))
-val NotoSansDevanagariFontFamily = FontFamily(Font(R.font.noto_sans_devanagari))
+val OutfitFontFamily = FontFamily(Font(R.font.outfit_variable))
+val NotoSansDevanagariFontFamily = FontFamily(Font(R.font.noto_sans_devanagari_variable))
 
 // Primary typography scale for AstroVeda
 val Typography = Typography(
