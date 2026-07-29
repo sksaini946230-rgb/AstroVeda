@@ -515,10 +515,12 @@ fun NorthIndianChart(
                             )
                         } else {
                             Text(
-                                text = "कोई ग्रह नहीं",
+                                text = "— इस भाव में कोई ग्रह नहीं",
                                 style = MaterialTheme.typography.bodySmall.copy(
                                     color = TextSecondaryDark,
-                                    fontSize = 11.sp
+                                    fontSize = 11.sp,
+                                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                                    fontWeight = FontWeight.Medium
                                 )
                             )
                         }
