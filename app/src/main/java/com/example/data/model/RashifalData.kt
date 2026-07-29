@@ -21,5 +21,6 @@ data class RashifalData(
     val loveReadingHi: String,
     val loveReadingEn: String,
     val financeReadingHi: String,
-    val financeReadingEn: String
+    val financeReadingEn: String,
+    val period: String = "TODAY" // "TODAY", "WEEK", "MONTH"
 )

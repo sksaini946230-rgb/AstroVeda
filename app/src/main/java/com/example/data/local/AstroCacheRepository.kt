@@ -119,12 +119,12 @@ class AstroCacheRepository(
         return@withContext freshPanchang
     }
 
-    suspend fun getHoroscopesWith7DayCache(forceRefresh: Boolean = false): List<RashifalData> = withContext(ioDispatcher) {
+    suspend fun getHoroscopesWith7DayCache(period: String = "TODAY", forceRefresh: Boolean = false): List<RashifalData> = withContext(ioDispatcher) {
         val now = System.currentTimeMillis()
         val validAfter = now - SEVEN_DAYS_MS
 
         if (!forceRefresh) {
-            val cachedEntities = horoscopeCacheDao.getAllValidHoroscopes(validAfter)
+            val cachedEntities = horoscopeCacheDao.getAllValidHoroscopes(period, validAfter)
             if (cachedEntities.size >= 12) {
                 return@withContext cachedEntities.map { entity ->
                     RashifalData(
@@ -148,20 +148,31 @@ class AstroCacheRepository(
                         loveReadingHi = entity.loveReadingHi,
                         loveReadingEn = entity.loveReadingEn,
                         financeReadingHi = entity.financeReadingHi,
-                        financeReadingEn = entity.financeReadingEn
+                        financeReadingEn = entity.financeReadingEn,
+                        period = entity.period
                     )
                 }
             }
         }
 
         // Fresh computation
-        val freshHoroscopes = RashifalProvider.getDailyHoroscope()
+        val freshHoroscopes = RashifalProvider.getHoroscope(period)
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-        val todayStr = dateFormat.format(Date())
+        val periodKey = when (period) {
+            "WEEK" -> {
+                val cal = java.util.Calendar.getInstance()
+                "${cal.get(java.util.Calendar.YEAR)}_W${cal.get(java.util.Calendar.WEEK_OF_YEAR)}"
+            }
+            "MONTH" -> {
+                val cal = java.util.Calendar.getInstance()
+                "${cal.get(java.util.Calendar.YEAR)}_M${cal.get(java.util.Calendar.MONTH)}"
+            }
+            else -> dateFormat.format(Date())
+        }
 
         val entities = freshHoroscopes.map { item ->
             HoroscopeCacheEntity(
-                cacheKey = "${item.rashiId}_$todayStr",
+                cacheKey = "${item.rashiId}_${period}_$periodKey",
                 rashiId = item.rashiId,
                 rashiNameEn = item.rashiNameEn,
                 rashiNameHi = item.rashiNameHi,
@@ -183,6 +194,7 @@ class AstroCacheRepository(
                 loveReadingEn = entityFieldOr(item.loveReadingEn),
                 financeReadingHi = item.financeReadingHi,
                 financeReadingEn = entityFieldOr(item.financeReadingEn),
+                period = item.period,
                 cachedAtTimestamp = now
             )
         }

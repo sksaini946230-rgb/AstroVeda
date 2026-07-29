@@ -10,8 +10,8 @@ interface HoroscopeCacheDao {
     @Query("SELECT * FROM horoscope_cache WHERE cacheKey = :key LIMIT 1")
     suspend fun getCachedHoroscope(key: String): HoroscopeCacheEntity?
 
-    @Query("SELECT * FROM horoscope_cache WHERE cachedAtTimestamp >= :validAfter")
-    suspend fun getAllValidHoroscopes(validAfter: Long): List<HoroscopeCacheEntity>
+    @Query("SELECT * FROM horoscope_cache WHERE period = :period AND cachedAtTimestamp >= :validAfter")
+    suspend fun getAllValidHoroscopes(period: String, validAfter: Long): List<HoroscopeCacheEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertHoroscopeCache(entity: HoroscopeCacheEntity)

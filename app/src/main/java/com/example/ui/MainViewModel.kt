@@ -554,11 +554,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val dailyHoroscopesState: StateFlow<List<RashifalData>> = _dailyHoroscopes.asStateFlow()
     val dailyHoroscopes: List<RashifalData> get() = _dailyHoroscopes.value
 
-    fun loadHoroscopesWithCache(forceRefresh: Boolean = false) {
+    fun loadHoroscopesWithCache(period: String = "TODAY", forceRefresh: Boolean = false) {
         viewModelScope.launch {
             _isHoroscopeLoading.value = true
             try {
-                _dailyHoroscopes.value = cacheRepository.getHoroscopesWith7DayCache(forceRefresh = forceRefresh)
+                _dailyHoroscopes.value = cacheRepository.getHoroscopesWith7DayCache(period = period, forceRefresh = forceRefresh)
                 incrementSessionActionCount()
             } catch (e: Exception) {
                 reportError(e)
@@ -568,8 +568,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun refreshHoroscopes() {
-        loadHoroscopesWithCache(forceRefresh = true)
+    fun refreshHoroscopes(period: String = "TODAY") {
+        loadHoroscopesWithCache(period = period, forceRefresh = true)
     }
 
     private val _selectedRashiId = MutableStateFlow(1) // Mesh

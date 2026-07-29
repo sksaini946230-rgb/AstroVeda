@@ -27,5 +27,6 @@ data class HoroscopeCacheEntity(
     val loveReadingEn: String,
     val financeReadingHi: String,
     val financeReadingEn: String,
+    val period: String = "TODAY",
     val cachedAtTimestamp: Long = System.currentTimeMillis()
 )
