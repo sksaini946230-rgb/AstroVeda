@@ -78,7 +78,6 @@ import com.example.ui.components.SectionHeader
 import com.example.ui.theme.GlassBorder
 import com.example.util.LanguageManager
 
-import com.example.ui.components.OfflineStatusChip
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -167,11 +166,6 @@ fun RashifalScreen(viewModel: MainViewModel) {
                 ),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-        item {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                OfflineStatusChip("Offline Mode: Showing cached daily horoscope")
-            }
-        }
         item {
             Spacer(modifier = Modifier.height(8.dp))
             SectionHeader(
