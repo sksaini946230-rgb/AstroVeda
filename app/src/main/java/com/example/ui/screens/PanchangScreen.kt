@@ -221,7 +221,7 @@ fun PanchangScreen(
 
                         // City Location Picker Pill
                         var expanded by remember { mutableStateOf(false) }
-                        var searchQuery by remember { mutableStateOf("") }
+                        var searchQuery by remember(selectedCity) { mutableStateOf(selectedCity.cityNameHindi) }
                         val cities = PanchangCalculator.popularCities
                         val filteredCities = if (searchQuery.isBlank()) {
                             cities
