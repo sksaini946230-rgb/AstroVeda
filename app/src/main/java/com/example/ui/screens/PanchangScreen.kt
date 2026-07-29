@@ -219,76 +219,80 @@ fun PanchangScreen(
                             )
                         }
 
-                        // City Location Picker Pill
-                        var expanded by remember { mutableStateOf(false) }
-                        var searchQuery by remember(selectedCity) { mutableStateOf(selectedCity.cityNameHindi) }
-                        val cities = PanchangCalculator.popularCities
-                        val filteredCities = if (searchQuery.isBlank()) {
-                            cities
-                        } else {
-                            cities.filter { it.cityNameHindi.contains(searchQuery, ignoreCase = true) || it.cityName.contains(searchQuery, ignoreCase = true) }
-                        }
+                    }
 
-                        ExposedDropdownMenuBox(
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // City Location Picker Pill
+                    var expanded by remember { mutableStateOf(false) }
+                    var searchQuery by remember(selectedCity) { mutableStateOf(selectedCity.cityNameHindi) }
+                    val cities = PanchangCalculator.popularCities
+                    val filteredCities = if (searchQuery.isBlank()) {
+                        cities
+                    } else {
+                        cities.filter { it.cityNameHindi.contains(searchQuery, ignoreCase = true) || it.cityName.contains(searchQuery, ignoreCase = true) }
+                    }
+
+                    ExposedDropdownMenuBox(
+                        expanded = expanded,
+                        onExpandedChange = { expanded = !expanded },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        OutlinedTextField(
+                            value = searchQuery,
+                            onValueChange = {
+                                searchQuery = it
+                                expanded = true
+                            },
+                            label = { Text("Search City", fontSize = 12.sp, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis) },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = GlassBorder,
+                                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                            ),
+                            shape = RoundedCornerShape(20.dp),
+                            singleLine = true,
+                            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable).fillMaxWidth()
+                        )
+
+                        ExposedDropdownMenu(
                             expanded = expanded,
-                            onExpandedChange = { expanded = !expanded },
-                            modifier = Modifier.width(180.dp)
+                            onDismissRequest = { expanded = false },
+                            modifier = Modifier.background(MaterialTheme.colorScheme.surfaceVariant)
                         ) {
-                            OutlinedTextField(
-                                value = searchQuery,
-                                onValueChange = {
-                                    searchQuery = it
-                                    expanded = true
-                                },
-                                label = { Text("Search City", fontSize = 12.sp, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis) },
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                                    unfocusedBorderColor = GlassBorder,
-                                    focusedContainerColor = MaterialTheme.colorScheme.surface,
-                                    unfocusedContainerColor = MaterialTheme.colorScheme.surface
-                                ),
-                                shape = RoundedCornerShape(20.dp),
-                                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable).fillMaxWidth()
+                            DropdownMenuItem(
+                                text = { Text("📍 वर्तमान स्थान (Current GPS)") },
+                                onClick = {
+                                    expanded = false
+                                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                                        ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                                        viewModel.detectGPSLocation(context) { success ->
+                                            if (!success) {
+                                                Toast.makeText(context, "स्थिति प्राप्त करने में असमर्थ (Unable to fetch location)", Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
+                                    } else {
+                                        locationPermissionsLauncher.launch(
+                                            arrayOf(
+                                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                                Manifest.permission.ACCESS_COARSE_LOCATION
+                                            )
+                                        )
+                                    }
+                                }
                             )
 
-                            ExposedDropdownMenu(
-                                expanded = expanded,
-                                onDismissRequest = { expanded = false },
-                                modifier = Modifier.background(MaterialTheme.colorScheme.surfaceVariant)
-                            ) {
+                            filteredCities.forEach { city ->
                                 DropdownMenuItem(
-                                    text = { Text("📍 वर्तमान स्थान (Current GPS)") },
+                                    text = { Text("${city.cityNameHindi} (${city.cityName})") },
                                     onClick = {
+                                        viewModel.setCity(city)
+                                        searchQuery = city.cityNameHindi
                                         expanded = false
-                                        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-                                            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                                            viewModel.detectGPSLocation(context) { success ->
-                                                if (!success) {
-                                                    Toast.makeText(context, "स्थिति प्राप्त करने में असमर्थ (Unable to fetch location)", Toast.LENGTH_SHORT).show()
-                                                }
-                                            }
-                                        } else {
-                                            locationPermissionsLauncher.launch(
-                                                arrayOf(
-                                                    Manifest.permission.ACCESS_FINE_LOCATION,
-                                                    Manifest.permission.ACCESS_COARSE_LOCATION
-                                                )
-                                            )
-                                        }
                                     }
                                 )
-
-                                filteredCities.forEach { city ->
-                                    DropdownMenuItem(
-                                        text = { Text("${city.cityNameHindi} (${city.cityName})") },
-                                        onClick = {
-                                            viewModel.setCity(city)
-                                            searchQuery = city.cityNameHindi
-                                            expanded = false
-                                        }
-                                    )
-                                }
                             }
                         }
                     }
