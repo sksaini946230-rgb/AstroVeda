@@ -52,7 +52,8 @@ fun CelestialBackground(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            Color.Transparent,
+                            MaterialTheme.colorScheme.background.copy(alpha = 0.55f),
+                            MaterialTheme.colorScheme.background.copy(alpha = 0.25f),
                             MaterialTheme.colorScheme.background.copy(alpha = 0.8f),
                             MaterialTheme.colorScheme.background
                         )
