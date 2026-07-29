@@ -154,7 +154,7 @@ fun RashifalScreen(viewModel: MainViewModel) {
         val isHoroscopeLoading by viewModel.isHoroscopeLoading.collectAsState()
         PullToRefreshBox(
             isRefreshing = isHoroscopeLoading,
-            onRefresh = { viewModel.refreshHoroscopes() },
+            onRefresh = { viewModel.refreshHoroscopes(period = selectedPeriod) },
             modifier = Modifier.fillMaxSize().testTag("rashifal_swipe_refresh")
         ) {
             LazyColumn(
@@ -244,6 +244,7 @@ fun RashifalScreen(viewModel: MainViewModel) {
                             .clickable {
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                 selectedPeriod = code
+                                viewModel.loadHoroscopesWithCache(period = code)
                             }
                             .padding(horizontal = 18.dp, vertical = 8.dp)
                             .testTag("period_toggle_$code")
