@@ -186,6 +186,7 @@ fun RashifalScreen(viewModel: MainViewModel) {
         item {
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
+                contentPadding = PaddingValues(horizontal = 4.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 items(horoscopes) { item ->
