@@ -42,6 +42,7 @@ object GeminiAstroService {
                 You are AstroVeda AI - an expert, compassionate Vedic Astrologer (ज्योतिषाचार्य).
                 Provide accurate, insightful, and uplifting Vedic astrology guidance in clear Hindi (with English technical terms in brackets).
                 Focus on planetary remedies (उपाय), gemstones (रत्न), and practical wisdom based on Parashara Jyotish principles.
+                IMPORTANT: Respond in plain text only. Do NOT use Markdown formatting - no headers (###), no bold (**text**), no bullet symbols (*), no horizontal rules (---). Use plain sentences and paragraphs, with line breaks between sections instead of Markdown headers.
             """.trimIndent()
 
             val fullPrompt = if (personDetails.isNotBlank()) {
@@ -70,7 +71,7 @@ object GeminiAstroService {
             val mediaType = "application/json; charset=utf-8".toMediaType()
             val requestBody = jsonBody.toString().toRequestBody(mediaType)
 
-            val url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=$apiKey"
+            val url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=$apiKey"
 
             val request = Request.Builder()
                 .url(url)
@@ -165,7 +166,7 @@ object GeminiAstroService {
             val mediaType = "application/json; charset=utf-8".toMediaType()
             val requestBody = jsonBody.toString().toRequestBody(mediaType)
 
-            val url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=$apiKey"
+            val url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=$apiKey"
 
             val request = Request.Builder()
                 .url(url)

@@ -64,4 +64,25 @@ object TransitCalculator {
         "MONTH" -> "Sun"
         else -> "Moon" // TODAY and WEEK both use Moon
     }
+
+    /** Hindi period phrase used inside reading templates ("आज" / "इस सप्ताह" / "इस माह"). */
+    fun periodWordHi(period: String): String = when (period) {
+        "WEEK" -> "इस सप्ताह"
+        "MONTH" -> "इस माह"
+        else -> "आज"
+    }
+
+    /** English period phrase, lowercase, for mid-sentence use ("today" / "this week" / "this month"). */
+    fun periodWordEn(period: String): String = when (period) {
+        "WEEK" -> "this week"
+        "MONTH" -> "this month"
+        else -> "today"
+    }
+
+    /** English period phrase, capitalized, for sentence-start use ("Today" / "This week" / "This month"). */
+    fun periodWordEnCap(period: String): String = when (period) {
+        "WEEK" -> "This week"
+        "MONTH" -> "This month"
+        else -> "Today"
+    }
 }
