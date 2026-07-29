@@ -52,6 +52,8 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.MenuAnchorType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -238,7 +240,7 @@ fun PanchangScreen(
                                     searchQuery = it
                                     expanded = true
                                 },
-                                label = { Text("Search City", fontSize = 12.sp) },
+                                label = { Text("Search City", fontSize = 12.sp, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis) },
                                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = MaterialTheme.colorScheme.primary,
@@ -247,7 +249,7 @@ fun PanchangScreen(
                                     unfocusedContainerColor = MaterialTheme.colorScheme.surface
                                 ),
                                 shape = RoundedCornerShape(20.dp),
-                                modifier = Modifier.menuAnchor().fillMaxWidth()
+                                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable).fillMaxWidth()
                             )
 
                             ExposedDropdownMenu(

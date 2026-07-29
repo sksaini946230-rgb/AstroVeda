@@ -389,28 +389,6 @@ fun NorthIndianChart(
                 }
             }
 
-            // Center Watermark / Lagna Legend
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(12.dp)
-            ) {
-                Text(
-                    text = "उत्तर भारतीय कुण्डली",
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        color = PremiumGold,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 10.sp
-                    )
-                )
-                Text(
-                    text = "लग्न: ${chartData.ascendantRashiHi}",
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        color = TextSecondaryDark,
-                        fontSize = 9.sp
-                    )
-                )
-            }
-
             // Zoom reset chip overlay when zoomed
             if (userScale > 1.05f) {
                 Surface(
@@ -440,6 +418,28 @@ fun NorthIndianChart(
                     }
                 }
             }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "उत्तर भारतीय कुण्डली",
+                style = MaterialTheme.typography.labelSmall.copy(
+                    color = PremiumGold,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 10.sp
+                )
+            )
+            Text(
+                text = "लग्न: ${chartData.ascendantRashiHi}",
+                style = MaterialTheme.typography.labelSmall.copy(
+                    color = TextSecondaryDark,
+                    fontSize = 9.sp
+                )
+            )
         }
 
         // Selected House Detail Sheet
