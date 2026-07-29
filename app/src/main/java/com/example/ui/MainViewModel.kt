@@ -357,6 +357,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _selectedCity = MutableStateFlow(loadCityFromPrefs())
     val selectedCity: StateFlow<CityLocation> = _selectedCity.asStateFlow()
 
+    fun hasUserSetCity(): Boolean = sharedPrefs.contains("city_name")
+
     private fun loadCityFromPrefs(): CityLocation {
         val lat = sharedPrefs.getFloat("city_lat", 26.9124f).toDouble()
         val lon = sharedPrefs.getFloat("city_lon", 75.7873f).toDouble()

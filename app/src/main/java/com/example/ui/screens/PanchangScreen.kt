@@ -62,6 +62,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -147,6 +148,23 @@ fun PanchangScreen(
         }
     }
 
+    // Auto-detect location on first launch if user has never set a city
+    LaunchedEffect(Unit) {
+        if (!viewModel.hasUserSetCity()) {
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                viewModel.detectGPSLocation(context) { }
+            } else {
+                locationPermissionsLauncher.launch(
+                    arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    )
+                )
+            }
+        }
+    }
+
     val isStartupComplete by viewModel.isStartupComplete.collectAsState()
 
     CelestialBackground(deferred = !isStartupComplete) {
@@ -225,7 +243,7 @@ fun PanchangScreen(
 
                     // City Location Picker Pill
                     var expanded by remember { mutableStateOf(false) }
-                    var searchQuery by remember(selectedCity) { mutableStateOf(selectedCity.cityNameHindi) }
+                    var searchQuery by remember(selectedCity) { mutableStateOf(if (viewModel.hasUserSetCity()) selectedCity.cityNameHindi else "") }
                     val cities = PanchangCalculator.popularCities
                     val filteredCities = if (searchQuery.isBlank()) {
                         cities
@@ -244,7 +262,7 @@ fun PanchangScreen(
                                 searchQuery = it
                                 expanded = true
                             },
-                            label = { Text("Search City", fontSize = 12.sp, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis) },
+                            label = { Text(LanguageManager.getString("स्थान चुनें", "Choose Location"), fontSize = 12.sp, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis) },
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = MaterialTheme.colorScheme.primary,
