@@ -232,7 +232,7 @@ fun PanchangScreen(
                                 text = "${panchang.dayOfWeekHindi} | ${panchang.pakshaHindi}",
                                 style = MaterialTheme.typography.bodyMedium.copy(
                                     color = MaterialTheme.colorScheme.onSurface,
-                                    fontWeight = FontWeight.SemiBold
+                                    fontWeight = FontWeight.Normal
                                 )
                             )
                         }
@@ -701,7 +701,7 @@ fun PanchangScreen(
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Text(
                                     text = time,
-                                    style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                                    style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Normal, fontSize = 15.sp)
                                 )
                             }
 
@@ -756,7 +756,7 @@ fun PanchangScreen(
                         Text(
                             text = "दिन (Day)",
                             style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Normal,
                                 color = if (isChoghadiyaDaytime) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
                                 fontSize = 11.sp
                             )
@@ -778,7 +778,7 @@ fun PanchangScreen(
                         Text(
                             text = "रात (Night)",
                             style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Normal,
                                 color = if (!isChoghadiyaDaytime) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
                                 fontSize = 11.sp
                             )
@@ -819,7 +819,7 @@ fun PanchangScreen(
                                 text = slot.type.natureHi,
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     color = statusColor,
-                                    fontWeight = FontWeight.Bold,
+                                    fontWeight = FontWeight.Normal,
                                     fontSize = 11.sp
                                 )
                             )
@@ -886,7 +886,7 @@ fun PanchangScreen(
                                 text = "पूर्ण कुण्डली देखें →",
                                 style = MaterialTheme.typography.labelMedium.copy(
                                     color = PremiumGold,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Normal
                                 )
                             )
                         }
@@ -1023,7 +1023,7 @@ fun TimingColumn(title: String, time: String, icon: ImageVector, iconColor: Colo
         Icon(imageVector = icon, contentDescription = null, tint = iconColor, modifier = Modifier.size(24.dp))
         Spacer(modifier = Modifier.height(4.dp))
         Text(text = title, style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp))
-        Text(text = time, style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold, fontSize = 14.sp))
+        Text(text = time, style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Normal, fontSize = 14.sp))
     }
 }
 
@@ -1047,7 +1047,7 @@ fun MuhuratTimeRow(titleHi: String, timeStr: String, statusText: String, color: 
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = timeStr,
-                    style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                    style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Normal, fontSize = 15.sp)
                 )
             }
 
@@ -1126,7 +1126,7 @@ fun PlanetaryPositionsCard(planets: List<com.example.data.model.PlanetPosition>)
                                     style = MaterialTheme.typography.labelSmall.copy(
                                         color = InauspiciousRed,
                                         fontSize = 11.sp,
-                                        fontWeight = FontWeight.Bold
+                                        fontWeight = FontWeight.Normal
                                     )
                                 )
                             }

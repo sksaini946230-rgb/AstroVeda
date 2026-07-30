@@ -152,7 +152,7 @@ fun GlassBadge(
         Text(
             text = text,
             style = MaterialTheme.typography.labelSmall.copy(
-                fontWeight = FontWeight.SemiBold,
+                fontWeight = FontWeight.Normal,
                 color = textColor,
                 fontSize = 12.sp
             )

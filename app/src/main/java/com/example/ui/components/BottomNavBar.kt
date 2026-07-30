@@ -96,7 +96,7 @@ fun BottomNavBar(
                         text = localizedTitle,
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontSize = 10.sp,
-                            fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Medium,
+                            fontWeight = if (isSelected) FontWeight.Normal else FontWeight.Medium,
                             letterSpacing = 0.2.sp
                         ),
                         maxLines = 1

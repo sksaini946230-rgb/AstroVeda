@@ -157,7 +157,7 @@ fun SouthIndianChart(
                                             text = "दक्षिण भारतीय कुण्डली",
                                             style = MaterialTheme.typography.labelSmall.copy(
                                                 color = PremiumGold,
-                                                fontWeight = FontWeight.Bold,
+                                                fontWeight = FontWeight.Normal,
                                                 fontSize = 11.sp
                                             )
                                         )
@@ -189,7 +189,7 @@ fun SouthIndianChart(
                                             style = MaterialTheme.typography.labelSmall.copy(
                                                 color = TextGold,
                                                 fontSize = 9.sp,
-                                                fontWeight = FontWeight.Bold
+                                                fontWeight = FontWeight.Normal
                                             )
                                         )
                                         if (isLagna) {
@@ -197,7 +197,7 @@ fun SouthIndianChart(
                                                 text = " [ल]",
                                                 style = MaterialTheme.typography.labelSmall.copy(
                                                     color = DateOrange,
-                                                    fontWeight = FontWeight.ExtraBold,
+                                                    fontWeight = FontWeight.Normal,
                                                     fontSize = 9.sp
                                                 )
                                             )
@@ -209,7 +209,7 @@ fun SouthIndianChart(
                                         style = MaterialTheme.typography.bodySmall.copy(
                                             color = TextPrimaryDark,
                                             fontSize = 9.sp,
-                                            fontWeight = FontWeight.SemiBold
+                                            fontWeight = FontWeight.Normal
                                         )
                                     )
                                 }
@@ -243,7 +243,7 @@ fun SouthIndianChart(
                         style = MaterialTheme.typography.labelSmall.copy(
                             color = TextGold,
                             fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Normal
                         )
                     )
                 }

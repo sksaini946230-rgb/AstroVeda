@@ -115,7 +115,7 @@ fun DashaHorizontalTimeline(
                         style = MaterialTheme.typography.labelSmall.copy(
                             color = TextGold,
                             fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Normal
                         ),
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
@@ -204,7 +204,7 @@ fun DashaHorizontalTimeline(
                                             text = "सक्रिय",
                                             style = MaterialTheme.typography.labelSmall.copy(
                                                 color = TextGold,
-                                                fontWeight = FontWeight.Bold,
+                                                fontWeight = FontWeight.Normal,
                                                 fontSize = 10.sp
                                             )
                                         )
@@ -266,7 +266,7 @@ fun DashaHorizontalTimeline(
                                         text = "${dasha.durationYears} वर्ष",
                                         style = MaterialTheme.typography.labelSmall.copy(
                                             color = if (isCurrent) DateOrange else MaterialTheme.colorScheme.onSurfaceVariant,
-                                            fontWeight = FontWeight.SemiBold,
+                                            fontWeight = FontWeight.Normal,
                                             fontSize = 11.sp
                                         ),
                                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
@@ -348,7 +348,7 @@ fun DashaHorizontalTimeline(
                                     text = "★ वर्तमान प्रभाव",
                                     style = MaterialTheme.typography.labelSmall.copy(
                                         color = DateOrange,
-                                        fontWeight = FontWeight.Bold,
+                                        fontWeight = FontWeight.Normal,
                                         fontSize = 10.sp
                                     ),
                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -362,7 +362,7 @@ fun DashaHorizontalTimeline(
                             text = "अंतर्दशा विवरण (Bhukti Sub-periods):",
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.secondary,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Normal,
                                 fontSize = 12.sp
                             ),
                             modifier = Modifier.padding(top = 4.dp)
@@ -385,7 +385,7 @@ fun DashaHorizontalTimeline(
                                     text = "• ${sub.planetHi} (${sub.planetEn})",
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         color = if (sub.isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                                        fontWeight = if (sub.isCurrent) FontWeight.Bold else FontWeight.Normal,
+                                        fontWeight = if (sub.isCurrent) FontWeight.Normal else FontWeight.Normal,
                                         fontSize = 12.sp
                                     )
                                 )
@@ -393,7 +393,7 @@ fun DashaHorizontalTimeline(
                                     text = "${sub.startDate} - ${sub.endDate} (${sub.durationMonths} माह)",
                                     style = MaterialTheme.typography.labelSmall.copy(
                                         color = if (sub.isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                                        fontWeight = if (sub.isCurrent) FontWeight.Bold else FontWeight.Normal,
+                                        fontWeight = if (sub.isCurrent) FontWeight.Normal else FontWeight.Normal,
                                         fontSize = 11.sp
                                     )
                                 )

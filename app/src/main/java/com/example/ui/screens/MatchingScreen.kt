@@ -281,7 +281,7 @@ fun MatchingScreen(viewModel: MainViewModel) {
                     Text(
                         text = "${gunaResult.boyName} ♥ ${gunaResult.girlName}",
                         style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.ExtraBold,
+                            fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary,
                             fontSize = 18.sp
                         )
@@ -292,7 +292,7 @@ fun MatchingScreen(viewModel: MainViewModel) {
                     Text(
                         text = "${gunaResult.totalObtainedGuna} / 36.0",
                         style = MaterialTheme.typography.displayMedium.copy(
-                            fontWeight = FontWeight.ExtraBold,
+                            fontWeight = FontWeight.Bold,
                             color = if (gunaResult.totalObtainedGuna >= 18) AuspiciousGreen else InauspiciousRed
                         )
                     )
@@ -418,9 +418,9 @@ fun MatchingScreen(viewModel: MainViewModel) {
                             .padding(bottom = 6.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(text = "कूट (Koota)", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 13.sp), modifier = Modifier.weight(1.5f))
-                        Text(text = "अधिकतम", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 13.sp), modifier = Modifier.weight(1f))
-                        Text(text = "प्राप्त", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 13.sp), modifier = Modifier.weight(1f))
+                        Text(text = "कूट (Koota)", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Normal, fontSize = 13.sp), modifier = Modifier.weight(1.5f))
+                        Text(text = "अधिकतम", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Normal, fontSize = 13.sp), modifier = Modifier.weight(1f))
+                        Text(text = "प्राप्त", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Normal, fontSize = 13.sp), modifier = Modifier.weight(1f))
                     }
 
                     gunaResult.kootDetails.forEach { koot ->
@@ -431,7 +431,7 @@ fun MatchingScreen(viewModel: MainViewModel) {
                         ) {
                             Text(text = koot.kootNameHi, style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp), modifier = Modifier.weight(1.5f))
                             Text(text = "${koot.maxPoints}", style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp), modifier = Modifier.weight(1f))
-                            Text(text = "${koot.obtainedPoints}", style = MaterialTheme.typography.bodySmall.copy(color = AuspiciousGreen, fontWeight = FontWeight.Bold, fontSize = 14.sp), modifier = Modifier.weight(1f))
+                            Text(text = "${koot.obtainedPoints}", style = MaterialTheme.typography.bodySmall.copy(color = AuspiciousGreen, fontWeight = FontWeight.Normal, fontSize = 14.sp), modifier = Modifier.weight(1f))
                         }
                     }
                 }

@@ -412,7 +412,7 @@ fun NorthIndianChart(
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = TextGold,
                                 fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Normal
                             )
                         )
                     }
@@ -429,7 +429,7 @@ fun NorthIndianChart(
                 text = "उत्तर भारतीय कुण्डली",
                 style = MaterialTheme.typography.labelSmall.copy(
                     color = PremiumGold,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Normal,
                     fontSize = 10.sp
                 )
             )
@@ -476,7 +476,7 @@ fun NorthIndianChart(
                             text = "राशि: $rashiName ($rashiNum)",
                             style = MaterialTheme.typography.bodySmall.copy(
                                 color = PremiumGold,
-                                fontWeight = FontWeight.SemiBold
+                                fontWeight = FontWeight.Normal
                             )
                         )
                     }
@@ -500,7 +500,7 @@ fun NorthIndianChart(
                             text = "स्थित ग्रह: ",
                             style = MaterialTheme.typography.bodySmall.copy(
                                 color = TextPrimaryDark,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Normal,
                                 fontSize = 11.sp
                             )
                         )
@@ -509,7 +509,7 @@ fun NorthIndianChart(
                                 text = planets.joinToString(", "),
                                 style = MaterialTheme.typography.bodySmall.copy(
                                     color = DateOrange,
-                                    fontWeight = FontWeight.Bold,
+                                    fontWeight = FontWeight.Normal,
                                     fontSize = 12.sp
                                 )
                             )
@@ -520,7 +520,7 @@ fun NorthIndianChart(
                                     color = TextSecondaryDark,
                                     fontSize = 11.sp,
                                     fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
-                                    fontWeight = FontWeight.Medium
+                                    fontWeight = FontWeight.Normal
                                 )
                             )
                         }

@@ -43,7 +43,7 @@ fun OfflineStatusChip(text: String = "Offline Mode: Showing Cached Content") {
                 text = text,
                 style = MaterialTheme.typography.labelSmall.copy(
                     color = MaterialTheme.colorScheme.secondary,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Normal,
                     fontSize = 10.sp
                 )
             )

@@ -143,10 +143,10 @@ fun TransitScreen(viewModel: MainViewModel) {
                 if (transit != null) {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         Row(modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp)) {
-                            Text(text = LanguageManager.getString("ग्रह", "Planet"), style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 13.sp), modifier = Modifier.weight(1f))
-                            Text(text = LanguageManager.getString("जन्म राशि", "Birth"), style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 13.sp), modifier = Modifier.weight(1f))
-                            Text(text = LanguageManager.getString("गोचर राशि", "Transit"), style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 13.sp), modifier = Modifier.weight(1f))
-                            Text(text = LanguageManager.getString("भाव", "House"), style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 13.sp), modifier = Modifier.weight(0.8f))
+                            Text(text = LanguageManager.getString("ग्रह", "Planet"), style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Normal, fontSize = 13.sp), modifier = Modifier.weight(1f))
+                            Text(text = LanguageManager.getString("जन्म राशि", "Birth"), style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Normal, fontSize = 13.sp), modifier = Modifier.weight(1f))
+                            Text(text = LanguageManager.getString("गोचर राशि", "Transit"), style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Normal, fontSize = 13.sp), modifier = Modifier.weight(1f))
+                            Text(text = LanguageManager.getString("भाव", "House"), style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Normal, fontSize = 13.sp), modifier = Modifier.weight(0.8f))
                         }
                         
                         transit.planets.forEach { transitPlanet ->
@@ -155,7 +155,7 @@ fun TransitScreen(viewModel: MainViewModel) {
                             Row(modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Text(text = LanguageManager.getString(transitPlanet.planetNameHi.substringBefore(" "), transitPlanet.planetNameEn), style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp), modifier = Modifier.weight(1f))
                                 Text(text = birthPlanet?.rashiNameHi ?: "-", style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 13.sp), modifier = Modifier.weight(1f))
-                                Text(text = transitPlanet.rashiNameHi, style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Bold), modifier = Modifier.weight(1f))
+                                Text(text = transitPlanet.rashiNameHi, style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Normal), modifier = Modifier.weight(1f))
                                 
                                 // House of transit relative to birth Lagna
                                 val transitHouse = ((transitPlanet.rashiNumber - birthKundali.ascendantRashiNumber + 12) % 12) + 1
@@ -584,7 +584,7 @@ fun KundaliScreen(
                                     text = LanguageManager.getString("उत्तर भारतीय (North)", "North Indian"),
                                     style = MaterialTheme.typography.labelSmall.copy(
                                         color = if (isNorthStyle) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
-                                        fontWeight = if (isNorthStyle) FontWeight.Bold else FontWeight.Normal
+                                        fontWeight = if (isNorthStyle) FontWeight.Normal else FontWeight.Normal
                                     )
                                 )
                             }
@@ -601,7 +601,7 @@ fun KundaliScreen(
                                     text = LanguageManager.getString("दक्षिण भारतीय (South)", "South Indian"),
                                     style = MaterialTheme.typography.labelSmall.copy(
                                         color = if (!isNorthStyle) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
-                                        fontWeight = if (!isNorthStyle) FontWeight.Bold else FontWeight.Normal
+                                        fontWeight = if (!isNorthStyle) FontWeight.Normal else FontWeight.Normal
                                     )
                                 )
                             }
@@ -680,7 +680,7 @@ fun KundaliScreen(
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
                                         text = LanguageManager.getString("कुण्डली चित्र शेयर करें", "Share Chart Image"),
-                                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
+                                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Normal)
                                     )
                                 }
                             }
@@ -701,17 +701,17 @@ fun KundaliScreen(
             GlassCard(modifier = Modifier.fillMaxWidth()) {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Row(modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp)) {
-                        Text(text = LanguageManager.getString("ग्रह", "Planet"), style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 13.sp), modifier = Modifier.weight(1f))
-                        Text(text = LanguageManager.getString("राशि", "Zodiac"), style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 13.sp), modifier = Modifier.weight(1.2f))
-                        Text(text = LanguageManager.getString("अंश", "Deg"), style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 13.sp), modifier = Modifier.weight(1f))
-                        Text(text = LanguageManager.getString("भाव", "House"), style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 13.sp), modifier = Modifier.weight(1f))
+                        Text(text = LanguageManager.getString("ग्रह", "Planet"), style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Normal, fontSize = 13.sp), modifier = Modifier.weight(1f))
+                        Text(text = LanguageManager.getString("राशि", "Zodiac"), style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Normal, fontSize = 13.sp), modifier = Modifier.weight(1.2f))
+                        Text(text = LanguageManager.getString("अंश", "Deg"), style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Normal, fontSize = 13.sp), modifier = Modifier.weight(1f))
+                        Text(text = LanguageManager.getString("भाव", "House"), style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Normal, fontSize = 13.sp), modifier = Modifier.weight(1f))
                     }
                     
                     kundali.planets.forEach { planet ->
                         Row(modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
                             Text(text = LanguageManager.getString(planet.planetNameHi.substringBefore(" "), planet.planetNameEn), style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp), modifier = Modifier.weight(1f))
                             Text(text = planet.rashiNameHi, style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp), modifier = Modifier.weight(1.2f))
-                            Text(text = "${planet.degree}°", style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.primary, fontSize = 14.sp, fontWeight = FontWeight.SemiBold), modifier = Modifier.weight(1f))
+                            Text(text = "${planet.degree}°", style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.primary, fontSize = 14.sp, fontWeight = FontWeight.Normal), modifier = Modifier.weight(1f))
                             Text(text = "${planet.houseNumber} भाव", style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp), modifier = Modifier.weight(1f))
                         }
                     }

@@ -159,7 +159,7 @@ fun ErrorStateUI(
                     style = MaterialTheme.typography.titleMedium.copy(
                         color = MaterialTheme.colorScheme.primary.copy(alpha = 0.85f),
                         fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium,
+                        fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
                     )
                 )

@@ -155,7 +155,7 @@ fun DailyPanchangCard(
                             text = locationName.ifBlank { panchang.locationName },
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.onSurface,
-                                fontWeight = FontWeight.SemiBold,
+                                fontWeight = FontWeight.Normal,
                                 fontSize = 11.sp
                             )
                         )
@@ -191,7 +191,7 @@ fun DailyPanchangCard(
                                     text = LanguageManager.getString("सूर्योदय", "SUNRISE"),
                                     style = MaterialTheme.typography.labelSmall.copy(
                                         color = MinimalistGold,
-                                        fontWeight = FontWeight.Bold,
+                                        fontWeight = FontWeight.Normal,
                                         fontSize = 10.sp
                                     )
                                 )
@@ -229,7 +229,7 @@ fun DailyPanchangCard(
                                     text = LanguageManager.getString("सूर्यास्त", "SUNSET"),
                                     style = MaterialTheme.typography.labelSmall.copy(
                                         color = NeutralOrange,
-                                        fontWeight = FontWeight.Bold,
+                                        fontWeight = FontWeight.Normal,
                                         fontSize = 10.sp
                                     )
                                 )
@@ -262,7 +262,7 @@ fun DailyPanchangCard(
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontSize = 10.sp,
-                                fontWeight = FontWeight.SemiBold
+                                fontWeight = FontWeight.Normal
                             )
                         )
                         Text(
@@ -291,7 +291,7 @@ fun DailyPanchangCard(
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontSize = 10.sp,
-                                fontWeight = FontWeight.SemiBold
+                                fontWeight = FontWeight.Normal
                             )
                         )
                         Text(
@@ -341,7 +341,7 @@ fun DailyPanchangCard(
                                         text = LanguageManager.getString("चंद्र कला (Moon Phase)", "MOON PHASE"),
                                         style = MaterialTheme.typography.labelSmall.copy(
                                             color = MaterialTheme.colorScheme.primary,
-                                            fontWeight = FontWeight.Bold,
+                                            fontWeight = FontWeight.Normal,
                                             fontSize = 9.sp
                                         )
                                     )
@@ -382,7 +382,7 @@ fun DailyPanchangCard(
                                 text = "${moonPhaseInfo.illuminationPercent}%",
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     color = MaterialTheme.colorScheme.primary,
-                                    fontWeight = FontWeight.Bold,
+                                    fontWeight = FontWeight.Normal,
                                     fontSize = 11.sp
                                 )
                             )

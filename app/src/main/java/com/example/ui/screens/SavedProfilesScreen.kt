@@ -669,7 +669,7 @@ fun CloudBackupCard(
                         ) {
                             Text(
                                 text = LanguageManager.getString("पुनर्प्राप्त (Restore)", "Restore"),
-                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal)
                             )
                         }
                     }

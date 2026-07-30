@@ -105,7 +105,7 @@ fun OnboardingScreen(
                 Text(
                     text = "छोड़ें (Skip)",
                     style = MaterialTheme.typography.labelSmall.copy(
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Normal,
                         color = MaterialTheme.colorScheme.primary,
                         fontSize = 12.sp
                     )
@@ -189,7 +189,7 @@ fun WelcomeOnboardingPage() {
         Text(
             text = "AstroVeda",
             style = MaterialTheme.typography.displayMedium.copy(
-                fontWeight = FontWeight.ExtraBold,
+                fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
                 letterSpacing = 1.sp
             )
@@ -276,7 +276,7 @@ fun RashiSelectOnboardingPage(viewModel: MainViewModel) {
                         Text(
                             text = item.rashiNameHi.substringBefore(" "),
                             style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Normal,
                                 color = if (isSelected) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.primary,
                                 fontSize = 13.sp
                             )

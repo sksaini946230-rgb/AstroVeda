@@ -99,7 +99,7 @@ fun PremiumDialog(
                 Text(
                     text = "AstroVeda PRO Gold",
                     style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.ExtraBold,
+                        fontWeight = FontWeight.Bold,
                         color = PremiumGold,
                         fontSize = 22.sp
                     )
@@ -148,7 +148,7 @@ fun FeatureRow(text: String) {
             text = text,
             style = MaterialTheme.typography.bodySmall.copy(
                 color = MaterialTheme.colorScheme.onSurface,
-                fontWeight = FontWeight.SemiBold,
+                fontWeight = FontWeight.Normal,
                 fontSize = 13.sp
             )
         )

@@ -207,7 +207,7 @@ fun RashifalScreen(viewModel: MainViewModel) {
                             Text(
                                 text = LanguageManager.getString(item.rashiNameHi.substringBefore(" "), item.rashiNameEn),
                                 style = MaterialTheme.typography.labelMedium.copy(
-                                    fontWeight = FontWeight.Bold,
+                                    fontWeight = FontWeight.Normal,
                                     color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
                                     fontSize = 13.sp
                                 )
@@ -246,7 +246,7 @@ fun RashifalScreen(viewModel: MainViewModel) {
                         Text(
                             text = label,
                             style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Normal,
                                 color = if (isSelected) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.primary,
                                 fontSize = 12.sp
                             )
@@ -268,7 +268,7 @@ fun RashifalScreen(viewModel: MainViewModel) {
                     text = "👈 कार्ड स्वाइप करें (Swipe for Next Rashi) 👉",
                     style = MaterialTheme.typography.labelSmall.copy(
                         color = MaterialTheme.colorScheme.secondary,
-                        fontWeight = FontWeight.SemiBold,
+                        fontWeight = FontWeight.Normal,
                         fontSize = 11.sp
                     )
                 )
@@ -414,7 +414,7 @@ fun RashifalScreen(viewModel: MainViewModel) {
                                         text = "📅 $dateRangeText",
                                         style = MaterialTheme.typography.labelMedium.copy(
                                             color = MaterialTheme.colorScheme.secondary,
-                                            fontWeight = FontWeight.SemiBold,
+                                            fontWeight = FontWeight.Normal,
                                             fontSize = 11.sp
                                         )
                                     )
@@ -653,7 +653,7 @@ fun AnimatedStarScoreDisplay(rating: Int) {
         Text(
             text = "$rating / 5",
             style = MaterialTheme.typography.labelSmall.copy(
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.Normal,
                 color = MaterialTheme.colorScheme.primary,
                 fontSize = 11.sp
             )

@@ -219,8 +219,8 @@ fun NumerologyScreen(viewModel: MainViewModel) {
                     GlassCard(modifier = Modifier.fillMaxWidth()) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(text = "मूलांक (Moolank)", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 13.sp))
-                            Text(text = "${numData.moolank}", style = MaterialTheme.typography.displayMedium.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.ExtraBold))
-                            Text(text = "स्वामी: ${numData.rulingPlanetHi}", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.secondary, fontSize = 12.sp, fontWeight = FontWeight.Bold))
+                            Text(text = "${numData.moolank}", style = MaterialTheme.typography.displayMedium.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold))
+                            Text(text = "स्वामी: ${numData.rulingPlanetHi}", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.secondary, fontSize = 12.sp, fontWeight = FontWeight.Normal))
                         }
                     }
                 }
@@ -232,8 +232,8 @@ fun NumerologyScreen(viewModel: MainViewModel) {
                     GlassCard(modifier = Modifier.fillMaxWidth()) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(text = "भाग्यांक (Bhagyank)", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 13.sp))
-                            Text(text = "${numData.bhagyank}", style = MaterialTheme.typography.displayMedium.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.ExtraBold))
-                            Text(text = "नाम अंक: ${numData.nameNumber}", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.secondary, fontSize = 12.sp, fontWeight = FontWeight.Bold))
+                            Text(text = "${numData.bhagyank}", style = MaterialTheme.typography.displayMedium.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold))
+                            Text(text = "नाम अंक: ${numData.nameNumber}", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.secondary, fontSize = 12.sp, fontWeight = FontWeight.Normal))
                         }
                     }
                 }
@@ -256,7 +256,7 @@ fun NumerologyScreen(viewModel: MainViewModel) {
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
                         text = numData.luckyDaysHi,
-                        style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                        style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Normal, fontSize = 13.sp)
                     )
                 }
             }
@@ -295,7 +295,7 @@ fun NumerologyScreen(viewModel: MainViewModel) {
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.primary,
                                 fontSize = 13.sp,
-                                fontWeight = FontWeight.Medium
+                                fontWeight = FontWeight.Normal
                             )
                         )
                     }
@@ -355,7 +355,7 @@ fun NumerologyScreen(viewModel: MainViewModel) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(imageVector = Icons.Default.AutoAwesome, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text(text = "ज्योतिषाचार्य का उत्तर:", style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 14.sp))
+                                    Text(text = "ज्योतिषाचार्य का उत्तर:", style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Normal, fontSize = 14.sp))
                                 }
                                 if (isAiOffline) {
                                     Spacer(modifier = Modifier.height(4.dp))

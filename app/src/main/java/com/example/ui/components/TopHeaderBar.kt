@@ -94,7 +94,7 @@ fun FirestoreSyncIndicator(isSyncing: Boolean, modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.labelSmall.copy(
                     color = MaterialTheme.colorScheme.primary,
                     fontSize = 9.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Normal
                 )
             )
         }
@@ -138,7 +138,7 @@ fun FirestoreSyncIndicator(isSyncing: Boolean, modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.labelSmall.copy(
                     color = Color(0xFF81C784),
                     fontSize = 9.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Normal
                 )
             )
         }
@@ -200,7 +200,7 @@ fun TopHeaderBar(
                     Text(
                         text = "AstroVeda",
                         style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.ExtraBold,
+                            fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary,
                             fontSize = 20.sp,
                             letterSpacing = 0.5.sp
@@ -215,7 +215,7 @@ fun TopHeaderBar(
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontSize = 11.sp,
-                                fontWeight = FontWeight.Medium
+                                fontWeight = FontWeight.Normal
                             ),
                             modifier = Modifier.weight(1f, fill = false)
                         )
@@ -247,7 +247,7 @@ fun TopHeaderBar(
                         Text(
                             text = if (LanguageManager.currentLanguage == AppLanguage.HINDI) "ENG" else "हिन्दी",
                             style = MaterialTheme.typography.labelMedium.copy(
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Normal,
                                 color = MaterialTheme.colorScheme.primary,
                                 fontSize = 11.sp
                             ),
@@ -281,7 +281,7 @@ fun TopHeaderBar(
                             Text(
                                 text = "PRO",
                                 style = MaterialTheme.typography.labelMedium.copy(
-                                    fontWeight = FontWeight.ExtraBold,
+                                    fontWeight = FontWeight.Normal,
                                     color = Color(0xFF1C1C1E),
                                     fontSize = 11.sp
                                 )

@@ -108,7 +108,7 @@ fun MuhuratScreen(viewModel: MainViewModel) {
                         Text(
                             text = LanguageManager.getString("दिन का चौघड़िया (Day)", "Day Choghadiya"),
                             style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Normal,
                                 color = if (isDaytime) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
                                 fontSize = 12.sp
                             )
@@ -140,7 +140,7 @@ fun MuhuratScreen(viewModel: MainViewModel) {
                         Text(
                             text = LanguageManager.getString("रात का चौघड़िया (Night)", "Night Choghadiya"),
                             style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Normal,
                                 color = if (!isDaytime) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
                                 fontSize = 12.sp
                             )
@@ -209,7 +209,7 @@ fun ChoghadiyaRow(slot: ChoghadiyaSlot) {
                         text = "(${slot.type.natureHi})",
                         style = MaterialTheme.typography.labelSmall.copy(
                             color = statusColor,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.Normal,
                             fontSize = 12.sp
                         )
                     )
@@ -266,7 +266,7 @@ fun EventMuhuratCard(item: MuhuratItem) {
                 text = "${item.dateString} (${item.dayOfWeekHi}) | ${item.startTime} - ${item.endTime}",
                 style = MaterialTheme.typography.labelMedium.copy(
                     color = MaterialTheme.colorScheme.secondary,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Normal,
                     fontSize = 14.sp
                 )
             )

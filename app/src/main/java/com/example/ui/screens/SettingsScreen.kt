@@ -236,7 +236,7 @@ fun SettingsScreen(
                             text = "अभी PRO अपग्रेड करें • ₹99/माह",
                             style = MaterialTheme.typography.labelMedium.copy(
                                 color = Color(0xFF1C1C1E),
-                                fontWeight = FontWeight.ExtraBold,
+                                fontWeight = FontWeight.Normal,
                                 fontSize = 13.sp
                             )
                         )
@@ -296,7 +296,7 @@ fun SettingsScreen(
                             Text(
                                 text = if (LanguageManager.currentLanguage == AppLanguage.HINDI) "English ⇄" else "हिन्दी ⇄",
                                 style = MaterialTheme.typography.labelMedium.copy(
-                                    fontWeight = FontWeight.Bold,
+                                    fontWeight = FontWeight.Normal,
                                     color = MaterialTheme.colorScheme.primary,
                                     fontSize = 12.sp
                                 )
@@ -360,7 +360,7 @@ fun SettingsScreen(
                         Text(
                             text = "बदलें (Change)",
                             style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Normal,
                                 color = MaterialTheme.colorScheme.secondary,
                                 fontSize = 11.sp
                             )
@@ -439,7 +439,7 @@ fun SettingsScreen(
                                     Text(
                                         text = "GPS",
                                         style = MaterialTheme.typography.labelSmall.copy(
-                                            fontWeight = FontWeight.Bold,
+                                            fontWeight = FontWeight.Normal,
                                             color = MaterialTheme.colorScheme.primary,
                                             fontSize = 11.sp
                                         )
@@ -463,7 +463,7 @@ fun SettingsScreen(
                                 Text(
                                     text = "शहर खोजें",
                                     style = MaterialTheme.typography.labelSmall.copy(
-                                        fontWeight = FontWeight.Bold,
+                                        fontWeight = FontWeight.Normal,
                                         color = MaterialTheme.colorScheme.primary,
                                         fontSize = 11.sp
                                     )
@@ -490,7 +490,7 @@ fun SettingsScreen(
                                 text = "समय प्रारूप (Panchang Time Format)",
                                 style = MaterialTheme.typography.bodyMedium.copy(
                                     color = MaterialTheme.colorScheme.onSurface,
-                                    fontWeight = FontWeight.SemiBold,
+                                    fontWeight = FontWeight.Normal,
                                     fontSize = 13.sp
                                 )
                             )
@@ -570,7 +570,7 @@ fun SettingsScreen(
                                 text = "दैनिक राहुकाल एवं पंचांग अलर्ट",
                                 style = MaterialTheme.typography.bodyMedium.copy(
                                     color = MaterialTheme.colorScheme.onSurface,
-                                    fontWeight = FontWeight.SemiBold,
+                                    fontWeight = FontWeight.Normal,
                                     fontSize = 13.sp
                                 )
                             )
@@ -583,7 +583,7 @@ fun SettingsScreen(
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         color = MaterialTheme.colorScheme.primary,
                                         fontSize = 12.sp,
-                                        fontWeight = FontWeight.Bold
+                                        fontWeight = FontWeight.Normal
                                     ),
                                     modifier = Modifier.clickable {
                                         android.app.TimePickerDialog(
@@ -634,7 +634,7 @@ fun SettingsScreen(
                                 text = "त्योहार व व्रत रिमाइंडर (Festival Reminders)",
                                 style = MaterialTheme.typography.bodyMedium.copy(
                                     color = MaterialTheme.colorScheme.onSurface,
-                                    fontWeight = FontWeight.SemiBold,
+                                    fontWeight = FontWeight.Normal,
                                     fontSize = 13.sp
                                 )
                             )
@@ -673,7 +673,7 @@ fun SettingsScreen(
                                 text = "शुभ मुहूर्त एवं चौघड़िया अलर्ट (Muhurta Alerts)",
                                 style = MaterialTheme.typography.bodyMedium.copy(
                                     color = MaterialTheme.colorScheme.onSurface,
-                                    fontWeight = FontWeight.SemiBold,
+                                    fontWeight = FontWeight.Normal,
                                     fontSize = 13.sp
                                 )
                             )
@@ -765,7 +765,7 @@ fun SettingsScreen(
                                     text = "Offline Mode: AI offline, showing cached news",
                                     style = MaterialTheme.typography.labelSmall.copy(
                                         color = MaterialTheme.colorScheme.secondary,
-                                        fontWeight = FontWeight.Bold,
+                                        fontWeight = FontWeight.Normal,
                                         fontSize = 11.sp
                                     ),
                                     modifier = Modifier.padding(bottom = 8.dp)
@@ -831,7 +831,7 @@ fun SettingsScreen(
                                     text = "रीफ्रेश समाचार (Live Search)",
                                     style = MaterialTheme.typography.labelSmall.copy(
                                         color = MaterialTheme.colorScheme.primary,
-                                        fontWeight = FontWeight.Bold,
+                                        fontWeight = FontWeight.Normal,
                                         fontSize = 11.sp
                                     )
                                 )
@@ -904,7 +904,7 @@ fun SettingsScreen(
                                 text = "प्ले स्टोर पर 5★ रेटिंग दें (Rate Us on Play Store)",
                                 style = MaterialTheme.typography.labelMedium.copy(
                                     color = MaterialTheme.colorScheme.primary,
-                                    fontWeight = FontWeight.Bold,
+                                    fontWeight = FontWeight.Normal,
                                     fontSize = 12.sp
                                 )
                             )
@@ -958,7 +958,7 @@ fun SettingsScreen(
                                     text = "गोपनीयता नीति",
                                     style = MaterialTheme.typography.labelMedium.copy(
                                         color = MaterialTheme.colorScheme.primary,
-                                        fontWeight = FontWeight.SemiBold,
+                                        fontWeight = FontWeight.Normal,
                                         fontSize = 12.sp
                                     )
                                 )
@@ -993,7 +993,7 @@ fun SettingsScreen(
                                     text = "सेवा शर्तें (Terms)",
                                     style = MaterialTheme.typography.labelMedium.copy(
                                         color = MaterialTheme.colorScheme.secondary,
-                                        fontWeight = FontWeight.SemiBold,
+                                        fontWeight = FontWeight.Normal,
                                         fontSize = 12.sp
                                     )
                                 )
@@ -1066,7 +1066,7 @@ fun SettingsScreen(
                                 text = if (currentUser != null) "खाता एवं सभी डेटा हटाएं (Delete Account & Data)" else "सभी सहेजा गया डेटा हटाएं (Delete Local Data)",
                                 style = MaterialTheme.typography.labelMedium.copy(
                                     color = InauspiciousRed,
-                                    fontWeight = FontWeight.Bold,
+                                    fontWeight = FontWeight.Normal,
                                     fontSize = 12.sp
                                 )
                             )
@@ -1121,7 +1121,7 @@ fun SettingsScreen(
                                     Text(
                                         text = rashi.rashiNameHi.substringBefore(" "),
                                         style = MaterialTheme.typography.labelSmall.copy(
-                                            fontWeight = FontWeight.Bold,
+                                            fontWeight = FontWeight.Normal,
                                             color = if (isSelected) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.primary,
                                             fontSize = 11.sp
                                         )
@@ -1205,7 +1205,7 @@ fun SettingsScreen(
                                         text = "${city.cityNameHindi} (${city.cityName})",
                                         style = MaterialTheme.typography.bodyMedium.copy(
                                             color = MaterialTheme.colorScheme.primary,
-                                            fontWeight = FontWeight.Bold,
+                                            fontWeight = FontWeight.Normal,
                                             fontSize = 13.sp
                                         )
                                     )

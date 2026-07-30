@@ -1,9 +1,12 @@
+@file:OptIn(androidx.compose.ui.text.ExperimentalTextApi::class)
+
 package com.example.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.R
@@ -13,8 +16,25 @@ import com.example.R
 // PEHLE: dono FontFamily.SansSerif (system Roboto) pe point kar rahe the — fonts
 // res/font/ me bundled the par kabhi wire hi nahi hue, isliye pura app default
 // Android typography me render ho raha tha.
-val OutfitFontFamily = FontFamily(Font(R.font.outfit_variable))
-val NotoSansDevanagariFontFamily = FontFamily(Font(R.font.noto_sans_devanagari_variable))
+// Register each weight explicitly against the variable font's "wght" axis.
+// Previously only one static instance was registered, so every FontWeight
+// (Bold, SemiBold, Normal, etc.) resolved to the same glyphs -- this is why
+// English (Outfit) text looked thin/inconsistent while Hindi (Noto) text
+// looked heavier, regardless of the FontWeight requested in code.
+val OutfitFontFamily = FontFamily(
+    Font(R.font.outfit_variable, weight = FontWeight.Normal, variationSettings = FontVariation.Settings(FontVariation.weight(400))),
+    Font(R.font.outfit_variable, weight = FontWeight.Medium, variationSettings = FontVariation.Settings(FontVariation.weight(500))),
+    Font(R.font.outfit_variable, weight = FontWeight.SemiBold, variationSettings = FontVariation.Settings(FontVariation.weight(600))),
+    Font(R.font.outfit_variable, weight = FontWeight.Bold, variationSettings = FontVariation.Settings(FontVariation.weight(700))),
+    Font(R.font.outfit_variable, weight = FontWeight.ExtraBold, variationSettings = FontVariation.Settings(FontVariation.weight(800)))
+)
+val NotoSansDevanagariFontFamily = FontFamily(
+    Font(R.font.noto_sans_devanagari_variable, weight = FontWeight.Normal, variationSettings = FontVariation.Settings(FontVariation.weight(400))),
+    Font(R.font.noto_sans_devanagari_variable, weight = FontWeight.Medium, variationSettings = FontVariation.Settings(FontVariation.weight(500))),
+    Font(R.font.noto_sans_devanagari_variable, weight = FontWeight.SemiBold, variationSettings = FontVariation.Settings(FontVariation.weight(600))),
+    Font(R.font.noto_sans_devanagari_variable, weight = FontWeight.Bold, variationSettings = FontVariation.Settings(FontVariation.weight(700))),
+    Font(R.font.noto_sans_devanagari_variable, weight = FontWeight.ExtraBold, variationSettings = FontVariation.Settings(FontVariation.weight(800)))
+)
 
 // Primary typography scale for AstroVeda
 val Typography = Typography(

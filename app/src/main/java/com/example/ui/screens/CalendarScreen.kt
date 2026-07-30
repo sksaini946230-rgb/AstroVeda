@@ -181,7 +181,7 @@ fun CalendarScreen(viewModel: MainViewModel) {
                                     text = day,
                                     style = MaterialTheme.typography.labelSmall.copy(
                                         color = MaterialTheme.colorScheme.secondary,
-                                        fontWeight = FontWeight.Bold,
+                                        fontWeight = FontWeight.Normal,
                                         fontSize = 13.sp
                                     )
                                 )
@@ -246,7 +246,7 @@ fun CalendarScreen(viewModel: MainViewModel) {
                                             Text(
                                                 text = "$dayNum",
                                                 style = MaterialTheme.typography.labelSmall.copy(
-                                                    fontWeight = if (isToday || hasFestival) FontWeight.Bold else FontWeight.Normal,
+                                                    fontWeight = if (isToday || hasFestival) FontWeight.Normal else FontWeight.Normal,
                                                     color = if (isToday) MaterialTheme.colorScheme.onPrimary else if (hasFestival) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                                                     fontSize = 14.sp
                                                 )
@@ -308,7 +308,7 @@ fun CalendarScreen(viewModel: MainViewModel) {
                         Text(
                             text = "#${index + 1}",
                             style = MaterialTheme.typography.labelMedium.copy(
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Normal,
                                 color = MaterialTheme.colorScheme.primary,
                                 fontSize = 12.sp
                             )
@@ -331,7 +331,7 @@ fun CalendarScreen(viewModel: MainViewModel) {
                                 text = "${festival.dateString} (${getLocalizedDay(festival.dayNameHi)})",
                                 style = MaterialTheme.typography.labelMedium.copy(
                                     color = MaterialTheme.colorScheme.secondary,
-                                    fontWeight = FontWeight.SemiBold,
+                                    fontWeight = FontWeight.Normal,
                                     fontSize = 12.sp
                                 )
                             )
@@ -397,7 +397,7 @@ fun CalendarScreen(viewModel: MainViewModel) {
                             Text(
                                 text = label,
                                 style = MaterialTheme.typography.labelSmall.copy(
-                                    fontWeight = FontWeight.Bold,
+                                    fontWeight = FontWeight.Normal,
                                     color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
                                     fontSize = 11.sp
                                 )
@@ -469,7 +469,7 @@ fun FestivalCard(
                         text = "${festival.dateString} (${getLocalizedDay(festival.dayNameHi)})",
                         style = MaterialTheme.typography.labelMedium.copy(
                             color = MaterialTheme.colorScheme.secondary,
-                            fontWeight = FontWeight.SemiBold,
+                            fontWeight = FontWeight.Normal,
                             fontSize = 12.sp
                         )
                     )
@@ -543,7 +543,7 @@ fun FestivalDetailDialog(
                         text = "${festival.dateString} (${getLocalizedDay(festival.dayNameHi)})",
                         style = MaterialTheme.typography.labelMedium.copy(
                             color = MaterialTheme.colorScheme.secondary,
-                            fontWeight = FontWeight.SemiBold,
+                            fontWeight = FontWeight.Normal,
                             fontSize = 12.sp
                         )
                     )
@@ -709,7 +709,7 @@ fun FestivalDetailDialog(
                 Text(
                     text = "बंद करें (Close)",
                     style = MaterialTheme.typography.labelMedium.copy(
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Normal,
                         color = MaterialTheme.colorScheme.primary
                     )
                 )
