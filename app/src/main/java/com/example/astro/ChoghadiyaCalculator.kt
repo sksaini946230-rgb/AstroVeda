@@ -43,7 +43,8 @@ object ChoghadiyaCalculator {
         date: Date,
         isDaytime: Boolean = true,
         lat: Double = 26.9124,
-        lon: Double = 75.7873
+        lon: Double = 75.7873,
+        use24Hour: Boolean = false
     ): List<ChoghadiyaSlot> {
         val cal = Calendar.getInstance().apply { time = date }
         val dayOfWeek = cal.get(Calendar.DAY_OF_WEEK)
@@ -79,8 +80,8 @@ object ChoghadiyaCalculator {
             val startMins = ((baseStartMin + idx * slotLen).toInt()) % 1440
             val endMins = ((baseStartMin + (idx + 1) * slotLen).toInt()) % 1440
 
-            val startStr = formatMins(startMins)
-            val endStr = formatMins(endMins)
+            val startStr = formatMins(startMins, use24Hour)
+            val endStr = formatMins(endMins, use24Hour)
 
             ChoghadiyaSlot(
                 timeSlotString = "$startStr - $endStr",
@@ -93,9 +94,12 @@ object ChoghadiyaCalculator {
         }
     }
 
-    private fun formatMins(mins: Int): String {
+    private fun formatMins(mins: Int, use24Hour: Boolean = false): String {
         val hrs = mins / 60
         val m = mins % 60
+        if (use24Hour) {
+            return String.format(java.util.Locale.US, "%02d:%02d", hrs % 24, m)
+        }
         val ampm = if (hrs >= 12) "PM" else "AM"
         val displayHrs = if (hrs == 0) 12 else if (hrs > 12) hrs - 12 else hrs
         return String.format(java.util.Locale.US, "%02d:%02d %s", displayHrs, m, ampm)

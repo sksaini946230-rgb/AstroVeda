@@ -588,7 +588,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             _selectedDate.value,
             _choghadiyaDaytime.value,
             _selectedCity.value.latitude,
-            _selectedCity.value.longitude
+            _selectedCity.value.longitude,
+            _use24HourFormat.value
         )
 
     fun toggleChoghadiyaDayNight(isDay: Boolean) {

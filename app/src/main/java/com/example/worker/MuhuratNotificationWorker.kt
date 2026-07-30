@@ -91,7 +91,7 @@ class MuhuratNotificationWorker(
             val use24Hour = sharedPrefs.getBoolean("use_24_hour_format", false)
             val today = Date()
             val panchang = PanchangCalculator.calculatePanchang(today, userCity, use24Hour)
-            val choghadiyaSlots = ChoghadiyaCalculator.getChoghadiyaSlots(today, isDaytime = true, lat = lat, lon = lon)
+            val choghadiyaSlots = ChoghadiyaCalculator.getChoghadiyaSlots(today, isDaytime = true, lat = lat, lon = lon, use24Hour = use24Hour)
 
             val auspiciousSlots = choghadiyaSlots.filter {
                 it.type == ChoghadiyaType.AMRIT || it.type == ChoghadiyaType.SHUBH || it.type == ChoghadiyaType.LABH
