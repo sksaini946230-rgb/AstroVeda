@@ -171,7 +171,7 @@ class MainActivity : ComponentActivity() {
                         bottomBar = {
                             Column {
                                 val isPro by mainViewModel.isProUser.collectAsState()
-                                if (!isPro && selectedTab == AppTab.PANCHANG) {
+                                if (!isPro) {
                                     androidx.compose.animation.AnimatedVisibility(
                                         visible = isStartupComplete,
                                         enter = androidx.compose.animation.fadeIn() + androidx.compose.animation.expandVertically()
