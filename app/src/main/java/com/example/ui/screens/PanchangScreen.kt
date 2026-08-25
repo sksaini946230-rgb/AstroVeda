@@ -88,6 +88,7 @@ import com.example.ui.components.DailyPanchangCard
 import com.example.ui.components.GlassBadge
 import com.example.ui.components.GlassCard
 import com.example.ui.components.NorthIndianChart
+import com.example.ui.components.PanchangLoadingSkeleton
 import com.example.ui.components.SectionHeader
 import com.example.ui.theme.AuspiciousGreen
 import com.example.ui.theme.GlassBorder

@@ -71,12 +71,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.RashifalData
 import com.example.ui.MainViewModel
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.platform.LocalContext
 import com.example.ui.components.GlassBadge
 import com.example.ui.components.GlassCard
 import com.example.ui.components.PersonalizedInsightCard
+import com.example.ui.components.RashifalLoadingSkeleton
 import com.example.ui.components.SectionHeader
 import com.example.ui.theme.GlassBorder
 import com.example.util.LanguageManager
+import com.example.util.ShareUtils
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -402,13 +407,15 @@ fun RashifalScreen(viewModel: MainViewModel) {
 
                                 Spacer(modifier = Modifier.height(14.dp))
 
-                                // Date Range Banner
-                                Box(
+                                // Date Range Banner + Share Button
+                                Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clip(RoundedCornerShape(8.dp))
                                         .background(MaterialTheme.colorScheme.surfaceVariant)
-                                        .padding(horizontal = 10.dp, vertical = 4.dp)
+                                        .padding(horizontal = 10.dp, vertical = 4.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
                                         text = "📅 $dateRangeText",
@@ -418,6 +425,47 @@ fun RashifalScreen(viewModel: MainViewModel) {
                                             fontSize = 11.sp
                                         )
                                     )
+                                    val context = LocalContext.current
+                                    Row(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(6.dp))
+                                            .clickable {
+                                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                                ShareUtils.shareRashifalText(
+                                                    context = context,
+                                                    rashiName = horoscope.rashiNameEn,
+                                                    rashiNameHi = horoscope.rashiNameHi,
+                                                    period = selectedPeriod,
+                                                    general = horoscope.generalReadingHi,
+                                                    career = horoscope.careerReadingHi,
+                                                    health = horoscope.healthReadingHi,
+                                                    love = horoscope.loveReadingHi,
+                                                    finance = horoscope.financeReadingHi,
+                                                    luckyNumber = horoscope.luckyNumber.toString(),
+                                                    luckyColor = horoscope.luckyColorHi,
+                                                    score = horoscope.ratingStars
+                                                )
+                                            }
+                                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                                            .testTag("share_rashifal_button"),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Share,
+                                            contentDescription = "Share",
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(14.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text(
+                                            text = LanguageManager.getString("शेयर करें", "Share"),
+                                            style = MaterialTheme.typography.labelSmall.copy(
+                                                color = MaterialTheme.colorScheme.primary,
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 11.sp
+                                            )
+                                        )
+                                    }
                                 }
 
                                 Spacer(modifier = Modifier.height(12.dp))
