@@ -90,6 +90,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         try {
+            com.example.util.AstroAnalytics.init(applicationContext)
+            com.example.util.AstroAnalytics.logAppOpen()
+        } catch (_: Throwable) {}
+
+        try {
             MobileAds.initialize(this) {}
             loadInterstitialAd()
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
