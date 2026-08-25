@@ -50,8 +50,10 @@ val NavigationGreen = Color(0xFF2ABF6E)
 // --- Removed hues, aliased to nearest of the 3 (no cyan/purple/red family) ---
 val AccentCyan = Color(0xFF2ABF6E)
 val AccentPurple = Color(0xFFC9A84C)
-val InauspiciousRed = Color(0xFF11142A)
-val StatusRed = Color(0xFF11142A)
+// Mars Red — genuine warning/danger color per FSD spec (Rahu Kaal, inauspicious)
+val InauspiciousRed = Color(0xFFE85A4A)
+val StatusRed = Color(0xFFE85A4A)
+val MarsRedGlow = Color(0x38E85A4A)  // 22% opacity for glass tint
 
 // --- Glassmorphism (Gold-tinted, not a new hue) ---
 val GlassBorder = Color(0x26C9A84C)

@@ -260,6 +260,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         sharedPrefs.edit().putBoolean("is_discovery_completed", false).apply()
     }
 
+    // Splash Screen State — shown on every launch for 1.5s
+    private val _isSplashCompleted = MutableStateFlow(false)
+    val isSplashCompleted: StateFlow<Boolean> = _isSplashCompleted.asStateFlow()
+
+    fun completeSplash() {
+        _isSplashCompleted.value = true
+    }
+
     // Onboarding State
     private val _isOnboardingCompleted = MutableStateFlow(sharedPrefs.getBoolean("is_onboarding_completed", false))
     val isOnboardingCompleted: StateFlow<Boolean> = _isOnboardingCompleted.asStateFlow()

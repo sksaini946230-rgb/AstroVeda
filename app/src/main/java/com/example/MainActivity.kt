@@ -56,6 +56,7 @@ import com.example.ui.screens.PanchangScreen
 import com.example.ui.screens.RashifalScreen
 import com.example.ui.screens.SavedProfilesScreen
 import com.example.ui.screens.SettingsScreen
+import com.example.ui.screens.SplashScreen
 import com.example.ui.theme.AstroVedaTheme
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -135,7 +136,13 @@ class MainActivity : ComponentActivity() {
                 val currentUser by mainViewModel.currentUser.collectAsState()
                 val isCloudBackupEnabled = currentUser != null
 
-                if (!isOnboardingCompleted) {
+                val isSplashCompleted by mainViewModel.isSplashCompleted.collectAsState()
+
+                if (!isSplashCompleted) {
+                    SplashScreen(
+                        onSplashComplete = { mainViewModel.completeSplash() }
+                    )
+                } else if (!isOnboardingCompleted) {
                     OnboardingScreen(
                         viewModel = mainViewModel,
                         onComplete = { mainViewModel.completeOnboarding() }
