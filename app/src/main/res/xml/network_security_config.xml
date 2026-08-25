@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Network Security Configuration for AstroVeda
+     Enforces HTTPS/TLS for all network traffic and blocks cleartext HTTP (Mitigating OWASP M5). -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

@@ -74,3 +74,18 @@
     @kotlinx.serialization.Serializable *;
 }
 -dontwarn kotlinx.coroutines.**
+
+# --- Security & Privacy Hardening ---
+# Strip Android debug and verbose logging in release builds (prevents sensitive PII leaks)
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int d(...);
+}
+
+# Preserve SecurityUtils and Billing integrity
+-keep class com.example.util.SecurityUtils { *; }
+-keepclassmembers class com.example.util.SecurityUtils {
+    public static <methods>;
+}
+
