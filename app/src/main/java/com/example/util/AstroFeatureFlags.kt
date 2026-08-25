@@ -19,7 +19,7 @@ object AstroFeatureFlags {
         val isFestivalNotificationsEnabled: Boolean = true,
         val isNumerologyEnabled: Boolean = true,
         val isProSubscriptionPromoEnabled: Boolean = true,
-        val softLaunchRolloutPercentage: Int = 10,
+        val softLaunchRolloutPercentage: Int = 100,
         val minSupportedVersionCode: Int = 1,
         val supportWhatsAppNumber: String = "+919462308945",
         val supportEmail: String = "support@astroveda.app",

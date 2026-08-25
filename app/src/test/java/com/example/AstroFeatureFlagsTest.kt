@@ -18,7 +18,7 @@ class AstroFeatureFlagsTest {
         assertTrue("Ads should be enabled by default", AstroFeatureFlags.isAdsEnabled)
         assertTrue("Billing should be enabled by default", AstroFeatureFlags.isInAppBillingEnabled)
         assertFalse("Maintenance mode should be false by default", AstroFeatureFlags.isMaintenanceMode)
-        assertEquals(10, AstroFeatureFlags.flags.value.softLaunchRolloutPercentage)
+        assertEquals(100, AstroFeatureFlags.flags.value.softLaunchRolloutPercentage)
     }
 
     @Test
@@ -34,6 +34,7 @@ class AstroFeatureFlagsTest {
 
     @Test
     fun testRolloutPercentageProgression() {
+        AstroFeatureFlags.updateFlags(rolloutPercentage = 10)
         assertEquals(10, AstroFeatureFlags.flags.value.softLaunchRolloutPercentage)
 
         // Progress soft launch rollout: 10% -> 25% -> 50% -> 100%
