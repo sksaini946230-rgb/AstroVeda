@@ -35,11 +35,11 @@ android {
 
   signingConfigs {
     create("release") {
-      val keystorePath = System.getenv("KEYSTORE_PATH") ?: "${rootDir}/my-upload-key.jks"
+      val keystorePath = System.getenv("KEYSTORE_PATH") ?: "${rootDir}/astroveda-upload-key.jks"
       storeFile = file(keystorePath)
-      storePassword = System.getenv("STORE_PASSWORD")
-      keyAlias = "upload"
-      keyPassword = System.getenv("KEY_PASSWORD")
+      storePassword = System.getenv("STORE_PASSWORD") ?: "a667ab8f5fc1b67c885dc63df6444e86"
+      keyAlias = System.getenv("KEY_ALIAS") ?: "b5f8bd64bd1691f90df02e3677e22d3f"
+      keyPassword = System.getenv("KEY_PASSWORD") ?: "a667ab8f5fc1b67c885dc63df6444e86"
     }
     create("debugConfig") {
       storeFile = file("${rootDir}/debug.keystore")

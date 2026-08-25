@@ -89,3 +89,10 @@
     public static <methods>;
 }
 
+# JVM & Third-Party Library Warnings Suppression
+-dontwarn java.lang.management.**
+-dontwarn io.ktor.**
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-dontwarn com.google.android.gms.internal.**
+

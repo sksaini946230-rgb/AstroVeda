@@ -16,6 +16,8 @@
 local.properties
 .env
 debug.keystore
+*.jks
+*.keystore
 
 # Scratch and patch files
 patch_*
