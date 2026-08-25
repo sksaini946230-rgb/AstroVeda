@@ -22,7 +22,7 @@ import org.robolectric.annotation.GraphicsMode
 @OptIn(ExperimentalSharedTransitionApi::class)
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(qualifiers = RobolectricDeviceQualifiers.Pixel8, sdk = [36])
+@Config(qualifiers = RobolectricDeviceQualifiers.Pixel8, sdk = [34])
 class MainScreensScreenshotTest {
 
     @get:Rule
