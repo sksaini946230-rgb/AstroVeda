@@ -17,6 +17,8 @@ data class HoroscopeCacheEntity(
     val luckyColorEn: String,
     val luckyColorHi: String,
     val luckyStoneHi: String,
+    val luckyTimeHi: String = "प्रातः 09:15 - 10:45",
+    val luckyTimeEn: String = "09:15 AM - 10:45 AM",
     val generalReadingHi: String,
     val generalReadingEn: String,
     val careerReadingHi: String,

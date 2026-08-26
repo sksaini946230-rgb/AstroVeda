@@ -32,6 +32,7 @@ object ShareUtils {
         finance: String = "",
         luckyNumber: String = "",
         luckyColor: String = "",
+        luckyTime: String = "",
         score: Int = 0
     ) {
         val stars = "⭐".repeat(score)
@@ -48,27 +49,28 @@ object ShareUtils {
         if (stars.isNotEmpty()) sb.appendLine("$stars ($score/5)")
         sb.appendLine()
         if (general.isNotBlank()) {
-            sb.appendLine("📋 *सामान्य:* $general")
+            sb.appendLine("📋 *सामान्य फलादेश:* $general")
             sb.appendLine()
         }
         if (career.isNotBlank()) {
-            sb.appendLine("💼 *करियर:* $career")
-            sb.appendLine()
-        }
-        if (health.isNotBlank()) {
-            sb.appendLine("❤\u200D🩹 *स्वास्थ्य:* $health")
-            sb.appendLine()
-        }
-        if (love.isNotBlank()) {
-            sb.appendLine("💑 *प्रेम:* $love")
+            sb.appendLine("💼 *करियर व व्यवसाय:* $career")
             sb.appendLine()
         }
         if (finance.isNotBlank()) {
-            sb.appendLine("💰 *वित्त:* $finance")
+            sb.appendLine("💰 *वित्त व धन लाभ:* $finance")
+            sb.appendLine()
+        }
+        if (love.isNotBlank()) {
+            sb.appendLine("💑 *प्रेम व संबंध:* $love")
+            sb.appendLine()
+        }
+        if (health.isNotBlank()) {
+            sb.appendLine("🌿 *स्वास्थ्य एवं ऊर्जा:* $health")
             sb.appendLine()
         }
         if (luckyNumber.isNotBlank()) sb.appendLine("🔢 शुभ अंक: $luckyNumber")
         if (luckyColor.isNotBlank()) sb.appendLine("🎨 शुभ रंग: $luckyColor")
+        if (luckyTime.isNotBlank()) sb.appendLine("⏰ शुभ समय: $luckyTime")
         sb.appendLine()
         sb.appendLine("— AstroVeda ज्योतिष ऐप से")
 

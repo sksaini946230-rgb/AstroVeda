@@ -436,13 +436,14 @@ fun RashifalScreen(viewModel: MainViewModel) {
                                                     rashiName = horoscope.rashiNameEn,
                                                     rashiNameHi = horoscope.rashiNameHi,
                                                     period = selectedPeriod,
-                                                    general = horoscope.generalReadingHi,
-                                                    career = horoscope.careerReadingHi,
-                                                    health = horoscope.healthReadingHi,
-                                                    love = horoscope.loveReadingHi,
-                                                    finance = horoscope.financeReadingHi,
+                                                    general = LanguageManager.getString(horoscope.generalReadingHi, horoscope.generalReadingEn),
+                                                    career = LanguageManager.getString(horoscope.careerReadingHi, horoscope.careerReadingEn),
+                                                    health = LanguageManager.getString(horoscope.healthReadingHi, horoscope.healthReadingEn),
+                                                    love = LanguageManager.getString(horoscope.loveReadingHi, horoscope.loveReadingEn),
+                                                    finance = LanguageManager.getString(horoscope.financeReadingHi, horoscope.financeReadingEn),
                                                     luckyNumber = horoscope.luckyNumber.toString(),
-                                                    luckyColor = horoscope.luckyColorHi,
+                                                    luckyColor = LanguageManager.getString(horoscope.luckyColorHi, horoscope.luckyColorEn),
+                                                    luckyTime = LanguageManager.getString(horoscope.luckyTimeHi, horoscope.luckyTimeEn),
                                                     score = horoscope.ratingStars
                                                 )
                                             }
@@ -470,27 +471,33 @@ fun RashifalScreen(viewModel: MainViewModel) {
 
                                 Spacer(modifier = Modifier.height(12.dp))
 
-                                // 5: Lucky Number, Lucky Color, Lucky Stone Chips
+                                // 5: Lucky Number, Lucky Color, Lucky Stone, Lucky Time Chips
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
                                     GlassBadge(
-                                        text = "शुभ अंक: ${horoscope.luckyNumber}",
+                                        text = LanguageManager.getString("शुभ अंक: ${horoscope.luckyNumber}", "Lucky No: ${horoscope.luckyNumber}"),
                                         textColor = MaterialTheme.colorScheme.primary,
                                         borderColor = MaterialTheme.colorScheme.primary
                                     )
                                     GlassBadge(
-                                        text = "शुभ रंग: ${horoscope.luckyColorHi}",
+                                        text = LanguageManager.getString("शुभ रंग: ${horoscope.luckyColorHi}", "Color: ${horoscope.luckyColorEn}"),
                                         textColor = MaterialTheme.colorScheme.primary,
                                         borderColor = MaterialTheme.colorScheme.primary
                                     )
                                     GlassBadge(
-                                        text = "शुभ रत्न: ${horoscope.luckyStoneHi}",
+                                        text = LanguageManager.getString("शुभ रत्न: ${horoscope.luckyStoneHi}", "Stone: ${horoscope.luckyStoneHi}"),
                                         textColor = MaterialTheme.colorScheme.secondary,
                                         borderColor = MaterialTheme.colorScheme.secondary
                                     )
                                 }
+                                Spacer(modifier = Modifier.height(6.dp))
+                                GlassBadge(
+                                    text = LanguageManager.getString("⏰ शुभ समय: ${horoscope.luckyTimeHi}", "⏰ Lucky Time: ${horoscope.luckyTimeEn}"),
+                                    textColor = MaterialTheme.colorScheme.primary,
+                                    borderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                                )
                             }
                         }
                     }
@@ -556,32 +563,32 @@ fun RashifalScreen(viewModel: MainViewModel) {
                             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                                 val domains = listOf(
                                     DomainItem(
-                                        "करियर व व्यवसाय (Career & Business)",
+                                        LanguageManager.getString("करियर व व्यवसाय (Career & Business)", "Career & Business"),
                                         horoscope.careerReadingHi,
                                         horoscope.careerReadingEn,
                                         Icons.Default.Work,
                                         MaterialTheme.colorScheme.primary
                                     ),
                                     DomainItem(
-                                        "स्वास्थ्य एवं ऊर्जा (Health & Fitness)",
-                                        horoscope.healthReadingHi,
-                                        horoscope.healthReadingEn,
-                                        Icons.Default.FitnessCenter,
-                                        MaterialTheme.colorScheme.tertiary
+                                        LanguageManager.getString("वित्त व धन लाभ (Finance & Money)", "Finance & Money"),
+                                        horoscope.financeReadingHi,
+                                        horoscope.financeReadingEn,
+                                        Icons.Default.MonetizationOn,
+                                        MaterialTheme.colorScheme.primary
                                     ),
                                     DomainItem(
-                                        "प्रेम व संबंध (Love & Marriage)",
+                                        LanguageManager.getString("प्रेम व संबंध (Love & Relationships)", "Love & Relationships"),
                                         horoscope.loveReadingHi,
                                         horoscope.loveReadingEn,
                                         Icons.Default.Favorite,
                                         MaterialTheme.colorScheme.secondary
                                     ),
                                     DomainItem(
-                                        "वित्त व धन लाभ (Finance & Money)",
-                                        horoscope.financeReadingHi,
-                                        horoscope.financeReadingEn,
-                                        Icons.Default.MonetizationOn,
-                                        MaterialTheme.colorScheme.primary
+                                        LanguageManager.getString("स्वास्थ्य एवं ऊर्जा (Health & Fitness)", "Health & Fitness"),
+                                        horoscope.healthReadingHi,
+                                        horoscope.healthReadingEn,
+                                        Icons.Default.FitnessCenter,
+                                        MaterialTheme.colorScheme.tertiary
                                     )
                                 )
 
