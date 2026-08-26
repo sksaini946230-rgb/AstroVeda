@@ -9,6 +9,8 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,8 +28,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -176,13 +181,14 @@ fun SplashScreen(
                         radius = size.minDimension / 2f
                     )
                 }
-                // OM symbol (using text as fallback — SVG can replace later)
-                Text(
-                    text = "ॐ",
-                    fontSize = 64.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = PrimaryButtonBackground,
+                // App logo image (matches launcher icon)
+                Image(
+                    painter = painterResource(id = com.example.R.drawable.img_app_icon_1784710282310),
+                    contentDescription = "AstroVeda Logo",
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
+                        .size(96.dp)
+                        .clip(CircleShape)
                         .scale(logoScale.value)
                         .alpha(logoAlpha.value)
                 )
