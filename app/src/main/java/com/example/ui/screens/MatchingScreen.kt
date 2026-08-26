@@ -63,8 +63,8 @@ import com.example.ui.components.EmptyStateComponent
 import com.example.ui.components.RecentSearchesComponent
 import com.example.ui.components.AstroLoadingIndicator
 import com.example.ui.components.SectionHeader
-import com.example.ui.theme.AuspiciousGreen
-import com.example.ui.theme.InauspiciousRed
+import com.example.ui.theme.RahuKaalDangerColor
+import com.example.ui.theme.ShubhSuccessColor
 import com.example.util.LanguageManager
 
 @Composable
@@ -293,7 +293,7 @@ fun MatchingScreen(viewModel: MainViewModel) {
                         text = "${gunaResult.totalObtainedGuna} / 36.0",
                         style = MaterialTheme.typography.displayMedium.copy(
                             fontWeight = FontWeight.Bold,
-                            color = if (gunaResult.totalObtainedGuna >= 18) AuspiciousGreen else InauspiciousRed
+                            color = if (gunaResult.totalObtainedGuna >= 18) ShubhSuccessColor else RahuKaalDangerColor
                         )
                     )
 
@@ -310,7 +310,7 @@ fun MatchingScreen(viewModel: MainViewModel) {
                             .fillMaxWidth()
                             .height(8.dp)
                             .clip(RoundedCornerShape(4.dp)),
-                        color = if (gunaResult.totalObtainedGuna >= 18) AuspiciousGreen else InauspiciousRed,
+                        color = if (gunaResult.totalObtainedGuna >= 18) ShubhSuccessColor else RahuKaalDangerColor,
                         trackColor = MaterialTheme.colorScheme.surfaceVariant
                     )
 
@@ -318,14 +318,15 @@ fun MatchingScreen(viewModel: MainViewModel) {
 
                     GlassBadge(
                         text = LanguageManager.getString(gunaResult.compatibilityVerdictHi, gunaResult.compatibilityVerdictEn),
-                        backgroundColor = (if (gunaResult.totalObtainedGuna >= 18) AuspiciousGreen else InauspiciousRed).copy(alpha = 0.2f),
-                        textColor = if (gunaResult.totalObtainedGuna >= 18) AuspiciousGreen else InauspiciousRed,
-                        borderColor = if (gunaResult.totalObtainedGuna >= 18) AuspiciousGreen else InauspiciousRed
+                        backgroundColor = (if (gunaResult.totalObtainedGuna >= 18) ShubhSuccessColor else RahuKaalDangerColor).copy(alpha = 0.2f),
+                        textColor = if (gunaResult.totalObtainedGuna >= 18) ShubhSuccessColor else RahuKaalDangerColor,
+                        borderColor = if (gunaResult.totalObtainedGuna >= 18) ShubhSuccessColor else RahuKaalDangerColor
                     )
 
                     Spacer(modifier = Modifier.height(14.dp))
 
                     val context = LocalContext.current
+                    val haptic = LocalHapticFeedback.current
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -431,7 +432,7 @@ fun MatchingScreen(viewModel: MainViewModel) {
                         ) {
                             Text(text = koot.kootNameHi, style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp), modifier = Modifier.weight(1.5f))
                             Text(text = "${koot.maxPoints}", style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp), modifier = Modifier.weight(1f))
-                            Text(text = "${koot.obtainedPoints}", style = MaterialTheme.typography.bodySmall.copy(color = AuspiciousGreen, fontWeight = FontWeight.Normal, fontSize = 14.sp), modifier = Modifier.weight(1f))
+                            Text(text = "${koot.obtainedPoints}", style = MaterialTheme.typography.bodySmall.copy(color = ShubhSuccessColor, fontWeight = FontWeight.Normal, fontSize = 14.sp), modifier = Modifier.weight(1f))
                         }
                     }
                 }

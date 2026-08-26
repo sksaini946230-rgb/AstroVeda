@@ -43,8 +43,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.astro.PanchangCalculator
 import com.example.data.model.PanchangData
-import com.example.ui.theme.MinimalistGold
-import com.example.ui.theme.NeutralOrange
+import com.example.ui.theme.DateTimeAccent
+import com.example.ui.theme.GlassCardBorder
 import com.example.util.LanguageManager
 
 /**
@@ -175,14 +175,14 @@ fun DailyPanchangCard(
                             .weight(1f)
                             .clip(RoundedCornerShape(12.dp))
                             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f))
-                            .border(1.dp, MinimalistGold.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+                            .border(1.dp, DateTimeAccent.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
                             .padding(10.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = Icons.Default.WbSunny,
                                 contentDescription = "Sunrise",
-                                tint = MinimalistGold,
+                                tint = DateTimeAccent,
                                 modifier = Modifier.size(24.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -190,7 +190,7 @@ fun DailyPanchangCard(
                                 Text(
                                     text = LanguageManager.getString("सूर्योदय", "SUNRISE"),
                                     style = MaterialTheme.typography.labelSmall.copy(
-                                        color = MinimalistGold,
+                                        color = DateTimeAccent,
                                         fontWeight = FontWeight.Normal,
                                         fontSize = 10.sp
                                     )
@@ -213,14 +213,14 @@ fun DailyPanchangCard(
                             .weight(1f)
                             .clip(RoundedCornerShape(12.dp))
                             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f))
-                            .border(1.dp, NeutralOrange.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+                            .border(1.dp, DateTimeAccent.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
                             .padding(10.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = Icons.Default.NightsStay,
                                 contentDescription = "Sunset",
-                                tint = NeutralOrange,
+                                tint = DateTimeAccent,
                                 modifier = Modifier.size(24.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -228,7 +228,7 @@ fun DailyPanchangCard(
                                 Text(
                                     text = LanguageManager.getString("सूर्यास्त", "SUNSET"),
                                     style = MaterialTheme.typography.labelSmall.copy(
-                                        color = NeutralOrange,
+                                        color = DateTimeAccent,
                                         fontWeight = FontWeight.Normal,
                                         fontSize = 10.sp
                                     )

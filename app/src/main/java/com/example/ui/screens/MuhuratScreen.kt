@@ -47,9 +47,9 @@ import com.example.ui.MainViewModel
 import com.example.ui.components.GlassBadge
 import com.example.ui.components.GlassCard
 import com.example.ui.components.SectionHeader
-import com.example.ui.theme.AuspiciousGreen
-import com.example.ui.theme.InauspiciousRed
-import com.example.ui.theme.NeutralOrange
+import com.example.ui.theme.DateTimeAccent
+import com.example.ui.theme.RahuKaalDangerColor
+import com.example.ui.theme.ShubhSuccessColor
 
 @Composable
 fun MuhuratScreen(viewModel: MainViewModel) {
@@ -180,9 +180,9 @@ fun MuhuratScreen(viewModel: MainViewModel) {
 @Composable
 fun ChoghadiyaRow(slot: ChoghadiyaSlot) {
     val statusColor = when (slot.type) {
-        ChoghadiyaType.AMRIT, ChoghadiyaType.SHUBH, ChoghadiyaType.LABH -> AuspiciousGreen
-        ChoghadiyaType.CHAR -> NeutralOrange
-        else -> InauspiciousRed
+        ChoghadiyaType.AMRIT, ChoghadiyaType.SHUBH, ChoghadiyaType.LABH -> ShubhSuccessColor
+        ChoghadiyaType.CHAR -> DateTimeAccent
+        else -> RahuKaalDangerColor
     }
 
     GlassCard(
@@ -254,9 +254,9 @@ fun EventMuhuratCard(item: MuhuratItem) {
 
                 GlassBadge(
                     text = item.qualityHi,
-                    backgroundColor = AuspiciousGreen.copy(alpha = 0.2f),
-                    textColor = AuspiciousGreen,
-                    borderColor = AuspiciousGreen
+                    backgroundColor = ShubhSuccessColor.copy(alpha = 0.2f),
+                    textColor = ShubhSuccessColor,
+                    borderColor = ShubhSuccessColor
                 )
             }
 

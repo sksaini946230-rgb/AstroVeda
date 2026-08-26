@@ -90,12 +90,14 @@ import com.example.ui.components.GlassCard
 import com.example.ui.components.NorthIndianChart
 import com.example.ui.components.PanchangLoadingSkeleton
 import com.example.ui.components.SectionHeader
-import com.example.ui.theme.AuspiciousGreen
-import com.example.ui.theme.GlassBorder
-import com.example.ui.theme.InauspiciousRed
-import com.example.ui.theme.NeutralOrange
-import com.example.ui.theme.MinimalistGold
-import com.example.ui.theme.PremiumGold
+import com.example.ui.theme.DateTimeAccent
+import com.example.ui.theme.GlassCardBorder
+import com.example.ui.theme.PrimaryButtonBackground
+import com.example.ui.theme.RahuKaalDangerColor
+import com.example.ui.theme.ShubhSuccessColor
+import com.example.ui.theme.TextLink
+import com.example.ui.theme.TextPrimary
+import com.example.ui.theme.TextSecondary
 import com.example.util.LanguageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -267,7 +269,7 @@ fun PanchangScreen(
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = MaterialTheme.colorScheme.primary,
-                                unfocusedBorderColor = GlassBorder,
+                                unfocusedBorderColor = GlassCardBorder,
                                 focusedContainerColor = MaterialTheme.colorScheme.surface,
                                 unfocusedContainerColor = MaterialTheme.colorScheme.surface
                             ),
@@ -457,17 +459,17 @@ fun PanchangScreen(
                                         )
                                         GlassBadge(
                                             text = "⚠️ राहु काल: ${panchang.rahuKaal} (अशुभ समय)",
-                                            textColor = InauspiciousRed,
-                                            borderColor = InauspiciousRed
+                                            textColor = RahuKaalDangerColor,
+                                            borderColor = RahuKaalDangerColor
                                         )
                                     }
                                 }
                                 2 -> {
                                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Icon(Icons.Default.Schedule, contentDescription = null, tint = AuspiciousGreen)
+                                            Icon(Icons.Default.Schedule, contentDescription = null, tint = ShubhSuccessColor)
                                             Spacer(modifier = Modifier.width(8.dp))
-                                            Text("चौघड़िया व शुभ मुहूर्त विचार", fontWeight = FontWeight.Bold, color = AuspiciousGreen, fontSize = 15.sp)
+                                            Text("चौघड़िया व शुभ मुहूर्त विचार", fontWeight = FontWeight.Bold, color = ShubhSuccessColor, fontSize = 15.sp)
                                         }
                                         Text(
                                             text = "अभिजीत मुहूर्त: ${panchang.abhijitMuhurat} (सर्वश्रेष्ठ मुहूर्त)। आज यमगण्‍ड काल ${panchang.yamaganda} में रहेगा।",
@@ -475,23 +477,23 @@ fun PanchangScreen(
                                         )
                                         GlassBadge(
                                             text = "🌟 अभिजीत मुहूर्त: ${panchang.abhijitMuhurat}",
-                                            textColor = AuspiciousGreen,
-                                            borderColor = AuspiciousGreen
+                                            textColor = ShubhSuccessColor,
+                                            borderColor = ShubhSuccessColor
                                         )
                                     }
                                 }
                                 else -> {
                                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                         Row(verticalAlignment = Alignment.CenterVertically) {
-                                            Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = PremiumGold)
+                                            Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = PrimaryButtonBackground)
                                             Spacer(modifier = Modifier.width(8.dp))
-                                            Text("नक्षत्र ऊर्जा व गोचर प्रभाव", fontWeight = FontWeight.Bold, color = PremiumGold, fontSize = 15.sp)
+                                            Text("नक्षत्र ऊर्जा व गोचर प्रभाव", fontWeight = FontWeight.Bold, color = PrimaryButtonBackground, fontSize = 15.sp)
                                         }
                                         Text(
                                             text = "नक्षत्र ${panchang.nakshatraHindi} (चरण ${panchang.nakshatraPada}) चंद्र प्रभाव ${panchang.moonSign} राशि में कार्यसिद्धि प्रदान करता है।",
                                             style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 13.sp)
                                         )
-                                        GlassBadge("सूर्य राशि: ${panchang.sunSign}", textColor = PremiumGold, borderColor = PremiumGold)
+                                        GlassBadge("सूर्य राशि: ${panchang.sunSign}", textColor = PrimaryButtonBackground, borderColor = PrimaryButtonBackground)
                                     }
                                 }
                             }
@@ -680,10 +682,10 @@ fun PanchangScreen(
             GlassCard(modifier = Modifier.fillMaxWidth()) {
                 Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
                     val timings = listOf(
-                        Triple("अभिजित मुहूर्त (Abhijit)", panchang.abhijitMuhurat, Pair("अति शुभ (Best)", AuspiciousGreen)),
-                        Triple("राहुकाल (Rahu Kaal)", panchang.rahuKaal, Pair("अशुभ (Avoid)", InauspiciousRed)),
-                        Triple("गुलिक काल (Gulika)", panchang.gulikaKaal, Pair("मध्यम (Neutral)", NeutralOrange)),
-                        Triple("यमगण्ड (Yamaganda)", panchang.yamaganda, Pair("अशुभ (Avoid)", InauspiciousRed))
+                        Triple("अभिजित मुहूर्त (Abhijit)", panchang.abhijitMuhurat, Pair("अति शुभ (Best)", ShubhSuccessColor)),
+                        Triple("राहुकाल (Rahu Kaal)", panchang.rahuKaal, Pair("अशुभ (Avoid)", RahuKaalDangerColor)),
+                        Triple("गुलिक काल (Gulika)", panchang.gulikaKaal, Pair("अशुभ (Avoid)", RahuKaalDangerColor)),
+                        Triple("यमगण्ड (Yamaganda)", panchang.yamaganda, Pair("अशुभ (Avoid)", RahuKaalDangerColor))
                     )
 
                     timings.forEachIndexed { index, timing ->
@@ -797,9 +799,9 @@ fun PanchangScreen(
             ) {
                 items(choghadiyaSlots) { slot ->
                     val statusColor = when (slot.type.name) {
-                        "AMRIT", "SHUBH", "LABH" -> AuspiciousGreen
-                        "CHAR" -> NeutralOrange
-                        else -> InauspiciousRed
+                        "AMRIT", "SHUBH", "LABH" -> ShubhSuccessColor
+                        "CHAR" -> DateTimeAccent
+                        else -> RahuKaalDangerColor
                     }
 
                     GlassCard(
@@ -828,8 +830,8 @@ fun PanchangScreen(
                             Text(
                                 text = slot.timeSlotString,
                                 style = MaterialTheme.typography.bodySmall.copy(
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                    fontSize = 11.sp
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    fontSize = 10.sp
                                 )
                             )
                         }
@@ -838,26 +840,18 @@ fun PanchangScreen(
             }
         }
 
-        // Quick Kundali Chart Preview Card (Shared Element Transition to Kundali Screen)
+        // Section 7: Daily Lagna Chart & Planetary Positions (Instant North Indian Chart)
         item {
             SectionHeader(
-                titleHi = "आज का कुण्डली चार्ट (Kundali Chart Preview)",
-                titleEn = "Today's Birth Chart",
-                subtitleHi = "टैप करके पूर्ण इंटरएक्टिव कुण्डली देखें",
-                subtitleEn = "Tap to view full interactive Kundali"
+                titleHi = "दैनिक लग्न कुण्डली व गोचर स्थिति",
+                titleEn = "Daily Lagna Kundali & Transits",
+                icon = Icons.Default.AutoAwesome
             )
         }
 
         item {
-            GlassCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                        viewModel.selectTab(AppTab.KUNDALI)
-                    }
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            GlassCard(modifier = Modifier.fillMaxWidth()) {
+                Column {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -867,7 +861,7 @@ fun PanchangScreen(
                             Icon(
                                 imageVector = Icons.Default.AutoAwesome,
                                 contentDescription = null,
-                                tint = PremiumGold,
+                                tint = PrimaryButtonBackground,
                                 modifier = Modifier.size(20.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -886,7 +880,7 @@ fun PanchangScreen(
                             Text(
                                 text = "पूर्ण कुण्डली देखें →",
                                 style = MaterialTheme.typography.labelMedium.copy(
-                                    color = PremiumGold,
+                                    color = TextLink,
                                     fontWeight = FontWeight.Normal
                                 )
                             )
@@ -1125,7 +1119,7 @@ fun PlanetaryPositionsCard(planets: List<com.example.data.model.PlanetPosition>)
                                 Text(
                                     text = "Retrograde (वक्री)",
                                     style = MaterialTheme.typography.labelSmall.copy(
-                                        color = InauspiciousRed,
+                                        color = RahuKaalDangerColor,
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.Normal
                                     )

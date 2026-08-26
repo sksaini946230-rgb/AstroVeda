@@ -44,10 +44,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.DashaPeriod
-import com.example.ui.theme.DateOrange
-import com.example.ui.theme.GlassBorder
-import com.example.ui.theme.GlassWhite
-import com.example.ui.theme.TextGold
+import com.example.ui.theme.DateTimeAccent
+import com.example.ui.theme.ElevatedSurface
+import com.example.ui.theme.GlassCardBorder
+import com.example.ui.theme.PrimaryButtonBackground
+import com.example.ui.theme.PrimaryButtonText
+import com.example.ui.theme.TextPrimary
 
 @Composable
 fun DashaHorizontalTimeline(
@@ -107,13 +109,13 @@ fun DashaHorizontalTimeline(
                         selectedIdx = currentIdx
                     },
                     shape = RoundedCornerShape(12.dp),
-                    color = GlassWhite,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, GlassBorder)
+                    color = ElevatedSurface,
+                    border = androidx.compose.foundation.BorderStroke(1.dp, GlassCardBorder)
                 ) {
                     Text(
                         text = "वर्तमान 🎯",
                         style = MaterialTheme.typography.labelSmall.copy(
-                            color = TextGold,
+                            color = PrimaryButtonBackground,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Normal
                         ),
@@ -137,10 +139,10 @@ fun DashaHorizontalTimeline(
 
                     val nodeBorderColor by animateColorAsState(
                         targetValue = when {
-                            isSelected && isCurrent -> TextGold
+                            isSelected && isCurrent -> PrimaryButtonBackground
                             isSelected -> MaterialTheme.colorScheme.primary
-                            isCurrent -> DateOrange
-                            else -> GlassBorder
+                            isCurrent -> DateTimeAccent
+                            else -> GlassCardBorder
                         },
                         animationSpec = tween(300),
                         label = "nodeBorder"
@@ -150,7 +152,7 @@ fun DashaHorizontalTimeline(
                         targetValue = when {
                             isCurrent -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
                             isSelected -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                            else -> GlassWhite.copy(alpha = 0.15f)
+                            else -> GlassCardBorder.copy(alpha = 0.08f)
                         },
                         animationSpec = tween(300),
                         label = "nodeBg"
@@ -187,7 +189,7 @@ fun DashaHorizontalTimeline(
                                                 .clip(CircleShape)
                                                 .background(
                                                     Brush.radialGradient(
-                                                        colors = listOf(TextGold, DateOrange)
+                                                        colors = listOf(PrimaryButtonBackground, DateTimeAccent)
                                                     )
                                                 ),
                                             contentAlignment = Alignment.Center
@@ -195,7 +197,7 @@ fun DashaHorizontalTimeline(
                                             Icon(
                                                 imageVector = Icons.Default.Star,
                                                 contentDescription = "Current Dasha",
-                                                tint = Color.White,
+                                                tint = PrimaryButtonText,
                                                 modifier = Modifier.size(11.dp)
                                             )
                                         }
@@ -203,7 +205,7 @@ fun DashaHorizontalTimeline(
                                         Text(
                                             text = "सक्रिय",
                                             style = MaterialTheme.typography.labelSmall.copy(
-                                                color = TextGold,
+                                                color = PrimaryButtonBackground,
                                                 fontWeight = FontWeight.Normal,
                                                 fontSize = 10.sp
                                             )
@@ -259,13 +261,13 @@ fun DashaHorizontalTimeline(
                                 // Duration pill
                                 Surface(
                                     shape = RoundedCornerShape(8.dp),
-                                    color = if (isCurrent) DateOrange.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                                    color = if (isCurrent) DateTimeAccent.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
                                     modifier = Modifier.padding(top = 2.dp)
                                 ) {
                                     Text(
                                         text = "${dasha.durationYears} वर्ष",
                                         style = MaterialTheme.typography.labelSmall.copy(
-                                            color = if (isCurrent) DateOrange else MaterialTheme.colorScheme.onSurfaceVariant,
+                                            color = if (isCurrent) DateTimeAccent else MaterialTheme.colorScheme.onSurfaceVariant,
                                             fontWeight = FontWeight.Normal,
                                             fontSize = 11.sp
                                         ),
@@ -295,7 +297,7 @@ fun DashaHorizontalTimeline(
                                     .height(2.dp)
                                     .background(
                                         if (index < currentIdx) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
-                                        else GlassBorder
+                                        else GlassCardBorder
                                     )
                             )
                         }
@@ -311,7 +313,7 @@ fun DashaHorizontalTimeline(
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
                         .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
-                        .border(1.dp, GlassBorder, RoundedCornerShape(12.dp))
+                        .border(1.dp, GlassCardBorder, RoundedCornerShape(12.dp))
                         .padding(12.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
@@ -341,13 +343,13 @@ fun DashaHorizontalTimeline(
                         if (selectedDasha.isCurrent) {
                             Surface(
                                 shape = RoundedCornerShape(10.dp),
-                                color = DateOrange.copy(alpha = 0.2f),
-                                border = androidx.compose.foundation.BorderStroke(1.dp, DateOrange)
+                                color = DateTimeAccent.copy(alpha = 0.2f),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, DateTimeAccent)
                             ) {
                                 Text(
                                     text = "★ वर्तमान प्रभाव",
                                     style = MaterialTheme.typography.labelSmall.copy(
-                                        color = DateOrange,
+                                        color = DateTimeAccent,
                                         fontWeight = FontWeight.Normal,
                                         fontSize = 10.sp
                                     ),

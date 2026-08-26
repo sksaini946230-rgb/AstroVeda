@@ -31,7 +31,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
@@ -39,13 +38,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.KundaliChartData
-import com.example.ui.theme.DateOrange
-import com.example.ui.theme.GlassBorder
-import com.example.ui.theme.GlassWhite
-import com.example.ui.theme.PremiumGold
-import com.example.ui.theme.TextGold
-import com.example.ui.theme.TextPrimaryDark
-import com.example.ui.theme.TextSecondaryDark
+import com.example.ui.theme.DateTimeAccent
+import com.example.ui.theme.ElevatedSurface
+import com.example.ui.theme.GlassCardBorder
+import com.example.ui.theme.PrimaryButtonBackground
+import com.example.ui.theme.TextPrimary
+import com.example.ui.theme.TextSecondary
 
 @Composable
 fun SouthIndianChart(
@@ -92,8 +90,8 @@ fun SouthIndianChart(
             .fillMaxWidth()
             .aspectRatio(1f)
             .clip(RoundedCornerShape(20.dp))
-            .background(GlassWhite)
-            .border(1.dp, GlassBorder, RoundedCornerShape(20.dp))
+            .background(ElevatedSurface)
+            .border(1.dp, GlassCardBorder, RoundedCornerShape(20.dp))
             .pointerInput(Unit) {
                 detectTransformGestures { _, pan, zoom, _ ->
                     val newScale = (userScale * zoom).coerceIn(1f, 3.5f)
@@ -156,7 +154,7 @@ fun SouthIndianChart(
                                         Text(
                                             text = "दक्षिण भारतीय कुण्डली",
                                             style = MaterialTheme.typography.labelSmall.copy(
-                                                color = PremiumGold,
+                                                color = PrimaryButtonBackground,
                                                 fontWeight = FontWeight.Normal,
                                                 fontSize = 11.sp
                                             )
@@ -164,7 +162,7 @@ fun SouthIndianChart(
                                         Text(
                                             text = "लग्न: ${chartData.ascendantRashiHi}",
                                             style = MaterialTheme.typography.labelSmall.copy(
-                                                color = TextSecondaryDark,
+                                                color = TextSecondary,
                                                 fontSize = 10.sp
                                             )
                                         )
@@ -179,7 +177,7 @@ fun SouthIndianChart(
                                 modifier = Modifier
                                     .weight(1f)
                                     .fillMaxHeight()
-                                    .border(1.dp, GlassBorder)
+                                    .border(1.dp, GlassCardBorder)
                                     .padding(4.dp)
                             ) {
                                 Column {
@@ -187,7 +185,7 @@ fun SouthIndianChart(
                                         Text(
                                             text = "${rashiShortHi.getOrElse(rashiNum) { "" }} ($rashiNum)",
                                             style = MaterialTheme.typography.labelSmall.copy(
-                                                color = TextGold,
+                                                color = PrimaryButtonBackground,
                                                 fontSize = 9.sp,
                                                 fontWeight = FontWeight.Normal
                                             )
@@ -196,7 +194,7 @@ fun SouthIndianChart(
                                             Text(
                                                 text = " [ल]",
                                                 style = MaterialTheme.typography.labelSmall.copy(
-                                                    color = DateOrange,
+                                                    color = DateTimeAccent,
                                                     fontWeight = FontWeight.Normal,
                                                     fontSize = 9.sp
                                                 )
@@ -207,7 +205,7 @@ fun SouthIndianChart(
                                     Text(
                                         text = planetsInRashi.joinToString(" "),
                                         style = MaterialTheme.typography.bodySmall.copy(
-                                            color = TextPrimaryDark,
+                                            color = TextPrimary,
                                             fontSize = 9.sp,
                                             fontWeight = FontWeight.Normal
                                         )
@@ -228,8 +226,8 @@ fun SouthIndianChart(
                     userOffset = Offset.Zero
                 },
                 shape = RoundedCornerShape(12.dp),
-                color = GlassWhite,
-                border = androidx.compose.foundation.BorderStroke(1.dp, GlassBorder),
+                color = ElevatedSurface,
+                border = androidx.compose.foundation.BorderStroke(1.dp, GlassCardBorder),
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(8.dp)
@@ -241,7 +239,7 @@ fun SouthIndianChart(
                     Text(
                         text = "${String.format(java.util.Locale.US, "%.1f", userScale)}x  रिसेट ↺",
                         style = MaterialTheme.typography.labelSmall.copy(
-                            color = TextGold,
+                            color = PrimaryButtonBackground,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Normal
                         )
@@ -251,4 +249,3 @@ fun SouthIndianChart(
         }
     }
 }
-

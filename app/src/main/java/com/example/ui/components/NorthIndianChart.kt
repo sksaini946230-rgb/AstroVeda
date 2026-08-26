@@ -53,13 +53,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.KundaliChartData
-import com.example.ui.theme.DateOrange
-import com.example.ui.theme.GlassBorder
-import com.example.ui.theme.GlassWhite
-import com.example.ui.theme.PremiumGold
-import com.example.ui.theme.TextGold
-import com.example.ui.theme.TextPrimaryDark
-import com.example.ui.theme.TextSecondaryDark
+import com.example.ui.theme.DateTimeAccent
+import com.example.ui.theme.ElevatedSurface
+import com.example.ui.theme.GlassCardBorder
+import com.example.ui.theme.PrimaryButtonBackground
+import com.example.ui.theme.TextPrimary
+import com.example.ui.theme.TextSecondary
 
 @Composable
 fun NorthIndianChart(
@@ -152,8 +151,8 @@ fun NorthIndianChart(
                 .fillMaxWidth()
                 .aspectRatio(1f)
                 .clip(RoundedCornerShape(20.dp))
-                .background(GlassWhite)
-                .border(1.dp, GlassBorder, RoundedCornerShape(20.dp))
+                .background(ElevatedSurface)
+                .border(1.dp, GlassCardBorder, RoundedCornerShape(20.dp))
                 .pointerInput(Unit) {
                     detectTransformGestures { _, pan, zoom, _ ->
                         val newScale = (userScale * zoom).coerceIn(1f, 3.5f)
@@ -219,8 +218,8 @@ fun NorthIndianChart(
                 val h = size.height
                 val strokeWidth = 2.5f
 
-                val chartLineColor = PremiumGold
-                val gridBorderColor = PremiumGold.copy(alpha = 0.45f)
+                val chartLineColor = PrimaryButtonBackground
+                val gridBorderColor = PrimaryButtonBackground.copy(alpha = 0.45f)
 
                 // 1. Draw Background Fills & Highlights
                 for (houseNum in 1..12) {
@@ -239,19 +238,19 @@ fun NorthIndianChart(
                         // Glowing golden highlight for selected house
                         drawPath(
                             path = path,
-                            color = PremiumGold.copy(alpha = 0.25f),
+                            color = PrimaryButtonBackground.copy(alpha = 0.25f),
                             style = Fill
                         )
                         drawPath(
                             path = path,
-                            color = PremiumGold,
+                            color = PrimaryButtonBackground,
                             style = Stroke(width = 3.5f)
                         )
                     } else if (houseNum == 1) {
                         // Soft Lagna house fill
                         drawPath(
                             path = path,
-                            color = PremiumGold.copy(alpha = 0.08f),
+                            color = PrimaryButtonBackground.copy(alpha = 0.08f),
                             style = Fill
                         )
                     }
@@ -306,11 +305,11 @@ fun NorthIndianChart(
                     val rashiText = "$rashiNum"
                     val planetsText = if (planets.isNotEmpty()) planets.joinToString(" ") else ""
 
-                    // Draw Rashi Number in Gold
+                    // Draw Rashi Number in Primary Text
                     val rashiMeas = textMeasurer.measure(
                         text = rashiText,
                         style = TextStyle(
-                            color = TextGold,
+                            color = TextPrimary,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -325,7 +324,7 @@ fun NorthIndianChart(
                         val lagnaMeas = textMeasurer.measure(
                             text = "लग्न",
                             style = TextStyle(
-                                color = PremiumGold,
+                                color = PrimaryButtonBackground,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.ExtraBold
                             )
@@ -336,7 +335,7 @@ fun NorthIndianChart(
                         )
                     }
 
-                    // Draw Planet names & degrees in DateOrange
+                    // Draw Planet names & degrees in DateTimeAccent
                     val housePlanets = chartData.planets.filter { it.houseNumber == houseNum }
 
                     if (userScale > 1.25f && housePlanets.isNotEmpty()) {
@@ -360,7 +359,7 @@ fun NorthIndianChart(
                             val planetMeas = textMeasurer.measure(
                                 text = detailedText,
                                 style = TextStyle(
-                                    color = DateOrange,
+                                    color = DateTimeAccent,
                                     fontSize = fontSizeSp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -376,7 +375,7 @@ fun NorthIndianChart(
                         val planetMeas = textMeasurer.measure(
                             text = planetsText,
                             style = TextStyle(
-                                color = DateOrange,
+                                color = DateTimeAccent,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -397,8 +396,8 @@ fun NorthIndianChart(
                         userOffset = Offset.Zero
                     },
                     shape = RoundedCornerShape(12.dp),
-                    color = GlassWhite,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, GlassBorder),
+                    color = ElevatedSurface,
+                    border = androidx.compose.foundation.BorderStroke(1.dp, GlassCardBorder),
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(8.dp)
@@ -410,7 +409,7 @@ fun NorthIndianChart(
                         Text(
                             text = "${String.format(java.util.Locale.US, "%.1f", userScale)}x ${if (userScale > 1.25f) "• अंश/डिग्री" else ""}  रिसेट ↺",
                             style = MaterialTheme.typography.labelSmall.copy(
-                                color = TextGold,
+                                color = PrimaryButtonBackground,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Normal
                             )
@@ -428,7 +427,7 @@ fun NorthIndianChart(
             Text(
                 text = "उत्तर भारतीय कुण्डली",
                 style = MaterialTheme.typography.labelSmall.copy(
-                    color = PremiumGold,
+                    color = PrimaryButtonBackground,
                     fontWeight = FontWeight.Normal,
                     fontSize = 10.sp
                 )
@@ -436,7 +435,7 @@ fun NorthIndianChart(
             Text(
                 text = "लग्न: ${chartData.ascendantRashiHi}",
                 style = MaterialTheme.typography.labelSmall.copy(
-                    color = TextSecondaryDark,
+                    color = TextSecondary,
                     fontSize = 9.sp
                 )
             )
@@ -452,8 +451,8 @@ fun NorthIndianChart(
             Spacer(modifier = Modifier.height(10.dp))
 
             Card(
-                colors = CardDefaults.cardColors(containerColor = GlassWhite),
-                border = androidx.compose.foundation.BorderStroke(1.dp, GlassBorder),
+                colors = CardDefaults.cardColors(containerColor = ElevatedSurface),
+                border = androidx.compose.foundation.BorderStroke(1.dp, GlassCardBorder),
                 shape = RoundedCornerShape(14.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -468,14 +467,14 @@ fun NorthIndianChart(
                         Text(
                             text = significance.substringBefore(" • "),
                             style = MaterialTheme.typography.titleSmall.copy(
-                                color = TextGold,
+                                color = TextPrimary,
                                 fontWeight = FontWeight.Bold
                             )
                         )
                         Text(
                             text = "राशि: $rashiName ($rashiNum)",
                             style = MaterialTheme.typography.bodySmall.copy(
-                                color = PremiumGold,
+                                color = PrimaryButtonBackground,
                                 fontWeight = FontWeight.Normal
                             )
                         )
@@ -486,7 +485,7 @@ fun NorthIndianChart(
                     Text(
                         text = significance.substringAfter(" • ", ""),
                         style = MaterialTheme.typography.bodySmall.copy(
-                            color = TextSecondaryDark,
+                            color = TextSecondary,
                             fontSize = 11.sp
                         )
                     )
@@ -499,7 +498,7 @@ fun NorthIndianChart(
                         Text(
                             text = "स्थित ग्रह: ",
                             style = MaterialTheme.typography.bodySmall.copy(
-                                color = TextPrimaryDark,
+                                color = TextPrimary,
                                 fontWeight = FontWeight.Normal,
                                 fontSize = 11.sp
                             )
@@ -508,7 +507,7 @@ fun NorthIndianChart(
                             Text(
                                 text = planets.joinToString(", "),
                                 style = MaterialTheme.typography.bodySmall.copy(
-                                    color = DateOrange,
+                                    color = DateTimeAccent,
                                     fontWeight = FontWeight.Normal,
                                     fontSize = 12.sp
                                 )
@@ -517,7 +516,7 @@ fun NorthIndianChart(
                             Text(
                                 text = "— इस भाव में कोई ग्रह नहीं",
                                 style = MaterialTheme.typography.bodySmall.copy(
-                                    color = TextSecondaryDark,
+                                    color = TextSecondary,
                                     fontSize = 11.sp,
                                     fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
                                     fontWeight = FontWeight.Normal

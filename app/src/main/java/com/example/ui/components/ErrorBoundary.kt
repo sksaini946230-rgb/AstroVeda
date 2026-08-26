@@ -29,7 +29,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ui.theme.MinimalistGold
+import com.example.ui.theme.AppBackground
+import com.example.ui.theme.ElevatedSurface
+import com.example.ui.theme.GlassCardBorder
+import com.example.ui.theme.RahuKaalDangerColor
+import com.example.ui.theme.SurfaceBackground
+import com.example.ui.theme.TextPrimary
 import com.google.firebase.Firebase
 import com.google.firebase.crashlytics.crashlytics
 import java.io.PrintWriter
@@ -103,9 +108,9 @@ fun ErrorStateUI(
 
     val backgroundGradient = Brush.verticalGradient(
         colors = listOf(
-            Color(0xFF0F0C1B), // Cosmic deep space
-            Color(0xFF15102A),
-            Color(0xFF0F0C1B)
+            AppBackground,
+            SurfaceBackground,
+            AppBackground
         )
     )
 
@@ -128,14 +133,14 @@ fun ErrorStateUI(
                 modifier = Modifier
                     .size(80.dp)
                     .clip(RoundedCornerShape(40.dp))
-                    .background(Color(0x1AFF5252))
-                    .border(2.dp, Color(0xFFFF5252), RoundedCornerShape(40.dp)),
+                    .background(RahuKaalDangerColor.copy(alpha = 0.1f))
+                    .border(2.dp, RahuKaalDangerColor, RoundedCornerShape(40.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.ErrorOutline,
                     contentDescription = "Error Icon",
-                    tint = Color(0xFFFF5252),
+                    tint = RahuKaalDangerColor,
                     modifier = Modifier.size(44.dp)
                 )
             }
@@ -177,7 +182,7 @@ fun ErrorStateUI(
                     Text(
                         text = "गणना या नेटवर्क के दौरान एक अप्रत्याशित समस्या आई है। कृपया पुन: प्रयास करें।",
                         style = MaterialTheme.typography.bodyMedium.copy(
-                            color = Color.White.copy(alpha = 0.9f),
+                            color = TextPrimary.copy(alpha = 0.9f),
                             textAlign = TextAlign.Center,
                             lineHeight = 22.sp
                         )
@@ -252,8 +257,8 @@ fun ErrorStateUI(
                             .fillMaxWidth()
                             .heightIn(max = 200.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .background(Color(0xFF07050E))
-                            .border(1.dp, Color.White.copy(alpha = 0.12f), RoundedCornerShape(8.dp))
+                            .background(AppBackground)
+                            .border(1.dp, GlassCardBorder, RoundedCornerShape(8.dp))
                             .padding(12.dp)
                     ) {
                         val sw = StringWriter()
@@ -272,20 +277,20 @@ fun ErrorStateUI(
                                 Icon(
                                     imageVector = Icons.Default.BugReport,
                                     contentDescription = "Bug",
-                                    tint = Color(0xFFFF5252),
+                                    tint = RahuKaalDangerColor,
                                     modifier = Modifier.size(16.dp)
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
                                     text = error.javaClass.simpleName,
-                                    color = Color(0xFFFF5252),
+                                    color = RahuKaalDangerColor,
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 12.sp
                                 )
                             }
                             Text(
                                 text = error.message ?: "No error message provided.",
-                                color = Color.White.copy(alpha = 0.85f),
+                                color = TextPrimary.copy(alpha = 0.85f),
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Medium,
                                 modifier = Modifier.padding(bottom = 8.dp)

@@ -79,7 +79,7 @@ import com.example.ui.components.M3TimePickerDialog
 
 import com.example.ui.components.CelestialBackground
 import com.example.ui.components.SubTabHeader
-import com.example.ui.theme.GlassBorder
+import com.example.ui.theme.GlassCardBorder
 import com.example.ui.AppTab
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
@@ -333,7 +333,7 @@ fun KundaliScreen(
                                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedProfileList) },
                                     colors = OutlinedTextFieldDefaults.colors(
                                         focusedBorderColor = MaterialTheme.colorScheme.primary,
-                                        unfocusedBorderColor = GlassBorder,
+                                        unfocusedBorderColor = GlassCardBorder,
                                         focusedTextColor = MaterialTheme.colorScheme.onSurface,
                                         unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
                                         focusedLabelColor = MaterialTheme.colorScheme.primary,
@@ -379,7 +379,7 @@ fun KundaliScreen(
 
                         val tfColors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = GlassBorder,
+                            unfocusedBorderColor = GlassCardBorder,
                             focusedTextColor = MaterialTheme.colorScheme.onSurface,
                             unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
                             focusedLabelColor = MaterialTheme.colorScheme.primary,
@@ -569,7 +569,7 @@ fun KundaliScreen(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(MaterialTheme.colorScheme.surfaceVariant)
-                                .border(1.dp, GlassBorder, RoundedCornerShape(12.dp))
+                                .border(1.dp, GlassCardBorder, RoundedCornerShape(12.dp))
                         ) {
                             Box(
                                 modifier = Modifier

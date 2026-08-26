@@ -36,7 +36,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.R
-import com.example.ui.theme.PremiumGold
+import com.example.ui.theme.PrimaryButtonText
+import com.example.ui.theme.ProBadgeColor
+import com.example.ui.theme.ShubhSuccessColor
 import com.example.util.AppLanguage
 import com.example.util.LanguageManager
 
@@ -113,7 +115,7 @@ fun FirestoreSyncIndicator(isSyncing: Boolean, modifier: Modifier = Modifier) {
             modifier = modifier
                 .testTag("firestore_sync_indicator_synced")
                 .background(
-                    color = Color(0xFF1E3A1E).copy(alpha = 0.4f),
+                    color = ShubhSuccessColor.copy(alpha = 0.2f),
                     shape = RoundedCornerShape(4.dp)
                 )
                 .padding(horizontal = 4.dp, vertical = 2.dp)
@@ -123,20 +125,20 @@ fun FirestoreSyncIndicator(isSyncing: Boolean, modifier: Modifier = Modifier) {
                     .size(5.dp)
                     .clip(CircleShape)
                     .alpha(pulseAlpha)
-                    .background(Color(0xFF4CAF50))
+                    .background(ShubhSuccessColor)
             )
             Spacer(modifier = Modifier.width(3.dp))
             Icon(
                 imageVector = Icons.Default.CloudDone,
                 contentDescription = "Backed up",
-                tint = Color(0xFF4CAF50),
+                tint = ShubhSuccessColor,
                 modifier = Modifier.size(10.dp)
             )
             Spacer(modifier = Modifier.width(2.dp))
             Text(
                 text = LanguageManager.getString("सुरक्षित", "Synced"),
                 style = MaterialTheme.typography.labelSmall.copy(
-                    color = Color(0xFF81C784),
+                    color = ShubhSuccessColor,
                     fontSize = 9.sp,
                     fontWeight = FontWeight.Normal
                 )
@@ -264,7 +266,7 @@ fun TopHeaderBar(
                             onPremiumClick()
                         },
                         shape = RoundedCornerShape(16.dp),
-                        color = PremiumGold,
+                        color = ProBadgeColor,
                         modifier = Modifier.testTag("premium_upgrade_button")
                     ) {
                         Row(
@@ -274,7 +276,7 @@ fun TopHeaderBar(
                             Icon(
                                 imageVector = Icons.Default.Star,
                                 contentDescription = "PRO",
-                                tint = Color(0xFF1C1C1E),
+                                tint = PrimaryButtonText,
                                 modifier = Modifier.size(14.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
@@ -282,7 +284,7 @@ fun TopHeaderBar(
                                 text = "PRO",
                                 style = MaterialTheme.typography.labelMedium.copy(
                                     fontWeight = FontWeight.Normal,
-                                    color = Color(0xFF1C1C1E),
+                                    color = PrimaryButtonText,
                                     fontSize = 11.sp
                                 )
                             )

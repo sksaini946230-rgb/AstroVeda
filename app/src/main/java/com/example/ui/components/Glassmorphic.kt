@@ -40,14 +40,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ui.theme.GlassBorder
-import com.example.ui.theme.PremiumGold
+import com.example.ui.theme.GlassCardBorder
+import com.example.ui.theme.PrimaryButtonBackground
+import com.example.ui.theme.PrimaryButtonText
 import com.example.util.LanguageManager
 
 @Composable
 fun GlassCard(
     modifier: Modifier = Modifier,
-    borderColor: Color = GlassBorder,
+    borderColor: Color = GlassCardBorder,
     borderWidth: Dp = 1.dp,
     shape: RoundedCornerShape = RoundedCornerShape(20.dp),
     onClick: (() -> Unit)? = null,
@@ -100,7 +101,7 @@ fun GoldGlowButton(
         modifier = modifier
             .testTag(testTag),
         shape = RoundedCornerShape(12.dp),
-        color = PremiumGold,
+        color = PrimaryButtonBackground,
         tonalElevation = 0.dp,
         shadowElevation = 2.dp
     ) {
@@ -114,7 +115,7 @@ fun GoldGlowButton(
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
-                        tint = Color(0xFF1C1C1E),
+                        tint = PrimaryButtonText,
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -123,7 +124,7 @@ fun GoldGlowButton(
                     text = text,
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1C1C1E),
+                        color = PrimaryButtonText,
                         fontSize = 14.sp,
                         letterSpacing = 0.2.sp
                     )
@@ -155,8 +156,7 @@ fun GlassBadge(
                 fontWeight = FontWeight.Normal,
                 color = textColor,
                 fontSize = 12.sp
-            )
-            ,
+            ),
             maxLines = 1,
             softWrap = false,
             overflow = TextOverflow.Ellipsis

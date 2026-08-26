@@ -132,7 +132,7 @@ fun RateUsDialog(
                         Icon(
                             imageVector = if (isSelected) Icons.Default.Star else Icons.Outlined.StarBorder,
                             contentDescription = "Rate $starIndex stars",
-                            tint = if (isSelected) Color(0xFFFFB300) else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                            tint = if (isSelected) com.example.ui.theme.StarRatingFilled else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                             modifier = Modifier
                                 .size(42.dp)
                                 .clickable { selectedStars = starIndex }

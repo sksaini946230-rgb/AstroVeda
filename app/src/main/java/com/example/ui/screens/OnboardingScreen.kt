@@ -54,7 +54,7 @@ import com.example.R
 import com.example.ui.MainViewModel
 import com.example.ui.components.GlassCard
 import com.example.ui.components.GoldGlowButton
-import com.example.ui.theme.AuspiciousGreen
+import com.example.ui.theme.ShubhSuccessColor
 
 @Composable
 fun OnboardingScreen(
@@ -359,7 +359,7 @@ fun LocationNotificationOnboardingPage(
                 Icon(
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = null,
-                    tint = if (locationGranted) AuspiciousGreen else MaterialTheme.colorScheme.surfaceVariant,
+                    tint = if (locationGranted) ShubhSuccessColor else MaterialTheme.colorScheme.surfaceVariant,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -400,7 +400,7 @@ fun LocationNotificationOnboardingPage(
                 Icon(
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = null,
-                    tint = if (notificationGranted) AuspiciousGreen else MaterialTheme.colorScheme.surfaceVariant,
+                    tint = if (notificationGranted) ShubhSuccessColor else MaterialTheme.colorScheme.surfaceVariant,
                     modifier = Modifier.size(24.dp)
                 )
             }

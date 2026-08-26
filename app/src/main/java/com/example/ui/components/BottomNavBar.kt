@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -50,10 +48,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ui.AppTab
-import com.example.ui.theme.GoldPrimary
-import com.example.ui.theme.CosmicDeepNavy
-import com.example.ui.theme.CosmicCardSurface
-import com.example.ui.theme.TextSecondaryDark
+import com.example.ui.theme.ElevatedSurface
+import com.example.ui.theme.GlassCardBorder
+import com.example.ui.theme.NavActiveColor
+import com.example.ui.theme.NavInactiveColor
+import com.example.ui.theme.TextTertiary
 import com.example.util.LanguageManager
 
 data class NavItem(
@@ -88,10 +87,10 @@ fun BottomNavBar(
                 spotColor = Color.Black.copy(alpha = 0.4f)
             )
             .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)),
-        color = CosmicDeepNavy,
+        color = ElevatedSurface,
         tonalElevation = 0.dp
     ) {
-        // Subtle top gold accent line
+        // Subtle top accent line
         Column {
             Box(
                 modifier = Modifier
@@ -101,9 +100,8 @@ fun BottomNavBar(
                         Brush.horizontalGradient(
                             colors = listOf(
                                 Color.Transparent,
-                                GoldPrimary.copy(alpha = 0.4f),
-                                GoldPrimary.copy(alpha = 0.6f),
-                                GoldPrimary.copy(alpha = 0.4f),
+                                GlassCardBorder,
+                                GlassCardBorder,
                                 Color.Transparent
                             )
                         )
@@ -131,13 +129,13 @@ fun BottomNavBar(
                     )
 
                     val iconColor by animateColorAsState(
-                        targetValue = if (isSelected) GoldPrimary else TextSecondaryDark,
+                        targetValue = if (isSelected) NavActiveColor else NavInactiveColor,
                         animationSpec = spring(stiffness = Spring.StiffnessLow),
                         label = "iconColor"
                     )
 
                     val textColor by animateColorAsState(
-                        targetValue = if (isSelected) GoldPrimary else TextSecondaryDark.copy(alpha = 0.7f),
+                        targetValue = if (isSelected) NavActiveColor else TextTertiary,
                         animationSpec = spring(stiffness = Spring.StiffnessLow),
                         label = "textColor"
                     )
@@ -159,12 +157,12 @@ fun BottomNavBar(
                             .padding(vertical = 6.dp)
                             .testTag("nav_item_${item.tab.name.lowercase()}")
                     ) {
-                        // Glow dot indicator for selected tab
+                        // Dot indicator for selected tab
                         Box(
                             modifier = Modifier
                                 .size(if (isSelected) 4.dp else 0.dp)
                                 .clip(CircleShape)
-                                .background(GoldPrimary)
+                                .background(NavActiveColor)
                         )
 
                         Spacer(modifier = Modifier.height(3.dp))

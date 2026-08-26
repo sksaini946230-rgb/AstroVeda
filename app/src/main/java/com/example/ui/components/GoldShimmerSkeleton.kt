@@ -25,7 +25,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.ui.theme.GoldPrimary
+import com.example.ui.theme.PrimaryButtonBackground
 
 /**
  * Gold-tinted shimmer skeleton loader per FSD PAN-016.
@@ -52,9 +52,9 @@ fun GoldShimmer(
 
     val shimmerBrush = Brush.linearGradient(
         colors = listOf(
-            GoldPrimary.copy(alpha = 0.08f),
-            GoldPrimary.copy(alpha = 0.22f),
-            GoldPrimary.copy(alpha = 0.08f)
+            PrimaryButtonBackground.copy(alpha = 0.08f),
+            PrimaryButtonBackground.copy(alpha = 0.22f),
+            PrimaryButtonBackground.copy(alpha = 0.08f)
         ),
         start = Offset(translateAnim - 300f, 0f),
         end = Offset(translateAnim, 0f)

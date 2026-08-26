@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -22,7 +22,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import com.example.ui.theme.PremiumGold
+import com.example.ui.theme.AppBackground
+import com.example.ui.theme.ElevatedSurface
+import com.example.ui.theme.GlassCardBorder
+import com.example.ui.theme.PrimaryButtonBackground
+import com.example.ui.theme.PrimaryButtonText
+import com.example.ui.theme.TextPrimary
+import com.example.ui.theme.TextSecondary
 import com.example.util.LanguageManager
 
 data class DiscoveryStep(
@@ -40,13 +46,11 @@ fun FeatureDiscoveryOverlay(
 ) {
     var currentStepIndex by remember { mutableIntStateOf(0) }
     val currentStep = steps[currentStepIndex]
-    
-    val secondaryText = Color(0xFF7885A8) // Requested secondary text color
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.85f))
+            .background(AppBackground.copy(alpha = 0.85f))
             .clickable(enabled = false) {} // Consume clicks
             .zIndex(9999f),
         contentAlignment = Alignment.Center
@@ -69,7 +73,7 @@ fun FeatureDiscoveryOverlay(
                             .size(if (index == currentStepIndex) 24.dp else 8.dp, 8.dp)
                             .clip(CircleShape)
                             .background(
-                                if (index == currentStepIndex) PremiumGold else secondaryText.copy(alpha = 0.3f)
+                                if (index == currentStepIndex) PrimaryButtonBackground else TextSecondary.copy(alpha = 0.3f)
                             )
                     )
                 }
@@ -81,7 +85,7 @@ fun FeatureDiscoveryOverlay(
                     .fillMaxWidth()
                     .animateContentSize(),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFF161B22) // Dark surface
+                    containerColor = ElevatedSurface
                 ),
                 shape = RoundedCornerShape(24.dp),
                 border = BoxDefaults.PremiumBorder()
@@ -97,14 +101,14 @@ fun FeatureDiscoveryOverlay(
                             modifier = Modifier
                                 .size(64.dp)
                                 .padding(bottom = 16.dp),
-                            tint = PremiumGold
+                            tint = PrimaryButtonBackground
                         )
                     }
 
                     Text(
                         text = LanguageManager.getString(currentStep.titleHi, currentStep.titleEn),
                         style = MaterialTheme.typography.headlineSmall,
-                        color = PremiumGold,
+                        color = PrimaryButtonBackground,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
                     )
@@ -114,7 +118,7 @@ fun FeatureDiscoveryOverlay(
                     Text(
                         text = LanguageManager.getString(currentStep.descriptionHi, currentStep.descriptionEn),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = secondaryText,
+                        color = TextSecondary,
                         textAlign = TextAlign.Center,
                         lineHeight = 24.sp
                     )
@@ -129,7 +133,7 @@ fun FeatureDiscoveryOverlay(
                             onClick = onComplete,
                             modifier = Modifier.weight(1f),
                             colors = ButtonDefaults.textButtonColors(
-                                contentColor = secondaryText
+                                contentColor = TextSecondary
                             )
                         ) {
                             Text(LanguageManager.getString("छोड़ें", "Skip"))
@@ -145,8 +149,8 @@ fun FeatureDiscoveryOverlay(
                             },
                             modifier = Modifier.weight(2f),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = PremiumGold,
-                                contentColor = Color.Black
+                                containerColor = PrimaryButtonBackground,
+                                contentColor = PrimaryButtonText
                             ),
                             shape = RoundedCornerShape(12.dp)
                         ) {
@@ -159,7 +163,7 @@ fun FeatureDiscoveryOverlay(
                             )
                             if (currentStepIndex < steps.size - 1) {
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Icon(Icons.Default.ArrowForward, contentDescription = null, modifier = Modifier.size(16.dp))
+                                Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, modifier = Modifier.size(16.dp))
                             }
                         }
                     }
@@ -172,9 +176,9 @@ fun FeatureDiscoveryOverlay(
                 onClick = onComplete,
                 modifier = Modifier
                     .size(48.dp)
-                    .background(Color.White.copy(alpha = 0.1f), CircleShape)
+                    .background(GlassCardBorder, CircleShape)
             ) {
-                Icon(Icons.Default.Close, contentDescription = "Close", tint = Color.White)
+                Icon(Icons.Default.Close, contentDescription = "Close", tint = TextPrimary)
             }
         }
     }
@@ -184,6 +188,6 @@ object BoxDefaults {
     @Composable
     fun PremiumBorder() = androidx.compose.foundation.BorderStroke(
         width = 1.dp,
-        color = PremiumGold.copy(alpha = 0.2f)
+        color = GlassCardBorder
     )
 }

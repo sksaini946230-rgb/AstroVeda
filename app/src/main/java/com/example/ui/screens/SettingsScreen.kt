@@ -83,11 +83,12 @@ import com.example.ui.components.AstroLoadingIndicator
 import com.example.ui.components.GlassBadge
 import com.example.ui.components.GlassCard
 import com.example.ui.components.SectionHeader
-import com.example.ui.theme.AuspiciousGreen
-import com.example.ui.theme.GoldSecondary
-import com.example.ui.theme.InauspiciousRed
-import com.example.ui.theme.NeutralOrange
-import com.example.ui.theme.PremiumGold
+import com.example.ui.theme.PrimaryButtonPressed
+import com.example.ui.theme.PrimaryButtonText
+import com.example.ui.theme.ProBadgeColor
+import com.example.ui.theme.RahuKaalDangerColor
+import com.example.ui.theme.ShubhSuccessColor
+import com.example.ui.theme.TextPrimary
 import com.example.util.AppLanguage
 import com.example.util.LanguageManager
 
@@ -169,7 +170,7 @@ fun SettingsScreen(
                                     .clip(CircleShape)
                                     .background(
                                         brush = Brush.horizontalGradient(
-                                            listOf(PremiumGold, GoldSecondary)
+                                            listOf(ProBadgeColor, PrimaryButtonPressed)
                                         )
                                     ),
                                 contentAlignment = Alignment.Center
@@ -177,7 +178,7 @@ fun SettingsScreen(
                                 Icon(
                                     imageVector = Icons.Default.Star,
                                     contentDescription = "PRO",
-                                    tint = Color(0xFF1C1C1E),
+                                    tint = PrimaryButtonText,
                                     modifier = Modifier.size(22.dp)
                                 )
                             }
@@ -186,7 +187,7 @@ fun SettingsScreen(
                                 Text(
                                     text = "AstroVeda PRO (अपग्रेड करें)",
                                     style = MaterialTheme.typography.titleMedium.copy(
-                                        color = PremiumGold,
+                                        color = ProBadgeColor,
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 17.sp
                                     )
@@ -203,9 +204,9 @@ fun SettingsScreen(
 
                         GlassBadge(
                             text = "PRO ₹99/माह",
-                            backgroundColor = PremiumGold.copy(alpha = 0.15f),
-                            textColor = PremiumGold,
-                            borderColor = PremiumGold
+                            backgroundColor = ProBadgeColor.copy(alpha = 0.15f),
+                            textColor = ProBadgeColor,
+                            borderColor = ProBadgeColor
                         )
                     }
 
@@ -226,7 +227,7 @@ fun SettingsScreen(
                             .clip(RoundedCornerShape(12.dp))
                             .background(
                                 brush = Brush.horizontalGradient(
-                                    listOf(PremiumGold, GoldSecondary)
+                                    listOf(ProBadgeColor, PrimaryButtonPressed)
                                 )
                             )
                             .padding(vertical = 10.dp),
@@ -235,7 +236,7 @@ fun SettingsScreen(
                         Text(
                             text = "अभी PRO अपग्रेड करें • ₹99/माह",
                             style = MaterialTheme.typography.labelMedium.copy(
-                                color = Color(0xFF1C1C1E),
+                                color = PrimaryButtonText,
                                 fontWeight = FontWeight.Normal,
                                 fontSize = 13.sp
                             )
@@ -746,8 +747,8 @@ fun SettingsScreen(
 
                         GlassBadge(
                             text = "🔍 Grounded by Google",
-                            textColor = AuspiciousGreen,
-                            borderColor = AuspiciousGreen
+                            textColor = ShubhSuccessColor,
+                            borderColor = ShubhSuccessColor
                         )
                     }
 
@@ -1017,7 +1018,7 @@ fun SettingsScreen(
                             Icon(
                                 imageVector = Icons.Default.DeleteForever,
                                 contentDescription = null,
-                                tint = InauspiciousRed,
+                                tint = RahuKaalDangerColor,
                                 modifier = Modifier.size(22.dp)
                             )
                             Spacer(modifier = Modifier.width(10.dp))
@@ -1044,8 +1045,8 @@ fun SettingsScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(12.dp))
-                            .background(InauspiciousRed.copy(alpha = 0.1f))
-                            .border(1.dp, InauspiciousRed.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
+                            .background(RahuKaalDangerColor.copy(alpha = 0.1f))
+                            .border(1.dp, RahuKaalDangerColor.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
                             .clickable {
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                 showDeleteAccountDialog = true
@@ -1058,14 +1059,14 @@ fun SettingsScreen(
                             Icon(
                                 imageVector = Icons.Default.DeleteForever,
                                 contentDescription = null,
-                                tint = InauspiciousRed,
+                                tint = RahuKaalDangerColor,
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = if (currentUser != null) "खाता एवं सभी डेटा हटाएं (Delete Account & Data)" else "सभी सहेजा गया डेटा हटाएं (Delete Local Data)",
                                 style = MaterialTheme.typography.labelMedium.copy(
-                                    color = InauspiciousRed,
+                                    color = RahuKaalDangerColor,
                                     fontWeight = FontWeight.Normal,
                                     fontSize = 12.sp
                                 )
@@ -1327,7 +1328,7 @@ fun SettingsScreen(
                 Icon(
                     imageVector = Icons.Default.Warning,
                     contentDescription = null,
-                    tint = InauspiciousRed,
+                    tint = RahuKaalDangerColor,
                     modifier = Modifier.size(32.dp)
                 )
             },
@@ -1364,9 +1365,9 @@ fun SettingsScreen(
                             viewModel.deleteLocalDataOnly()
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = InauspiciousRed)
+                    colors = ButtonDefaults.buttonColors(containerColor = RahuKaalDangerColor)
                 ) {
-                    Text("हां, हटाएँ (Delete)", color = Color.White, fontWeight = FontWeight.Bold)
+                    Text("हां, हटाएँ (Delete)", color = TextPrimary, fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {

@@ -7,47 +7,52 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val AstroDarkColorScheme = darkColorScheme(
-    primary = SacredSaffron,
-    onPrimary = Color.Black,
-    primaryContainer = CosmicPrimaryContainer,
-    onPrimaryContainer = SacredSaffron,
-    secondary = GoldSecondary,
-    onSecondary = Color.Black,
-    secondaryContainer = CosmicCardSurface,
-    onSecondaryContainer = TextPrimaryDark,
-    tertiary = GoldGlow,
-    onTertiary = Color.Black,
-    background = CosmicDeepNavy,
-    onBackground = TextPrimaryDark,
-    surface = CosmicCardSurface,
-    onSurface = TextPrimaryDark,
-    surfaceVariant = CosmicSurfaceVariant,
-    onSurfaceVariant = TextSecondaryDark,
-    outline = CosmicOutline
+    primary = PrimaryButtonBackground,
+    onPrimary = PrimaryButtonText,
+    primaryContainer = ElevatedSurface,
+    onPrimaryContainer = TextPrimary,
+    secondary = DateTimeAccent,
+    onSecondary = PrimaryButtonText,
+    secondaryContainer = SurfaceBackground,
+    onSecondaryContainer = TextPrimary,
+    tertiary = NavActiveColor,
+    onTertiary = PrimaryButtonText,
+    background = AppBackground,
+    onBackground = TextPrimary,
+    surface = SurfaceBackground,
+    onSurface = TextPrimary,
+    surfaceVariant = ElevatedSurface,
+    onSurfaceVariant = TextSecondary,
+    outline = GlassCardBorder,
+    outlineVariant = TextTertiary,
+    error = RahuKaalDangerColor,
+    onError = PrimaryButtonText
 )
 
-private val AstroLightColorScheme = lightColorScheme(
-    primary = GoldPrimary,
-    onPrimary = DeepNavy,
-    primaryContainer = CelestialPrimaryContainer,
-    onPrimaryContainer = CelestialOnPrimaryContainer,
-    secondary = GoldSecondary,
-    onSecondary = DeepNavy,
-    secondaryContainer = CelestialSurfaceVariant,
-    onSecondaryContainer = TextPrimaryLight,
-    tertiary = SacredSaffron,
-    onTertiary = DeepNavy,
-    background = CelestialCream,
-    onBackground = TextPrimaryLight,
-    surface = Color.White,
-    onSurface = TextPrimaryLight,
-    surfaceVariant = CelestialSurfaceVariant,
-    onSurfaceVariant = TextSecondaryLight,
-    outline = CelestialOutline
+private val AstroLightColorScheme = darkColorScheme(
+    primary = PrimaryButtonBackground,
+    onPrimary = PrimaryButtonText,
+    primaryContainer = ElevatedSurface,
+    onPrimaryContainer = TextPrimary,
+    secondary = DateTimeAccent,
+    onSecondary = PrimaryButtonText,
+    secondaryContainer = SurfaceBackground,
+    onSecondaryContainer = TextPrimary,
+    tertiary = NavActiveColor,
+    onTertiary = PrimaryButtonText,
+    background = AppBackground,
+    onBackground = TextPrimary,
+    surface = SurfaceBackground,
+    onSurface = TextPrimary,
+    surfaceVariant = ElevatedSurface,
+    onSurfaceVariant = TextSecondary,
+    outline = GlassCardBorder,
+    outlineVariant = TextTertiary,
+    error = RahuKaalDangerColor,
+    onError = PrimaryButtonText
 )
 
 @Composable

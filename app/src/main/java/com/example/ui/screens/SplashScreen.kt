@@ -34,9 +34,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ui.theme.GoldPrimary
-import com.example.ui.theme.GoldGlow
-import com.example.ui.theme.DeepNavy
+import com.example.ui.theme.AppBackground
+import com.example.ui.theme.ElevatedSurface
+import com.example.ui.theme.PrimaryButtonBackground
+import com.example.ui.theme.SurfaceBackground
+import com.example.ui.theme.TextPrimary
+import com.example.ui.theme.TextSecondary
 import kotlinx.coroutines.delay
 import kotlin.math.sin
 import kotlin.random.Random
@@ -126,8 +129,8 @@ fun SplashScreen(
             .background(
                 Brush.radialGradient(
                     colors = listOf(
-                        Color(0xFF0F1320), // Deep Space center
-                        Color(0xFF080A14), // Void Black edges
+                        SurfaceBackground, // Deep Space center
+                        AppBackground, // Void Black edges
                         Color(0xFF1A0A2E)  // Subtle violet edge
                     ),
                     radius = 1200f
@@ -140,7 +143,7 @@ fun SplashScreen(
             stars.forEach { star ->
                 val offsetY = sin((starTime + star.phase).toDouble()).toFloat() * 8f
                 drawCircle(
-                    color = Color.White.copy(alpha = star.alpha),
+                    color = TextPrimary.copy(alpha = star.alpha),
                     radius = star.size,
                     center = Offset(
                         x = star.x * size.width,
@@ -164,8 +167,8 @@ fun SplashScreen(
                     drawCircle(
                         brush = Brush.radialGradient(
                             colors = listOf(
-                                GoldGlow.copy(alpha = 0.4f),
-                                GoldGlow.copy(alpha = 0.1f),
+                                PrimaryButtonBackground.copy(alpha = 0.4f),
+                                PrimaryButtonBackground.copy(alpha = 0.1f),
                                 Color.Transparent
                             )
                         ),
@@ -177,7 +180,7 @@ fun SplashScreen(
                     text = "ॐ",
                     fontSize = 64.sp,
                     fontWeight = FontWeight.Bold,
-                    color = GoldPrimary,
+                    color = PrimaryButtonBackground,
                     modifier = Modifier
                         .scale(logoScale.value)
                         .alpha(logoAlpha.value)
@@ -191,7 +194,7 @@ fun SplashScreen(
                 text = "AstroVeda",
                 fontSize = 42.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color = GoldPrimary,
+                color = PrimaryButtonBackground,
                 modifier = Modifier.alpha(nameAlpha.value),
                 textAlign = TextAlign.Center
             )
@@ -205,7 +208,7 @@ fun SplashScreen(
                 text = displayedTagline,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Medium,
-                color = GoldGlow.copy(alpha = 0.85f),
+                color = TextPrimary.copy(alpha = 0.85f),
                 textAlign = TextAlign.Center
             )
         }

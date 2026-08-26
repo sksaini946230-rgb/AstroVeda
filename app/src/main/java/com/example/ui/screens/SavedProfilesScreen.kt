@@ -55,8 +55,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.ui.graphics.Color
-import com.example.ui.theme.AuspiciousGreen
-import com.example.ui.theme.CosmicCardSurface
+import com.example.ui.theme.ElevatedSurface
+import com.example.ui.theme.PrimaryButtonText
+import com.example.ui.theme.RahuKaalDangerColor
+import com.example.ui.theme.ShubhSuccessColor
+import com.example.ui.theme.TextPrimary
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -81,7 +84,6 @@ import com.example.ui.components.EmptyStateComponent
 import com.example.ui.components.M3DatePickerDialog
 import com.example.ui.components.M3TimePickerDialog
 import com.example.ui.components.SectionHeader
-import com.example.ui.theme.InauspiciousRed
 import com.example.util.LanguageManager
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -157,7 +159,7 @@ fun SavedProfilesScreen(viewModel: MainViewModel) {
                     state = dismissState,
                     backgroundContent = {
                         val color = when (dismissState.dismissDirection) {
-                            SwipeToDismissBoxValue.EndToStart, SwipeToDismissBoxValue.StartToEnd -> InauspiciousRed.copy(alpha = 0.8f)
+                            SwipeToDismissBoxValue.EndToStart, SwipeToDismissBoxValue.StartToEnd -> RahuKaalDangerColor.copy(alpha = 0.8f)
                             else -> Color.Transparent
                         }
                         Box(
@@ -171,7 +173,7 @@ fun SavedProfilesScreen(viewModel: MainViewModel) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
                                 contentDescription = "Swipe to Delete Profile",
-                                tint = Color.White
+                                tint = PrimaryButtonText
                             )
                         }
                     }
@@ -437,7 +439,7 @@ fun SavedProfileCard(
                     }
 
                     IconButton(onClick = onDelete, modifier = Modifier.testTag("delete_profile_${profile.id}")) {
-                        Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete", tint = InauspiciousRed)
+                        Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete", tint = RahuKaalDangerColor)
                     }
                 }
 
@@ -540,7 +542,7 @@ fun SavedReportCard(
                         onClick = onDelete,
                         modifier = Modifier.testTag("delete_report_${report.id}")
                     ) {
-                        Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Report", tint = InauspiciousRed)
+                        Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Report", tint = RahuKaalDangerColor)
                     }
                 }
 
@@ -594,163 +596,163 @@ fun CloudBackupCard(
             }
     ) {
         GlassCard(modifier = Modifier.fillMaxWidth()) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.CloudUpload,
-                        contentDescription = "Cloud Backup",
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Text(
-                        text = LanguageManager.getString("क्लाउड बैकअप (Firebase)", "Firebase Cloud Sync"),
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    )
-                }
-
-                if (currentUser != null) {
-                    GlassBadge(
-                        text = "Online",
-                        backgroundColor = AuspiciousGreen.copy(alpha = 0.2f),
-                        textColor = AuspiciousGreen
-                    )
-                } else {
-                    GlassBadge(
-                        text = "Offline",
-                        backgroundColor = Color.Gray.copy(alpha = 0.2f),
-                        textColor = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            if (currentUser != null) {
-                Text(
-                    text = LanguageManager.getString(
-                        "साइन इन किया: ${currentUser?.displayName ?: currentUser?.email ?: "उपयोगकर्ता"}",
-                        "Signed in as: ${currentUser?.displayName ?: currentUser?.email ?: "User"}"
-                    ),
-                    style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface)
-                )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Box(modifier = Modifier.weight(1f)) {
-                        GoldGlowButton(
-                            text = LanguageManager.getString("बैकअप (Backup)", "Backup to Cloud"),
-                            onClick = { viewModel.backupProfilesToCloud() },
-                            modifier = Modifier.fillMaxWidth().testTag("backup_to_cloud_button")
-                        )
-                    }
-
-                    Box(modifier = Modifier.weight(1f)) {
-                        OutlinedButton(
-                            onClick = { viewModel.restoreProfilesFromCloud() },
-                            modifier = Modifier.fillMaxWidth().testTag("restore_from_cloud_button"),
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
-                        ) {
-                            Text(
-                                text = LanguageManager.getString("पुनर्प्राप्त (Restore)", "Restore"),
-                                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal)
-                            )
-                        }
-                    }
-                }
-
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    TextButton(
-                        onClick = { showDeleteAccountDialog = true },
-                        modifier = Modifier.testTag("delete_account_button")
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
+                        Icon(
+                            imageVector = Icons.Default.CloudUpload,
+                            contentDescription = "Cloud Backup",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
                         Text(
-                            text = LanguageManager.getString("खाता एवं डेटा हटाएँ (Delete Account)", "Delete Account & Data"),
-                            style = MaterialTheme.typography.labelSmall.copy(color = InauspiciousRed)
+                            text = LanguageManager.getString("क्लाउड बैकअप (Firebase)", "Firebase Cloud Sync"),
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
                         )
                     }
 
-                    TextButton(
-                        onClick = { viewModel.signOutFirebase() },
-                        modifier = Modifier.testTag("sign_out_button")
-                    ) {
-                        Text(
-                            text = LanguageManager.getString("साइन आउट (Sign Out)", "Sign Out"),
-                            style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    if (currentUser != null) {
+                        GlassBadge(
+                            text = "Online",
+                            backgroundColor = ShubhSuccessColor.copy(alpha = 0.2f),
+                            textColor = ShubhSuccessColor
+                        )
+                    } else {
+                        GlassBadge(
+                            text = "Offline",
+                            backgroundColor = Color.Gray.copy(alpha = 0.2f),
+                            textColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
-            } else {
-                Text(
-                    text = LanguageManager.getString(
-                        "अपने कुण्डली प्रोफाइल को सुरक्षित रूप से गूगल क्लाउड पर बैकअप करने के लिए गूगल से साइन इन करें।",
-                        "Sign in with Google to securely back up and sync your Kundali profiles to Firebase Cloud."
-                    ),
-                    style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
-                )
 
-                GoldGlowButton(
-                    text = LanguageManager.getString("Google से साइन इन करें", "Sign In with Google"),
-                    onClick = { viewModel.signInWithGoogle(context) },
-                    modifier = Modifier.fillMaxWidth().testTag("google_sign_in_button")
-                )
-            }
+                if (currentUser != null) {
+                    Text(
+                        text = LanguageManager.getString(
+                            "साइन इन किया: ${currentUser?.displayName ?: currentUser?.email ?: "उपयोगकर्ता"}",
+                            "Signed in as: ${currentUser?.displayName ?: currentUser?.email ?: "User"}"
+                        ),
+                        style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface)
+                    )
 
-            if (!backupStatusMessage.isNullOrBlank()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(CosmicCardSurface.copy(alpha = 0.6f))
-                        .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
-                        .padding(10.dp)
-                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Box(modifier = Modifier.weight(1f)) {
+                            GoldGlowButton(
+                                text = LanguageManager.getString("बैकअप (Backup)", "Backup to Cloud"),
+                                onClick = { viewModel.backupProfilesToCloud() },
+                                modifier = Modifier.fillMaxWidth().testTag("backup_to_cloud_button")
+                            )
+                        }
+
+                        Box(modifier = Modifier.weight(1f)) {
+                            OutlinedButton(
+                                onClick = { viewModel.restoreProfilesFromCloud() },
+                                modifier = Modifier.fillMaxWidth().testTag("restore_from_cloud_button"),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+                            ) {
+                                Text(
+                                    text = LanguageManager.getString("पुनर्प्राप्त (Restore)", "Restore"),
+                                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal)
+                                )
+                            }
+                        }
+                    }
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = backupStatusMessage!!,
-                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.primary),
-                            modifier = Modifier.weight(1f)
-                        )
-                        IconButton(
-                            onClick = { viewModel.clearBackupStatusMessage() },
-                            modifier = Modifier.size(24.dp)
+                        TextButton(
+                            onClick = { showDeleteAccountDialog = true },
+                            modifier = Modifier.testTag("delete_account_button")
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "Clear Message",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.size(16.dp)
+                            Text(
+                                text = LanguageManager.getString("खाता एवं डेटा हटाएँ (Delete Account)", "Delete Account & Data"),
+                                style = MaterialTheme.typography.labelSmall.copy(color = RahuKaalDangerColor)
                             )
+                        }
+
+                        TextButton(
+                            onClick = { viewModel.signOutFirebase() },
+                            modifier = Modifier.testTag("sign_out_button")
+                        ) {
+                            Text(
+                                text = LanguageManager.getString("साइन आउट (Sign Out)", "Sign Out"),
+                                style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            )
+                        }
+                    }
+                } else {
+                    Text(
+                        text = LanguageManager.getString(
+                            "अपने कुण्डली प्रोफाइल को सुरक्षित रूप से गूगल क्लाउड पर बैकअप करने के लिए गूगल से साइन इन करें।",
+                            "Sign in with Google to securely back up and sync your Kundali profiles to Firebase Cloud."
+                        ),
+                        style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    )
+
+                    GoldGlowButton(
+                        text = LanguageManager.getString("Google से साइन इन करें", "Sign In with Google"),
+                        onClick = { viewModel.signInWithGoogle(context) },
+                        modifier = Modifier.fillMaxWidth().testTag("google_sign_in_button")
+                    )
+                }
+
+                if (!backupStatusMessage.isNullOrBlank()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(ElevatedSurface.copy(alpha = 0.6f))
+                            .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
+                            .padding(10.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = backupStatusMessage!!,
+                                style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.primary),
+                                modifier = Modifier.weight(1f)
+                            )
+                            IconButton(
+                                onClick = { viewModel.clearBackupStatusMessage() },
+                                modifier = Modifier.size(24.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "Clear Message",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
                         }
                     }
                 }
             }
         }
-    }
     }
 
     if (showDeleteAccountDialog) {
@@ -760,7 +762,7 @@ fun CloudBackupCard(
                 Icon(
                     imageVector = Icons.Default.Warning,
                     contentDescription = null,
-                    tint = InauspiciousRed,
+                    tint = RahuKaalDangerColor,
                     modifier = Modifier.size(32.dp)
                 )
             },
@@ -788,11 +790,11 @@ fun CloudBackupCard(
                         showDeleteAccountDialog = false
                         viewModel.deleteAccountAndData()
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = InauspiciousRed)
+                    colors = ButtonDefaults.buttonColors(containerColor = RahuKaalDangerColor)
                 ) {
                     Text(
                         text = LanguageManager.getString("हां, हटाएँ (Delete)", "Delete Account"),
-                        color = androidx.compose.ui.graphics.Color.White,
+                        color = TextPrimary,
                         fontWeight = FontWeight.Bold
                     )
                 }
