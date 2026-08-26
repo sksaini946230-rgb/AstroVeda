@@ -370,4 +370,45 @@ class AstroVedaComprehensiveQATest {
         assertEquals(9, fallbackKundali.planets.size)
         assertEquals(12, fallbackKundali.housePlanetsMap.size)
     }
+
+    // --- 12. Full Hindi / English Localization Integrity ---
+
+    @Test
+    fun testBilingualLocalizationIntegrity() {
+        // Test LanguageManager String Resolution
+        com.example.util.LanguageManager.setLanguage(com.example.util.AppLanguage.HINDI)
+        val hindiGreeting = com.example.util.LanguageManager.getString("दैनिक पंचांग", "Daily Panchang")
+        assertEquals("दैनिक पंचांग", hindiGreeting)
+
+        com.example.util.LanguageManager.setLanguage(com.example.util.AppLanguage.ENGLISH)
+        val englishGreeting = com.example.util.LanguageManager.getString("दैनिक पंचांग", "Daily Panchang")
+        assertEquals("Daily Panchang", englishGreeting)
+
+        // Reset to default
+        com.example.util.LanguageManager.setLanguage(com.example.util.AppLanguage.HINDI)
+
+        // Test 12 Rashis have non-empty Hindi and English labels & readings
+        val rashis = RashifalProvider.getDailyHoroscope()
+        assertEquals(12, rashis.size)
+        rashis.forEach { rashi ->
+            assertTrue("Rashi name in Hindi must not be blank", rashi.rashiNameHi.isNotBlank())
+            assertTrue("Rashi name in English must not be blank", rashi.rashiNameEn.isNotBlank())
+            assertTrue("General reading Hindi must not be blank", rashi.generalReadingHi.isNotBlank())
+            assertTrue("General reading English must not be blank", rashi.generalReadingEn.isNotBlank())
+        }
+
+        // Test 9 Planets have valid Hindi & English short names
+        val testKundali = KundaliCalculator.generateKundali(
+            name = "Test",
+            dobString = "1995-05-15",
+            tobString = "12:00",
+            placeName = "Jaipur"
+        )
+        assertEquals(9, testKundali.planets.size)
+        testKundali.planets.forEach { p ->
+            assertTrue("Planet English name must not be blank", p.planetNameEn.isNotBlank())
+            assertTrue("Planet Hindi name must not be blank", p.planetNameHi.isNotBlank())
+            assertTrue("Planet Nakshatra in Hindi must not be blank", p.nakshatraHi.isNotBlank())
+        }
+    }
 }

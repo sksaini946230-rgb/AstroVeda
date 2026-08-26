@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">AstroVeda</string>
+    <string name="notif_channel_panchang_name">दिव्य दैनिक पंचांग</string>
+    <string name="notif_channel_panchang_desc">तिथि, नक्षत्र और शुभ समय के लिए दैनिक अलर्ट।</string>
+    <string name="notif_daily_panchang_title">✨ दिव्य दैनिक पंचांग</string>
+    <string name="notif_channel_muhurat_name">शुभ मुहूर्त अलर्ट</string>
+    <string name="notif_channel_muhurat_desc">प्रतिदिन शुभ मुहूर्त, अभिजित मुहूर्त, चौघड़िया एवं ब्रह्म मुहूर्त की सूचनाएं।</string>
+</resources>
