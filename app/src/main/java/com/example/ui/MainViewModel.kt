@@ -356,9 +356,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _selectedTab.value = AppTab.MUHURAT
     }
 
-    // Language Toggle
+    // Language Toggle & Selection
     fun toggleLanguage() {
         LanguageManager.toggleLanguage()
+    }
+
+    fun setLanguage(lang: com.example.util.AppLanguage) {
+        LanguageManager.setLanguage(lang)
     }
 
     // Selected City Location for Panchang

@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -26,11 +27,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.CloudDone
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.NotificationsActive
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.RadioButtonChecked
+import androidx.compose.material.icons.filled.RadioButtonUnchecked
+import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -44,6 +50,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -55,15 +62,21 @@ import com.example.ui.MainViewModel
 import com.example.ui.components.GlassCard
 import com.example.ui.components.GoldGlowButton
 import com.example.ui.theme.ShubhSuccessColor
+import com.example.util.AppLanguage
+import com.example.util.LanguageManager
 
 @Composable
 fun OnboardingScreen(
     viewModel: MainViewModel,
     onComplete: () -> Unit
 ) {
+    val context = LocalContext.current
     var pageIndex by remember { mutableIntStateOf(0) }
+    val totalPages = 4
+
     val selectedRashiId by viewModel.selectedRashiId.collectAsState()
     val selectedCity by viewModel.selectedCity.collectAsState()
+    val currentUser by viewModel.currentUser.collectAsState()
 
     var locationPermissionGranted by remember { mutableStateOf(true) }
     var notificationPermissionGranted by remember { mutableStateOf(true) }
@@ -74,7 +87,7 @@ fun OnboardingScreen(
             .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
     ) {
-        // Skip Button Top Right
+        // Top Bar: Page Indicators (Dots) & Skip Button
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -84,16 +97,20 @@ fun OnboardingScreen(
         ) {
             // Page Indicators (Dots)
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                repeat(3) { idx ->
+                repeat(totalPages) { idx ->
                     Box(
                         modifier = Modifier
                             .size(if (idx == pageIndex) 24.dp else 8.dp, 8.dp)
                             .clip(RoundedCornerShape(4.dp))
-                            .background(if (idx == pageIndex) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
+                            .background(
+                                if (idx == pageIndex) MaterialTheme.colorScheme.primary
+                                else MaterialTheme.colorScheme.surfaceVariant
+                            )
                     )
                 }
             }
 
+            // Skip Button Top Right
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(16.dp))
@@ -103,7 +120,7 @@ fun OnboardingScreen(
                     .testTag("onboarding_skip_button")
             ) {
                 Text(
-                    text = "छोड़ें (Skip)",
+                    text = LanguageManager.getString("छोड़ें (Skip)", "Skip"),
                     style = MaterialTheme.typography.labelSmall.copy(
                         fontWeight = FontWeight.Normal,
                         color = MaterialTheme.colorScheme.primary,
@@ -117,11 +134,11 @@ fun OnboardingScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 60.dp, bottom = 80.dp),
+                .padding(top = 55.dp, bottom = 80.dp),
             contentAlignment = Alignment.Center
         ) {
             when (pageIndex) {
-                0 -> WelcomeOnboardingPage()
+                0 -> LanguageSelectOnboardingPage(viewModel)
                 1 -> RashiSelectOnboardingPage(viewModel)
                 2 -> LocationNotificationOnboardingPage(
                     selectedCityName = selectedCity.cityNameHindi,
@@ -130,42 +147,55 @@ fun OnboardingScreen(
                     onToggleLocation = { locationPermissionGranted = !locationPermissionGranted },
                     onToggleNotification = { notificationPermissionGranted = !notificationPermissionGranted }
                 )
+                3 -> CloudAccountOnboardingPage(
+                    context = context,
+                    viewModel = viewModel,
+                    onComplete = onComplete
+                )
             }
         }
 
-        // Bottom Action Button (Next / Start)
+        // Bottom Action Buttons (Next / Get Started)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 12.dp)
         ) {
-            GoldGlowButton(
-                text = if (pageIndex < 2) "आगे बढ़ें (Next)" else "प्रारंभ करें (Get Started)",
-                onClick = {
-                    if (pageIndex < 2) {
-                        pageIndex++
-                    } else {
-                        onComplete()
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                testTag = "onboarding_next_button"
-            )
+            if (pageIndex < 3) {
+                GoldGlowButton(
+                    text = LanguageManager.getString("आगे बढ़ें (Next)", "Next"),
+                    onClick = { pageIndex++ },
+                    modifier = Modifier.fillMaxWidth(),
+                    testTag = "onboarding_next_button"
+                )
+            } else {
+                GoldGlowButton(
+                    text = LanguageManager.getString("ऐप शुरू करें (Get Started)", "Enter AstroVeda"),
+                    onClick = { onComplete() },
+                    modifier = Modifier.fillMaxWidth(),
+                    testTag = "onboarding_start_button"
+                )
+            }
         }
     }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Page 0: Welcome & Language Selection
+// ─────────────────────────────────────────────────────────────────────────────
 @Composable
-fun WelcomeOnboardingPage() {
+fun LanguageSelectOnboardingPage(viewModel: MainViewModel) {
+    val currentLang = LanguageManager.currentLanguage
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = Modifier.padding(16.dp)
+        modifier = Modifier.padding(horizontal = 12.dp)
     ) {
         Box(
             modifier = Modifier
-                .size(100.dp)
+                .size(90.dp)
                 .clip(CircleShape)
                 .background(
                     brush = Brush.radialGradient(
@@ -179,19 +209,20 @@ fun WelcomeOnboardingPage() {
                 painter = painterResource(id = R.drawable.img_app_icon_1784710282310),
                 contentDescription = "AstroVeda Logo",
                 modifier = Modifier
-                    .size(86.dp)
+                    .size(76.dp)
                     .clip(CircleShape)
             )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             text = "AstroVeda",
             style = MaterialTheme.typography.displayMedium.copy(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
-                letterSpacing = 1.sp
+                letterSpacing = 1.sp,
+                fontSize = 32.sp
             )
         )
 
@@ -199,25 +230,129 @@ fun WelcomeOnboardingPage() {
             text = "वैदिक पंचांग एवं कुण्डली 2026",
             style = MaterialTheme.typography.titleMedium.copy(
                 color = MaterialTheme.colorScheme.secondary,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                fontSize = 15.sp
             )
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
-        GlassCard(modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = "100% सटीक वैदिक पंचांग, दैनिक राशिफल, शुभ मुहूर्त एवं एआई ज्योतिषाचार्य परामर्श। भारत का सबसे भरोसेमंद वैदिक पंचांग ऐप।",
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Center,
-                    lineHeight = 22.sp
-                )
+        Text(
+            text = "भाषा का चयन करें / Select App Language",
+            style = MaterialTheme.typography.titleSmall.copy(
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = 14.5.sp
             )
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Language Choice Cards
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            // Hindi Option
+            val isHindi = currentLang == AppLanguage.HINDI
+            GlassCard(
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable { viewModel.setLanguage(AppLanguage.HINDI) }
+                    .border(
+                        width = if (isHindi) 2.dp else 1.dp,
+                        color = if (isHindi) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                        shape = RoundedCornerShape(16.dp)
+                    )
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(vertical = 12.dp)
+                ) {
+                    Icon(
+                        imageVector = if (isHindi) Icons.Default.RadioButtonChecked else Icons.Default.RadioButtonUnchecked,
+                        contentDescription = "Hindi",
+                        tint = if (isHindi) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(22.dp)
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = "हिन्दी",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 16.sp
+                        )
+                    )
+                    Text(
+                        text = "Vedic Hindi",
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 11.sp
+                        )
+                    )
+                }
+            }
+
+            // English Option
+            val isEnglish = currentLang == AppLanguage.ENGLISH
+            GlassCard(
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable { viewModel.setLanguage(AppLanguage.ENGLISH) }
+                    .border(
+                        width = if (isEnglish) 2.dp else 1.dp,
+                        color = if (isEnglish) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                        shape = RoundedCornerShape(16.dp)
+                    )
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(vertical = 12.dp)
+                ) {
+                    Icon(
+                        imageVector = if (isEnglish) Icons.Default.RadioButtonChecked else Icons.Default.RadioButtonUnchecked,
+                        contentDescription = "English",
+                        tint = if (isEnglish) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(22.dp)
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = "English",
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 16.sp
+                        )
+                    )
+                    Text(
+                        text = "International",
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 11.sp
+                        )
+                    )
+                }
+            }
         }
+
+        Spacer(modifier = Modifier.height(14.dp))
+
+        Text(
+            text = "💡 आप बाद में कभी भी सेटिंग्स से भाषा बदल सकते हैं\n(You can change the language anytime in Settings)",
+            style = MaterialTheme.typography.bodySmall.copy(
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                fontSize = 11.5.sp,
+                lineHeight = 16.sp
+            )
+        )
     }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Page 1: Rashi / Zodiac Selection
+// ─────────────────────────────────────────────────────────────────────────────
 @Composable
 fun RashiSelectOnboardingPage(viewModel: MainViewModel) {
     val horoscopes = viewModel.dailyHoroscopes
@@ -225,16 +360,19 @@ fun RashiSelectOnboardingPage(viewModel: MainViewModel) {
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
-            text = "अपनी राशि चुनें (Select Your Rashi)",
+            text = LanguageManager.getString("अपनी राशि चुनें (Select Your Rashi)", "Select Your Zodiac Sign (Rashi)"),
             style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
-                fontSize = 20.sp
+                fontSize = 19.sp
             )
         )
 
         Text(
-            text = "दैनिक सटीक राशिफल एवं व्यक्तिगत सूचनाओं हेतु अपनी राशि का चयन करें",
+            text = LanguageManager.getString(
+                "दैनिक सटीक राशिफल एवं व्यक्तिगत सूचनाओं हेतु अपनी राशि का चयन करें",
+                "Choose your Moon/Sun sign for personalized daily horoscope & transit insights"
+            ),
             style = MaterialTheme.typography.bodySmall.copy(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -242,43 +380,43 @@ fun RashiSelectOnboardingPage(viewModel: MainViewModel) {
             )
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
             items(horoscopes) { item ->
                 val isSelected = (item.rashiId == selectedRashiId)
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(16.dp))
+                        .clip(RoundedCornerShape(14.dp))
                         .background(if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
                         .border(
                             1.2.dp,
                             if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
-                            RoundedCornerShape(16.dp)
+                            RoundedCornerShape(14.dp)
                         )
                         .clickable { viewModel.selectRashi(item.rashiId) }
-                        .padding(12.dp)
+                        .padding(10.dp)
                         .testTag("onboarding_rashi_${item.rashiId}"),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             text = item.symbol,
-                            fontSize = 28.sp,
+                            fontSize = 24.sp,
                             color = if (isSelected) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.primary
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
-                            text = item.rashiNameHi.substringBefore(" "),
+                            text = LanguageManager.getString(item.rashiNameHi.substringBefore(" "), item.rashiNameEn),
                             style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.Normal,
-                                color = if (isSelected) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.primary,
-                                fontSize = 13.sp
+                                fontWeight = FontWeight.SemiBold,
+                                color = if (isSelected) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.onSurface,
+                                fontSize = 12.sp
                             )
                         )
                     }
@@ -288,6 +426,9 @@ fun RashiSelectOnboardingPage(viewModel: MainViewModel) {
     }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Page 2: Permissions Setup (Location & Notification)
+// ─────────────────────────────────────────────────────────────────────────────
 @Composable
 fun LocationNotificationOnboardingPage(
     selectedCityName: String,
@@ -301,22 +442,25 @@ fun LocationNotificationOnboardingPage(
             imageVector = Icons.Default.AutoAwesome,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(48.dp)
+            modifier = Modifier.size(44.dp)
         )
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "अनुमतियां (Setup Permissions)",
+            text = LanguageManager.getString("अनुमतियां (Setup Permissions)", "Permissions Setup"),
             style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
-                fontSize = 20.sp
+                fontSize = 19.sp
             )
         )
 
         Text(
-            text = "सटीक सूर्योदय, सूर्यास्त व राहुकाल गणना हेतु स्थान अनुमति आवश्यक है",
+            text = LanguageManager.getString(
+                "सटीक सूर्योदय, सूर्यास्त व राहुकाल गणना हेतु स्थान एवं सूचना अनुमति आवश्यक है",
+                "Location & notification permissions enable accurate local astronomical timings & alerts."
+            ),
             style = MaterialTheme.typography.bodySmall.copy(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -324,7 +468,7 @@ fun LocationNotificationOnboardingPage(
             )
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         GlassCard(
             modifier = Modifier
@@ -346,12 +490,12 @@ fun LocationNotificationOnboardingPage(
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text(
-                            text = "स्थान अनुमति (GPS Location)",
+                            text = LanguageManager.getString("स्थान अनुमति (GPS Location)", "GPS Location Access"),
                             style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                         )
                         Text(
-                            text = "वर्तमान स्थान: $selectedCityName",
-                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
+                            text = LanguageManager.getString("वर्तमान शहर: $selectedCityName (सूर्योदय/राहुकाल)", "Current City: $selectedCityName (Sunrise/Rahu Kaal)"),
+                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.5.sp)
                         )
                     }
                 }
@@ -387,12 +531,12 @@ fun LocationNotificationOnboardingPage(
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text(
-                            text = "दैनिक पंचांग नोटिफिकेशन",
+                            text = LanguageManager.getString("दैनिक पंचांग व मुहूर्त अलर्ट", "Daily Panchang & Muhurat Alerts"),
                             style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                         )
                         Text(
-                            text = "प्रातः 06:00 बजे शुभ मुहूर्त व चौघड़िया अलर्ट",
-                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.sp)
+                            text = LanguageManager.getString("प्रातः 06:00 बजे शुभ मुहूर्त व चौघड़िया सूचनाएं", "Morning 6:00 AM auspicious timings & festival alerts"),
+                            style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.5.sp)
                         )
                     }
                 }
@@ -405,5 +549,119 @@ fun LocationNotificationOnboardingPage(
                 )
             }
         }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Page 3: Optional Account & Cloud Sync
+// ─────────────────────────────────────────────────────────────────────────────
+@Composable
+fun CloudAccountOnboardingPage(
+    context: Context,
+    viewModel: MainViewModel,
+    onComplete: () -> Unit
+) {
+    val currentUser by viewModel.currentUser.collectAsState()
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.padding(horizontal = 8.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Default.Shield,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(46.dp)
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Text(
+            text = LanguageManager.getString("क्लाउड बैकअप (Optional Account)", "Cloud Backup & Sync (Optional)"),
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = 19.sp
+            )
+        )
+
+        Text(
+            text = LanguageManager.getString(
+                "अपनी कुण्डली प्रोफाइल को सुरक्षित रखने और अन्य उपकरणों में सिंक करने हेतु",
+                "Keep your saved Kundali charts safely synced across all your devices."
+            ),
+            style = MaterialTheme.typography.bodySmall.copy(
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                fontSize = 12.sp
+            )
+        )
+
+        Spacer(modifier = Modifier.height(18.dp))
+
+        GlassCard(modifier = Modifier.fillMaxWidth()) {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                if (currentUser != null) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CloudDone,
+                            contentDescription = "Signed In",
+                            tint = ShubhSuccessColor,
+                            modifier = Modifier.size(22.dp)
+                        )
+                        Text(
+                            text = LanguageManager.getString("सफलतापूर्वक जुड़े: ${currentUser?.email ?: currentUser?.displayName ?: "Google User"}", "Connected as: ${currentUser?.email ?: currentUser?.displayName ?: "Google User"}"),
+                            style = MaterialTheme.typography.bodySmall.copy(color = ShubhSuccessColor, fontWeight = FontWeight.Bold)
+                        )
+                    }
+                } else {
+                    Text(
+                        text = LanguageManager.getString(
+                            "✓ 100% निजता सुरक्षित एवं ऑन-डिवाइस कार्यक्षमता\n✓ सभी ज्योतिष गणनाएं बिना इंटरनेट व खाते के भी उपलब्ध\n✓ केवल प्रोफाइल सिंक हेतु खाता ऐच्छिक है",
+                            "✓ 100% Privacy & on-device calculations\n✓ All astrology features work fully offline\n✓ Account is completely optional for cloud backup"
+                        ),
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 12.5.sp,
+                            lineHeight = 18.sp
+                        )
+                    )
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    OutlinedButton(
+                        onClick = { viewModel.signInWithGoogle(context) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = LanguageManager.getString("Google से साइन-इन करें (Optional)", "Sign in with Google (Optional)"),
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(14.dp))
+
+        Text(
+            text = LanguageManager.getString(
+                "साइन-इन नहीं करना चाहते? नीचे 'ऐप शुरू करें' पर क्लिक करें।",
+                "Don't want to sign in? Tap 'Enter AstroVeda' below to continue as guest."
+            ),
+            style = MaterialTheme.typography.bodySmall.copy(
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                fontSize = 11.5.sp
+            )
+        )
     }
 }
