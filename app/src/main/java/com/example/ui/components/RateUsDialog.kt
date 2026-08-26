@@ -98,13 +98,11 @@ fun RateUsDialog(
                     )
                     IconButton(
                         onClick = onDismiss,
-                        modifier = Modifier
-                            .size(36.dp)
-                            .testTag("close_rate_us_dialog")
+                        modifier = Modifier.testTag("close_rate_us_dialog")
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "Close dialog",
+                            contentDescription = com.example.util.LanguageManager.getString("डायलॉग बंद करें (Close Dialog)", "Close Dialog"),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }

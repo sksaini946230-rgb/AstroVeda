@@ -673,10 +673,10 @@ fun SavedProfileCard(
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         IconButton(onClick = onEdit, modifier = Modifier.testTag("edit_profile_${profile.id}")) {
-                            Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit Profile", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                            Icon(imageVector = Icons.Default.Edit, contentDescription = LanguageManager.getString("प्रोफाइल संपादित करें (Edit Profile)", "Edit Profile"), tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
                         }
                         IconButton(onClick = onDelete, modifier = Modifier.testTag("delete_profile_${profile.id}")) {
-                            Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Profile", tint = RahuKaalDangerColor, modifier = Modifier.size(20.dp))
+                            Icon(imageVector = Icons.Default.Delete, contentDescription = LanguageManager.getString("प्रोफाइल हटाएं (Delete Profile)", "Delete Profile"), tint = RahuKaalDangerColor, modifier = Modifier.size(20.dp))
                         }
                     }
                 }
@@ -977,14 +977,13 @@ fun CloudBackupCard(
                                 modifier = Modifier.weight(1f)
                             )
                             IconButton(
-                                onClick = { viewModel.clearBackupStatusMessage() },
-                                modifier = Modifier.size(24.dp)
+                                onClick = { viewModel.clearBackupStatusMessage() }
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Delete,
-                                    contentDescription = "Clear Message",
+                                    contentDescription = LanguageManager.getString("संदेश हटाएं (Clear Message)", "Clear Message"),
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.size(16.dp)
+                                    modifier = Modifier.size(18.dp)
                                 )
                             }
                         }

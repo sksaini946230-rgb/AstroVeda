@@ -549,12 +549,11 @@ fun FestivalDetailDialog(
                     )
                 }
                 IconButton(
-                    onClick = onDismiss,
-                    modifier = Modifier.size(32.dp)
+                    onClick = onDismiss
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Close",
+                        contentDescription = com.example.util.LanguageManager.getString("कैलेंडर विवरण बंद करें (Close Calendar Details)", "Close Calendar Details"),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
