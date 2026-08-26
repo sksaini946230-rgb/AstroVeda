@@ -37,9 +37,10 @@ android {
     create("release") {
       val keystorePath = System.getenv("KEYSTORE_PATH") ?: "${rootDir}/astroveda-upload-key.jks"
       storeFile = file(keystorePath)
-      storePassword = System.getenv("STORE_PASSWORD") ?: "a667ab8f5fc1b67c885dc63df6444e86"
-      keyAlias = System.getenv("KEY_ALIAS") ?: "b5f8bd64bd1691f90df02e3677e22d3f"
-      keyPassword = System.getenv("KEY_PASSWORD") ?: "a667ab8f5fc1b67c885dc63df6444e86"
+      val envProps = Properties().apply { val f = rootProject.file(".env"); if (f.exists()) f.inputStream().use { load(it) } }
+      storePassword = System.getenv("STORE_PASSWORD") ?: envProps.getProperty("STORE_PASSWORD") ?: error("STORE_PASSWORD is required (.env or environment variable) for release build")
+      keyAlias = System.getenv("KEY_ALIAS") ?: envProps.getProperty("KEY_ALIAS") ?: error("KEY_ALIAS is required (.env or environment variable) for release build")
+      keyPassword = System.getenv("KEY_PASSWORD") ?: envProps.getProperty("KEY_PASSWORD") ?: error("KEY_PASSWORD is required (.env or environment variable) for release build")
     }
     create("debugConfig") {
       storeFile = file("${rootDir}/debug.keystore")
