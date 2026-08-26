@@ -322,4 +322,52 @@ class AstroVedaComprehensiveQATest {
         assertTrue(activeReports.isEmpty())
         assertTrue(activeRecentSearches.isEmpty())
     }
+
+    // --- 11. Edge-Case Validation & Graceful Fallback Integrity ---
+
+    @Test
+    fun testDateInputEdgeCasesAndBoundaries() {
+        // Year bounds (1900..2100)
+        assertFalse("Year 1800 is out of bounds", com.example.util.SecurityUtils.isValidDate("1800-01-01"))
+        assertFalse("Year 2101 is out of bounds", com.example.util.SecurityUtils.isValidDate("2101-01-01"))
+        assertTrue("Year 1995 is within bounds", com.example.util.SecurityUtils.isValidDate("1995-05-15"))
+
+        // Leap Year February
+        assertTrue("Feb 29 on leap year 2024 is valid", com.example.util.SecurityUtils.isValidDate("2024-02-29"))
+        assertTrue("Feb 29 on leap year 2000 is valid", com.example.util.SecurityUtils.isValidDate("2000-02-29"))
+        assertFalse("Feb 29 on non-leap year 2023 is invalid", com.example.util.SecurityUtils.isValidDate("2023-02-29"))
+        assertFalse("Feb 30 on leap year 2024 is invalid", com.example.util.SecurityUtils.isValidDate("2024-02-30"))
+
+        // 30 vs 31 day months
+        assertTrue("April 30 is valid", com.example.util.SecurityUtils.isValidDate("2024-04-30"))
+        assertFalse("April 31 is invalid", com.example.util.SecurityUtils.isValidDate("2024-04-31"))
+        assertTrue("May 31 is valid", com.example.util.SecurityUtils.isValidDate("2024-05-31"))
+
+        // Month out of range
+        assertFalse("Month 13 is invalid", com.example.util.SecurityUtils.isValidDate("2024-13-10"))
+        assertFalse("Month 00 is invalid", com.example.util.SecurityUtils.isValidDate("2024-00-10"))
+    }
+
+    @Test
+    fun testTimeInputEdgeCases() {
+        assertTrue("00:00 is valid", com.example.util.SecurityUtils.isValidTime("00:00"))
+        assertTrue("23:59 is valid", com.example.util.SecurityUtils.isValidTime("23:59"))
+        assertFalse("24:00 is invalid", com.example.util.SecurityUtils.isValidTime("24:00"))
+        assertFalse("12:60 is invalid", com.example.util.SecurityUtils.isValidTime("12:60"))
+        assertFalse("-1:30 is invalid", com.example.util.SecurityUtils.isValidTime("-1:30"))
+    }
+
+    @Test
+    fun testKundaliCalculatorMalformedInputGracefulHandling() {
+        // Completely corrupt input strings should not crash the engine
+        val fallbackKundali = KundaliCalculator.generateKundali(
+            name = "Test",
+            dobString = "invalid-date",
+            tobString = "invalid-time",
+            placeName = "Unknown"
+        )
+        assertNotNull(fallbackKundali)
+        assertEquals(9, fallbackKundali.planets.size)
+        assertEquals(12, fallbackKundali.housePlanetsMap.size)
+    }
 }
