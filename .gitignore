@@ -25,3 +25,4 @@ fix_*
 *.txt
 .vscode/
 
+upload_certificate.pem
