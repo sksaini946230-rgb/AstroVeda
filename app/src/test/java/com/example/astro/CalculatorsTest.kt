@@ -22,27 +22,23 @@ class CalculatorsTest {
 
     @Test
     fun testKundaliCalculatorAccuracy() {
-        // Generate a Kundali for a standard date, time, and location
-        val name = "Astro Tester"
-        val dob = "1995-05-20"
-        val tob = "08:15"
-        val place = "Jaipur"
-        val lat = 26.9124
-        val lng = 75.7873
+        // Sample 1: Jaipur, 1995-05-20, 08:15 AM
+        val name1 = "Sample Native 1"
+        val dob1 = "1995-05-20"
+        val tob1 = "08:15"
+        val place1 = "Jaipur"
+        val lat1 = 26.9124
+        val lng1 = 75.7873
 
-        val kundali = KundaliCalculator.generateKundali(name, dob, tob, place, lat, lng)
-        
-        assertNotNull(kundali)
-        assertEquals(name, kundali.personName)
-        assertEquals(dob, kundali.dateOfBirth)
-        assertEquals(tob, kundali.timeOfBirth)
-        
-        // Establish core Vedic astrological constants check:
-        // 1. There must be exactly 9 astrological bodies/planets
-        assertEquals(9, kundali.planets.size)
+        val kundali1 = KundaliCalculator.generateKundali(name1, dob1, tob1, place1, lat1, lng1)
+        assertNotNull(kundali1)
+        assertEquals(name1, kundali1.personName)
+        assertEquals(dob1, kundali1.dateOfBirth)
+        assertEquals(tob1, kundali1.timeOfBirth)
+        assertEquals(9, kundali1.planets.size)
+        assertTrue(kundali1.ascendantRashiNumber in 1..12)
 
-        // 2. All planet degrees must be in the range [0.0, 30.0) degrees within their Rashi
-        for (planet in kundali.planets) {
+        for (planet in kundali1.planets) {
             assertTrue(
                 "Planet ${planet.planetNameEn} degree ${planet.degree} must be within [0.0, 30.0)",
                 planet.degree in 0.0..30.0
@@ -57,19 +53,34 @@ class CalculatorsTest {
             )
         }
 
-        // 3. Verify the fundamental Vedic astronomical constant:
-        // Rahu and Ketu are opposite shadow nodes, hence they are exactly 180 degrees apart.
-        val rahu = kundali.planets.first { it.planetNameEn == "Rahu" }
-        val ketu = kundali.planets.first { it.planetNameEn == "Ketu" }
-        
-        val rahuAbsLon = (rahu.rashiNumber - 1) * 30.0 + rahu.degree
-        val ketuAbsLon = (ketu.rashiNumber - 1) * 30.0 + ketu.degree
-        
-        val longitudeDiff = abs(rahuAbsLon - ketuAbsLon)
-        val modDiff = (longitudeDiff % 360.0 + 360.0) % 360.0
-        
-        // Assert that Rahu and Ketu are exactly 180 degrees apart in longitude
-        assertEquals(180.0, modDiff, 0.01)
+        // Verify Rahu and Ketu are exactly 180 degrees apart in longitude
+        val rahu1 = kundali1.planets.first { it.planetNameEn == "Rahu" }
+        val ketu1 = kundali1.planets.first { it.planetNameEn == "Ketu" }
+        val rahuAbsLon1 = (rahu1.rashiNumber - 1) * 30.0 + rahu1.degree
+        val ketuAbsLon1 = (ketu1.rashiNumber - 1) * 30.0 + ketu1.degree
+        val longitudeDiff1 = abs(rahuAbsLon1 - ketuAbsLon1)
+        val modDiff1 = (longitudeDiff1 % 360.0 + 360.0) % 360.0
+        assertEquals(180.0, modDiff1, 0.01)
+        assertTrue("Rahu must be flagged retrograde", rahu1.isRetrograde)
+        assertTrue("Ketu must be flagged retrograde", ketu1.isRetrograde)
+
+        // Verify Vimshottari Mahadasha timeline has 9 periods
+        assertEquals(9, kundali1.dashaTimeline.size)
+        assertTrue(kundali1.currentMahadashaHi.isNotBlank())
+
+        // Sample 2: New Delhi, 1990-01-15, 06:00 AM
+        val kundali2 = KundaliCalculator.generateKundali("Sample Native 2", "1990-01-15", "06:00", "New Delhi", 28.6139, 77.2090)
+        assertNotNull(kundali2)
+        assertEquals(9, kundali2.planets.size)
+        val sun2 = kundali2.planets.first { it.planetNameEn == "Sun" }
+        assertEquals("मकर", sun2.rashiNameHi) // Sun in Capricorn in mid-January
+
+        // Sample 3: Mumbai, 2000-08-25, 12:00 PM
+        val kundali3 = KundaliCalculator.generateKundali("Sample Native 3", "2000-08-25", "12:00", "Mumbai", 19.0760, 72.8777)
+        assertNotNull(kundali3)
+        assertEquals(9, kundali3.planets.size)
+        val sun3 = kundali3.planets.first { it.planetNameEn == "Sun" }
+        assertEquals("सिंह", sun3.rashiNameHi) // Sun in Leo after Simha Sankranti in late August
     }
 
     @Test

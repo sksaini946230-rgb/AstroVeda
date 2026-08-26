@@ -59,8 +59,8 @@ object AstroMath {
             return Triple(x, y, z)
         }
 
-        // 1. Sun (Earth) Heliocentric Coords
-        val (xe, ye, _) = getHeliocentricCoords(
+        // 1. Sun (Geocentric orbital elements)
+        val (xs, ys, _) = getHeliocentricCoords(
             0.0, 0.0,
             0.0, 0.0,
             282.9404, 4.70935E-5,
@@ -69,9 +69,9 @@ object AstroMath {
             356.0470, 0.9856002585
         )
 
-        // Geocentric Sun coordinates are opposite of Earth's heliocentric coords
-        val xs = -xe
-        val ys = -ye
+        // Earth's heliocentric coordinates (opposite of Sun's geocentric vector)
+        val xe = -xs
+        val ye = -ys
 
         val trueSunLong = Math.toDegrees(atan2(ys, xs)).let { if (it < 0) it + 360.0 else it }
 

@@ -99,11 +99,32 @@ object KundaliCalculator {
             housePlanetsMap[i] = mutableListOf()
         }
 
-        // Calculate planet positions
+        // Calculate planet positions for birth time
         val planetDegrees = AstroMath.calculatePlanets(year, month, day, hourDecimal)
+
+        // Calculate next day's positions to detect astronomical retrograde motion (dLambda / dt < 0)
+        val calTomorrow = Calendar.getInstance().apply {
+            set(year, month - 1, day, hour, minute)
+            add(Calendar.DAY_OF_YEAR, 1)
+        }
+        val tomorrowYear = calTomorrow.get(Calendar.YEAR)
+        val tomorrowMonth = calTomorrow.get(Calendar.MONTH) + 1
+        val tomorrowDay = calTomorrow.get(Calendar.DAY_OF_MONTH)
+        val planetDegreesTomorrow = AstroMath.calculatePlanets(tomorrowYear, tomorrowMonth, tomorrowDay, hourDecimal)
 
         PLANETS_INFO.forEach { (en, hi) ->
             val deg = planetDegrees[en] ?: 0.0
+            val degTomorrow = planetDegreesTomorrow[en] ?: 0.0
+            var diff = degTomorrow - deg
+            while (diff > 180.0) diff -= 360.0
+            while (diff < -180.0) diff += 360.0
+
+            val isRetro = when (en) {
+                "Rahu", "Ketu" -> true // Nodes are perpetually retrograde in mean motion
+                "Sun", "Moon" -> false // Luminaries never retrograde
+                else -> diff < -0.0001
+            }
+
             val rashiIdx = (deg / 30.0).toInt().coerceIn(0, 11)
             val degreeInRashi = deg % 30.0
 
@@ -111,7 +132,11 @@ object KundaliCalculator {
             val houseNum = ((rashiIdx - ascendantRashiIdx + 12) % 12) + 1
             val nakshatraIdx = (deg / 13.333333).toInt().coerceIn(0, 26)
 
-            val shortPlanetName = hi.substringBefore(" ")
+            val shortPlanetName = if (isRetro && en != "Rahu" && en != "Ketu") {
+                "${hi.substringBefore(" ")}(व)"
+            } else {
+                hi.substringBefore(" ")
+            }
 
             val planet = PlanetPosition(
                 planetNameEn = en,
@@ -120,7 +145,7 @@ object KundaliCalculator {
                 rashiNameHi = RASHI_SHORT_HI[rashiIdx],
                 degree = String.format(java.util.Locale.US, "%.2f", degreeInRashi).toDouble(),
                 houseNumber = houseNum,
-                isRetrograde = false, // Simplified
+                isRetrograde = isRetro,
                 nakshatraHi = NAKSHATRAS[nakshatraIdx]
             )
             planetPositions.add(planet)
