@@ -12,4 +12,7 @@ interface RecentSearchDao {
 
     @Insert
     suspend fun insertSearch(search: RecentSearchEntity)
+
+    @Query("DELETE FROM recent_searches")
+    suspend fun clearAllSearches()
 }

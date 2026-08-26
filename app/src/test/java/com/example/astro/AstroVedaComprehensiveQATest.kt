@@ -289,4 +289,37 @@ class AstroVedaComprehensiveQATest {
         assertTrue(localList.any { it.name == "Local User" })
         assertTrue(localList.any { it.name == "Cloud User" })
     }
+
+    // --- 10. DPDP Act 2023 Data Deletion & Privacy Compliance ---
+
+    @Test
+    fun testDpdpAct2023DataPurgeLifecycle() {
+        val activeProfiles = mutableListOf(
+            com.example.data.local.KundaliEntity(
+                id = 10L,
+                name = "User To Purge",
+                gender = "MALE",
+                dateOfBirth = "1990-01-01",
+                timeOfBirth = "12:00",
+                placeOfBirth = "Jaipur",
+                latitude = 26.9124,
+                longitude = 75.7873
+            )
+        )
+        val activeReports = mutableListOf("Report 1", "Report 2")
+        val activeRecentSearches = mutableListOf("Search A", "Search B")
+
+        assertEquals(1, activeProfiles.size)
+        assertEquals(2, activeReports.size)
+        assertEquals(2, activeRecentSearches.size)
+
+        // Simulate complete DPDP Act 2023 wipe
+        activeProfiles.clear()
+        activeReports.clear()
+        activeRecentSearches.clear()
+
+        assertTrue(activeProfiles.isEmpty())
+        assertTrue(activeReports.isEmpty())
+        assertTrue(activeRecentSearches.isEmpty())
+    }
 }

@@ -15,4 +15,8 @@ class RecentSearchRepository(
     suspend fun insertSearch(search: RecentSearchEntity) = withContext(ioDispatcher) {
         recentSearchDao.insertSearch(search)
     }
+
+    suspend fun clearAllSearches() = withContext(ioDispatcher) {
+        recentSearchDao.clearAllSearches()
+    }
 }

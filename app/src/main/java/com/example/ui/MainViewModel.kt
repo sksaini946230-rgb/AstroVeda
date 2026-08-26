@@ -1065,6 +1065,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 try {
                     repository.deleteAllProfiles()
                     reportRepository.deleteAllReports()
+                    recentSearchRepository.clearAllSearches()
                 } catch (e: Exception) {
                     android.util.Log.e("MainViewModel", "Error clearing local DB", e)
                 }
@@ -1081,6 +1082,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 repository.deleteAllProfiles()
                 reportRepository.deleteAllReports()
+                recentSearchRepository.clearAllSearches()
                 _backupStatusMessage.value = "सभी स्थानीय डेटा और सहेजे गए प्रोफाइल हटा दिए गए हैं। (Local data deleted successfully.)"
             } catch (e: Exception) {
                 _backupStatusMessage.value = "स्थानीय डेटा हटाने में त्रुटि: ${e.message}"
