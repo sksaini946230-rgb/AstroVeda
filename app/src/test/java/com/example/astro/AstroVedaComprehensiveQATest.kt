@@ -211,4 +211,36 @@ class AstroVedaComprehensiveQATest {
         assertEquals("Mumbai, Maharashtra", updatedProfile.placeOfBirth)
         assertEquals("1998-04-12", updatedProfile.dateOfBirth)
     }
+
+    // --- 8. Language & Time Format Settings Integrity ---
+
+    @Test
+    fun testLanguageManagerReactiveToggle() {
+        com.example.util.LanguageManager.setLanguage(com.example.util.AppLanguage.HINDI)
+        assertEquals(com.example.util.AppLanguage.HINDI, com.example.util.LanguageManager.currentLanguage)
+        assertEquals("नमस्ते", com.example.util.LanguageManager.getString("नमस्ते", "Hello"))
+
+        com.example.util.LanguageManager.toggleLanguage()
+        assertEquals(com.example.util.AppLanguage.ENGLISH, com.example.util.LanguageManager.currentLanguage)
+        assertEquals("Hello", com.example.util.LanguageManager.getString("नमस्ते", "Hello"))
+
+        // Reset to default Hindi
+        com.example.util.LanguageManager.setLanguage(com.example.util.AppLanguage.HINDI)
+    }
+
+    @Test
+    fun testTimeFormat12hAnd24hConsistency() {
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+        val testDate = sdf.parse("2026-07-22")!!
+        val jaipur = CityLocation("Jaipur", "जयपुर", "Rajasthan", 26.9124, 75.7873)
+
+        // 12-hour format: AM/PM included
+        val p12 = PanchangCalculator.calculatePanchang(testDate, jaipur, use24Hour = false)
+        assertTrue(p12.sunrise.contains("AM") || p12.sunrise.contains("PM"))
+
+        // 24-hour format: pure HH:mm
+        val p24 = PanchangCalculator.calculatePanchang(testDate, jaipur, use24Hour = true)
+        assertFalse(p24.sunrise.contains("AM") || p24.sunrise.contains("PM"))
+        assertTrue(p24.sunrise.matches(Regex("\\d{2}:\\d{2}")))
+    }
 }

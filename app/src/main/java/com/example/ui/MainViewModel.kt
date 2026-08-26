@@ -492,6 +492,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         com.example.widget.PanchangWidgetProvider.triggerUpdate(getApplication())
         com.example.widget.TithiNakshatraWidgetProvider.triggerUpdate(getApplication())
     }
+
+    fun set24HourFormat(enable24Hour: Boolean) {
+        if (_use24HourFormat.value != enable24Hour) {
+            _use24HourFormat.value = enable24Hour
+            sharedPrefs.edit().putBoolean("use_24_hour_format", enable24Hour).apply()
+            recalculatePanchang(forceRefresh = true)
+            com.example.widget.PanchangWidgetProvider.triggerUpdate(getApplication())
+            com.example.widget.TithiNakshatraWidgetProvider.triggerUpdate(getApplication())
+        }
+    }
     
     private val _notificationHour = MutableStateFlow(sharedPrefs.getInt("notification_hour", 7))
     val notificationHour: StateFlow<Int> = _notificationHour.asStateFlow()
