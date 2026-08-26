@@ -35,6 +35,15 @@ class AstroVedaComprehensiveQATest {
             assertTrue("Lucky number must be in 1..9", item.luckyNumber in 1..9)
             assertTrue("Lucky color must not be blank", item.luckyColorHi.isNotBlank())
             assertTrue("General reading must not be blank", item.generalReadingHi.isNotBlank())
+            assertTrue("Career reading must not be blank", item.careerReadingHi.isNotBlank())
+            assertTrue("Finance reading must not be blank", item.financeReadingHi.isNotBlank())
+            assertTrue("Love reading must not be blank", item.loveReadingHi.isNotBlank())
+            assertTrue("Health reading must not be blank", item.healthReadingHi.isNotBlank())
+
+            // Total reading text must be deep and context-rich (150+ words)
+            val combinedText = "${item.generalReadingHi} ${item.careerReadingHi} ${item.financeReadingHi} ${item.loveReadingHi} ${item.healthReadingHi}"
+            val wordCount = combinedText.split("\\s+".toRegex()).size
+            assertTrue("Daily reading for ${item.rashiNameEn} must be context-rich with > 100 words (actual: $wordCount)", wordCount >= 100)
         }
     }
 
@@ -46,10 +55,14 @@ class AstroVedaComprehensiveQATest {
         assertEquals(12, monthlyList.size)
 
         for (item in weeklyList) {
-            assertTrue("Weekly reading must not be blank", item.generalReadingHi.isNotBlank())
+            assertTrue("Weekly general reading must not be blank", item.generalReadingHi.isNotBlank())
+            assertTrue("Weekly career reading must not be blank", item.careerReadingHi.isNotBlank())
+            assertTrue("Weekly love reading must not be blank", item.loveReadingHi.isNotBlank())
         }
         for (item in monthlyList) {
-            assertTrue("Monthly reading must not be blank", item.generalReadingHi.isNotBlank())
+            assertTrue("Monthly general reading must not be blank", item.generalReadingHi.isNotBlank())
+            assertTrue("Monthly career reading must not be blank", item.careerReadingHi.isNotBlank())
+            assertTrue("Monthly love reading must not be blank", item.loveReadingHi.isNotBlank())
         }
     }
 
