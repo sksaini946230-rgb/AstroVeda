@@ -42,6 +42,20 @@
 -keep class com.android.billingclient.api.** { *; }
 -dontwarn com.android.billingclient.api.**
 
+# Google Play In-App Review
+-keep class com.google.android.play.review.** { *; }
+-dontwarn com.google.android.play.review.**
+
+# Google Identity / Credentials (Google Sign-In)
+-keep class androidx.credentials.** { *; }
+-keep class com.google.android.libraries.identity.** { *; }
+-dontwarn androidx.credentials.**
+-dontwarn com.google.android.libraries.identity.**
+
+# PDF Document Generation ( Kundali Matching PDF reports )
+-keep class android.graphics.pdf.** { *; }
+-dontwarn android.graphics.pdf.**
+
 # Google Mobile Ads (AdMob)
 -keep public class com.google.android.gms.ads.** {
    public *;
