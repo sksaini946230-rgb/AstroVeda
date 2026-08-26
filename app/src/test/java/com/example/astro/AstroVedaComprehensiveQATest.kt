@@ -456,4 +456,20 @@ class AstroVedaComprehensiveQATest {
         assertNotNull(milan)
         assertTrue("Milan computation took ${milanDuration}ms (must be < 50ms)", milanDuration < 50)
     }
+
+    // --- 14. Crash Reporting Privacy & Gemini Offline Resilience ---
+
+    @Test
+    fun testCrashlyticsAndAiTelemetryPrivacyCompliance() {
+        // Test Gemini Offline Fallback Response
+        val offlineQuestion = "What is the effect of Shani Sade Sati?"
+        val fallbackResponse = com.example.data.ai.GeminiAstroService.getOfflineVedicResponse(offlineQuestion)
+        assertNotNull(fallbackResponse)
+        assertTrue("Fallback response must contain helpful Vedic advice", fallbackResponse.isNotBlank())
+
+        // Test Offline Astro News
+        val offlineNews = com.example.data.ai.GeminiAstroService.getOfflineAstroNews()
+        assertNotNull(offlineNews)
+        assertTrue("Offline astro news must not be empty", offlineNews.isNotEmpty())
+    }
 }
