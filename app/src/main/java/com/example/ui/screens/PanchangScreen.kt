@@ -109,7 +109,6 @@ fun PanchangScreen(
     animatedVisibilityScope: AnimatedVisibilityScope? = null
 ) {
     val panchang by viewModel.panchangState.collectAsState()
-    val generatedKundali by viewModel.generatedKundali.collectAsState()
     val selectedCity by viewModel.selectedCity.collectAsState()
     val isChoghadiyaDaytime by viewModel.choghadiyaDaytime.collectAsState()
     val choghadiyaSlots = viewModel.choghadiyaSlots
@@ -868,6 +867,17 @@ fun PanchangScreen(
                                 }
 
                                 item {
+                                    val dailyLagnaChart = remember(panchang.dateString, selectedCity) {
+                                        com.example.astro.KundaliCalculator.generateKundali(
+                                            name = "Daily Lagna",
+                                            dobString = panchang.dateString.ifBlank { "2026-08-26" },
+                                            tobString = panchang.sunrise.ifBlank { "06:00" },
+                                            placeName = selectedCity.cityNameHindi,
+                                            lat = selectedCity.latitude,
+                                            lng = selectedCity.longitude
+                                        )
+                                    }
+
                                     GlassCard(modifier = Modifier.fillMaxWidth()) {
                                         Column {
                                             Row(
@@ -884,7 +894,7 @@ fun PanchangScreen(
                                                     )
                                                     Spacer(modifier = Modifier.width(8.dp))
                                                     Text(
-                                                        text = "लग्न: ${generatedKundali.ascendantRashiHi}",
+                                                        text = "लग्न: ${dailyLagnaChart.ascendantRashiHi}",
                                                         style = MaterialTheme.typography.titleMedium.copy(
                                                             fontWeight = FontWeight.Bold,
                                                             color = MaterialTheme.colorScheme.primary
@@ -918,7 +928,7 @@ fun PanchangScreen(
                                             } else Modifier.fillMaxWidth(0.85f)
 
                                             NorthIndianChart(
-                                                chartData = generatedKundali,
+                                                chartData = dailyLagnaChart,
                                                 modifier = chartModifier,
                                                 onHouseClick = { _, _, _ -> viewModel.selectTab(AppTab.KUNDALI) }
                                             )

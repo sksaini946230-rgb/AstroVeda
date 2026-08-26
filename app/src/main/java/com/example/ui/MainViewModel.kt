@@ -619,32 +619,45 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     // Muhurats
     val upcomingMuhurats: List<MuhuratItem> = MuhuratCalculator.getUpcomingMuhurats()
 
-    // Kundali Generator Input State
-    var kundaliName = MutableStateFlow("Rahul Saini")
-    var kundaliDob = MutableStateFlow("1996-08-15")
-    var kundaliTob = MutableStateFlow("10:30")
-    var kundaliPlace = MutableStateFlow("Jaipur, Rajasthan")
+    // Kundali Generator Input State - Starts empty (no hardcoded dummy data)
+    var kundaliName = MutableStateFlow("")
+    var kundaliDob = MutableStateFlow("")
+    var kundaliTob = MutableStateFlow("")
+    var kundaliPlace = MutableStateFlow("")
 
-    private val _generatedKundali = MutableStateFlow(
-        KundaliCalculator.generateKundali("Rahul Saini", "1996-08-15", "10:30", "Jaipur, Rajasthan")
-    )
-    val generatedKundali: StateFlow<KundaliChartData> = _generatedKundali.asStateFlow()
+    private val _generatedKundali = MutableStateFlow<KundaliChartData?>(null)
+    val generatedKundali: StateFlow<KundaliChartData?> = _generatedKundali.asStateFlow()
+
+    fun resetKundaliForm() {
+        kundaliName.value = ""
+        kundaliDob.value = ""
+        kundaliTob.value = ""
+        kundaliPlace.value = ""
+        _generatedKundali.value = null
+    }
 
     private val _isCalculating = MutableStateFlow(false)
     val isCalculating: StateFlow<Boolean> = _isCalculating.asStateFlow()
 
     fun generateKundaliChart(name: String, dob: String, tob: String, place: String) {
-        kundaliName.value = name
-        kundaliDob.value = dob
-        kundaliTob.value = tob
-        kundaliPlace.value = place
+        val trimmedName = name.trim()
+        val trimmedDob = dob.trim()
+        val trimmedTob = tob.trim()
+        val trimmedPlace = place.trim()
+
+        kundaliName.value = trimmedName
+        kundaliDob.value = trimmedDob
+        kundaliTob.value = trimmedTob
+        kundaliPlace.value = trimmedPlace
         
-        addRecentSearch("KUNDALI", name, dob, tob, place)
+        if (trimmedName.isNotBlank() && trimmedDob.isNotBlank() && trimmedTob.isNotBlank() && trimmedPlace.isNotBlank()) {
+            addRecentSearch("KUNDALI", trimmedName, trimmedDob, trimmedTob, trimmedPlace)
+        }
         
         viewModelScope.launch(Dispatchers.Default) {
             _isCalculating.value = true
             try {
-                val result = KundaliCalculator.generateKundali(name, dob, tob, place)
+                val result = KundaliCalculator.generateKundali(trimmedName, trimmedDob, trimmedTob, trimmedPlace)
                 _generatedKundali.value = result
                 triggerInterstitial()
                 incrementLookupCount()
@@ -744,7 +757,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             _isAiLoading.value = true
             _isAiOffline.value = false
             try {
-                val kundaliDetails = "${_generatedKundali.value.personName}, DOB: ${_generatedKundali.value.dateOfBirth}, Lagna: ${_generatedKundali.value.ascendantRashiHi}"
+                val currentChart = _generatedKundali.value
+                val kundaliDetails = if (currentChart != null) {
+                    "${currentChart.personName}, DOB: ${currentChart.dateOfBirth}, Lagna: ${currentChart.ascendantRashiHi}"
+                } else {
+                    "General Vedic Chart"
+                }
                 val res = GeminiAstroService.getAiAstrologyInsight(question, kundaliDetails)
                 _aiResponse.value = res
                 if (res == com.example.data.ai.GeminiAstroService.getOfflineVedicResponse(question)) {

@@ -25,15 +25,13 @@ class KundaliViewModel(application: Application) : AndroidViewModel(application)
 
     // --- Kundali input state --------------------------------------------
 
-    var kundaliName = MutableStateFlow("Rahul Saini")
-    var kundaliDob = MutableStateFlow("1996-08-15")
-    var kundaliTob = MutableStateFlow("10:30")
-    var kundaliPlace = MutableStateFlow("Jaipur, Rajasthan")
+    var kundaliName = MutableStateFlow("")
+    var kundaliDob = MutableStateFlow("")
+    var kundaliTob = MutableStateFlow("")
+    var kundaliPlace = MutableStateFlow("")
 
-    private val _generatedKundali = MutableStateFlow(
-        KundaliCalculator.generateKundali("Rahul Saini", "1996-08-15", "10:30", "Jaipur, Rajasthan")
-    )
-    val generatedKundali: StateFlow<KundaliChartData> = _generatedKundali.asStateFlow()
+    private val _generatedKundali = MutableStateFlow<KundaliChartData?>(null)
+    val generatedKundali: StateFlow<KundaliChartData?> = _generatedKundali.asStateFlow()
 
     // --- Transit state -------------------------------------------------
 
