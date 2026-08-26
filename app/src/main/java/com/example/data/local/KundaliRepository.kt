@@ -16,6 +16,10 @@ class KundaliRepository(
         return kundaliDao.getProfileById(id).flowOn(ioDispatcher)
     }
 
+    suspend fun getSavedProfilesList(): List<KundaliEntity> = withContext(ioDispatcher) {
+        kundaliDao.getSavedProfilesList()
+    }
+
     suspend fun saveProfile(profile: KundaliEntity): Long = withContext(ioDispatcher) {
         kundaliDao.insertProfile(profile)
     }

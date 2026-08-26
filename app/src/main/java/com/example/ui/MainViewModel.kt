@@ -101,6 +101,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         connectivityManager.registerNetworkCallback(networkRequest, object : android.net.ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: android.net.Network) {
                 _isOffline.value = false
+                if (_currentUser.value != null) {
+                    syncCloudAndLocalProfiles()
+                }
             }
             override fun onLost(network: android.net.Network) {
                 _isOffline.value = true
@@ -968,15 +971,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun signInWithGoogle(context: android.content.Context, webClientId: String = "") {
         viewModelScope.launch {
-            _backupStatusMessage.value = "Signing in with Google..."
+            _backupStatusMessage.value = "Google से साइन-इन हो रहा है... (Signing in with Google...)"
             val result = authService.signInWithGoogle(context, webClientId)
             result.onSuccess { user ->
                 _currentUser.value = user
-                _backupStatusMessage.value = "Signed in as ${user.displayName ?: user.email}"
+                _backupStatusMessage.value = "साइन इन सफल: ${user.displayName ?: user.email}"
                 Firebase.crashlytics.setUserId(user.uid)
-                triggerBackgroundBackup(_savedProfiles.value)
+                syncCloudAndLocalProfiles()
             }.onFailure { err ->
-                _backupStatusMessage.value = "Sign-In failed: ${err.message}"
+                _backupStatusMessage.value = "साइन-इन विफल: ${err.message}"
                 Firebase.crashlytics.recordException(err)
             }
         }
@@ -985,51 +988,68 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun signOutFirebase() {
         authService.signOut()
         _currentUser.value = null
-        _backupStatusMessage.value = "Signed out"
+        _backupStatusMessage.value = "साइन-आउट सफल। स्थानीय प्रोफाइल डिवाइस पर सुरक्षित हैं। (Signed out. Local profiles retained.)"
+    }
+
+    fun syncCloudAndLocalProfiles() {
+        val user = _currentUser.value ?: return
+        viewModelScope.launch {
+            _isFirestoreSyncing.value = true
+            try {
+                // 1. Fetch remote cloud profiles
+                val restoreResult = authService.restoreProfilesFromCloud()
+                val cloudProfiles = restoreResult.getOrDefault(emptyList())
+                val localProfiles = repository.getSavedProfilesList()
+
+                // 2. Merge: Insert any cloud profiles not present locally
+                var newlyRestored = 0
+                cloudProfiles.forEach { cloudProfile ->
+                    val existsLocally = localProfiles.any { 
+                        it.id == cloudProfile.id || (it.name.equals(cloudProfile.name, ignoreCase = true) && it.dateOfBirth == cloudProfile.dateOfBirth)
+                    }
+                    if (!existsLocally) {
+                        repository.saveProfile(cloudProfile)
+                        newlyRestored++
+                    }
+                }
+
+                // 3. Backup merged complete superset to cloud
+                val updatedLocalProfiles = repository.getSavedProfilesList()
+                val backupResult = authService.backupProfilesToCloud(updatedLocalProfiles)
+                backupResult.onSuccess { totalSynced ->
+                    if (newlyRestored > 0) {
+                        _backupStatusMessage.value = "क्लाउड सिंक पूर्ण: $newlyRestored नए प्रोफाइल डाउनलोड हुए, कुल $totalSynced क्लाउड पर सुरक्षित।"
+                    } else {
+                        _backupStatusMessage.value = "क्लाउड सिंक पूर्ण: कुल $totalSynced प्रोफाइल सुरक्षित।"
+                    }
+                }.onFailure { err ->
+                    _backupStatusMessage.value = "क्लाउड बैकअप में समस्या: ${err.message}"
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("MainViewModel", "Sync failed", e)
+                _backupStatusMessage.value = "सिंक त्रुटि: ${e.message}"
+            } finally {
+                _isFirestoreSyncing.value = false
+            }
+        }
     }
 
     fun backupProfilesToCloud() {
         val user = _currentUser.value
         if (user == null) {
-            _backupStatusMessage.value = "Please sign in with Google first."
+            _backupStatusMessage.value = "कृपया पहले Google से साइन-इन करें। (Please sign in with Google first.)"
             return
         }
-        viewModelScope.launch {
-            _isFirestoreSyncing.value = true
-            _backupStatusMessage.value = "Backing up profiles to cloud..."
-            val profiles = _savedProfiles.value
-            val result = authService.backupProfilesToCloud(profiles)
-            result.onSuccess { count ->
-                _backupStatusMessage.value = "Successfully backed up $count profiles to cloud!"
-            }.onFailure { err ->
-                _backupStatusMessage.value = "Backup failed: ${err.message}"
-                Firebase.crashlytics.recordException(err)
-            }
-            _isFirestoreSyncing.value = false
-        }
+        syncCloudAndLocalProfiles()
     }
 
     fun restoreProfilesFromCloud() {
         val user = _currentUser.value
         if (user == null) {
-            _backupStatusMessage.value = "Please sign in with Google first."
+            _backupStatusMessage.value = "कृपया पहले Google से साइन-इन करें। (Please sign in with Google first.)"
             return
         }
-        viewModelScope.launch {
-            _isFirestoreSyncing.value = true
-            _backupStatusMessage.value = "Restoring profiles from cloud..."
-            val result = authService.restoreProfilesFromCloud()
-            result.onSuccess { cloudProfiles ->
-                cloudProfiles.forEach { profile ->
-                    repository.saveProfile(profile)
-                }
-                _backupStatusMessage.value = "Restored ${cloudProfiles.size} profiles from cloud!"
-            }.onFailure { err ->
-                _backupStatusMessage.value = "Restore failed: ${err.message}"
-                Firebase.crashlytics.recordException(err)
-            }
-            _isFirestoreSyncing.value = false
-        }
+        syncCloudAndLocalProfiles()
     }
 
     fun deleteAccountAndData() {

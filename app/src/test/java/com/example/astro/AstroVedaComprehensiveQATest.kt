@@ -243,4 +243,50 @@ class AstroVedaComprehensiveQATest {
         assertFalse(p24.sunrise.contains("AM") || p24.sunrise.contains("PM"))
         assertTrue(p24.sunrise.matches(Regex("\\d{2}:\\d{2}")))
     }
+
+    // --- 9. Two-Way Cloud Sync Conflict-Free Union Merge ---
+
+    @Test
+    fun testProfileTwoWayUnionMergeStrategy() {
+        // Scenario: User created profile 1 locally while offline
+        val localList = mutableListOf(
+            com.example.data.local.KundaliEntity(
+                id = 1L,
+                name = "Local User",
+                gender = "MALE",
+                dateOfBirth = "1992-01-01",
+                timeOfBirth = "10:00",
+                placeOfBirth = "Delhi",
+                latitude = 28.6139,
+                longitude = 77.2090
+            )
+        )
+
+        // Remote cloud contains profile 2 (created previously on another device) and profile 1
+        val cloudList = listOf(
+            com.example.data.local.KundaliEntity(
+                id = 2L,
+                name = "Cloud User",
+                gender = "FEMALE",
+                dateOfBirth = "1994-06-15",
+                timeOfBirth = "15:30",
+                placeOfBirth = "Mumbai",
+                latitude = 19.0760,
+                longitude = 72.8777
+            )
+        )
+
+        // Union merge simulation:
+        cloudList.forEach { cloudProfile ->
+            val exists = localList.any { it.id == cloudProfile.id || (it.name.equals(cloudProfile.name, true) && it.dateOfBirth == cloudProfile.dateOfBirth) }
+            if (!exists) {
+                localList.add(cloudProfile)
+            }
+        }
+
+        // Assert: Result contains BOTH profiles (Union = 2 profiles, 0 data loss)
+        assertEquals(2, localList.size)
+        assertTrue(localList.any { it.name == "Local User" })
+        assertTrue(localList.any { it.name == "Cloud User" })
+    }
 }

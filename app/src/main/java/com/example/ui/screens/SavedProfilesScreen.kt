@@ -808,6 +808,7 @@ fun CloudBackupCard(
     val currentUser by viewModel.currentUser.collectAsState()
     val backupStatusMessage by viewModel.backupStatusMessage.collectAsState()
     var showDeleteAccountDialog by remember { mutableStateOf(false) }
+    var showSignOutDialog by remember { mutableStateOf(false) }
 
     val animatedAlpha = remember { Animatable(0f) }
     val animatedTranslationY = remember { Animatable(25f) }
@@ -931,7 +932,7 @@ fun CloudBackupCard(
                         }
 
                         TextButton(
-                            onClick = { viewModel.signOutFirebase() },
+                            onClick = { showSignOutDialog = true },
                             modifier = Modifier.testTag("sign_out_button")
                         ) {
                             Text(
@@ -991,6 +992,54 @@ fun CloudBackupCard(
                 }
             }
         }
+    }
+
+    if (showSignOutDialog) {
+        AlertDialog(
+            onDismissRequest = { showSignOutDialog = false },
+            title = {
+                Text(
+                    text = LanguageManager.getString("साइन आउट करें?", "Sign Out?"),
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                )
+            },
+            text = {
+                Text(
+                    text = LanguageManager.getString(
+                        "क्या आप Google खाते से साइन आउट करना चाहते हैं?\n\nआपके स्थानीय रूप से सहेजे गए सभी कुण्डली प्रोफाइल इस डिवाइस पर सुरक्षित रहेंगे।",
+                        "Are you sure you want to sign out of your Google account?\n\nYour locally saved Kundali profiles will remain safe on this device."
+                    ),
+                    style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface)
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showSignOutDialog = false
+                        viewModel.signOutFirebase()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text(
+                        text = LanguageManager.getString("साइन आउट (Sign Out)", "Sign Out"),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showSignOutDialog = false }) {
+                    Text(
+                        text = LanguageManager.getString("रद्द करें", "Cancel"),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            },
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
     }
 
     if (showDeleteAccountDialog) {
