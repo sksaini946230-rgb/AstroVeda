@@ -5,7 +5,9 @@ data class GunaKootDetail(
     val kootNameEn: String,
     val maxPoints: Double,
     val obtainedPoints: Double,
-    val descriptionHi: String
+    val descriptionHi: String,
+    val descriptionEn: String = "",
+    val isFavorable: Boolean = true
 )
 
 data class GunaMatchingResult(
@@ -21,5 +23,26 @@ data class GunaMatchingResult(
     val compatibilityVerdictHi: String,
     val compatibilityVerdictEn: String,
     val summaryReadingHi: String,
-    val summaryReadingEn: String
+    val summaryReadingEn: String,
+    val boyMoonRashi: String = "",
+    val girlMoonRashi: String = "",
+    val boyNakshatra: String = "",
+    val girlNakshatra: String = "",
+    val boyNadi: String = "",
+    val girlNadi: String = "",
+    val boyGana: String = "",
+    val girlGana: String = "",
+    val boyYoni: String = "",
+    val girlYoni: String = "",
+    val boyVarna: String = "",
+    val girlVarna: String = "",
+    val boyVashya: String = "",
+    val girlVashya: String = "",
+    val hasNadiDosha: Boolean = false,
+    val nadiDoshaStatusHi: String = "",
+    val nadiDoshaStatusEn: String = "",
+    val hasBhakootDosha: Boolean = false,
+    val bhakootDoshaStatusHi: String = "",
+    val bhakootDoshaStatusEn: String = "",
+    val scoreCategory: String = "AVERAGE"
 )

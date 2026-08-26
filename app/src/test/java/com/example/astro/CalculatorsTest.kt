@@ -189,6 +189,34 @@ class CalculatorsTest {
 
         assertEquals(isBoyManglikExpected, matchingResult.isManglikBoy)
         assertEquals(isGirlManglikExpected, matchingResult.isManglikGirl)
+
+        // 5. Verify Nadi & Bhakoot Dosha flags consistency
+        val nadiKoot = matchingResult.kootDetails.first { it.kootNameEn == "Nadi" }
+        assertEquals(nadiKoot.obtainedPoints == 0.0, matchingResult.hasNadiDosha)
+
+        val bhakootKoot = matchingResult.kootDetails.first { it.kootNameEn == "Bhakoot" }
+        assertEquals(bhakootKoot.obtainedPoints == 0.0, matchingResult.hasBhakootDosha)
+
+        // 6. Verify 4-tier score category
+        when {
+            matchingResult.totalObtainedGuna >= 33.0 -> assertEquals("EXCELLENT", matchingResult.scoreCategory)
+            matchingResult.totalObtainedGuna >= 25.0 -> assertEquals("GOOD", matchingResult.scoreCategory)
+            matchingResult.totalObtainedGuna >= 18.0 -> assertEquals("AVERAGE", matchingResult.scoreCategory)
+            else -> assertEquals("POOR", matchingResult.scoreCategory)
+        }
+    }
+
+    @Test
+    fun testNadiAndBhakootDoshaDetection() {
+        val result = KundaliMatchingCalculator.matchKundali(
+            "Rohan", "1993-04-14", "10:30",
+            "Pooja", "1995-08-22", "16:45"
+        )
+        assertNotNull(result)
+        assertTrue(result.totalObtainedGuna in 0.0..36.0)
+        assertNotNull(result.nadiDoshaStatusHi)
+        assertNotNull(result.bhakootDoshaStatusHi)
+        assertTrue(result.kootDetails.size == 8)
     }
 
     @Test

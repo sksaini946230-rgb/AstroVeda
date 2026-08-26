@@ -137,12 +137,20 @@ object MatchingPdfReportService {
 
         yPos += 85f
 
-        // 6. Mangal Dosha Analysis
-        canvas.drawText("1. मंगल दोष विचार (Mangal Dosha Status):", 40f, yPos, titlePaint)
-        yPos += 22f
-        canvas.drawText("• ${result.mangalDoshaStatusHi}", 50f, yPos, bodyPaint)
+        // 6. Dosha Analysis (Mangal, Nadi, Bhakoot)
+        canvas.drawText("1. प्रमुख दोष विचार (Dosha Analysis):", 40f, yPos, titlePaint)
+        yPos += 18f
+        canvas.drawText("• मंगल दोष: ${result.mangalDoshaStatusHi}", 50f, yPos, bodyPaint)
+        yPos += 16f
+        val nadiColor = if (result.hasNadiDosha) Color.parseColor("#C62828") else Color.parseColor("#2E7D32")
+        val nadiPaint = Paint(bodyPaint).apply { color = nadiColor }
+        canvas.drawText("• नाड़ी दोष: ${if (result.hasNadiDosha) "दोष उपस्थित (समान नाड़ी)" else "दोष मुक्त (अनुकूल)"}", 50f, yPos, nadiPaint)
+        yPos += 16f
+        val bhakootColor = if (result.hasBhakootDosha) Color.parseColor("#C62828") else Color.parseColor("#2E7D32")
+        val bhakootPaint = Paint(bodyPaint).apply { color = bhakootColor }
+        canvas.drawText("• भकूट दोष: ${if (result.hasBhakootDosha) "दोष उपस्थित" else "दोष मुक्त (अनुकूल)"}", 50f, yPos, bhakootPaint)
 
-        yPos += 35f
+        yPos += 28f
 
         // 7. Ashtakoot Breakdown Table Header
         canvas.drawText("2. अष्टकूट 36-गुण विवरण तालिका (Ashtakoot Score Table):", 40f, yPos, titlePaint)

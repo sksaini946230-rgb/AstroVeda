@@ -5,6 +5,58 @@ import com.example.data.model.GunaMatchingResult
 
 object KundaliMatchingCalculator {
 
+    // Varna names & ranks
+    private val VARNA_RANKS = listOf(3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1, 4) // 4:Brahmin, 3:Kshatriya, 2:Vaishya, 1:Shudra
+    private val VARNA_NAMES_HI = mapOf(4 to "ब्राह्मण", 3 to "क्षत्रिय", 2 to "वैश्य", 1 to "शूद्र")
+    private val VARNA_NAMES_EN = mapOf(4 to "Brahmin", 3 to "Kshatriya", 2 to "Vaishya", 1 to "Shudra")
+
+    // Vashya groups by Rashi
+    // 0:Chatushpad, 1:Manav, 2:Jalchar, 3:Vanchar, 4:Keet
+    private val VASHYA_GROUP = listOf(0, 0, 1, 2, 3, 1, 1, 4, 1, 0, 1, 2)
+    private val VASHYA_NAMES_HI = listOf("चतुष्पाद", "मानव", "जलचर", "वनचर", "कीट")
+    private val VASHYA_NAMES_EN = listOf("Chatushpad (Quadruped)", "Manav (Human)", "Jalchar (Aquatic)", "Vanchar (Wild/Lion)", "Keet (Insect)")
+
+    // 27 Nakshatras Yoni Animals (14 Animals)
+    // 0:Ashwa, 1:Gaja, 2:Mesha, 3:Sarpa, 4:Shwan, 5:Marjara, 6:Mushaka, 7:Gau, 8:Mahisha, 9:Vyaghra, 10:Mriga, 11:Vanara, 12:Nakula, 13:Simha
+    private val NAKSHATRA_YONI = listOf(
+        0, 1, 2, 3, 3, 4, 5, 2, 5, 6, 6, 7, 8, 9, 8, 9, 10, 10, 4, 11, 12, 11, 13, 0, 13, 7, 1
+    )
+    private val YONI_NAMES_HI = listOf(
+        "अश्व (Horse)", "गज (Elephant)", "मेष (Sheep)", "सर्प (Serpent)", "श्वान (Dog)",
+        "मार्जार (Cat)", "मूषक (Rat)", "गौ (Cow)", "महिष (Buffalo)", "व्याघ्र (Tiger)",
+        "मृग (Deer)", "वानर (Monkey)", "नकुल (Mongoose)", "सिंह (Lion)"
+    )
+    private val YONI_NAMES_EN = listOf(
+        "Horse (Ashwa)", "Elephant (Gaja)", "Sheep (Mesha)", "Serpent (Sarpa)", "Dog (Shwan)",
+        "Cat (Marjara)", "Rat (Mushaka)", "Cow (Gau)", "Buffalo (Mahisha)", "Tiger (Vyaghra)",
+        "Deer (Mriga)", "Monkey (Vanara)", "Mongoose (Nakula)", "Lion (Simha)"
+    )
+
+    // 27 Nakshatras Gana (0:Deva, 1:Manushya, 2:Rakshasa)
+    private val NAKSHATRA_GANA = listOf(
+        0, 1, 2, 1, 0, 1, 0, 0, 2, 2, 1, 1, 0, 2, 0, 2, 0, 2, 2, 1, 1, 0, 2, 2, 1, 1, 0
+    )
+    private val GANA_NAMES_HI = listOf("देव (Deva)", "मनुष्य (Manushya)", "राक्षस (Rakshasa)")
+    private val GANA_NAMES_EN = listOf("Deva (Divine)", "Manushya (Human)", "Rakshasa (Demonic)")
+
+    // 27 Nakshatras Nadi (0:Adi, 1:Madhya, 2:Antya)
+    private val NAKSHATRA_NADI = listOf(
+        0, 1, 2, 2, 1, 0, 0, 1, 2, 2, 1, 0, 0, 1, 2, 2, 1, 0, 0, 1, 2, 2, 1, 0, 0, 1, 2
+    )
+    private val NADI_NAMES_HI = listOf("आद्य (Adi / Vata)", "मध्य (Madhya / Pitta)", "अन्त्य (Antya / Kapha)")
+    private val NADI_NAMES_EN = listOf("Adi (Vata)", "Madhya (Pitta)", "Antya (Kapha)")
+
+    private val RASHI_NAMES_HI = listOf(
+        "मेष (Aries)", "वृषभ (Taurus)", "मिथुन (Gemini)", "कर्क (Cancer)",
+        "सिंह (Leo)", "कन्या (Virgo)", "तुला (Libra)", "वृश्चिक (Scorpio)",
+        "धनु (Sagittarius)", "मकर (Capricorn)", "कुंभ (Aquarius)", "मीन (Pisces)"
+    )
+    private val RASHI_NAMES_EN = listOf(
+        "Aries", "Taurus", "Gemini", "Cancer",
+        "Leo", "Virgo", "Libra", "Scorpio",
+        "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+    )
+
     fun matchKundali(
         boyName: String,
         boyDob: String,
@@ -13,13 +65,13 @@ object KundaliMatchingCalculator {
         girlDob: String,
         girlTob: String
     ): GunaMatchingResult {
-        // Generate actual charts to get planetary positions
+        // Generate planetary charts
         val boyChart = KundaliCalculator.generateKundali(boyName, boyDob, boyTob, "Default")
         val girlChart = KundaliCalculator.generateKundali(girlName, girlDob, girlTob, "Default")
 
         val boyMoonRashiIdx = boyChart.moonRashiHi.let { KundaliCalculator.RASHI_SHORT_HI.indexOf(it) }.coerceAtLeast(0)
         val girlMoonRashiIdx = girlChart.moonRashiHi.let { KundaliCalculator.RASHI_SHORT_HI.indexOf(it) }.coerceAtLeast(0)
-        
+
         val boyNakshatraIdx = boyChart.moonNakshatraHi.let { KundaliCalculator.NAKSHATRAS.indexOf(it) }.coerceAtLeast(0)
         val girlNakshatraIdx = girlChart.moonNakshatraHi.let { KundaliCalculator.NAKSHATRAS.indexOf(it) }.coerceAtLeast(0)
 
@@ -35,10 +87,12 @@ object KundaliMatchingCalculator {
         val grahaMaitriPoints = calculateGrahaMaitri(boyMoonRashiIdx, girlMoonRashiIdx)
         // 6. Gana (6 pts)
         val ganaPoints = calculateGana(boyNakshatraIdx, girlNakshatraIdx)
-        // 7. Bhakoot (7 pts)
+        // 7. Bhakoot (7 pts) & Bhakoot Dosha
         val bhakootPoints = calculateBhakoot(boyMoonRashiIdx, girlMoonRashiIdx)
-        // 8. Nadi (8 pts)
+        val hasBhakootDosha = bhakootPoints == 0.0
+        // 8. Nadi (8 pts) & Nadi Dosha
         val nadiPoints = calculateNadi(boyNakshatraIdx, girlNakshatraIdx)
+        val hasNadiDosha = nadiPoints == 0.0
 
         val totalGuna = varnaPoints + vashyaPoints + taraPoints + yoniPoints + grahaMaitriPoints + ganaPoints + bhakootPoints + nadiPoints
 
@@ -49,54 +103,169 @@ object KundaliMatchingCalculator {
         val isBoyManglik = boyMarsHouse in manglikHouses
         val isGirlManglik = girlMarsHouse in manglikHouses
 
-        val mangalStatus = when {
-            isBoyManglik && isGirlManglik -> "दोनों मांगलिक हैं (मंगल दोष निरस्त/मांगलिक सामंजस्य)"
-            isBoyManglik -> "वर मांगलिक हैं, कन्या मांगलिक नहीं हैं"
-            isGirlManglik -> "कन्या मांगलिक हैं, वर मांगलिक नहीं हैं"
+        val mangalStatusHi = when {
+            isBoyManglik && isGirlManglik -> "दोनों मांगलिक हैं (मंगल दोष निरस्त / मांगलिक सामंजस्य)"
+            isBoyManglik -> "वर मांगलिक हैं, कन्या मांगलिक नहीं हैं (सावधानी अपेक्षित)"
+            isGirlManglik -> "कन्या मांगलिक हैं, वर मांगलिक नहीं हैं (सावधानी अपेक्षित)"
             else -> "दोनों अंश-मांगलिक नहीं हैं (कोई मंगल दोष नहीं)"
         }
 
         val mangalStatusEn = when {
-            isBoyManglik && isGirlManglik -> "Both are Manglik (Mangal Dosha canceled / Manglik compatibility)"
-            isBoyManglik -> "Boy is Manglik, Girl is not Manglik"
-            isGirlManglik -> "Girl is Manglik, Boy is not Manglik"
-            else -> "Both are non-Manglik (No Mangal Dosha)"
+            isBoyManglik && isGirlManglik -> "Both are Manglik (Mangal Dosha canceled / Compatible)"
+            isBoyManglik -> "Boy is Manglik, Girl is Non-Manglik (Remedy Recommended)"
+            isGirlManglik -> "Girl is Manglik, Boy is Non-Manglik (Remedy Recommended)"
+            else -> "Both are Non-Manglik (No Mangal Dosha)"
+        }
+
+        // Nadi Dosha Status Text
+        val boyNadiStrHi = NADI_NAMES_HI[NAKSHATRA_NADI[boyNakshatraIdx]]
+        val girlNadiStrHi = NADI_NAMES_HI[NAKSHATRA_NADI[girlNakshatraIdx]]
+        val boyNadiStrEn = NADI_NAMES_EN[NAKSHATRA_NADI[boyNakshatraIdx]]
+        val girlNadiStrEn = NADI_NAMES_EN[NAKSHATRA_NADI[girlNakshatraIdx]]
+
+        val nadiDoshaStatusHi = if (hasNadiDosha) {
+            "⚠️ नाड़ी दोष उपस्थित है (दोनों की नाड़ी '$boyNadiStrHi' समान है)। यह संतान स्वास्थ्य एवं आनुवंशिक अनुकूलता में बाधा का संकेत देता है। योग्य ज्योतिषी से नाड़ी दोष शांति अनुष्ठान का परामर्श लें।"
+        } else {
+            "✅ नाड़ी दोष नहीं है (वर: $boyNadiStrHi, कन्या: $girlNadiStrHi)। संतान सुख एवं स्वास्थ्य के लिए पूर्ण अनुकूलता है।"
+        }
+
+        val nadiDoshaStatusEn = if (hasNadiDosha) {
+            "⚠️ Nadi Dosha Present (Both have identical '$boyNadiStrEn' Nadi). This traditionally impacts genetic harmony and child wellbeing. Astrological remedies are advised."
+        } else {
+            "✅ No Nadi Dosha (Boy: $boyNadiStrEn, Girl: $girlNadiStrEn). Auspicious for family health and progeny."
+        }
+
+        // Bhakoot Dosha Status Text
+        val boyRashiNameHi = RASHI_NAMES_HI[boyMoonRashiIdx]
+        val girlRashiNameHi = RASHI_NAMES_HI[girlMoonRashiIdx]
+        val boyRashiNameEn = RASHI_NAMES_EN[boyMoonRashiIdx]
+        val girlRashiNameEn = RASHI_NAMES_EN[girlMoonRashiIdx]
+
+        val bhakootDoshaStatusHi = if (hasBhakootDosha) {
+            val rashiDist = ((girlMoonRashiIdx - boyMoonRashiIdx + 12) % 12) + 1
+            val combo = if (rashiDist == 2 || rashiDist == 12) "द्विर्द्वादश (2/12 - आर्थिक/व्यय दोष)" else "षडाष्टक (6/8 - स्वास्थ्य/कलह दोष)"
+            "⚠️ भकूट दोष उपस्थित है ($combo - $boyRashiNameHi एवं $girlRashiNameHi)। पारिवारिक सामंजस्य एवं आर्थिक स्थिरता के लिए सावधानी व महामृत्युंजय जप परामर्श योग्य है।"
+        } else {
+            "✅ भकूट दोष नहीं है ($boyRashiNameHi व $girlRashiNameHi अनुकूल भाव में हैं)। पारिवारिक सौहार्द एवं समृद्धि के लिए पूर्ण 7 गुण प्राप्त हुए हैं।"
+        }
+
+        val bhakootDoshaStatusEn = if (hasBhakootDosha) {
+            val rashiDist = ((girlMoonRashiIdx - boyMoonRashiIdx + 12) % 12) + 1
+            val combo = if (rashiDist == 2 || rashiDist == 12) "Dwidwadasha (2/12 - Financial/Expenditure discord)" else "Shadashtaka (6/8 - Health/Relationship friction)"
+            "⚠️ Bhakoot Dosha Present ($combo between $boyRashiNameEn and $girlRashiNameEn). Prior prayers and Vedic remedies are recommended."
+        } else {
+            "✅ No Bhakoot Dosha ($boyRashiNameEn & $girlRashiNameEn are harmoniously placed). Full 7 points awarded for marital happiness."
         }
 
         val kootDetails = listOf(
-            GunaKootDetail("वर्ण (Varna)", "Varna", 1.0, varnaPoints, "आध्यात्मिक एवं मानसिक दृष्टिकोण का मिलान।"),
-            GunaKootDetail("वश्य (Vashya)", "Vashya", 2.0, vashyaPoints, "पारस्परिक आकर्षण एवं अधिकार क्षेत्र।"),
-            GunaKootDetail("तारा (Tara)", "Tara", 3.0, taraPoints, "भाग्य, दीर्घायु एवं स्वास्थ्य अनुकूलता।"),
-            GunaKootDetail("योनि (Yoni)", "Yoni", 4.0, yoniPoints, "शारीरिक एवं दाम्पत्य सामंजस्य।"),
-            GunaKootDetail("ग्रह मैत्री (Graha Maitri)", "Graha Maitri", 5.0, grahaMaitriPoints, "मानसिक विचार एवं बौद्धिक मित्रता।"),
-            GunaKootDetail("गण (Gana)", "Gana", 6.0, ganaPoints, "स्वभाव, व्यवहार एवं चरित्र सामंजस्य।"),
-            GunaKootDetail("भकूट (Bhakoot)", "Bhakoot", 7.0, bhakootPoints, "पारिवारिक समृद्धि एवं वंश वृद्धि।"),
-            GunaKootDetail("नाडी (Nadi)", "Nadi", 8.0, nadiPoints, "आनुवंशिक स्वास्थ्य एवं संतान सुख।")
+            GunaKootDetail(
+                kootNameHi = "वर्ण (Varna)",
+                kootNameEn = "Varna",
+                maxPoints = 1.0,
+                obtainedPoints = varnaPoints,
+                descriptionHi = "आध्यात्मिक एवं मानसिक दृष्टिकोण का सामंजस्य। (वर: ${VARNA_NAMES_HI[VARNA_RANKS[boyMoonRashiIdx]]}, कन्या: ${VARNA_NAMES_HI[VARNA_RANKS[girlMoonRashiIdx]]})",
+                descriptionEn = "Spiritual & ego compatibility. (Boy: ${VARNA_NAMES_EN[VARNA_RANKS[boyMoonRashiIdx]]}, Girl: ${VARNA_NAMES_EN[VARNA_RANKS[girlMoonRashiIdx]]})",
+                isFavorable = varnaPoints == 1.0
+            ),
+            GunaKootDetail(
+                kootNameHi = "वश्य (Vashya)",
+                kootNameEn = "Vashya",
+                maxPoints = 2.0,
+                obtainedPoints = vashyaPoints,
+                descriptionHi = "पारस्परिक आकर्षण, प्रभुत्व एवं भावनात्मक समर्पण। (वर: ${VASHYA_NAMES_HI[VASHYA_GROUP[boyMoonRashiIdx]]}, कन्या: ${VASHYA_NAMES_HI[VASHYA_GROUP[girlMoonRashiIdx]]})",
+                descriptionEn = "Mutual attraction and control balance. (Boy: ${VASHYA_NAMES_EN[VASHYA_GROUP[boyMoonRashiIdx]]}, Girl: ${VASHYA_NAMES_EN[VASHYA_GROUP[girlMoonRashiIdx]]})",
+                isFavorable = vashyaPoints >= 1.0
+            ),
+            GunaKootDetail(
+                kootNameHi = "तारा (Tara)",
+                kootNameEn = "Tara",
+                maxPoints = 3.0,
+                obtainedPoints = taraPoints,
+                descriptionHi = "भाग्य, दीर्घायु, स्वास्थ्य एवं ऊर्जा अनुकूलता।",
+                descriptionEn = "Destiny, health, longevity, and star harmony.",
+                isFavorable = taraPoints >= 1.5
+            ),
+            GunaKootDetail(
+                kootNameHi = "योनि (Yoni)",
+                kootNameEn = "Yoni",
+                maxPoints = 4.0,
+                obtainedPoints = yoniPoints,
+                descriptionHi = "शारीरिक आकर्षण, अंतरंगता एवं दाम्पत्य सामंजस्य। (वर: ${YONI_NAMES_HI[NAKSHATRA_YONI[boyNakshatraIdx]]}, कन्या: ${YONI_NAMES_HI[NAKSHATRA_YONI[girlNakshatraIdx]]})",
+                descriptionEn = "Physical, intimacy, and biological compatibility. (Boy: ${YONI_NAMES_EN[NAKSHATRA_YONI[boyNakshatraIdx]]}, Girl: ${YONI_NAMES_EN[NAKSHATRA_YONI[girlNakshatraIdx]]})",
+                isFavorable = yoniPoints >= 2.0
+            ),
+            GunaKootDetail(
+                kootNameHi = "ग्रह मैत्री (Graha Maitri)",
+                kootNameEn = "Graha Maitri",
+                maxPoints = 5.0,
+                obtainedPoints = grahaMaitriPoints,
+                descriptionHi = "मानसिक विचार, बौद्धिक मित्रता एवं आपसी समझ।",
+                descriptionEn = "Intellectual rapport and mental wavelength between Moon lords.",
+                isFavorable = grahaMaitriPoints >= 3.0
+            ),
+            GunaKootDetail(
+                kootNameHi = "गण (Gana)",
+                kootNameEn = "Gana",
+                maxPoints = 6.0,
+                obtainedPoints = ganaPoints,
+                descriptionHi = "स्वभाव, आचरण, व्यवहार एवं चरित्र सामंजस्य। (वर: ${GANA_NAMES_HI[NAKSHATRA_GANA[boyNakshatraIdx]]}, कन्या: ${GANA_NAMES_HI[NAKSHATRA_GANA[girlNakshatraIdx]]})",
+                descriptionEn = "Temperament and lifestyle compatibility. (Boy: ${GANA_NAMES_EN[NAKSHATRA_GANA[boyNakshatraIdx]]}, Girl: ${GANA_NAMES_EN[NAKSHATRA_GANA[girlNakshatraIdx]]})",
+                isFavorable = ganaPoints >= 5.0
+            ),
+            GunaKootDetail(
+                kootNameHi = "भकूट (Bhakoot)",
+                kootNameEn = "Bhakoot",
+                maxPoints = 7.0,
+                obtainedPoints = bhakootPoints,
+                descriptionHi = if (hasBhakootDosha) "भकूट दोष उपस्थित है — पारिवारिक समृद्धि व भावनात्मक सुरक्षा में बाधा संभव।" else "पूर्ण भकूट सामंजस्य — पारिवारिक सुख एवं आर्थिक समृद्धि के लिए शुभ।",
+                descriptionEn = if (hasBhakootDosha) "Bhakoot Dosha present — possible financial or emotional discord." else "Harmonious Bhakoot — auspicious for marital prosperity and joy.",
+                isFavorable = !hasBhakootDosha
+            ),
+            GunaKootDetail(
+                kootNameHi = "नाडी (Nadi)",
+                kootNameEn = "Nadi",
+                maxPoints = 8.0,
+                obtainedPoints = nadiPoints,
+                descriptionHi = if (hasNadiDosha) "नाड़ी दोष उपस्थित है (समान नाड़ी) — स्वास्थ्य एवं संतान पक्ष के लिए उपाय आवश्यक।" else "नाड़ी अनुकूलता पूर्ण है — आनुवंशिक स्वास्थ्य एवं संतान सुख के लिए सर्वथा शुभ।",
+                descriptionEn = if (hasNadiDosha) "Nadi Dosha present (Same Nadi) — remedies recommended for health & progeny." else "Complete Nadi harmony — excellent genetic compatibility and progeny welfare.",
+                isFavorable = !hasNadiDosha
+            )
         )
 
+        val scoreCategory: String
         val verdictHi: String
         val verdictEn: String
         val summaryHi: String
         val summaryEn: String
 
         when {
-            totalGuna >= 28.0 -> {
-                verdictHi = "अति उत्तम मिलान (Excellent Match)"
+            totalGuna >= 33.0 -> {
+                scoreCategory = "EXCELLENT"
+                verdictHi = "सर्वोत्कृष्ट मिलान (Excellent Match)"
                 verdictEn = "Excellent Match"
-                summaryHi = "$boyName एवं $girlName की कुंडली में $totalGuna / 36 गुण प्राप्त हुए हैं। यह विवाह अत्यंत शुभ एवं सुखद वैवाहिक जीवन का संकेत देता है।"
-                summaryEn = "Guna score of $totalGuna / 36 obtained between $boyName and $girlName. This indicates an exceptionally auspicious and happy married life."
+                summaryHi = "$boyName एवं $girlName की कुंडली में $totalGuna / 36 गुण प्राप्त हुए हैं। यह विवाह वैदिक दृष्टि से अत्यंत शुभ, समृद्ध एवं सुखद दाम्पत्य जीवन का परिचायक है।"
+                summaryEn = "An outstanding $totalGuna / 36 gunas match between $boyName and $girlName. Highly auspicious for lifelong marital harmony and prosperity."
+            }
+            totalGuna >= 25.0 -> {
+                scoreCategory = "GOOD"
+                verdictHi = "उत्तम एवं शुभ मिलान (Good Match)"
+                verdictEn = "Good Match"
+                summaryHi = "$boyName एवं $girlName की कुंडली में $totalGuna / 36 गुण प्राप्त हुए हैं। यह एक उत्तम मिलान है और विवाह के लिए पूर्णतः अनुशंसित है।"
+                summaryEn = "A solid $totalGuna / 36 gunas match between $boyName and $girlName. This is a very good match and is warmly recommended for marriage."
             }
             totalGuna >= 18.0 -> {
-                verdictHi = "शुभ एवं अनुकूल मिलान (Good Match)"
-                verdictEn = "Good Match"
-                summaryHi = "$boyName एवं $girlName की कुंडली में $totalGuna / 36 गुण मिल रहे हैं। सामान्य पूजा-अनुष्ठान के उपरांत विवाह सम्पन्न किया जा सकता है।"
-                summaryEn = "$totalGuna / 36 gunas are matching. The wedding can be safely performed after simple standard rituals."
+                scoreCategory = "AVERAGE"
+                verdictHi = "मध्यम / सामान्य मिलान (Average Match)"
+                verdictEn = "Average Match"
+                summaryHi = "$boyName एवं $girlName की कुंडली में $totalGuna / 36 गुण मिल रहे हैं। यह एक स्वीकार्य मिलान है। नाड़ी अथवा भकूट दोष होने पर शांति पूजा करवाना श्रेयस्कर रहेगा।"
+                summaryEn = "$totalGuna / 36 gunas match. This is an acceptable average match. If any Doshas exist, performing Vedic remedial prayers is recommended."
             }
             else -> {
-                verdictHi = "औसत मिलान (Average Match - Remedy Required)"
-                verdictEn = "Average Match"
-                summaryHi = "$boyName एवं $girlName की कुंडली में $totalGuna / 36 गुण प्राप्त हुए हैं। विवाह पूर्व नाडी अथवा भकूट दोष निवारण उपाय परामर्श योग्य हैं।"
-                summaryEn = "Only $totalGuna / 36 gunas match. Prior remedies/prayers for Nadi or Bhakoot Dosha are strongly recommended before marriage."
+                scoreCategory = "POOR"
+                verdictHi = "अशुभ / असहमत मिलान (Poor Match - Caution)"
+                verdictEn = "Poor Match (Not Recommended)"
+                summaryHi = "$boyName एवं $girlName की कुंडली में मात्र $totalGuna / 36 गुण प्राप्त हुए हैं (18 से कम)। विवाह पूर्व वरिष्ठ ज्योतिषी से विस्तृत परामर्श एवं दोष निवारण आवश्यक है।"
+                summaryEn = "Only $totalGuna / 36 gunas match (below acceptable threshold of 18). Detailed astrological consultation and remedies are strongly advised."
             }
         }
 
@@ -107,61 +276,157 @@ object KundaliMatchingCalculator {
             maxGuna = 36.0,
             isManglikBoy = isBoyManglik,
             isManglikGirl = isGirlManglik,
-            mangalDoshaStatusHi = mangalStatus,
+            mangalDoshaStatusHi = mangalStatusHi,
             mangalDoshaStatusEn = mangalStatusEn,
             kootDetails = kootDetails,
             compatibilityVerdictHi = verdictHi,
             compatibilityVerdictEn = verdictEn,
             summaryReadingHi = summaryHi,
-            summaryReadingEn = summaryEn
+            summaryReadingEn = summaryEn,
+            boyMoonRashi = boyRashiNameHi,
+            girlMoonRashi = girlRashiNameHi,
+            boyNakshatra = boyChart.moonNakshatraHi,
+            girlNakshatra = girlChart.moonNakshatraHi,
+            boyNadi = boyNadiStrHi,
+            girlNadi = girlNadiStrHi,
+            boyGana = GANA_NAMES_HI[NAKSHATRA_GANA[boyNakshatraIdx]],
+            girlGana = GANA_NAMES_HI[NAKSHATRA_GANA[girlNakshatraIdx]],
+            boyYoni = YONI_NAMES_HI[NAKSHATRA_YONI[boyNakshatraIdx]],
+            girlYoni = YONI_NAMES_HI[NAKSHATRA_YONI[girlNakshatraIdx]],
+            boyVarna = VARNA_NAMES_HI[VARNA_RANKS[boyMoonRashiIdx]] ?: "",
+            girlVarna = VARNA_NAMES_HI[VARNA_RANKS[girlMoonRashiIdx]] ?: "",
+            boyVashya = VASHYA_NAMES_HI[VASHYA_GROUP[boyMoonRashiIdx]],
+            girlVashya = VASHYA_NAMES_HI[VASHYA_GROUP[girlMoonRashiIdx]],
+            hasNadiDosha = hasNadiDosha,
+            nadiDoshaStatusHi = nadiDoshaStatusHi,
+            nadiDoshaStatusEn = nadiDoshaStatusEn,
+            hasBhakootDosha = hasBhakootDosha,
+            bhakootDoshaStatusHi = bhakootDoshaStatusHi,
+            bhakootDoshaStatusEn = bhakootDoshaStatusEn,
+            scoreCategory = scoreCategory
         )
     }
 
+    // 1. Varna (Max 1.0 pt)
+    // Brahmin (Water: Cancer 3, Scorpio 7, Pisces 11) = 4
+    // Kshatriya (Fire: Aries 0, Leo 4, Sagittarius 8) = 3
+    // Vaishya (Earth: Taurus 1, Virgo 5, Capricorn 9) = 2
+    // Shudra (Air: Gemini 2, Libra 6, Aquarius 10) = 1
     private fun calculateVarna(b: Int, g: Int): Double {
-        val v = listOf(3, 2, 1, 0, 3, 2, 1, 0, 3, 2, 1, 0)
-        return if (v[b] >= v[g]) 1.0 else 0.0
+        val bVarna = VARNA_RANKS[b]
+        val gVarna = VARNA_RANKS[g]
+        return if (bVarna >= gVarna) 1.0 else 0.0
     }
-    private fun calculateVashya(b: Int, g: Int): Double = if (b == g) 2.0 else 1.0
-    private fun calculateTara(b: Int, g: Int): Double {
-        val tbg = (g - b + 27) % 27
-        val tgb = (b - g + 27) % 27
-        val r1 = (tbg % 9)
-        val r2 = (tgb % 9)
+
+    // 2. Vashya (Max 2.0 pts)
+    // 0: Chatushpad (Aries, Taurus, Sag-2nd half, Cap-1st half)
+    // 1: Manav/Dwipada (Gemini, Virgo, Libra, Sag-1st half, Aquarius)
+    // 2: Jalchar (Cancer, Pisces, Cap-2nd half)
+    // 3: Vanchar (Leo)
+    // 4: Keet (Scorpio)
+    private fun calculateVashya(b: Int, g: Int): Double {
+        if (b == g) return 2.0
+        val bGroup = VASHYA_GROUP[b]
+        val gGroup = VASHYA_GROUP[g]
+        if (bGroup == gGroup) return 2.0
+
+        // Classical Rashi-level Vashya pairing matrix
+        val vashyaScoreMatrix = arrayOf(
+            // Aries (0) to 12 signs
+            doubleArrayOf(2.0, 1.0, 0.5, 0.5, 1.0, 0.5, 0.5, 1.0, 1.0, 0.5, 0.5, 0.5),
+            // Taurus (1)
+            doubleArrayOf(1.0, 2.0, 0.5, 1.0, 0.5, 0.5, 1.0, 0.5, 0.5, 1.0, 0.5, 0.5),
+            // Gemini (2)
+            doubleArrayOf(0.5, 0.5, 2.0, 0.5, 0.0, 1.0, 1.0, 0.5, 0.5, 0.5, 1.0, 0.5),
+            // Cancer (3)
+            doubleArrayOf(0.5, 1.0, 0.5, 2.0, 0.0, 0.5, 0.5, 1.0, 1.0, 0.5, 0.5, 1.0),
+            // Leo (4)
+            doubleArrayOf(1.0, 0.5, 0.0, 0.0, 2.0, 0.0, 1.0, 0.0, 0.5, 0.5, 0.5, 0.0),
+            // Virgo (5)
+            doubleArrayOf(0.5, 0.5, 1.0, 0.5, 0.0, 2.0, 1.0, 0.5, 0.5, 0.5, 1.0, 1.0),
+            // Libra (6)
+            doubleArrayOf(0.5, 1.0, 1.0, 0.5, 1.0, 1.0, 2.0, 0.5, 0.5, 1.0, 1.0, 0.5),
+            // Scorpio (7)
+            doubleArrayOf(1.0, 0.5, 0.5, 1.0, 0.0, 0.5, 0.5, 2.0, 0.5, 0.5, 0.5, 0.5),
+            // Sagittarius (8)
+            doubleArrayOf(1.0, 0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 0.5, 2.0, 0.5, 0.5, 1.0),
+            // Capricorn (9)
+            doubleArrayOf(0.5, 1.0, 0.5, 0.5, 0.5, 0.5, 1.0, 0.5, 0.5, 2.0, 1.0, 1.0),
+            // Aquarius (10)
+            doubleArrayOf(0.5, 0.5, 1.0, 0.5, 0.5, 1.0, 1.0, 0.5, 0.5, 1.0, 2.0, 0.5),
+            // Pisces (11)
+            doubleArrayOf(0.5, 0.5, 0.5, 1.0, 0.0, 1.0, 0.5, 0.5, 1.0, 1.0, 0.5, 2.0)
+        )
+
+        return vashyaScoreMatrix[b][g]
+    }
+
+    // 3. Tara (Max 3.0 pts)
+    // 1-based distance from Boy to Girl % 9, and Girl to Boy % 9
+    // Inauspicious taras: 3 (Vipat), 5 (Pratyak), 7 (Naidhana/Vadha) = 0 pt
+    // Auspicious taras: 1, 2, 4, 6, 8, 0 (Parama Mitra) = 1.5 pts
+    private fun calculateTara(bNak: Int, gNak: Int): Double {
+        val b2g = ((gNak - bNak + 27) % 27) + 1
+        val g2b = ((bNak - gNak + 27) % 27) + 1
+        val r1 = b2g % 9
+        val r2 = g2b % 9
         val score1 = if (r1 in listOf(3, 5, 7)) 0.0 else 1.5
         val score2 = if (r2 in listOf(3, 5, 7)) 0.0 else 1.5
         return score1 + score2
     }
-    private fun calculateYoni(b: Int, g: Int): Double {
-        val yoniMap = listOf(
-            0, 1, 2, 3, 3, 4, 5, 2, 5, 6, 6, 7, 8, 9, 8, 9, 10, 10, 4, 11, 12, 11, 13, 0, 13, 7, 1
-        ) // 0:Horse, 1:Elephant, 2:Sheep, 3:Serpent, 4:Dog, 5:Cat, 6:Rat, 7:Cow, 8:Buffalo, 9:Tiger, 10:Deer, 11:Monkey, 12:Mongoose, 13:Lion
-        
-        val bYoni = yoniMap[b]
-        val gYoni = yoniMap[g]
-        
+
+    // 4. Yoni (Max 4.0 pts)
+    // Full 14x14 Yoni compatibility matrix (4, 3, 2, 1, 0 pts)
+    private fun calculateYoni(bNak: Int, gNak: Int): Double {
+        val bYoni = NAKSHATRA_YONI[bNak]
+        val gYoni = NAKSHATRA_YONI[gNak]
+
         if (bYoni == gYoni) return 4.0
-        
-        val swornEnemies = setOf(
-            Pair(0, 8), Pair(8, 0), // Horse-Buffalo
-            Pair(1, 13), Pair(13, 1), // Elephant-Lion
-            Pair(2, 11), Pair(11, 2), // Sheep-Monkey
-            Pair(3, 12), Pair(12, 3), // Serpent-Mongoose
-            Pair(4, 10), Pair(10, 4), // Dog-Deer
-            Pair(5, 6), Pair(6, 5), // Cat-Rat
-            Pair(7, 9), Pair(9, 7)  // Cow-Tiger
+
+        val yoniMatrix = arrayOf(
+            // 0: Ashwa (Horse)
+            doubleArrayOf(4.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 0.0, 1.0, 2.0, 2.0, 2.0, 1.0),
+            // 1: Gaja (Elephant)
+            doubleArrayOf(2.0, 4.0, 3.0, 3.0, 2.0, 2.0, 2.0, 2.0, 3.0, 1.0, 2.0, 2.0, 2.0, 0.0),
+            // 2: Mesha (Sheep)
+            doubleArrayOf(2.0, 3.0, 4.0, 2.0, 1.0, 2.0, 1.0, 3.0, 2.0, 1.0, 2.0, 0.0, 2.0, 1.0),
+            // 3: Sarpa (Serpent)
+            doubleArrayOf(2.0, 3.0, 2.0, 4.0, 2.0, 1.0, 1.0, 1.0, 2.0, 2.0, 2.0, 2.0, 0.0, 2.0),
+            // 4: Shwan (Dog)
+            doubleArrayOf(2.0, 2.0, 1.0, 2.0, 4.0, 2.0, 1.0, 2.0, 1.0, 1.0, 0.0, 2.0, 1.0, 1.0),
+            // 5: Marjara (Cat)
+            doubleArrayOf(2.0, 2.0, 2.0, 1.0, 2.0, 4.0, 0.0, 2.0, 2.0, 1.0, 3.0, 3.0, 2.0, 1.0),
+            // 6: Mushaka (Rat)
+            doubleArrayOf(2.0, 2.0, 1.0, 1.0, 1.0, 0.0, 4.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 1.0),
+            // 7: Gau (Cow)
+            doubleArrayOf(2.0, 2.0, 3.0, 1.0, 2.0, 2.0, 2.0, 4.0, 3.0, 0.0, 2.0, 3.0, 2.0, 1.0),
+            // 8: Mahisha (Buffalo)
+            doubleArrayOf(0.0, 3.0, 2.0, 2.0, 1.0, 2.0, 2.0, 3.0, 4.0, 1.0, 2.0, 2.0, 2.0, 1.0),
+            // 9: Vyaghra (Tiger)
+            doubleArrayOf(1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 2.0, 0.0, 1.0, 4.0, 1.0, 1.0, 2.0, 1.0),
+            // 10: Mriga (Deer)
+            doubleArrayOf(2.0, 2.0, 2.0, 2.0, 0.0, 3.0, 2.0, 2.0, 2.0, 1.0, 4.0, 2.0, 2.0, 1.0),
+            // 11: Vanara (Monkey)
+            doubleArrayOf(2.0, 2.0, 0.0, 2.0, 2.0, 3.0, 2.0, 3.0, 2.0, 1.0, 2.0, 4.0, 3.0, 2.0),
+            // 12: Nakula (Mongoose)
+            doubleArrayOf(2.0, 2.0, 2.0, 0.0, 1.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 3.0, 4.0, 2.0),
+            // 13: Simha (Lion)
+            doubleArrayOf(1.0, 0.0, 1.0, 2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0, 2.0, 4.0)
         )
-        
-        if (swornEnemies.contains(Pair(bYoni, gYoni))) return 0.0
-        return 2.0 // Simplified: 2.0 for neutral/friendly
+
+        return yoniMatrix[bYoni][gYoni]
     }
 
+    // 5. Graha Maitri (Max 5.0 pts)
+    // Moon sign ruling planets:
+    // Sun(0), Moon(1), Mars(2), Mercury(3), Jupiter(4), Venus(5), Saturn(6)
     private fun calculateGrahaMaitri(b: Int, g: Int): Double {
-        val lords = listOf(2, 5, 3, 1, 0, 3, 5, 2, 4, 6, 6, 4) // 0:Sun, 1:Moon, 2:Mars, 3:Mercury, 4:Jupiter, 5:Venus, 6:Saturn
+        val lords = listOf(2, 5, 3, 1, 0, 3, 5, 2, 4, 6, 6, 4)
         val bLord = lords[b]
         val gLord = lords[g]
-        
+
         if (bLord == gLord) return 5.0
-        
+
         fun getRelation(p1: Int, p2: Int): Int { // 2:Friend, 1:Neutral, 0:Enemy
             return when (p1) {
                 0 -> if (p2 in listOf(1, 2, 4)) 2 else if (p2 in listOf(5, 6)) 0 else 1
@@ -174,47 +439,46 @@ object KundaliMatchingCalculator {
                 else -> 1
             }
         }
-        
+
         val r1 = getRelation(bLord, gLord)
         val r2 = getRelation(gLord, bLord)
         val sum = r1 + r2
         return when (sum) {
             4 -> 5.0 // Friend-Friend
             3 -> 4.0 // Friend-Neutral
-            2 -> if (r1 == 1 && r2 == 1) 3.0 else 1.0 // Neutral-Neutral or Friend-Enemy
+            2 -> if (r1 == 1 && r2 == 1) 3.0 else 1.0 // Neutral-Neutral vs Friend-Enemy
             1 -> 0.5 // Neutral-Enemy
             else -> 0.0 // Enemy-Enemy
         }
     }
 
-    private fun calculateGana(b: Int, g: Int): Double {
-        val ganaMap = listOf(
-            0, 1, 2, 1, 0, 1, 0, 0, 2, 2, 1, 1, 0, 2, 0, 2, 0, 2, 2, 1, 1, 0, 2, 2, 1, 1, 0
-        ) // 0:Deva, 1:Manushya, 2:Rakshasa
-        val bGana = ganaMap[b]
-        val gGana = ganaMap[g]
-        
+    // 6. Gana (Max 6.0 pts)
+    // 0:Deva, 1:Manushya, 2:Rakshasa
+    private fun calculateGana(bNak: Int, gNak: Int): Double {
+        val bGana = NAKSHATRA_GANA[bNak]
+        val gGana = NAKSHATRA_GANA[gNak]
+
         if (bGana == gGana) return 6.0
-        if (bGana == 0 && gGana == 1) return 5.0
-        if (bGana == 1 && gGana == 0) return 6.0
+        if (bGana == 0 && gGana == 1) return 6.0
+        if (bGana == 1 && gGana == 0) return 5.0
         if (bGana == 2 && gGana == 0) return 1.0
-        if (bGana == 0 && gGana == 2) return 0.0
-        if (bGana == 1 && gGana == 2) return 0.0
-        if (bGana == 2 && gGana == 1) return 0.0
-        return 0.0
+        return 0.0 // Deva-Rakshasa, Manushya-Rakshasa, Rakshasa-Manushya
     }
 
+    // 7. Bhakoot (Max 7.0 pts)
+    // 2/12 (Dwidwadasha) and 6/8 (Shadashtaka) = 0.0 pts (Bhakoot Dosha)
+    // Other distance combinations (1/1, 1/7, 3/11, 4/10, 5/9) = 7.0 pts
     private fun calculateBhakoot(b: Int, g: Int): Double {
-        val dist = (g - b + 12) % 12
-        return if (dist in listOf(1, 5, 7)) 0.0 else 7.0
+        val dist = ((g - b + 12) % 12) + 1
+        return if (dist in listOf(2, 12, 6, 8)) 0.0 else 7.0
     }
 
-    private fun calculateNadi(b: Int, g: Int): Double {
-        val nadiMap = listOf(
-            0, 1, 2, 2, 1, 0, 0, 1, 2, 2, 1, 0, 0, 1, 2, 2, 1, 0, 0, 1, 2, 2, 1, 0, 0, 1, 2
-        ) // 0:Adi, 1:Madhya, 2:Antya
-        val bNadi = nadiMap[b]
-        val gNadi = nadiMap[g]
+    // 8. Nadi (Max 8.0 pts)
+    // Same Nadi (Adi-Adi, Madhya-Madhya, Antya-Antya) = 0.0 pts (Nadi Dosha)
+    // Different Nadi = 8.0 pts
+    private fun calculateNadi(bNak: Int, gNak: Int): Double {
+        val bNadi = NAKSHATRA_NADI[bNak]
+        val gNadi = NAKSHATRA_NADI[gNak]
         return if (bNadi != gNadi) 8.0 else 0.0
     }
 }
