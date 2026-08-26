@@ -93,12 +93,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         panchang || horoscope || news
     }.stateIn(viewModelScope, kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000), false)
 
+    private var networkCallback: android.net.ConnectivityManager.NetworkCallback? = null
+
     private fun monitorNetwork() {
         val networkRequest = android.net.NetworkRequest.Builder()
             .addCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET)
             .build()
         
-        connectivityManager.registerNetworkCallback(networkRequest, object : android.net.ConnectivityManager.NetworkCallback() {
+        val callback = object : android.net.ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: android.net.Network) {
                 _isOffline.value = false
                 if (_currentUser.value != null) {
@@ -108,7 +110,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             override fun onLost(network: android.net.Network) {
                 _isOffline.value = true
             }
-        })
+        }
+        networkCallback = callback
+        try {
+            connectivityManager.registerNetworkCallback(networkRequest, callback)
+        } catch (_: Exception) {}
         
         // Initial check
         val activeNetwork = connectivityManager.activeNetwork
@@ -1131,5 +1137,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        try {
+            networkCallback?.let { connectivityManager.unregisterNetworkCallback(it) }
+        } catch (_: Exception) {}
+        try {
+            billingManager.destroy()
+        } catch (_: Exception) {}
     }
 }

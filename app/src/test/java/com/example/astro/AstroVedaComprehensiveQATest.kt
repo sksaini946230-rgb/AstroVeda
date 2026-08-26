@@ -411,4 +411,49 @@ class AstroVedaComprehensiveQATest {
             assertTrue("Planet Nakshatra in Hindi must not be blank", p.nakshatraHi.isNotBlank())
         }
     }
+
+    // --- 13. High Performance & Calculation Latency Benchmarks ---
+
+    @Test
+    fun testAstrologicalCalculationLatencyAndPerformance() {
+        val testDate = java.util.Calendar.getInstance(java.util.TimeZone.getTimeZone("Asia/Kolkata")).apply {
+            set(2026, java.util.Calendar.AUGUST, 26)
+        }.time
+        val delhiCity = CityLocation("New Delhi", "नई दिल्ली", "Delhi", 28.6139, 77.2090)
+
+        // 1. Panchang Benchmark (<50ms for complete daily calculations)
+        val panchangStart = System.currentTimeMillis()
+        val panchang = PanchangCalculator.calculatePanchang(testDate, delhiCity)
+        val panchangDuration = System.currentTimeMillis() - panchangStart
+        assertNotNull(panchang)
+        assertTrue("Panchang computation took ${panchangDuration}ms (must be < 50ms)", panchangDuration < 50)
+
+        // 2. Kundali Benchmark (<50ms for complete chart & 9 planetary positions)
+        val kundaliStart = System.currentTimeMillis()
+        val kundali = KundaliCalculator.generateKundali(
+            name = "Benchmark User",
+            dobString = "1995-10-24",
+            tobString = "14:30",
+            placeName = "New Delhi",
+            lat = 28.6139,
+            lng = 77.2090
+        )
+        val kundaliDuration = System.currentTimeMillis() - kundaliStart
+        assertNotNull(kundali)
+        assertTrue("Kundali computation took ${kundaliDuration}ms (must be < 50ms)", kundaliDuration < 50)
+
+        // 3. Kundali Milan Benchmark (<50ms for 36 Guna Ashtakoot calculation)
+        val milanStart = System.currentTimeMillis()
+        val milan = KundaliMatchingCalculator.matchKundali(
+            boyName = "Rahul",
+            boyDob = "1995-05-15",
+            boyTob = "08:15",
+            girlName = "Priya",
+            girlDob = "1997-11-12",
+            girlTob = "14:30"
+        )
+        val milanDuration = System.currentTimeMillis() - milanStart
+        assertNotNull(milan)
+        assertTrue("Milan computation took ${milanDuration}ms (must be < 50ms)", milanDuration < 50)
+    }
 }

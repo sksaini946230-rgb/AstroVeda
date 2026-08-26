@@ -204,4 +204,10 @@ class BillingManager(
             // fail gracefully
         }
     }
+
+    fun destroy() {
+        try {
+            billingClient?.endConnection()
+        } catch (_: Throwable) {}
+    }
 }

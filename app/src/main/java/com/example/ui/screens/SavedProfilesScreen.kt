@@ -247,7 +247,7 @@ fun SavedProfilesScreen(viewModel: MainViewModel) {
                 )
             }
         } else {
-            items(savedReports) { report ->
+            items(savedReports, key = { it.id }) { report ->
                 SavedReportCard(
                     report = report,
                     onDelete = { viewModel.deleteReport(report) }
