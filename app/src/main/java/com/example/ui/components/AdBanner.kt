@@ -24,9 +24,12 @@ fun AdBanner(
 ) {
     val bannerId = remember {
         try {
-            com.example.BuildConfig.ADMOB_BANNER_ID.ifBlank { "ca-app-pub-3940256099942544/6300978111" }
+            val id = com.example.BuildConfig.ADMOB_BANNER_ID
+            if (id.isNotBlank()) id
+            else if (com.example.BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111"
+            else ""
         } catch (e: Throwable) {
-            "ca-app-pub-3940256099942544/6300978111" // fallback to official test banner ID
+            if (com.example.BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else ""
         }
     }
 

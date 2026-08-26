@@ -296,9 +296,12 @@ class MainActivity : ComponentActivity() {
 
     private fun loadInterstitialAd() {
         val interstitialId = try {
-            com.example.BuildConfig.ADMOB_INTERSTITIAL_ID.ifBlank { "ca-app-pub-3940256099942544/1033173712" }
+            val id = com.example.BuildConfig.ADMOB_INTERSTITIAL_ID
+            if (id.isNotBlank()) id
+            else if (com.example.BuildConfig.DEBUG) "ca-app-pub-3940256099942544/1033173712"
+            else ""
         } catch (e: Throwable) {
-            "ca-app-pub-3940256099942544/1033173712"
+            if (com.example.BuildConfig.DEBUG) "ca-app-pub-3940256099942544/1033173712" else ""
         }
 
         if (interstitialId.isBlank()) return
