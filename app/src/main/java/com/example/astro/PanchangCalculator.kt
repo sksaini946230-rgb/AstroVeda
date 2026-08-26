@@ -253,9 +253,29 @@ object PanchangCalculator {
 
         val ascendantRashiIdx = (siderealAscendant / 30.0).toInt().coerceIn(0, 11)
 
+        val calTomorrow = Calendar.getInstance().apply {
+            time = date
+            add(Calendar.DAY_OF_YEAR, 1)
+        }
+        val tYear = calTomorrow.get(Calendar.YEAR)
+        val tMonth = calTomorrow.get(Calendar.MONTH) + 1
+        val tDay = calTomorrow.get(Calendar.DAY_OF_MONTH)
+        val planetDegreesTomorrow = AstroMath.calculatePlanets(tYear, tMonth, tDay, hourDecimal)
+
         val planetPositions = mutableListOf<PlanetPosition>()
         PLANETS_INFO.forEach { (en, hi) ->
             val deg = planetDegrees[en] ?: 0.0
+            val degTomorrow = planetDegreesTomorrow[en] ?: 0.0
+            var diff = degTomorrow - deg
+            while (diff > 180.0) diff -= 360.0
+            while (diff < -180.0) diff += 360.0
+
+            val isRetro = when (en) {
+                "Rahu", "Ketu" -> true
+                "Sun", "Moon" -> false
+                else -> diff < -0.0001
+            }
+
             val rashiIdx = (deg / 30.0).toInt().coerceIn(0, 11)
             val degreeInRashi = deg % 30.0
             val houseNum = ((rashiIdx - ascendantRashiIdx + 12) % 12) + 1
@@ -268,7 +288,7 @@ object PanchangCalculator {
                 rashiNameHi = rashiNamesHi[rashiIdx],
                 degree = String.format(Locale.US, "%.2f", degreeInRashi).toDouble(),
                 houseNumber = houseNum,
-                isRetrograde = false,
+                isRetrograde = isRetro,
                 nakshatraHi = NAKSHATRAS[nakshatraIdxP]
             ))
         }

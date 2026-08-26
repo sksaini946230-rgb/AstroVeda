@@ -113,6 +113,18 @@ class CalculatorsTest {
         assertTrue(panchang.sunset.contains(":"))
         assertTrue(panchang.moonrise.contains(":"))
         assertTrue(panchang.moonset.contains(":"))
+        assertTrue(panchang.rahuKaal.contains("-"))
+        assertTrue(panchang.abhijitMuhurat.contains("-"))
+
+        // 5. Verify location sensitivity: Kolkata (East) sunrise must be earlier than Jaipur (West)
+        val kolkata = CityLocation("Kolkata", "कोलकाता", "West Bengal", 22.5726, 88.3639)
+        val jaipur = CityLocation("Jaipur", "जयपुर", "Rajasthan", 26.9124, 75.7873)
+        val pKolkata = PanchangCalculator.calculatePanchang(testDate, kolkata, use24Hour = true)
+        val pJaipur = PanchangCalculator.calculatePanchang(testDate, jaipur, use24Hour = true)
+
+        val kolkataSunriseMinutes = pKolkata.sunrise.split(":")[0].toInt() * 60 + pKolkata.sunrise.split(":")[1].toInt()
+        val jaipurSunriseMinutes = pJaipur.sunrise.split(":")[0].toInt() * 60 + pJaipur.sunrise.split(":")[1].toInt()
+        assertTrue("Kolkata sunrise ($kolkataSunriseMinutes mins) must be earlier than Jaipur sunrise ($jaipurSunriseMinutes mins)", kolkataSunriseMinutes < jaipurSunriseMinutes)
     }
 
     @Test
