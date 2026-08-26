@@ -356,6 +356,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _selectedTab.value = AppTab.MUHURAT
     }
 
+    fun navigateToMatching() {
+        navigateToKundali(subTab = 1)
+    }
+
+    fun navigateToNumerology() {
+        navigateToKundali(subTab = 2)
+    }
+
     // Language Toggle & Selection
     fun toggleLanguage() {
         LanguageManager.toggleLanguage()
