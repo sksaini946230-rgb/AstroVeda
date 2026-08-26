@@ -48,6 +48,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -812,6 +813,9 @@ fun KundaliScreen(
                                             ) {
                                                 Text(
                                                     text = "जन्म कुण्डली (Birth Chart)",
+                                                    modifier = Modifier.weight(1f, fill = false),
+                                                    maxLines = 1,
+                                                    overflow = TextOverflow.Ellipsis,
                                                     style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                                                 )
                                                 // Style Toggle
@@ -833,6 +837,8 @@ fun KundaliScreen(
                                                     ) {
                                                         Text(
                                                             text = LanguageManager.getString("उत्तर भारतीय (North)", "North Indian"),
+                                                            maxLines = 1,
+                                                            softWrap = false,
                                                             style = MaterialTheme.typography.labelSmall.copy(
                                                                 color = if (isNorthStyle) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                                                                 fontWeight = FontWeight.Medium
@@ -850,6 +856,8 @@ fun KundaliScreen(
                                                     ) {
                                                         Text(
                                                             text = LanguageManager.getString("दक्षिण भारतीय (South)", "South Indian"),
+                                                            maxLines = 1,
+                                                            softWrap = false,
                                                             style = MaterialTheme.typography.labelSmall.copy(
                                                                 color = if (!isNorthStyle) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
                                                                 fontWeight = FontWeight.Medium
