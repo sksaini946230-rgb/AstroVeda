@@ -23,4 +23,5 @@ debug.keystore
 patch_*
 fix_*
 *.txt
+.vscode/
 
