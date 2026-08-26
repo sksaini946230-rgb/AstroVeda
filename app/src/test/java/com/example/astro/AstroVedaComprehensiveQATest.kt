@@ -180,4 +180,35 @@ class AstroVedaComprehensiveQATest {
         assertFalse(panchang.sunset.isBlank())
         assertFalse(panchang.tithiHindi.isBlank())
     }
+
+    // --- 7. Saved Profile Data Model & CRUD Integrity ---
+
+    @Test
+    fun testKundaliProfileEntityLifecycle() {
+        val originalProfile = com.example.data.local.KundaliEntity(
+            id = 101L,
+            name = "Aarav Sharma",
+            gender = "MALE",
+            dateOfBirth = "1998-04-12",
+            timeOfBirth = "14:30",
+            placeOfBirth = "Jaipur, Rajasthan",
+            latitude = 26.9124,
+            longitude = 75.7873,
+            notes = "Family Member"
+        )
+
+        assertEquals("Aarav Sharma", originalProfile.name)
+        assertEquals("1998-04-12", originalProfile.dateOfBirth)
+
+        // Verify copy/update lifecycle
+        val updatedProfile = originalProfile.copy(
+            name = "Aarav S. Sharma",
+            placeOfBirth = "Mumbai, Maharashtra"
+        )
+
+        assertEquals(101L, updatedProfile.id)
+        assertEquals("Aarav S. Sharma", updatedProfile.name)
+        assertEquals("Mumbai, Maharashtra", updatedProfile.placeOfBirth)
+        assertEquals("1998-04-12", updatedProfile.dateOfBirth)
+    }
 }

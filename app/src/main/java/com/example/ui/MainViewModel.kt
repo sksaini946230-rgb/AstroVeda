@@ -899,6 +899,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun updateProfile(entity: KundaliEntity) {
+        viewModelScope.launch {
+            repository.updateProfile(entity)
+        }
+    }
+
     fun deleteProfile(entity: KundaliEntity) {
         viewModelScope.launch {
             repository.deleteProfile(entity)

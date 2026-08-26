@@ -87,6 +87,7 @@ import com.example.ui.components.SectionHeader
 import com.example.util.LanguageManager
 import java.text.SimpleDateFormat
 import java.util.Date
+import androidx.compose.material.icons.filled.Edit
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -95,6 +96,8 @@ fun SavedProfilesScreen(viewModel: MainViewModel) {
     val profiles by viewModel.savedProfiles.collectAsState()
     val savedReports by viewModel.savedReports.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
+    var editingProfile by remember { mutableStateOf<KundaliEntity?>(null) }
+    var deletingProfile by remember { mutableStateOf<KundaliEntity?>(null) }
 
     if (showAddDialog) {
         AddProfileDialog(
@@ -103,6 +106,28 @@ fun SavedProfilesScreen(viewModel: MainViewModel) {
                 showAddDialog = false
             },
             onDismiss = { showAddDialog = false }
+        )
+    }
+
+    editingProfile?.let { profile ->
+        EditProfileDialog(
+            profile = profile,
+            onSave = { updatedProfile ->
+                viewModel.updateProfile(updatedProfile)
+                editingProfile = null
+            },
+            onDismiss = { editingProfile = null }
+        )
+    }
+
+    deletingProfile?.let { profile ->
+        DeleteProfileConfirmationDialog(
+            profile = profile,
+            onConfirm = {
+                viewModel.deleteProfile(profile)
+                deletingProfile = null
+            },
+            onDismiss = { deletingProfile = null }
         )
     }
 
@@ -147,8 +172,8 @@ fun SavedProfilesScreen(viewModel: MainViewModel) {
                 val dismissState = rememberSwipeToDismissBoxState(
                     confirmValueChange = { dismissValue ->
                         if (dismissValue == SwipeToDismissBoxValue.EndToStart || dismissValue == SwipeToDismissBoxValue.StartToEnd) {
-                            viewModel.deleteProfile(profile)
-                            true
+                            deletingProfile = profile
+                            false
                         } else {
                             false
                         }
@@ -196,7 +221,8 @@ fun SavedProfilesScreen(viewModel: MainViewModel) {
                             viewModel.matchGirlDob.value = profile.dateOfBirth
                             viewModel.navigateToKundali(1)
                         },
-                        onDelete = { viewModel.deleteProfile(profile) }
+                        onEdit = { editingProfile = profile },
+                        onDelete = { deletingProfile = profile }
                     )
                 }
             }
@@ -241,16 +267,16 @@ fun AddProfileDialog(
     onDismiss: () -> Unit
 ) {
     var name by remember { mutableStateOf("") }
-    var dob by remember { mutableStateOf("1995-05-15") }
-    var tob by remember { mutableStateOf("08:30") }
-    var place by remember { mutableStateOf("Jaipur, Rajasthan") }
+    var dob by remember { mutableStateOf("") }
+    var tob by remember { mutableStateOf("") }
+    var place by remember { mutableStateOf("") }
 
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
 
     if (showDatePicker) {
         M3DatePickerDialog(
-            initialDateString = dob,
+            initialDateString = dob.ifBlank { "1995-05-15" },
             onDateSelected = { dob = it },
             onDismiss = { showDatePicker = false }
         )
@@ -258,7 +284,7 @@ fun AddProfileDialog(
 
     if (showTimePicker) {
         M3TimePickerDialog(
-            initialTimeString = tob,
+            initialTimeString = tob.ifBlank { "12:00" },
             onTimeSelected = { tob = it },
             onDismiss = { showTimePicker = false }
         )
@@ -289,8 +315,148 @@ fun AddProfileDialog(
                     value = name,
                     onValueChange = { name = it },
                     label = { Text(LanguageManager.getString("नाम", "Name")) },
+                    placeholder = { Text(LanguageManager.getString("उदा. राहुल शर्मा", "e.g. Rahul Sharma"), fontSize = 13.sp) },
                     colors = tfColors,
                     modifier = Modifier.fillMaxWidth().testTag("add_profile_name")
+                )
+
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Box(modifier = Modifier.weight(1f)) {
+                        OutlinedTextField(
+                            value = dob,
+                            onValueChange = { dob = it },
+                            readOnly = true,
+                            label = { Text(LanguageManager.getString("जन्म तिथि", "DOB")) },
+                            placeholder = { Text("YYYY-MM-DD", fontSize = 13.sp) },
+                            trailingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.CalendarMonth,
+                                    contentDescription = "DOB",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            },
+                            colors = tfColors,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Box(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .clickable { showDatePicker = true }
+                        )
+                    }
+
+                    Box(modifier = Modifier.weight(1f)) {
+                        OutlinedTextField(
+                            value = tob,
+                            onValueChange = { tob = it },
+                            readOnly = true,
+                            label = { Text(LanguageManager.getString("समय", "Time")) },
+                            placeholder = { Text("HH:mm", fontSize = 13.sp) },
+                            trailingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Schedule,
+                                    contentDescription = "TOB",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            },
+                            colors = tfColors,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Box(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .clickable { showTimePicker = true }
+                        )
+                    }
+                }
+
+                OutlinedTextField(
+                    value = place,
+                    onValueChange = { place = it },
+                    label = { Text(LanguageManager.getString("जन्म स्थान", "Place of Birth")) },
+                    placeholder = { Text(LanguageManager.getString("उदा. जयपुर, राजस्थान", "e.g. Jaipur, Rajasthan"), fontSize = 13.sp) },
+                    colors = tfColors,
+                    modifier = Modifier.fillMaxWidth().testTag("add_profile_place")
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    if (name.isNotBlank() && dob.isNotBlank() && tob.isNotBlank() && place.isNotBlank()) {
+                        onSave(name, dob, tob, place)
+                    }
+                },
+                enabled = name.isNotBlank() && dob.isNotBlank() && tob.isNotBlank() && place.isNotBlank()
+            ) {
+                Text(LanguageManager.getString("सहेजें", "Save"), color = if (name.isNotBlank() && dob.isNotBlank() && tob.isNotBlank() && place.isNotBlank()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f), fontWeight = FontWeight.Bold)
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(LanguageManager.getString("रद्द करें", "Cancel"), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+    )
+}
+
+@Composable
+fun EditProfileDialog(
+    profile: KundaliEntity,
+    onSave: (KundaliEntity) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var name by remember { mutableStateOf(profile.name) }
+    var dob by remember { mutableStateOf(profile.dateOfBirth) }
+    var tob by remember { mutableStateOf(profile.timeOfBirth) }
+    var place by remember { mutableStateOf(profile.placeOfBirth) }
+
+    var showDatePicker by remember { mutableStateOf(false) }
+    var showTimePicker by remember { mutableStateOf(false) }
+
+    if (showDatePicker) {
+        M3DatePickerDialog(
+            initialDateString = dob.ifBlank { "1995-05-15" },
+            onDateSelected = { dob = it },
+            onDismiss = { showDatePicker = false }
+        )
+    }
+
+    if (showTimePicker) {
+        M3TimePickerDialog(
+            initialTimeString = tob.ifBlank { "12:00" },
+            onTimeSelected = { tob = it },
+            onDismiss = { showTimePicker = false }
+        )
+    }
+
+    val tfColors = OutlinedTextFieldDefaults.colors(
+        focusedBorderColor = MaterialTheme.colorScheme.primary,
+        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+        focusedLabelColor = MaterialTheme.colorScheme.primary,
+        unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+        unfocusedTextColor = MaterialTheme.colorScheme.onSurface
+    )
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.background,
+        title = {
+            Text(
+                text = LanguageManager.getString("प्रोफाइल संपादित करें", "Edit Birth Profile"),
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+            )
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text(LanguageManager.getString("नाम", "Name")) },
+                    colors = tfColors,
+                    modifier = Modifier.fillMaxWidth().testTag("edit_profile_name")
                 )
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -346,7 +512,7 @@ fun AddProfileDialog(
                     onValueChange = { place = it },
                     label = { Text(LanguageManager.getString("जन्म स्थान", "Place of Birth")) },
                     colors = tfColors,
-                    modifier = Modifier.fillMaxWidth().testTag("add_profile_place")
+                    modifier = Modifier.fillMaxWidth().testTag("edit_profile_place")
                 )
             }
         },
@@ -354,11 +520,19 @@ fun AddProfileDialog(
             TextButton(
                 onClick = {
                     if (name.isNotBlank()) {
-                        onSave(name, dob, tob, place)
+                        onSave(
+                            profile.copy(
+                                name = name,
+                                dateOfBirth = dob,
+                                timeOfBirth = tob,
+                                placeOfBirth = place
+                            )
+                        )
                     }
-                }
+                },
+                enabled = name.isNotBlank()
             ) {
-                Text(LanguageManager.getString("सहेजें", "Save"), color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                Text(LanguageManager.getString("अपडेट करें", "Update"), color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {
@@ -370,11 +544,70 @@ fun AddProfileDialog(
 }
 
 @Composable
+fun DeleteProfileConfirmationDialog(
+    profile: KundaliEntity,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = {
+            Icon(
+                imageVector = Icons.Default.Warning,
+                contentDescription = null,
+                tint = RahuKaalDangerColor,
+                modifier = Modifier.size(32.dp)
+            )
+        },
+        title = {
+            Text(
+                text = LanguageManager.getString("प्रोफाइल हटाएं?", "Delete Profile?"),
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            )
+        },
+        text = {
+            Text(
+                text = LanguageManager.getString(
+                    "क्या आप '${profile.name}' का कुण्डली प्रोफाइल हटाना चाहते हैं?\nयह स्थानीय डिवाइस से हटा दिया जाएगा।",
+                    "Are you sure you want to delete the birth profile for '${profile.name}'?\nThis will remove it from this device."
+                ),
+                style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface)
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = onConfirm,
+                colors = ButtonDefaults.buttonColors(containerColor = RahuKaalDangerColor)
+            ) {
+                Text(
+                    text = LanguageManager.getString("हटाएं (Delete)", "Delete"),
+                    color = PrimaryButtonText,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(
+                    text = LanguageManager.getString("रद्द करें", "Cancel"),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.surfaceVariant
+    )
+}
+
+@Composable
 fun SavedProfileCard(
     profile: KundaliEntity,
     onOpenKundali: () -> Unit,
     onUseForMatchingBoy: () -> Unit,
     onUseForMatchingGirl: () -> Unit,
+    onEdit: () -> Unit,
     onDelete: () -> Unit
 ) {
     val animatedAlpha = remember { Animatable(0f) }
@@ -438,8 +671,13 @@ fun SavedProfileCard(
                         }
                     }
 
-                    IconButton(onClick = onDelete, modifier = Modifier.testTag("delete_profile_${profile.id}")) {
-                        Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete", tint = RahuKaalDangerColor)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(onClick = onEdit, modifier = Modifier.testTag("edit_profile_${profile.id}")) {
+                            Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit Profile", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                        }
+                        IconButton(onClick = onDelete, modifier = Modifier.testTag("delete_profile_${profile.id}")) {
+                            Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Profile", tint = RahuKaalDangerColor, modifier = Modifier.size(20.dp))
+                        }
                     }
                 }
 
