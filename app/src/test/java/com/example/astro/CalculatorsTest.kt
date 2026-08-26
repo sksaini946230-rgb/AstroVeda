@@ -219,15 +219,24 @@ class CalculatorsTest {
 
     @Test
     fun testNadiAndBhakootDoshaDetection() {
-        val result = KundaliMatchingCalculator.matchKundali(
+        // Sample Pair 1: Rohan & Pooja
+        val result1 = KundaliMatchingCalculator.matchKundali(
             "Rohan", "1993-04-14", "10:30",
             "Pooja", "1995-08-22", "16:45"
         )
-        assertNotNull(result)
-        assertTrue(result.totalObtainedGuna in 0.0..36.0)
-        assertNotNull(result.nadiDoshaStatusHi)
-        assertNotNull(result.bhakootDoshaStatusHi)
-        assertTrue(result.kootDetails.size == 8)
+        assertNotNull(result1)
+        assertTrue(result1.totalObtainedGuna in 0.0..36.0)
+        assertNotNull(result1.nadiDoshaStatusHi)
+        assertNotNull(result1.bhakootDoshaStatusHi)
+        assertEquals(8, result1.kootDetails.size)
+
+        // Sample Pair 2: Verify same birth details produce identical Nadi and trigger Nadi Dosha
+        val resultSame = KundaliMatchingCalculator.matchKundali(
+            "Twin Boy", "1995-05-20", "08:15",
+            "Twin Girl", "1995-05-20", "08:15"
+        )
+        assertTrue("Identical birth details must have identical Nadi and thus Nadi Dosha", resultSame.hasNadiDosha)
+        assertEquals(0.0, resultSame.kootDetails.first { it.kootNameEn == "Nadi" }.obtainedPoints, 0.01)
     }
 
     @Test

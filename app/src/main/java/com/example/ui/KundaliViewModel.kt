@@ -40,18 +40,16 @@ class KundaliViewModel(application: Application) : AndroidViewModel(application)
 
     // --- Guna matching state -------------------------------------------
 
-    var matchBoyName = MutableStateFlow("Rahul")
-    var matchBoyDob = MutableStateFlow("1995-05-20")
-    var matchBoyTob = MutableStateFlow("08:15")
+    var matchBoyName = MutableStateFlow("")
+    var matchBoyDob = MutableStateFlow("")
+    var matchBoyTob = MutableStateFlow("12:00")
 
-    var matchGirlName = MutableStateFlow("Priya")
-    var matchGirlDob = MutableStateFlow("1997-11-12")
-    var matchGirlTob = MutableStateFlow("14:30")
+    var matchGirlName = MutableStateFlow("")
+    var matchGirlDob = MutableStateFlow("")
+    var matchGirlTob = MutableStateFlow("12:00")
 
-    private val _gunaResult = MutableStateFlow(
-        KundaliMatchingCalculator.matchKundali("Rahul", "1995-05-20", "08:15", "Priya", "1997-11-12", "14:30")
-    )
-    val gunaResult: StateFlow<GunaMatchingResult> = _gunaResult.asStateFlow()
+    private val _gunaResult = MutableStateFlow<GunaMatchingResult?>(null)
+    val gunaResult: StateFlow<GunaMatchingResult?> = _gunaResult.asStateFlow()
 
     // --- Numerology state ----------------------------------------------
 
@@ -125,12 +123,19 @@ class KundaliViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun calculateGunaMatching() {
+        val bName = matchBoyName.value.trim()
+        val bDob = matchBoyDob.value.trim()
+        val bTob = matchBoyTob.value.trim().ifBlank { "12:00" }
+        val gName = matchGirlName.value.trim()
+        val gDob = matchGirlDob.value.trim()
+        val gTob = matchGirlTob.value.trim().ifBlank { "12:00" }
+
         viewModelScope.launch(Dispatchers.Default) {
             _isCalculating.value = true
             try {
                 val result = KundaliMatchingCalculator.matchKundali(
-                    matchBoyName.value, matchBoyDob.value, matchBoyTob.value,
-                    matchGirlName.value, matchGirlDob.value, matchGirlTob.value
+                    bName, bDob, bTob,
+                    gName, gDob, gTob
                 )
                 _gunaResult.value = result
                 onGunaCalculated?.invoke()
