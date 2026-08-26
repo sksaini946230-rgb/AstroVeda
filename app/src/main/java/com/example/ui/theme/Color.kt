@@ -36,5 +36,6 @@ val DateTimeAccent = Color(0xFFE8934A)         // Header dates, sunrise/sunset, 
 val ShubhSuccessColor = Color(0xFF2ABF6E)      // Amrit/Shubh Choghadiya badges
 val RahuKaalDangerColor = Color(0xFFE85A4A)    // Rahu Kaal, Gulika Kaal, error states
 
-// GLASS CARD BORDER — consistent across all screens
+// GLASS CARD BORDER & COSMIC EFFECTS — consistent across all screens
 val GlassCardBorder = Color(0x1FFFFFFF)        // rgba(255,255,255,0.12)
+val CosmicGradientEdge = Color(0xFF1A0A2E)     // Subtle cosmic violet edge for splash and hero cards

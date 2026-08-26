@@ -35,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ui.theme.AppBackground
+import com.example.ui.theme.CosmicGradientEdge
 import com.example.ui.theme.ElevatedSurface
 import com.example.ui.theme.PrimaryButtonBackground
 import com.example.ui.theme.SurfaceBackground
@@ -131,7 +132,7 @@ fun SplashScreen(
                     colors = listOf(
                         SurfaceBackground, // Deep Space center
                         AppBackground, // Void Black edges
-                        Color(0xFF1A0A2E)  // Subtle violet edge
+                        CosmicGradientEdge // Subtle cosmic violet edge
                     ),
                     radius = 1200f
                 )
