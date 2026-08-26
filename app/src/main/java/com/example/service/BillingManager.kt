@@ -22,7 +22,8 @@ class BillingManager(
     private var billingClient: BillingClient? = try {
         BillingClient.newBuilder(context)
             .setListener(this)
-            .enablePendingPurchases()
+            .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
+            .enableAutoServiceReconnection()
             .build()
     } catch (e: Throwable) {
         null
@@ -88,9 +89,9 @@ class BillingManager(
             .build()
 
         try {
-            client.queryProductDetailsAsync(queryProductDetailsParams) { billingResult, productDetailsList ->
+            client.queryProductDetailsAsync(queryProductDetailsParams) { billingResult, queryProductDetailsResult ->
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                    val details = productDetailsList.firstOrNull { it.productId == SUB_PRODUCT_ID_PRO }
+                    val details = queryProductDetailsResult.productDetailsList.firstOrNull { it.productId == SUB_PRODUCT_ID_PRO }
                     _productDetails.value = details
                 } else {
                     _errorMessage.value = "Query available products failed: ${billingResult.debugMessage}"
