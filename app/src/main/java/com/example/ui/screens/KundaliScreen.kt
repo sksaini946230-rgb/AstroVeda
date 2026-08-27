@@ -1,11 +1,15 @@
 package com.example.ui.screens
 
 import android.content.Intent
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +19,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -35,6 +40,7 @@ import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -55,6 +61,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -62,6 +69,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.ui.window.PopupProperties
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -231,7 +242,7 @@ fun TransitScreen(viewModel: MainViewModel) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun KundaliScreen(
     viewModel: MainViewModel,
@@ -254,6 +265,8 @@ fun KundaliScreen(
     var dobInput by remember { mutableStateOf("") }
     var tobInput by remember { mutableStateOf("") }
     var placeInput by remember { mutableStateOf("") }
+    var placeSuggestions by remember { mutableStateOf<List<String>>(emptyList()) }
+    var placeDropdownExpanded by remember { mutableStateOf(false) }
     var formValidationError by remember { mutableStateOf<String?>(null) }
 
     var showDatePicker by remember { mutableStateOf(false) }
@@ -610,21 +623,75 @@ fun KundaliScreen(
                                             }
 
                                             // 3. Place of Birth Field
-                                            OutlinedTextField(
-                                                value = placeInput,
-                                                onValueChange = {
-                                                    placeInput = it
-                                                    formValidationError = null
-                                                },
-                                                label = { Text(LanguageManager.getString("जन्म स्थान (Place of Birth) *", "Place of Birth *")) },
-                                                placeholder = { Text(LanguageManager.getString("शहर, राज्य (उदा. जयपुर, राजस्थान)", "City, State (e.g. Jaipur, Rajasthan)")) },
-                                                shape = RoundedCornerShape(14.dp),
-                                                colors = tfColors,
-                                                singleLine = true,
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .testTag("input_kundali_place")
-                                            )
+                                            LaunchedEffect(placeInput) {
+                                                if (placeInput.length < 3) {
+                                                    placeSuggestions = emptyList()
+                                                    placeDropdownExpanded = false
+                                                } else {
+                                                    delay(400)
+                                                    val results = withContext(Dispatchers.IO) {
+                                                        try {
+                                                            val geocoder = android.location.Geocoder(context, java.util.Locale.getDefault())
+                                                            @Suppress("DEPRECATION")
+                                                            val addresses = geocoder.getFromLocationName(placeInput, 5)
+                                                            addresses?.mapNotNull { addr ->
+                                                                val city = addr.locality ?: addr.subAdminArea ?: addr.featureName
+                                                                val state = addr.adminArea
+                                                                val country = addr.countryName
+                                                                listOfNotNull(city, state, country).joinToString(", ").takeIf { it.isNotBlank() }
+                                                            }?.distinct() ?: emptyList()
+                                                        } catch (e: Exception) {
+                                                            emptyList()
+                                                        }
+                                                    }
+                                                    placeSuggestions = results
+                                                    placeDropdownExpanded = results.isNotEmpty()
+                                                }
+                                            }
+
+                                            Column(modifier = Modifier.fillMaxWidth()) {
+                                                OutlinedTextField(
+                                                    value = placeInput,
+                                                    onValueChange = {
+                                                        placeInput = it
+                                                        formValidationError = null
+                                                    },
+                                                    label = { Text(LanguageManager.getString("जन्म स्थान (Place of Birth) *", "Place of Birth *")) },
+                                                    placeholder = { Text(LanguageManager.getString("शहर, राज्य (उदा. जयपुर, राजस्थान)", "City, State (e.g. Jaipur, Rajasthan)")) },
+                                                    shape = RoundedCornerShape(14.dp),
+                                                    colors = tfColors,
+                                                    singleLine = true,
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .testTag("input_kundali_place")
+                                                )
+                                                if (placeSuggestions.isNotEmpty()) {
+                                                    Column(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .padding(top = 4.dp)
+                                                            .clip(RoundedCornerShape(12.dp))
+                                                            .background(ElevatedSurface)
+                                                            .border(1.dp, GlassCardBorder, RoundedCornerShape(12.dp))
+                                                    ) {
+                                                        placeSuggestions.forEach { suggestion ->
+                                                            Text(
+                                                                text = suggestion,
+                                                                style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
+                                                                modifier = Modifier
+                                                                    .fillMaxWidth()
+                                                                    .clickable {
+                                                                        placeInput = suggestion
+                                                                        placeSuggestions = emptyList()
+                                                                        placeDropdownExpanded = false
+                                                                        formValidationError = null
+                                                                    }
+                                                                    .padding(horizontal = 14.dp, vertical = 12.dp)
+                                                            )
+                                                        }
+                                                    }
+                                                }
+                                            }
 
                                             // Validation Error Alert
                                             if (formValidationError != null) {
