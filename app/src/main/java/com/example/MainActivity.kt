@@ -82,6 +82,37 @@ class MainActivity : ComponentActivity() {
             if (isGranted) scheduleNotificationWorkers()
         }
 
+    /**
+     * Registers App Check, which attests that a request really comes from a genuine
+     * install of this app on a real device.
+     *
+     * This is what makes it safe to call Firebase AI Logic without shipping an API
+     * key — and it was never wired up: the project pulled in the reCAPTCHA provider,
+     * which is the WEB one and does nothing on Android, and never installed any
+     * provider at all.
+     *
+     * Debug builds use the debug provider, which prints a token to logcat that has
+     * to be pasted into the Firebase console once per machine.
+     */
+    private fun initAppCheck() {
+        try {
+            val appCheck = com.google.firebase.appcheck.FirebaseAppCheck.getInstance()
+            if (BuildConfig.DEBUG) {
+                appCheck.installAppCheckProviderFactory(
+                    com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory.getInstance()
+                )
+            } else {
+                appCheck.installAppCheckProviderFactory(
+                    com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory.getInstance()
+                )
+            }
+        } catch (e: Throwable) {
+            // Firebase not configured on this build — the AI feature falls back to
+            // its on-device answers, and nothing else in the app depends on this.
+            android.util.Log.w("MainActivity", "App Check not initialised: ${e.message}")
+        }
+    }
+
     private fun scheduleNotificationWorkers() {
         try {
             com.example.worker.AstroNotificationWorker.scheduleDailyNotification(this)
@@ -126,6 +157,8 @@ class MainActivity : ComponentActivity() {
         // Restore the user's language before anything composes, or the first frame
         // renders in Hindi regardless of what they chose during onboarding.
         com.example.util.LanguageManager.init(applicationContext)
+
+        initAppCheck()
 
         try {
             com.example.util.AstroAnalytics.init(applicationContext)

@@ -123,7 +123,12 @@ dependencies {
   implementation(libs.androidx.credentials)
   implementation(libs.androidx.credentials.play.services)
   implementation(libs.googleid)
-  implementation(libs.firebase.appcheck.recaptcha)
+  // App Check attests that requests really come from this app, signed with this
+  // keystore, on a genuine device. It is what makes Firebase AI Logic safe to call
+  // without shipping an API key. recaptcha is the WEB provider and does nothing on
+  // Android; Play Integrity is the Android one.
+  implementation(libs.firebase.appcheck.playintegrity)
+  debugImplementation(libs.firebase.appcheck.debug)
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.coroutines.core)
   implementation(libs.logging.interceptor)

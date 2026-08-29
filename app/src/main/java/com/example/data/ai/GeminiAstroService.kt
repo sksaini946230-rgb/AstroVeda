@@ -1,42 +1,40 @@
 package com.example.data.ai
 
 import android.util.Log
-import com.example.BuildConfig
+import com.google.firebase.Firebase
+import com.google.firebase.ai.GenerativeModel
+import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.GenerativeBackend
+import com.google.firebase.ai.type.content
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONArray
-import org.json.JSONObject
-import java.util.concurrent.TimeUnit
 
+/**
+ * The AI astrologer, over Firebase AI Logic.
+ *
+ * This used to call generativelanguage.googleapis.com directly with
+ * BuildConfig.GEMINI_API_KEY appended to the URL. That key shipped inside every
+ * APK — minification does not hide string constants — so anyone could pull it out
+ * with apktool and spend against this project's billing account without limit.
+ * There was no App Check, no proxy and no rate limit behind it.
+ *
+ * Firebase AI Logic keeps the credential server-side. Requests are attested by
+ * App Check (Play Integrity), so they only succeed from a genuine install of this
+ * app, signed with this keystore. No key reaches the device.
+ *
+ * If Firebase AI Logic is not enabled in the console yet, every call here fails
+ * and falls back to the on-device responses below — the feature degrades, it does
+ * not crash.
+ */
 object GeminiAstroService {
 
     private const val TAG = "GeminiAstroService"
-
-    private val client = OkHttpClient.Builder()
-        .connectTimeout(60, TimeUnit.SECONDS)
-        .readTimeout(60, TimeUnit.SECONDS)
-        .writeTimeout(60, TimeUnit.SECONDS)
-        .build()
+    private const val MODEL = "gemini-2.5-flash"
 
     suspend fun getAiAstrologyInsight(
         userQuestion: String,
         personDetails: String = ""
     ): String = withContext(Dispatchers.IO) {
-        val apiKey = try {
-            BuildConfig.GEMINI_API_KEY
-        } catch (e: Exception) {
-            ""
-        }
-
-        if (apiKey.isBlank() || apiKey == "MY_GEMINI_API_KEY") {
-            Log.d(TAG, "API key is empty or default; utilizing fallback offline Vedic response.")
-            return@withContext getOfflineVedicResponse(userQuestion)
-        }
-
         try {
             // The prompt used to be four lines of persona with no boundaries at all,
             // in front of a free-text box that says "अपना प्रश्न पूछें". People ask
@@ -91,65 +89,35 @@ object GeminiAstroService {
                 "प्रश्न (Question): $userQuestion"
             }
 
-            val jsonBody = JSONObject().apply {
-                put("system_instruction", JSONObject().apply {
-                    put("parts", JSONObject().apply {
-                        put("text", systemPrompt)
-                    })
-                })
-                put("contents", JSONArray().apply {
-                    put(JSONObject().apply {
-                        put("parts", JSONArray().apply {
-                            put(JSONObject().apply {
-                                put("text", fullPrompt)
-                            })
-                        })
-                    })
-                })
-            }
+            val model = modelFor(systemPrompt)
+                ?: return@withContext getOfflineVedicResponse(userQuestion)
 
-            val mediaType = "application/json; charset=utf-8".toMediaType()
-            val requestBody = jsonBody.toString().toRequestBody(mediaType)
+            val text = model.generateContent(fullPrompt).text
+            if (!text.isNullOrBlank()) return@withContext text.trim()
 
-            val url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=$apiKey"
-
-            val request = Request.Builder()
-                .url(url)
-                .post(requestBody)
-                .build()
-
-            val response = try {
-                client.newCall(request).execute()
-            } catch (e: Exception) {
-                Log.e(TAG, "Network failure calling Gemini API: ${e.message}", e)
-                return@withContext getOfflineVedicResponse(userQuestion)
-            }
-
-            val responseString = response.body?.string() ?: ""
-
-            if (response.isSuccessful && responseString.isNotBlank()) {
-                try {
-                    val jsonRes = JSONObject(responseString)
-                    val candidates = jsonRes.optJSONArray("candidates")
-                    if (candidates != null && candidates.length() > 0) {
-                        val firstCandidate = candidates.getJSONObject(0)
-                        val content = firstCandidate.optJSONObject("content")
-                        val parts = content?.optJSONArray("parts")
-                        if (parts != null && parts.length() > 0) {
-                            return@withContext parts.getJSONObject(0).optString("text", "शुभं करोति कल्याणम्।")
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.e(TAG, "Failed to parse Gemini response: ${e.message}", e)
-                }
-            } else {
-                Log.e(TAG, "Gemini API error response code: ${response.code}, message: $responseString")
-            }
+            Log.w(TAG, "Empty response from Firebase AI Logic")
             return@withContext getOfflineVedicResponse(userQuestion)
         } catch (e: Exception) {
-            Log.e(TAG, "Unhandled exception in getAiAstrologyInsight: ${e.message}", e)
+            // Most likely causes: Firebase AI Logic not enabled in the console, App
+            // Check not registered for this build, or no network. All of them mean
+            // the same thing to the user, and the offline answers cover it.
+            Log.e(TAG, "Firebase AI Logic call failed: ${e.message}", e)
             return@withContext getOfflineVedicResponse(userQuestion)
         }
+    }
+
+    /**
+     * Builds a model bound to [systemPrompt], or null if Firebase is not
+     * initialised on this device.
+     */
+    private fun modelFor(systemPrompt: String): GenerativeModel? = try {
+        Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+            modelName = MODEL,
+            systemInstruction = content { text(systemPrompt) }
+        )
+    } catch (e: Throwable) {
+        Log.e(TAG, "Firebase AI Logic unavailable: ${e.message}", e)
+        null
     }
 
     fun getOfflineVedicResponse(question: String): String {
@@ -166,83 +134,37 @@ object GeminiAstroService {
         }
     }
 
+    /**
+     * Astro news.
+     *
+     * The old version asked for Google Search grounding by hand-rolling a
+     * `"tools": [{"googleSearch": {}}]` block into the raw REST body. Grounding is
+     * a paid, separately-enabled feature; rather than reach for it, this asks the
+     * model directly and falls back to the bundled highlights when it cannot.
+     */
     suspend fun fetchAstroNewsWithSearchGrounding(): String = withContext(Dispatchers.IO) {
-        val apiKey = try {
-            BuildConfig.GEMINI_API_KEY
-        } catch (e: Exception) {
-            ""
-        }
-
-        if (apiKey.isBlank() || apiKey == "MY_GEMINI_API_KEY") {
-            Log.d(TAG, "API key is empty or default; utilizing fallback offline Astro News.")
-            return@withContext getOfflineAstroNews()
-        }
-
         try {
-            val systemPrompt = "You are a real-time Astro-News curator. Using Google Search grounding, search for current 2026 Vedic astrological planetary transits (गोचर), eclipses (ग्रहण), and astronomical events. Provide 3 crisp, fascinating news highlights in Hindi with clear headings."
+            val systemPrompt = """
+                You are an astro-news curator writing for an Indian Vedic astrology app.
+                Give exactly three short highlights in Hindi about notable planetary
+                transits (गोचर), eclipses (ग्रहण) and astronomical events for the current
+                period. Each highlight gets a one-line heading and two or three sentences.
 
-            val jsonBody = JSONObject().apply {
-                put("system_instruction", JSONObject().apply {
-                    put("parts", JSONObject().apply {
-                        put("text", systemPrompt)
-                    })
-                })
-                put("contents", JSONArray().apply {
-                    put(JSONObject().apply {
-                        put("parts", JSONArray().apply {
-                            put(JSONObject().apply {
-                                put("text", "Search latest 2026 Vedic astrology planetary transits and space astronomical news.")
-                            })
-                        })
-                    })
-                })
-                put("tools", JSONArray().apply {
-                    put(JSONObject().apply {
-                        put("googleSearch", JSONObject())
-                    })
-                })
-            }
+                Be careful with facts. If you are not confident about a specific date,
+                describe the event without pinning a date to it rather than inventing one.
+                Do not predict outcomes for individuals. Plain text only, no Markdown.
+            """.trimIndent()
 
-            val mediaType = "application/json; charset=utf-8".toMediaType()
-            val requestBody = jsonBody.toString().toRequestBody(mediaType)
+            val model = modelFor(systemPrompt) ?: return@withContext getOfflineAstroNews()
 
-            val url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=$apiKey"
+            val text = model.generateContent(
+                "Summarise the current notable Vedic planetary transits and astronomical events."
+            ).text
 
-            val request = Request.Builder()
-                .url(url)
-                .post(requestBody)
-                .build()
-
-            val response = try {
-                client.newCall(request).execute()
-            } catch (e: Exception) {
-                Log.e(TAG, "Network failure calling Gemini API (AstroNews): ${e.message}", e)
-                return@withContext getOfflineAstroNews()
-            }
-
-            val responseString = response.body?.string() ?: ""
-
-            if (response.isSuccessful && responseString.isNotBlank()) {
-                try {
-                    val jsonRes = JSONObject(responseString)
-                    val candidates = jsonRes.optJSONArray("candidates")
-                    if (candidates != null && candidates.length() > 0) {
-                        val firstCandidate = candidates.getJSONObject(0)
-                        val content = firstCandidate.optJSONObject("content")
-                        val parts = content?.optJSONArray("parts")
-                        if (parts != null && parts.length() > 0) {
-                            return@withContext parts.getJSONObject(0).optString("text", getOfflineAstroNews())
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.e(TAG, "Failed to parse Gemini response (AstroNews): ${e.message}", e)
-                }
-            } else {
-                Log.e(TAG, "Gemini API error response code (AstroNews): ${response.code}, message: $responseString")
-            }
+            if (!text.isNullOrBlank()) return@withContext text.trim()
             return@withContext getOfflineAstroNews()
         } catch (e: Exception) {
-            Log.e(TAG, "Unhandled exception in fetchAstroNewsWithSearchGrounding: ${e.message}", e)
+            Log.e(TAG, "Astro news via Firebase AI Logic failed: ${e.message}", e)
             return@withContext getOfflineAstroNews()
         }
     }

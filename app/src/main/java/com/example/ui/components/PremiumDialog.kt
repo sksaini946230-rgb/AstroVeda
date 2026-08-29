@@ -106,20 +106,55 @@ fun PremiumDialog(
                     )
                 )
                 Text(
-                    text = "Unlock Complete Vedic Wisdom & AI Features",
+                    text = com.example.util.LanguageManager.getString(
+                        "सम्पूर्ण वैदिक अनुभव अनलॉक करें",
+                        "Unlock the complete Vedic experience"
+                    ),
                     style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
+                // Every line here used to overstate something. "Swiss Ephemeris
+                // Micro-Second Precision" was doubly untrue — this project has never
+                // used Swiss Ephemeris, and micro-second precision is not a thing an
+                // ephemeris offers. "Gemini 1.5" named a model the app does not run.
+                // These are the claims someone reads before paying, so they say what
+                // the app actually does.
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    FeatureRow("100% Ad-Free Glassmorphism Experience")
-                    FeatureRow("Unlimited Gemini 1.5 AI Astrologer Queries")
-                    FeatureRow("HD PDF Kundali Export & Printing")
-                    FeatureRow("Swiss Ephemeris Micro-Second Precision")
-                    FeatureRow("Unlimited Saved Kundali Profiles in Room DB")
+                    FeatureRow(com.example.util.LanguageManager.getString(
+                        "पूरी तरह विज्ञापन रहित", "Completely ad-free"))
+                    FeatureRow(com.example.util.LanguageManager.getString(
+                        "एआई ज्योतिष परामर्श — असीमित प्रश्न", "AI astrologer — unlimited questions"))
+                    FeatureRow(com.example.util.LanguageManager.getString(
+                        "कुण्डली एवं गुण मिलान की PDF रिपोर्ट", "Kundali and Guna Milan reports as PDF"))
+                    FeatureRow(com.example.util.LanguageManager.getString(
+                        "असीमित सहेजी गई कुण्डलियाँ", "Unlimited saved birth charts"))
+                    FeatureRow(com.example.util.LanguageManager.getString(
+                        "120 वर्ष की पूर्ण विंशोत्तरी दशा", "The full 120-year Vimshottari Dasha timeline"))
                 }
                 Spacer(modifier = Modifier.height(20.dp))
+                // The price comes from Play, not from a hardcoded string. This dialog
+                // said "₹199/वर्ष" while the Settings screen said "₹99/माह" — two
+                // different prices for the same subscription, and neither was read
+                // from the actual Play Console product.
+                val productDetails by viewModel.subscriptionProductDetails.collectAsState()
+                val priceLabel = productDetails
+                    ?.subscriptionOfferDetails
+                    ?.firstOrNull()
+                    ?.pricingPhases
+                    ?.pricingPhaseList
+                    ?.firstOrNull()
+                    ?.formattedPrice
+
                 GoldGlowButton(
-                    text = "प्रारंभ करें ₹199/वर्ष (Get PRO Gold)",
+                    text = if (priceLabel != null) {
+                        com.example.util.LanguageManager.getString(
+                            "PRO लें — $priceLabel", "Get PRO — $priceLabel"
+                        )
+                    } else {
+                        com.example.util.LanguageManager.getString(
+                            "PRO लें", "Get PRO"
+                        )
+                    },
                     onClick = {
                         val activity = context as? Activity
                         if (activity != null) {

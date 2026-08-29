@@ -142,7 +142,7 @@ fun SettingsScreen(
             SectionHeader(
                 titleHi = "ऐप सेटिंग्स (App Settings)",
                 titleEn = "Settings",
-                subtitleHi = "आपकी पसंद एवं प्राथमिकताओं का अनुकूलन करें",
+                subtitleHi = LanguageManager.getString("आपकी पसंद एवं प्राथमिकताओं का अनुकूलन करें", "Customise your preferences and alerts"),
                 subtitleEn = "Customize your preferences & notifications"
             )
         }
@@ -186,7 +186,7 @@ fun SettingsScreen(
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {
                                 Text(
-                                    text = "AstroVeda PRO (अपग्रेड करें)",
+                                    text = LanguageManager.getString("AstroVeda PRO (अपग्रेड करें)", "AstroVeda PRO (Upgrade)"),
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         color = ProBadgeColor,
                                         fontWeight = FontWeight.Bold,
@@ -194,7 +194,7 @@ fun SettingsScreen(
                                     )
                                 )
                                 Text(
-                                    text = "प्रीमियम वैदिक अनुभव अनलॉक करें",
+                                    text = LanguageManager.getString("प्रीमियम वैदिक अनुभव अनलॉक करें", "Unlock the premium Vedic experience"),
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         fontSize = 12.sp
@@ -204,7 +204,7 @@ fun SettingsScreen(
                         }
 
                         GlassBadge(
-                            text = "PRO ₹99/माह",
+                            text = LanguageManager.getString("PRO", "PRO"),
                             backgroundColor = ProBadgeColor.copy(alpha = 0.15f),
                             textColor = ProBadgeColor,
                             borderColor = ProBadgeColor
@@ -214,10 +214,10 @@ fun SettingsScreen(
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        ProBenefitRow(text = "🚫 100% विज्ञापन रहित अनुभव (No Ads)")
-                        ProBenefitRow(text = "📜 विस्तृत 120 वर्ष महादशा एवं कुण्डली फलादेश")
-                        ProBenefitRow(text = "💖 अष्टकूट 36 गुण मिलान रिपोर्ट PDF")
-                        ProBenefitRow(text = "🤖 एआई अस्ट्रोलॉजर अनलिमिटेड परामर्श")
+                        ProBenefitRow(text = LanguageManager.getString("🚫 100% विज्ञापन रहित अनुभव", "🚫 Completely ad-free"))
+                        ProBenefitRow(text = LanguageManager.getString("📜 विस्तृत 120 वर्ष महादशा एवं कुण्डली फलादेश", "📜 Full 120-year Mahadasha timeline and chart reading"))
+                        ProBenefitRow(text = LanguageManager.getString("💖 अष्टकूट 36 गुण मिलान रिपोर्ट PDF", "💖 Ashtakoot 36-Guna matching report as PDF"))
+                        ProBenefitRow(text = LanguageManager.getString("🤖 एआई अस्ट्रोलॉजर अनलिमिटेड परामर्श", "🤖 Unlimited AI astrologer questions"))
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -235,7 +235,7 @@ fun SettingsScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "अभी PRO अपग्रेड करें • ₹99/माह",
+                            text = LanguageManager.getString("अभी PRO अपग्रेड करें", "Upgrade to PRO"),
                             style = MaterialTheme.typography.labelMedium.copy(
                                 color = PrimaryButtonText,
                                 fontWeight = FontWeight.Normal,
@@ -267,7 +267,7 @@ fun SettingsScreen(
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {
                                 Text(
-                                    text = "भाषा (App Language)",
+                                    text = LanguageManager.getString("भाषा (App Language)", "App Language"),
                                     style = MaterialTheme.typography.titleSmall.copy(
                                         color = MaterialTheme.colorScheme.primary,
                                         fontWeight = FontWeight.Bold
@@ -331,7 +331,7 @@ fun SettingsScreen(
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
                             Text(
-                                text = "मुख्य राशि (Default Rashi)",
+                                text = LanguageManager.getString("मुख्य राशि (Default Rashi)", "Default Rashi"),
                                 style = MaterialTheme.typography.titleSmall.copy(
                                     color = MaterialTheme.colorScheme.primary,
                                     fontWeight = FontWeight.Bold
@@ -360,7 +360,7 @@ fun SettingsScreen(
                             .testTag("settings_change_rashi_button")
                     ) {
                         Text(
-                            text = "बदलें (Change)",
+                            text = LanguageManager.getString("बदलें", "Change"),
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Normal,
                                 color = MaterialTheme.colorScheme.secondary,
@@ -391,7 +391,7 @@ fun SettingsScreen(
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {
                                 Text(
-                                    text = "स्थान सेटिंग्स (Location)",
+                                    text = LanguageManager.getString("स्थान सेटिंग्स (Location)", "Location"),
                                     style = MaterialTheme.typography.titleSmall.copy(
                                         color = MaterialTheme.colorScheme.primary,
                                         fontWeight = FontWeight.Bold
@@ -463,7 +463,7 @@ fun SettingsScreen(
                                     .testTag("settings_manual_city_button")
                             ) {
                                 Text(
-                                    text = "शहर खोजें",
+                                    text = LanguageManager.getString("शहर खोजें", "Search city"),
                                     style = MaterialTheme.typography.labelSmall.copy(
                                         fontWeight = FontWeight.Normal,
                                         color = MaterialTheme.colorScheme.primary,
@@ -489,7 +489,7 @@ fun SettingsScreen(
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "समय प्रारूप (Panchang Time Format)",
+                                text = LanguageManager.getString("समय प्रारूप (Panchang Time Format)", "Time format"),
                                 style = MaterialTheme.typography.bodyMedium.copy(
                                     color = MaterialTheme.colorScheme.onSurface,
                                     fontWeight = FontWeight.Normal,
@@ -497,7 +497,7 @@ fun SettingsScreen(
                                 )
                             )
                             Text(
-                                text = if (use24HourFormat) "24-घंटे प्रारूप (e.g. 18:30)" else "12-घंटे AM/PM प्रारूप (e.g. 06:30 PM)",
+                                text = if (use24HourFormat) LanguageManager.getString("24-घंटे प्रारूप (उदा. 18:30)", "24-hour (e.g. 18:30)") else LanguageManager.getString("12-घंटे AM/PM प्रारूप (उदा. 06:30 PM)", "12-hour AM/PM (e.g. 06:30 PM)"),
                                 style = MaterialTheme.typography.bodySmall.copy(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     fontSize = 11.sp
@@ -553,7 +553,7 @@ fun SettingsScreen(
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = "अधिसूचनाएं एवं अलर्ट (Notifications)",
+                            text = LanguageManager.getString("अधिसूचनाएं एवं अलर्ट (Notifications)", "Notifications"),
                             style = MaterialTheme.typography.titleSmall.copy(
                                 color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.Bold
@@ -569,7 +569,7 @@ fun SettingsScreen(
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "दैनिक राहुकाल एवं पंचांग अलर्ट",
+                                text = LanguageManager.getString("दैनिक राहुकाल एवं पंचांग अलर्ट", "Daily Rahu Kaal and Panchang alerts"),
                                 style = MaterialTheme.typography.bodyMedium.copy(
                                     color = MaterialTheme.colorScheme.onSurface,
                                     fontWeight = FontWeight.Normal,
@@ -601,7 +601,7 @@ fun SettingsScreen(
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = "(बदलें / Change)",
+                                    text = LanguageManager.getString("(बदलें)", "(Change)"),
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         fontSize = 10.sp
@@ -633,7 +633,7 @@ fun SettingsScreen(
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "त्योहार व व्रत रिमाइंडर (Festival Reminders)",
+                                text = LanguageManager.getString("त्योहार व व्रत रिमाइंडर", "Festival and fast reminders"),
                                 style = MaterialTheme.typography.bodyMedium.copy(
                                     color = MaterialTheme.colorScheme.onSurface,
                                     fontWeight = FontWeight.Normal,
@@ -641,7 +641,7 @@ fun SettingsScreen(
                                 )
                             )
                             Text(
-                                text = "प्रमुख एकादशी, पूर्णिमा व पर्व की पूर्व सूचना",
+                                text = LanguageManager.getString("प्रमुख एकादशी, पूर्णिमा व पर्व की पूर्व सूचना", "Advance notice of major Ekadashi, Purnima and festivals"),
                                 style = MaterialTheme.typography.bodySmall.copy(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     fontSize = 11.sp
@@ -672,7 +672,7 @@ fun SettingsScreen(
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "शुभ मुहूर्त एवं चौघड़िया अलर्ट (Muhurta Alerts)",
+                                text = LanguageManager.getString("शुभ मुहूर्त एवं चौघड़िया अलर्ट", "Muhurta and Choghadiya alerts"),
                                 style = MaterialTheme.typography.bodyMedium.copy(
                                     color = MaterialTheme.colorScheme.onSurface,
                                     fontWeight = FontWeight.Normal,
@@ -680,7 +680,7 @@ fun SettingsScreen(
                                 )
                             )
                             Text(
-                                text = "अभिजित मुहूर्त, शुभ चौघड़िया व ब्रह्म मुहूर्त की दैनिक अलर्ट",
+                                text = LanguageManager.getString("अभिजित मुहूर्त, शुभ चौघड़िया व ब्रह्म मुहूर्त की दैनिक अलर्ट", "Daily alerts for Abhijit Muhurta, auspicious Choghadiya and Brahma Muhurta"),
                                 style = MaterialTheme.typography.bodySmall.copy(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     fontSize = 11.sp
@@ -729,7 +729,7 @@ fun SettingsScreen(
                             Spacer(modifier = Modifier.width(8.dp))
                             Column {
                                 Text(
-                                    text = "ताज़ा खगोलीय व ज्योतिष समाचार",
+                                    text = LanguageManager.getString("ताज़ा खगोलीय व ज्योतिष समाचार", "Latest astronomy and astrology news"),
                                     style = MaterialTheme.typography.titleSmall.copy(
                                         color = MaterialTheme.colorScheme.primary,
                                         fontWeight = FontWeight.Bold,
@@ -784,7 +784,7 @@ fun SettingsScreen(
                                     AstroLoadingIndicator(size = 18.dp, strokeWidth = 2.dp)
                                     Spacer(modifier = Modifier.width(10.dp))
                                     Text(
-                                        text = "गूगल सर्च द्वारा ताज़ा खगोलीय घटनाएँ खोजी जा रही हैं...",
+                                        text = LanguageManager.getString("ताज़ा खगोलीय घटनाएँ लाई जा रही हैं...", "Fetching the latest celestial events..."),
                                         style = MaterialTheme.typography.bodySmall.copy(
                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                                             fontSize = 12.sp
@@ -830,7 +830,7 @@ fun SettingsScreen(
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = "रीफ्रेश समाचार (Live Search)",
+                                    text = LanguageManager.getString("समाचार रीफ्रेश करें", "Refresh news"),
                                     style = MaterialTheme.typography.labelSmall.copy(
                                         color = MaterialTheme.colorScheme.primary,
                                         fontWeight = FontWeight.Normal,
@@ -863,14 +863,14 @@ fun SettingsScreen(
                         Spacer(modifier = Modifier.width(10.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "AstroVeda के बारे में (About App)",
+                                text = LanguageManager.getString("AstroVeda के बारे में", "About AstroVeda"),
                                 style = MaterialTheme.typography.titleSmall.copy(
                                     color = MaterialTheme.colorScheme.primary,
                                     fontWeight = FontWeight.Bold
                                 )
                             )
                             Text(
-                                text = "संस्करण 2026.1.0 (Build 108) • स्विस् एपिफेमरीस परिशुद्धता",
+                                text = LanguageManager.getString("संस्करण 2026.1.0 • Meeus/ELP2000 खगोलीय गणना", "Version 2026.1.0 • Meeus/ELP2000 astronomical engine"),
                                 style = MaterialTheme.typography.bodySmall.copy(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     fontSize = 11.sp
@@ -903,7 +903,7 @@ fun SettingsScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "प्ले स्टोर पर 5★ रेटिंग दें (Rate Us on Play Store)",
+                                text = LanguageManager.getString("प्ले स्टोर पर 5★ रेटिंग दें", "Rate us 5★ on the Play Store"),
                                 style = MaterialTheme.typography.labelMedium.copy(
                                     color = MaterialTheme.colorScheme.primary,
                                     fontWeight = FontWeight.Normal,
@@ -921,7 +921,7 @@ fun SettingsScreen(
             GlassCard(modifier = Modifier.fillMaxWidth()) {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text(
-                        text = "कानूनी एवं गोपनीयता (Legal & Terms)",
+                        text = LanguageManager.getString("कानूनी एवं गोपनीयता", "Legal & Privacy"),
                         style = MaterialTheme.typography.titleSmall.copy(
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold
@@ -957,7 +957,7 @@ fun SettingsScreen(
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
-                                    text = "गोपनीयता नीति",
+                                    text = LanguageManager.getString("गोपनीयता नीति", "Privacy Policy"),
                                     style = MaterialTheme.typography.labelMedium.copy(
                                         color = MaterialTheme.colorScheme.primary,
                                         fontWeight = FontWeight.Normal,
@@ -992,7 +992,7 @@ fun SettingsScreen(
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
-                                    text = "सेवा शर्तें (Terms)",
+                                    text = LanguageManager.getString("सेवा शर्तें", "Terms of Service"),
                                     style = MaterialTheme.typography.labelMedium.copy(
                                         color = MaterialTheme.colorScheme.secondary,
                                         fontWeight = FontWeight.Normal,
@@ -1025,7 +1025,7 @@ fun SettingsScreen(
                             Spacer(modifier = Modifier.width(10.dp))
                             Column {
                                 Text(
-                                    text = "खाता एवं डेटा नियंत्रण (Data Privacy)",
+                                    text = LanguageManager.getString("खाता एवं डेटा नियंत्रण", "Account & data controls"),
                                     style = MaterialTheme.typography.titleSmall.copy(
                                         color = MaterialTheme.colorScheme.primary,
                                         fontWeight = FontWeight.Bold
@@ -1089,7 +1089,7 @@ fun SettingsScreen(
             onDismissRequest = { showRashiDialog = false },
             title = {
                 Text(
-                    text = "अपनी मुख्य राशि चुनें (Select Default Rashi)",
+                    text = LanguageManager.getString("अपनी मुख्य राशि चुनें", "Select your default Rashi"),
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
@@ -1158,7 +1158,7 @@ fun SettingsScreen(
             onDismissRequest = { showLocationModal = false },
             title = {
                 Text(
-                    text = "शहर खोजें एवं चुनें (Search City)",
+                    text = LanguageManager.getString("शहर खोजें एवं चुनें", "Search and select a city"),
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
@@ -1250,7 +1250,10 @@ fun SettingsScreen(
             },
             text = {
                 Text(
-                    text = "AstroVeda (वैदिक पंचांग एवं कुण्डली 2026) भारत का सबसे भरोसेमंद एवं सटीक पंचांग ऐप है। इसमें स्विस् एपिफेमरीस आधारित ग्रहों की उच्च परिशुद्धता गणना, 12 राशियां, चौघड़िया, राहुकाल, व्रत-त्योहार व एआई ज्योतिष परामर्श शामिल हैं।",
+                    text = LanguageManager.getString(
+                        "AstroVeda (वैदिक पंचांग एवं कुण्डली) एक सटीक पंचांग ऐप है। ग्रहों की गणना Meeus/ELP2000 खगोलीय एल्गोरिदम एवं लाहिड़ी अयनांश पर आधारित है, और पूरी तरह आपके फ़ोन पर ही होती है — इंटरनेट की आवश्यकता नहीं। इसमें 12 राशियां, चौघड़िया, राहुकाल, व्रत-त्योहार, कुण्डली, गुण मिलान व एआई ज्योतिष परामर्श शामिल हैं।",
+                        "AstroVeda is an accurate Panchang app. Planetary positions are computed with the Meeus/ELP2000 algorithms and the Lahiri ayanamsa, entirely on your phone — no internet needed. It covers all 12 Rashis, Choghadiya, Rahu Kaal, festivals and fasts, birth charts, Guna Milan and an AI astrologer."
+                    ),
                     color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 13.sp
                 )
