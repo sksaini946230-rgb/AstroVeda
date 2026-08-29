@@ -286,7 +286,7 @@ class MainActivity : ComponentActivity() {
                                 }
                                 BottomNavBar(
                                     selectedTab = selectedTab,
-                                    onTabSelected = { mainViewModel.selectTab(it) }
+                                    onTabSelected = { mainViewModel.onBottomNavTabSelected(it) }
                                 )
                             }
                         }

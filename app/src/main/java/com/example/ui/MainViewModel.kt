@@ -323,11 +323,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val moreSubTab: StateFlow<Int> = _moreSubTab.asStateFlow()
 
     fun selectTab(tab: AppTab) {
+        _selectedTab.value = tab
+    }
+
+    /**
+     * A deliberate tab tap on the bottom bar — the only place an interstitial is
+     * allowed.
+     *
+     * It used to fire the moment a Kundali or match result was produced, covering
+     * the thing the user had just asked for. Hanging it off selectTab instead was
+     * too broad in the other direction: every programmatic navigation counted,
+     * including "पूर्ण कुण्डली देखें →" and a stray tap on the daily Lagna chart.
+     */
+    fun onBottomNavTabSelected(tab: AppTab) {
         val previous = _selectedTab.value
         _selectedTab.value = tab
-        // Show the interstitial on a real transition — when the user is leaving a
-        // result behind — instead of on top of the chart they just asked for.
-        // AdMob's interruptive-ads policy is aimed squarely at the old placement.
         if (previous != tab) triggerInterstitial()
     }
 

@@ -5,7 +5,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -150,7 +152,10 @@ fun NorthIndianChart(
                 .background(ElevatedSurface)
                 .border(1.dp, GlassCardBorder, RoundedCornerShape(20.dp))
                 .pointerInput(Unit) {
-                    detectTransformGestures { _, pan, zoom, _ ->
+                    // panZoomLock keeps a one-finger drag from being read as a pan
+                    // while the chart sits at rest inside a scrolling page — without
+                    // it, this gesture detector swallowed the scroll.
+                    detectTransformGestures(panZoomLock = true) { _, pan, zoom, _ ->
                         val newScale = (userScale * zoom).coerceIn(1f, 3.5f)
                         val maxOffsetX = (size.width * (newScale - 1f)) / 2f
                         val maxOffsetY = (size.height * (newScale - 1f)) / 2f
@@ -179,35 +184,35 @@ fun NorthIndianChart(
                 modifier = Modifier
                     .fillMaxSize()
                     .pointerInput(chartData, userScale, userOffset) {
-                        detectTapGestures(
-                            onDoubleTap = {
-                                if (userScale > 1.1f) {
-                                    userScale = 1f
-                                    userOffset = Offset.Zero
-                                } else {
-                                    userScale = 2f
-                                }
-                            },
-                            onTap = { tapOffset ->
-                                val w = size.width.toFloat()
-                                val h = size.height.toFloat()
-                                if (w > 0 && h > 0) {
-                                    val center = Offset(w / 2f, h / 2f)
-                                    val chartPoint = center + (tapOffset - center - userOffset) / userScale
-                                    val normPoint = Offset(chartPoint.x / w, chartPoint.y / h)
-                                    for (houseNum in 1..12) {
-                                        val vertices = getNormalizedHouseVertices(houseNum)
-                                        if (isPointInPolygon(normPoint, vertices)) {
-                                            selectedHouse = houseNum
-                                            val rashi = getRashiForHouse(houseNum)
-                                            val planets = chartData.housePlanetsMap[houseNum] ?: emptyList()
-                                            onHouseClick(houseNum, rashi, planets)
-                                            break
-                                        }
-                                    }
+                        // Slop-aware tap detection. detectTapGestures reports a tap
+                        // for any press-and-release regardless of distance travelled,
+                        // so a scroll that started on the chart registered as a house
+                        // tap. Measure the movement and ignore anything that is a drag.
+                        awaitEachGesture {
+                            val down = awaitFirstDown(requireUnconsumed = false)
+                            val up = waitForUpOrCancellation() ?: return@awaitEachGesture
+                            val travelled = (up.position - down.position).getDistance()
+                            if (travelled > viewConfiguration.touchSlop) return@awaitEachGesture
+
+                            val w = size.width.toFloat()
+                            val h = size.height.toFloat()
+                            if (w <= 0 || h <= 0) return@awaitEachGesture
+
+                            val center = Offset(w / 2f, h / 2f)
+                            val chartPoint = center + (up.position - center - userOffset) / userScale
+                            val normPoint = Offset(chartPoint.x / w, chartPoint.y / h)
+                            for (houseNum in 1..12) {
+                                if (isPointInPolygon(normPoint, getNormalizedHouseVertices(houseNum))) {
+                                    selectedHouse = houseNum
+                                    onHouseClick(
+                                        houseNum,
+                                        getRashiForHouse(houseNum),
+                                        chartData.housePlanetsMap[houseNum] ?: emptyList()
+                                    )
+                                    break
                                 }
                             }
-                        )
+                        }
                     }
             ) {
                 val w = size.width
