@@ -110,3 +110,18 @@
 -dontwarn okio.**
 -dontwarn com.google.android.gms.internal.**
 
+
+# User Messaging Platform (ad consent). play-services-ads' rules cover
+# com.google.android.gms.ads.** but UMP lives in its own package.
+-keep class com.google.android.ump.** { *; }
+-dontwarn com.google.android.ump.**
+
+# Firebase AI Logic serialises its request/response models with
+# kotlinx.serialization; keep the generated serializers.
+-keepclassmembers class com.google.firebase.ai.** {
+    *** Companion;
+    kotlinx.serialization.KSerializer serializer(...);
+}
+-keepclasseswithmembers class com.google.firebase.ai.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
