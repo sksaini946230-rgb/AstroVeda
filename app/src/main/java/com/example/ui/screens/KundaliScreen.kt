@@ -573,7 +573,7 @@ fun KundaliScreen(
                                                             formValidationError = null
                                                         },
                                                         readOnly = true,
-                                                        label = { Text(LanguageManager.getString("जन्म तिथि *", "Date of Birth *")) },
+                                                        label = { Text(LanguageManager.getString("जन्म तिथि *", "Date of Birth *"), maxLines = 1, softWrap = false) },
                                                         placeholder = { Text("YYYY-MM-DD") },
                                                         trailingIcon = {
                                                             Icon(
@@ -608,7 +608,7 @@ fun KundaliScreen(
                                                             formValidationError = null
                                                         },
                                                         readOnly = true,
-                                                        label = { Text(LanguageManager.getString("जन्म समय *", "Time of Birth *")) },
+                                                        label = { Text(LanguageManager.getString("जन्म समय *", "Time of Birth *"), maxLines = 1, softWrap = false) },
                                                         placeholder = { Text("HH:MM") },
                                                         trailingIcon = {
                                                             Icon(
@@ -919,7 +919,7 @@ fun KundaliScreen(
                                                     shape = RoundedCornerShape(12.dp),
                                                     colors = ButtonDefaults.buttonColors(
                                                         containerColor = if (isSaved) ShubhSuccessColor else MaterialTheme.colorScheme.primaryContainer,
-                                                        contentColor = if (isSaved) Color.White else MaterialTheme.colorScheme.onPrimaryContainer
+                                                        contentColor = if (isSaved) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onPrimaryContainer
                                                     ),
                                                     modifier = Modifier.weight(1f)
                                                 ) {

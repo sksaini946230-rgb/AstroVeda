@@ -76,6 +76,7 @@ fun BottomNavBar(
     )
 
     val view = LocalView.current
+    val isLightTheme = com.example.ui.theme.LocalAstroColors.current.isLight
 
     Surface(
         modifier = Modifier
@@ -83,8 +84,8 @@ fun BottomNavBar(
             .shadow(
                 elevation = 16.dp,
                 shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-                ambientColor = Color.Black.copy(alpha = 0.3f),
-                spotColor = Color.Black.copy(alpha = 0.4f)
+                ambientColor = Color.Black.copy(alpha = if (isLightTheme) 0.08f else 0.3f),
+                spotColor = Color.Black.copy(alpha = if (isLightTheme) 0.12f else 0.4f)
             )
             .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)),
         color = ElevatedSurface,

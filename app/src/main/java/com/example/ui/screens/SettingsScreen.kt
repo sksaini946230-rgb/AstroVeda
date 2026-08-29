@@ -184,9 +184,9 @@ fun SettingsScreen(
                                 )
                             }
                             Spacer(modifier = Modifier.width(12.dp))
-                            Column {
+                            Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = LanguageManager.getString("AstroVeda PRO (अपग्रेड करें)", "AstroVeda PRO (Upgrade)"),
+                                    text = LanguageManager.getString("AstroVeda PRO", "AstroVeda PRO"),
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         color = ProBadgeColor,
                                         fontWeight = FontWeight.Bold,
@@ -203,8 +203,9 @@ fun SettingsScreen(
                             }
                         }
 
+                        // Sits beside a long title; without this it squeezed to "P …".
                         GlassBadge(
-                            text = LanguageManager.getString("PRO", "PRO"),
+                            text = "PRO",
                             backgroundColor = ProBadgeColor.copy(alpha = 0.15f),
                             textColor = ProBadgeColor,
                             borderColor = ProBadgeColor
@@ -217,7 +218,7 @@ fun SettingsScreen(
                         ProBenefitRow(text = LanguageManager.getString("🚫 100% विज्ञापन रहित अनुभव", "🚫 Completely ad-free"))
                         ProBenefitRow(text = LanguageManager.getString("📜 विस्तृत 120 वर्ष महादशा एवं कुण्डली फलादेश", "📜 Full 120-year Mahadasha timeline and chart reading"))
                         ProBenefitRow(text = LanguageManager.getString("💖 अष्टकूट 36 गुण मिलान रिपोर्ट PDF", "💖 Ashtakoot 36-Guna matching report as PDF"))
-                        ProBenefitRow(text = LanguageManager.getString("🤖 एआई अस्ट्रोलॉजर अनलिमिटेड परामर्श", "🤖 Unlimited AI astrologer questions"))
+                        ProBenefitRow(text = LanguageManager.getString("✨ असीमित ज्योतिष परामर्श", "✨ Unlimited astrological guidance"))
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -267,7 +268,7 @@ fun SettingsScreen(
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {
                                 Text(
-                                    text = LanguageManager.getString("भाषा (App Language)", "App Language"),
+                                    text = LanguageManager.getString("भाषा", "App Language"),
                                     style = MaterialTheme.typography.titleSmall.copy(
                                         color = MaterialTheme.colorScheme.primary,
                                         fontWeight = FontWeight.Bold
@@ -331,7 +332,7 @@ fun SettingsScreen(
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
                             Text(
-                                text = LanguageManager.getString("मुख्य राशि (Default Rashi)", "Default Rashi"),
+                                text = LanguageManager.getString("मुख्य राशि", "Default Rashi"),
                                 style = MaterialTheme.typography.titleSmall.copy(
                                     color = MaterialTheme.colorScheme.primary,
                                     fontWeight = FontWeight.Bold
@@ -394,7 +395,7 @@ fun SettingsScreen(
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {
                                 Text(
-                                    text = LanguageManager.getString("स्थान सेटिंग्स (Location)", "Location"),
+                                    text = LanguageManager.getString("स्थान", "Location"),
                                     style = MaterialTheme.typography.titleSmall.copy(
                                         color = MaterialTheme.colorScheme.primary,
                                         fontWeight = FontWeight.Bold
@@ -492,7 +493,7 @@ fun SettingsScreen(
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = LanguageManager.getString("समय प्रारूप (Panchang Time Format)", "Time format"),
+                                text = LanguageManager.getString("समय प्रारूप", "Time format"),
                                 style = MaterialTheme.typography.bodyMedium.copy(
                                     color = MaterialTheme.colorScheme.onSurface,
                                     fontWeight = FontWeight.Normal,
@@ -556,7 +557,7 @@ fun SettingsScreen(
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Text(
-                            text = LanguageManager.getString("अधिसूचनाएं एवं अलर्ट (Notifications)", "Notifications"),
+                            text = LanguageManager.getString("अधिसूचनाएं", "Notifications"),
                             style = MaterialTheme.typography.titleSmall.copy(
                                 color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.Bold
@@ -1254,8 +1255,8 @@ fun SettingsScreen(
             text = {
                 Text(
                     text = LanguageManager.getString(
-                        "AstroVeda (वैदिक पंचांग एवं कुण्डली) एक सटीक पंचांग ऐप है। ग्रहों की गणना Meeus/ELP2000 खगोलीय एल्गोरिदम एवं लाहिड़ी अयनांश पर आधारित है, और पूरी तरह आपके फ़ोन पर ही होती है — इंटरनेट की आवश्यकता नहीं। इसमें 12 राशियां, चौघड़िया, राहुकाल, व्रत-त्योहार, कुण्डली, गुण मिलान व एआई ज्योतिष परामर्श शामिल हैं।",
-                        "AstroVeda is an accurate Panchang app. Planetary positions are computed with the Meeus/ELP2000 algorithms and the Lahiri ayanamsa, entirely on your phone — no internet needed. It covers all 12 Rashis, Choghadiya, Rahu Kaal, festivals and fasts, birth charts, Guna Milan and an AI astrologer."
+                        "AstroVeda (वैदिक पंचांग एवं कुण्डली) एक सटीक पंचांग ऐप है। ग्रहों की गणना Meeus/ELP2000 खगोलीय एल्गोरिदम एवं लाहिड़ी अयनांश पर आधारित है, और पूरी तरह आपके फ़ोन पर ही होती है — इंटरनेट की आवश्यकता नहीं। इसमें 12 राशियां, चौघड़िया, राहुकाल, व्रत-त्योहार, कुण्डली, गुण मिलान व ज्योतिष परामर्श शामिल हैं।",
+                        "AstroVeda is an accurate Panchang app. Planetary positions are computed with the Meeus/ELP2000 algorithms and the Lahiri ayanamsa, entirely on your phone — no internet needed. It covers all 12 Rashis, Choghadiya, Rahu Kaal, festivals and fasts, birth charts, Guna Milan and astrological guidance."
                     ),
                     color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 13.sp

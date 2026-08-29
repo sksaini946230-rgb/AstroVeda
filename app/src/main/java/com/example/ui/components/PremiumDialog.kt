@@ -123,7 +123,7 @@ fun PremiumDialog(
                     FeatureRow(com.example.util.LanguageManager.getString(
                         "पूरी तरह विज्ञापन रहित", "Completely ad-free"))
                     FeatureRow(com.example.util.LanguageManager.getString(
-                        "एआई ज्योतिष परामर्श — असीमित प्रश्न", "AI astrologer — unlimited questions"))
+                        "ज्योतिष परामर्श — असीमित प्रश्न", "Astrological guidance — unlimited questions"))
                     FeatureRow(com.example.util.LanguageManager.getString(
                         "कुण्डली एवं गुण मिलान की PDF रिपोर्ट", "Kundali and Guna Milan reports as PDF"))
                     FeatureRow(com.example.util.LanguageManager.getString(

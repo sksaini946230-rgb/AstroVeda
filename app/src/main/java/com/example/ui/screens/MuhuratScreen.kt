@@ -112,7 +112,8 @@ fun MuhuratScreen(viewModel: MainViewModel) {
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = LanguageManager.getString("दिन का चौघड़िया (Day)", "Day Choghadiya"),
+                            text = LanguageManager.getString("दिन का चौघड़िया", "Day"),
+                            maxLines = 1,
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Normal,
                                 color = if (isDaytime) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
@@ -144,7 +145,8 @@ fun MuhuratScreen(viewModel: MainViewModel) {
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = LanguageManager.getString("रात का चौघड़िया (Night)", "Night Choghadiya"),
+                            text = LanguageManager.getString("रात का चौघड़िया", "Night"),
+                            maxLines = 1,
                             style = MaterialTheme.typography.labelSmall.copy(
                                 fontWeight = FontWeight.Normal,
                                 color = if (!isDaytime) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
