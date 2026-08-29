@@ -29,7 +29,10 @@ import kotlinx.coroutines.withContext
 object GeminiAstroService {
 
     private const val TAG = "GeminiAstroService"
-    private const val MODEL = "gemini-2.5-flash"
+    // gemini-2.5-flash is closed to new projects — the API answers with
+    // "no longer available to new users" and names this as the replacement.
+    // Found on device; the call had otherwise gone all the way through App Check.
+    private const val MODEL = "gemini-3.6-flash"
 
     suspend fun getAiAstrologyInsight(
         userQuestion: String,

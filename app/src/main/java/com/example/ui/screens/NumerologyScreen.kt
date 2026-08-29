@@ -268,8 +268,8 @@ fun NumerologyScreen(viewModel: MainViewModel) {
             SectionHeader(
                 titleHi = "एआई ज्योतिषाचार्य (AI Vedic Astrologer)",
                 titleEn = "AI Vedic Astrologer Chat",
-                subtitleHi = "Gemini 1.5 संचालित व्यक्तिगत ज्योतिष परामर्श",
-                subtitleEn = "Powered by Gemini 1.5 Flash"
+                subtitleHi = "व्यक्तिगत ज्योतिष परामर्श",
+                subtitleEn = "Personalised astrological guidance"
             )
         }
 
