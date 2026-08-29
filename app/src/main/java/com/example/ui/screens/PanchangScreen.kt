@@ -401,9 +401,13 @@ fun PanchangScreen(
 
                                 // 5. Daily Panchang Summary Card
                                 item {
-                                    DailyPanchangCard(
-                                        panchang = panchang,
-                                        locationName = selectedCity.cityNameHindi
+                                    // Bento layout, replacing the single tall card.
+                                    // To go back, swap this for DailyPanchangCard(
+                                    //     panchang = panchang,
+                                    //     locationName = selectedCity.cityNameHindi
+                                    // ) — the old component is untouched.
+                                    com.example.ui.components.BentoPanchangGrid(
+                                        panchang = panchang
                                     )
                                 }
 
