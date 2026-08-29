@@ -79,7 +79,9 @@ fun GlassCard(
                 onClick()
             } else Modifier
         )
-        .padding(18.dp)
+        // 18dp left the content floating in the middle of the card. 14 keeps
+        // it comfortable without the box looking oversized for what it holds.
+        .padding(14.dp)
     
     Box(modifier = cardModifier, content = content)
 }

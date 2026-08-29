@@ -111,7 +111,8 @@ fun BottomNavBar(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 4.dp, vertical = 8.dp),
+                    // Bar height trimmed ~20%: this was vertical = 8.dp.
+                    .padding(horizontal = 4.dp, vertical = 5.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -135,7 +136,9 @@ fun BottomNavBar(
                     )
 
                     val textColor by animateColorAsState(
-                        targetValue = if (isSelected) NavActiveColor else TextTertiary,
+                        // TextTertiary is the disabled-text token; on this bar it was
+                        // effectively invisible. Inactive labels share the icon colour now.
+                        targetValue = if (isSelected) NavActiveColor else NavInactiveColor,
                         animationSpec = spring(stiffness = Spring.StiffnessLow),
                         label = "textColor"
                     )
@@ -154,34 +157,35 @@ fun BottomNavBar(
                                     onTabSelected(item.tab)
                                 }
                             )
-                            .padding(vertical = 6.dp)
+                            .padding(vertical = 4.dp)
                             .testTag("nav_item_${item.tab.name.lowercase()}")
                     ) {
                         // Dot indicator for selected tab
                         Box(
                             modifier = Modifier
-                                .size(if (isSelected) 4.dp else 0.dp)
+                                .size(if (isSelected) 3.dp else 0.dp)
                                 .clip(CircleShape)
                                 .background(NavActiveColor)
                         )
 
-                        Spacer(modifier = Modifier.height(3.dp))
+                        Spacer(modifier = Modifier.height(2.dp))
 
                         Icon(
                             imageVector = item.icon,
                             contentDescription = localizedTitle,
                             modifier = Modifier
-                                .size(24.dp)
+                                .size(21.dp)
                                 .scale(iconScale),
                             tint = iconColor
                         )
 
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(3.dp))
 
                         Text(
                             text = localizedTitle,
                             style = MaterialTheme.typography.labelSmall.copy(
-                                fontSize = 10.sp,
+                                fontSize = 10.5.sp,
+                                lineHeight = 13.sp,
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                                 letterSpacing = 0.3.sp
                             ),

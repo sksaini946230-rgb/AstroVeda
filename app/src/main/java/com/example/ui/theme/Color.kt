@@ -27,7 +27,9 @@ val StarRatingFilled = Color(0xFFD4A84B)
 
 // NAVIGATION — GREEN — reserve ONLY for these purposes
 val NavActiveColor = Color(0xFF2ABF6E)
-val NavInactiveColor = Color(0xFF3D4A68)
+// Was 0xFF3D4A68 — on the ElevatedSurface bar that is roughly 1.7:1 contrast,
+// far under the 3:1 a UI element needs, so unselected tabs read as blank.
+val NavInactiveColor = Color(0xFF6B7899)
 
 // DATE & TIME — ORANGE — reserve ONLY for these purposes
 val DateTimeAccent = Color(0xFFE8934A)         // Header dates, sunrise/sunset, Vikram Samvat year

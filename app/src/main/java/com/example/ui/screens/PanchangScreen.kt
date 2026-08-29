@@ -100,6 +100,7 @@ import com.example.ui.components.NorthIndianChart
 import com.example.ui.components.PanchangLoadingSkeleton
 import com.example.ui.components.SectionHeader
 import com.example.ui.components.SubTabHeader
+import com.example.ui.theme.AstroVedaTheme
 import com.example.ui.theme.DateTimeAccent
 import com.example.ui.theme.GlassCardBorder
 import com.example.ui.theme.PrimaryButtonBackground
@@ -164,7 +165,15 @@ fun PanchangScreen(
         }
     }
 
-    CelestialBackground(deferred = !isStartupComplete) {
+    // TEMPORARY — light preview of this screen, so the layout can be judged
+    // without the cosmic backdrop. To go back: delete this wrapper and restore
+    // CelestialBackground(deferred = !isStartupComplete) { ... }
+    AstroVedaTheme(darkTheme = false) {
+    androidx.compose.foundation.layout.Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
         Scaffold(
             // The outer Scaffold in MainActivity already applies the status bar inset
             // through TopHeaderBar's statusBarsPadding(). Letting this inner Scaffold
@@ -207,7 +216,7 @@ fun PanchangScreen(
                                     end = 16.dp,
                                     bottom = paddingValues.calculateBottomPadding() + 16.dp
                                 ),
-                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
                                 // 1. Personalized Greeting & Welcome Header
                                 item {
@@ -576,7 +585,7 @@ fun PanchangScreen(
 
                                 item {
                                     GlassCard(modifier = Modifier.fillMaxWidth()) {
-                                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                                             // Tithi Section
                                             Column {
                                                 Row(
@@ -998,6 +1007,7 @@ fun PanchangScreen(
                 }
             }
         }
+    }
     }
 }
 

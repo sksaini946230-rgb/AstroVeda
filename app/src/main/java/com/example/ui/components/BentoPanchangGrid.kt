@@ -74,12 +74,12 @@ private fun BentoTile(
             .clip(RoundedCornerShape(18.dp))
             .background(
                 if (emphasis) {
-                    Brush.verticalGradient(listOf(ElevatedSurface, SurfaceBackground))
+                    Brush.verticalGradient(listOf(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.surface))
                 } else {
-                    Brush.verticalGradient(listOf(SurfaceBackground, SurfaceBackground))
+                    Brush.verticalGradient(listOf(MaterialTheme.colorScheme.surface, MaterialTheme.colorScheme.surface))
                 }
             )
-            .border(1.dp, GlassCardBorder, RoundedCornerShape(18.dp))
+            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(18.dp))
             .padding(horizontal = 14.dp, vertical = 12.dp)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
@@ -152,8 +152,8 @@ fun BentoPanchangGrid(
                     .weight(1f)
                     .heightIn(min = 128.dp)
                     .clip(RoundedCornerShape(18.dp))
-                    .background(Brush.verticalGradient(listOf(ElevatedSurface, SurfaceBackground)))
-                    .border(1.dp, GlassCardBorder, RoundedCornerShape(18.dp))
+                    .background(Brush.verticalGradient(listOf(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.colorScheme.surface)))
+                    .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(18.dp))
                     .padding(12.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -189,7 +189,7 @@ fun BentoPanchangGrid(
             BentoTile(
                 label = LanguageManager.getString("सूर्योदय", "Sunrise"),
                 value = panchang.sunrise,
-                accent = DateTimeAccent,
+                accent = MaterialTheme.colorScheme.secondary,
                 valueSize = 20,
                 minHeight = 76,
                 singleLineValue = true,
@@ -198,7 +198,7 @@ fun BentoPanchangGrid(
             BentoTile(
                 label = LanguageManager.getString("सूर्यास्त", "Sunset"),
                 value = panchang.sunset,
-                accent = DateTimeAccent,
+                accent = MaterialTheme.colorScheme.secondary,
                 valueSize = 20,
                 minHeight = 76,
                 singleLineValue = true,
@@ -233,7 +233,7 @@ fun BentoPanchangGrid(
             label = LanguageManager.getString("राहु काल", "Rahu Kaal"),
             value = panchang.rahuKaal,
             sub = LanguageManager.getString("इस अवधि में शुभ कार्य टालें", "Avoid starting anything auspicious"),
-            accent = RahuKaalDangerColor,
+            accent = MaterialTheme.colorScheme.error,
             valueSize = 19,
             minHeight = 84,
             singleLineValue = true,
@@ -245,7 +245,7 @@ fun BentoPanchangGrid(
             BentoTile(
                 label = LanguageManager.getString("अभिजित मुहूर्त", "Abhijit"),
                 value = panchang.abhijitMuhurat,
-                accent = ShubhSuccessColor,
+                accent = MaterialTheme.colorScheme.tertiary,
                 valueSize = 13,
                 minHeight = 78,
                 singleLineValue = true,
@@ -254,7 +254,7 @@ fun BentoPanchangGrid(
             BentoTile(
                 label = LanguageManager.getString("ब्रह्म मुहूर्त", "Brahma Muhurta"),
                 value = panchang.brahmaMuhurat,
-                accent = ShubhSuccessColor,
+                accent = MaterialTheme.colorScheme.tertiary,
                 valueSize = 13,
                 minHeight = 78,
                 singleLineValue = true,

@@ -108,7 +108,7 @@ fun NumerologyScreen(viewModel: MainViewModel) {
                 end = 16.dp,
                 bottom = paddingValues.calculateBottomPadding() + 16.dp
             ),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
         if (isAiOffline) {
             item {

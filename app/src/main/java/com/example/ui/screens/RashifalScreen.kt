@@ -171,7 +171,7 @@ fun RashifalScreen(viewModel: MainViewModel) {
                     end = 16.dp,
                     bottom = paddingValues.calculateBottomPadding() + 16.dp
                 ),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
         item {
             Spacer(modifier = Modifier.height(8.dp))
@@ -354,7 +354,7 @@ fun RashifalScreen(viewModel: MainViewModel) {
                             alpha = cardAlpha
                             rotationY = cardRotation
                         },
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     // Hero Rashi Card with 5-Star Rating & Lucky Chips
                     Box(
@@ -562,7 +562,7 @@ fun RashifalScreen(viewModel: MainViewModel) {
                             }
                     ) {
                         GlassCard(modifier = Modifier.fillMaxWidth()) {
-                            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                                 val domains = listOf(
                                     DomainItem(
                                         LanguageManager.getString("करियर व व्यवसाय (Career & Business)", "Career & Business"),
