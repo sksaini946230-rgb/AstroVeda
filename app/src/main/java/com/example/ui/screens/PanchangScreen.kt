@@ -166,6 +166,10 @@ fun PanchangScreen(
 
     CelestialBackground(deferred = !isStartupComplete) {
         Scaffold(
+            // The outer Scaffold in MainActivity already applies the status bar inset
+            // through TopHeaderBar's statusBarsPadding(). Letting this inner Scaffold
+            // apply it again is what put an empty band above every sub-tab row.
+            contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0),
             containerColor = Color.Transparent,
             modifier = Modifier.fillMaxSize()
         ) { paddingValues ->
@@ -178,7 +182,7 @@ fun PanchangScreen(
                     selectedTab = currentSubTab,
                     tabs = listOf(
                         LanguageManager.getString("दैनिक पंचांग", "Daily Panchang"),
-                        LanguageManager.getString("मासिक कैलेंडर", "Monthly Calendar")
+                        LanguageManager.getString("मासिक कैलेंडर", "Calendar")
                     ),
                     onTabSelected = { viewModel.setPanchangSubTab(it) },
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)

@@ -93,6 +93,10 @@ fun NumerologyScreen(viewModel: MainViewModel) {
     )
 
     Scaffold(
+        // The outer Scaffold in MainActivity already applies the status bar inset
+        // through TopHeaderBar's statusBarsPadding(). Letting this inner Scaffold
+        // apply it again is what put an empty band above every sub-tab row.
+        contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0),
         containerColor = Color.Transparent,
         modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
@@ -266,8 +270,8 @@ fun NumerologyScreen(viewModel: MainViewModel) {
         // AI Vedic Astrologer Chat Header
         item {
             SectionHeader(
-                titleHi = "एआई ज्योतिषाचार्य (AI Vedic Astrologer)",
-                titleEn = "AI Vedic Astrologer Chat",
+                titleHi = "ज्योतिष परामर्श",
+                titleEn = "Astrological Guidance",
                 subtitleHi = "व्यक्तिगत ज्योतिष परामर्श",
                 subtitleEn = "Personalised astrological guidance"
             )

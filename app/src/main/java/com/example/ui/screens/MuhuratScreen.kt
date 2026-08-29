@@ -61,6 +61,10 @@ fun MuhuratScreen(viewModel: MainViewModel) {
     val muhurats = viewModel.upcomingMuhurats
 
     Scaffold(
+        // The outer Scaffold in MainActivity already applies the status bar inset
+        // through TopHeaderBar's statusBarsPadding(). Letting this inner Scaffold
+        // apply it again is what put an empty band above every sub-tab row.
+        contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0),
         containerColor = Color.Transparent,
         modifier = Modifier.fillMaxSize()
     ) { paddingValues ->

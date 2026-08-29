@@ -79,13 +79,14 @@ fun AstroDisclaimer(
                 "and a high one is no reason to accept. The decision is yours."
         )
 
+        // Kept deliberately short and quiet. It does not name a vendor or a model,
+        // and it does not lead with the word "AI" — but it does say the answers are
+        // generated, because letting someone believe a human astrologer replied
+        // would be a false impression, and the helpline has to survive for the
+        // person who is actually in trouble.
         DisclaimerScope.AI -> LanguageManager.getString(
-            "उत्तर AI द्वारा तैयार किए जाते हैं और इनमें त्रुटि संभव है। ये मार्गदर्शन हैं, " +
-                "चिकित्सा, कानूनी या आर्थिक सलाह नहीं। संकट की स्थिति में Tele-MANAS 14416 " +
-                "पर निःशुल्क सहायता उपलब्ध है।",
-            "Answers are AI-generated and can be wrong. They are guidance, not medical, " +
-                "legal or financial advice. If you are in distress, Tele-MANAS 14416 offers " +
-                "free help, 24x7."
+            "उत्तर स्वतः तैयार होते हैं; त्रुटि संभव है। संकट में हों तो Tele-MANAS 14416।",
+            "Answers are generated automatically and can be wrong. In distress: Tele-MANAS 14416."
         )
     }
 

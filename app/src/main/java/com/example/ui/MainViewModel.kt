@@ -299,7 +299,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _panchangSubTab = MutableStateFlow(0) // 0: Daily Panchang, 1: Monthly Calendar
     val panchangSubTab: StateFlow<Int> = _panchangSubTab.asStateFlow()
 
-    private val _kundaliSubTab = MutableStateFlow(0) // 0: Kundali Chart, 1: Guna Matching, 2: Astro AI, 3: Transits
+    private val _kundaliSubTab = MutableStateFlow(0) // 0: Kundali Chart, 1: Guna Matching, 2: Numerology & Guidance, 3: Transits
     val kundaliSubTab: StateFlow<Int> = _kundaliSubTab.asStateFlow()
 
     private val _transitKundali = MutableStateFlow<KundaliChartData?>(null)
@@ -862,7 +862,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    // Astro & Astronomical News Grounded via Google Search & Gemini API
+    // Astro & astronomical news
     private val _astroNews = MutableStateFlow("")
     val astroNews: StateFlow<String> = _astroNews.asStateFlow()
 

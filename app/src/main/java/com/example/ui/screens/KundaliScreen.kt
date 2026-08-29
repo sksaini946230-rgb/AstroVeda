@@ -319,6 +319,10 @@ fun KundaliScreen(
 
     CelestialBackground(deferred = !isStartupComplete) {
         Scaffold(
+            // The outer Scaffold in MainActivity already applies the status bar inset
+            // through TopHeaderBar's statusBarsPadding(). Letting this inner Scaffold
+            // apply it again is what put an empty band above every sub-tab row.
+            contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0),
             containerColor = Color.Transparent,
             modifier = Modifier.fillMaxSize()
         ) { paddingValues ->
@@ -331,9 +335,9 @@ fun KundaliScreen(
                     selectedTab = currentSubTab,
                     tabs = listOf(
                         LanguageManager.getString("जन्म कुंडली", "Birth Chart"),
-                        LanguageManager.getString("गुण मिलान", "Guna Matching"),
-                        LanguageManager.getString("अंकशास्त्र व AI", "Astro AI"),
-                        LanguageManager.getString("गोचर (Transits)", "Transits")
+                        LanguageManager.getString("गुण मिलान", "Matching"),
+                        LanguageManager.getString("अंकशास्त्र", "Numerology"),
+                        LanguageManager.getString("गोचर", "Transits")
                     ),
                     onTabSelected = {
                         viewModel.setKundaliSubTab(it)

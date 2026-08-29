@@ -260,16 +260,24 @@ fun SubTabHeader(
                             view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                             onTabSelected(index)
                         }
-                        .padding(vertical = 10.dp),
+                        .padding(vertical = 9.dp, horizontal = 2.dp),
                     contentAlignment = Alignment.Center
                 ) {
+                    // One line, always. A tab that wraps makes the whole row grow
+                    // and sit unevenly next to its neighbours; keeping the labels
+                    // short is the real fix, and this is the guard behind it.
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleSmall.copy(
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                             color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 13.sp
-                        )
+                            fontSize = 12.5.sp,
+                            lineHeight = 17.sp
+                        ),
+                        maxLines = 1,
+                        softWrap = false,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
                 }
             }

@@ -19,6 +19,10 @@ fun MoreScreen(viewModel: MainViewModel) {
     val currentSubTab by viewModel.moreSubTab.collectAsState()
 
     Scaffold(
+        // The outer Scaffold in MainActivity already applies the status bar inset
+        // through TopHeaderBar's statusBarsPadding(). Letting this inner Scaffold
+        // apply it again is what put an empty band above every sub-tab row.
+        contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0),
         containerColor = Color.Transparent,
         modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
@@ -30,7 +34,7 @@ fun MoreScreen(viewModel: MainViewModel) {
             SubTabHeader(
                 selectedTab = currentSubTab,
                 tabs = listOf(
-                    LanguageManager.getString("सहेजे प्रोफाइल", "Saved Profiles"),
+                    LanguageManager.getString("प्रोफाइल", "Profiles"),
                     LanguageManager.getString("सेटिंग्स", "Settings")
                 ),
                 onTabSelected = { viewModel.setMoreSubTab(it) },
