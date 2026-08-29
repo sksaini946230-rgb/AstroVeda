@@ -111,8 +111,11 @@ class CalculatorsTest {
         // 4. Verify Sun/Moon rise and set times are computed
         assertTrue(panchang.sunrise.contains(":"))
         assertTrue(panchang.sunset.contains(":"))
-        assertTrue(panchang.moonrise.contains(":"))
-        assertTrue(panchang.moonset.contains(":"))
+        // The Moon's day runs about 24h50m, so roughly once a month it skips a rise
+        // or a set entirely within a calendar day — on 2026-07-22 at Delhi, moonset
+        // slips past midnight. "—" is the correct answer there, not a failure.
+        assertTrue(panchang.moonrise.contains(":") || panchang.moonrise == "—")
+        assertTrue(panchang.moonset.contains(":") || panchang.moonset == "—")
         assertTrue(panchang.rahuKaal.contains("-"))
         assertTrue(panchang.abhijitMuhurat.contains("-"))
 

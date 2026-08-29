@@ -3,11 +3,11 @@ package com.example.astro
 import com.example.data.model.AntardashaPeriod
 import com.example.data.model.DashaPeriod
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
 data class DashaPlanetInfo(
     val nameHi: String,
@@ -34,11 +34,25 @@ data class VimshottariDashaResult(
     val currentAntardasha: AntardashaPeriod?
 )
 
+/**
+ * Vimshottari Dasha.
+ *
+ * The sequence, lordships and balance formula here were already correct. Two
+ * things were not: the timeline started from the birth *date* with the birth
+ * *time* discarded, and every period boundary was rounded to a whole day and
+ * round-tripped through a "dd/MM/yyyy" string, so the error compounded down the
+ * 120-year cycle. Everything below now runs in milliseconds from the exact birth
+ * moment, and formats to a string only at the very end.
+ */
 object VimshottariDashaCalculator {
 
-    const val NAKSHATRA_SPAN_DEG = 360.0 / 27.0 // 13.333333333333334 degrees (13° 20')
+    const val NAKSHATRA_SPAN_DEG = 360.0 / 27.0
     const val TOTAL_VIMSHOTTARI_YEARS = 120.0
-    const val DAYS_PER_YEAR = 365.2425
+
+    /** Vimshottari uses the sidereal solar year. */
+    const val DAYS_PER_YEAR = 365.256363
+
+    private const val MS_PER_DAY = 86_400_000.0
 
     val VIMSHOTTARI_PLANETS = listOf(
         DashaPlanetInfo("केतु", "Ketu", 7.0),
@@ -60,18 +74,13 @@ object VimshottariDashaCalculator {
         "पूर्वाभाद्रपद", "उत्तराभाद्रपद", "रेवती"
     )
 
-    /**
-     * Calculates Nakshatra info from Moon's absolute longitude (0..360 degrees).
-     */
     fun getNakshatraInfo(moonLongitude: Double): NakshatraInfo {
-        val normalizedLon = ((moonLongitude % 360.0) + 360.0) % 360.0
+        val normalizedLon = AstroTime.norm360(moonLongitude)
         val index = (normalizedLon / NAKSHATRA_SPAN_DEG).toInt().coerceIn(0, 26)
-        val lordIdx = index % 9
-        val planet = VIMSHOTTARI_PLANETS[lordIdx]
+        val planet = VIMSHOTTARI_PLANETS[index % 9]
 
-        val degreeInNakshatra = normalizedLon % NAKSHATRA_SPAN_DEG
+        val degreeInNakshatra = normalizedLon - index * NAKSHATRA_SPAN_DEG
         val fractionElapsed = (degreeInNakshatra / NAKSHATRA_SPAN_DEG).coerceIn(0.0, 1.0)
-        val fractionRemaining = (1.0 - fractionElapsed).coerceIn(0.0, 1.0)
 
         return NakshatraInfo(
             index = index,
@@ -80,17 +89,19 @@ object VimshottariDashaCalculator {
             lordNameEn = planet.nameEn,
             degreeInNakshatra = degreeInNakshatra,
             fractionElapsed = fractionElapsed,
-            fractionRemaining = fractionRemaining
+            fractionRemaining = (1.0 - fractionElapsed).coerceIn(0.0, 1.0)
         )
     }
 
     /**
-     * Calculates full Vimshottari Dasha timeline (Mahadashas and Antardashas)
-     * based on Moon's absolute longitude and birth date.
+     * Full 120-year timeline from the exact birth moment.
+     *
+     * @param moonLongitude sidereal Moon longitude at birth, full precision
+     * @param birthJulianDay Julian Day (UT) of the birth moment
      */
     fun calculateVimshottariDasha(
         moonLongitude: Double,
-        birthDateStr: String,
+        birthJulianDay: Double,
         currentTimeMs: Long = System.currentTimeMillis()
     ): VimshottariDashaResult {
         val nakshatra = getNakshatraInfo(moonLongitude)
@@ -98,44 +109,40 @@ object VimshottariDashaCalculator {
         val birthPlanet = VIMSHOTTARI_PLANETS[startPlanetIdx]
 
         val balanceAtBirthYears = birthPlanet.durationYears * nakshatra.fractionRemaining
-        val balanceFormatted = formatDurationYears(balanceAtBirthYears)
+        val birthMs = AstroTime.millisFromJulianDay(birthJulianDay)
 
-        val birthCal = parseBirthDate(birthDateStr)
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.US)
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.US).apply {
+            timeZone = AstroTime.IST
+        }
 
         val mahadashas = mutableListOf<DashaPeriod>()
-        val runningCal = birthCal.clone() as Calendar
-
         var activeMahadasha: DashaPeriod? = null
         var activeAntardasha: AntardashaPeriod? = null
 
-        // Generate Mahadashas for a full 120-year Vimshottari cycle (9 planets)
+        // The birth mahadasha notionally began before birth; that notional start is
+        // what the antardashas must be measured from, or every sub-period is skewed.
+        val birthDashaNotionalStartMs =
+            birthMs - yearsToMs(birthPlanet.durationYears * nakshatra.fractionElapsed)
+
+        var runningMs = birthMs
+
         for (i in 0 until 9) {
             val planetIdx = (startPlanetIdx + i) % 9
             val planet = VIMSHOTTARI_PLANETS[planetIdx]
-
             val isBirthDasha = (i == 0)
+
             val durationYears = if (isBirthDasha) balanceAtBirthYears else planet.durationYears
+            val startMs = runningMs
+            val endMs = startMs + yearsToMs(durationYears)
+            runningMs = endMs
 
-            val startDateMs = runningCal.timeInMillis
-            val startDateStr = dateFormat.format(runningCal.time)
+            val antardashaAnchorMs = if (isBirthDasha) birthDashaNotionalStartMs else startMs
 
-            // Add duration in days
-            val durationDays = (durationYears * DAYS_PER_YEAR).roundToInt()
-            runningCal.add(Calendar.DAY_OF_YEAR, durationDays)
-
-            val endDateMs = runningCal.timeInMillis
-            val endDateStr = dateFormat.format(runningCal.time)
-
-            val isCurrentMahadasha = currentTimeMs in startDateMs..endDateMs
-
-            // Calculate Antardashas within this Mahadasha
             val antardashas = calculateAntardashas(
                 mahadashaPlanetIdx = planetIdx,
-                mahadashaStartCal = parseDateToCal(startDateStr, dateFormat),
+                anchorMs = antardashaAnchorMs,
+                birthMs = birthMs,
                 isBirthMahadasha = isBirthDasha,
-                birthCal = birthCal,
-                nakshatraFractionElapsed = nakshatra.fractionElapsed,
                 currentTimeMs = currentTimeMs,
                 dateFormat = dateFormat
             )
@@ -143,14 +150,14 @@ object VimshottariDashaCalculator {
             val dashaPeriod = DashaPeriod(
                 planetHi = planet.nameHi,
                 planetEn = planet.nameEn,
-                startDate = startDateStr,
-                endDate = endDateStr,
+                startDate = dateFormat.format(Date(startMs)),
+                endDate = dateFormat.format(Date(endMs)),
                 durationYears = roundToOneDecimal(durationYears),
-                isCurrent = isCurrentMahadasha,
+                isCurrent = currentTimeMs in startMs until endMs,
                 antardashas = antardashas
             )
 
-            if (isCurrentMahadasha) {
+            if (dashaPeriod.isCurrent) {
                 activeMahadasha = dashaPeriod
                 activeAntardasha = antardashas.find { it.isCurrent }
             }
@@ -161,123 +168,59 @@ object VimshottariDashaCalculator {
         return VimshottariDashaResult(
             nakshatraInfo = nakshatra,
             balanceAtBirthYears = balanceAtBirthYears,
-            balanceAtBirthFormatted = balanceFormatted,
+            balanceAtBirthFormatted = formatDurationYears(balanceAtBirthYears),
             mahadashas = mahadashas,
-            currentMahadasha = activeMahadasha ?: mahadashas.firstOrNull(),
+            // A chart older than 120 years falls off the end of the cycle; report
+            // nothing current rather than pretending the first period is running.
+            currentMahadasha = activeMahadasha,
             currentAntardasha = activeAntardasha
         )
     }
 
-    /**
-     * Calculates 9 Antardashas (Bhuktis) for a Mahadasha.
-     */
     private fun calculateAntardashas(
         mahadashaPlanetIdx: Int,
-        mahadashaStartCal: Calendar,
+        anchorMs: Long,
+        birthMs: Long,
         isBirthMahadasha: Boolean,
-        birthCal: Calendar,
-        nakshatraFractionElapsed: Double,
         currentTimeMs: Long,
         dateFormat: SimpleDateFormat
     ): List<AntardashaPeriod> {
         val mahadashaPlanet = VIMSHOTTARI_PLANETS[mahadashaPlanetIdx]
         val mDuration = mahadashaPlanet.durationYears
-        val antardashaList = mutableListOf<AntardashaPeriod>()
+        val result = mutableListOf<AntardashaPeriod>()
 
-        val runningCal = mahadashaStartCal.clone() as Calendar
-
-        // Calculate theoretical start of the birth Mahadasha before birth (if birth Mahadasha)
-        if (isBirthMahadasha && nakshatraFractionElapsed > 0) {
-            val elapsedDays = (nakshatraFractionElapsed * mDuration * DAYS_PER_YEAR).roundToInt()
-            runningCal.add(Calendar.DAY_OF_YEAR, -elapsedDays)
-        }
+        var runningMs = anchorMs
 
         for (j in 0 until 9) {
-            val subPlanetIdx = (mahadashaPlanetIdx + j) % 9
-            val subPlanet = VIMSHOTTARI_PLANETS[subPlanetIdx]
-
+            val subPlanet = VIMSHOTTARI_PLANETS[(mahadashaPlanetIdx + j) % 9]
             val antardashaYears = (mDuration * subPlanet.durationYears) / TOTAL_VIMSHOTTARI_YEARS
-            val antardashaDays = (antardashaYears * DAYS_PER_YEAR).roundToInt()
 
-            val subStartMs = runningCal.timeInMillis
-            val subStartStr = dateFormat.format(runningCal.time)
+            val subStartMs = runningMs
+            val subEndMs = subStartMs + yearsToMs(antardashaYears)
+            runningMs = subEndMs
 
-            runningCal.add(Calendar.DAY_OF_YEAR, antardashaDays)
+            // Sub-periods that finished before the native was born are not theirs.
+            if (isBirthMahadasha && subEndMs <= birthMs) continue
 
-            val subEndMs = runningCal.timeInMillis
-            val subEndStr = dateFormat.format(runningCal.time)
+            val effectiveStartMs = if (isBirthMahadasha) maxOf(subStartMs, birthMs) else subStartMs
 
-            // For birth Mahadasha, skip sub-periods that ended strictly before birth
-            if (isBirthMahadasha && subEndMs < birthCal.timeInMillis) {
-                continue
-            }
-
-            val adjustedStartStr = if (isBirthMahadasha && subStartMs < birthCal.timeInMillis) {
-                dateFormat.format(birthCal.time)
-            } else {
-                subStartStr
-            }
-
-            val effectiveStartMs = if (isBirthMahadasha && subStartMs < birthCal.timeInMillis) {
-                birthCal.timeInMillis
-            } else {
-                subStartMs
-            }
-
-            val isCurrent = currentTimeMs in effectiveStartMs..subEndMs
-            val durationMonths = roundToOneDecimal(antardashaYears * 12.0)
-
-            antardashaList.add(
+            result.add(
                 AntardashaPeriod(
                     planetHi = subPlanet.nameHi,
                     planetEn = subPlanet.nameEn,
-                    startDate = adjustedStartStr,
-                    endDate = subEndStr,
-                    durationMonths = durationMonths,
-                    isCurrent = isCurrent
+                    startDate = dateFormat.format(Date(effectiveStartMs)),
+                    endDate = dateFormat.format(Date(subEndMs)),
+                    durationMonths = roundToOneDecimal(antardashaYears * 12.0),
+                    isCurrent = currentTimeMs in effectiveStartMs until subEndMs
                 )
             )
         }
 
-        return antardashaList
+        return result
     }
 
-    private fun parseBirthDate(dobStr: String): Calendar {
-        val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-        cal.clear()
-
-        val formats = listOf(
-            SimpleDateFormat("yyyy-MM-dd", Locale.US),
-            SimpleDateFormat("yyyy-M-d", Locale.US),
-            SimpleDateFormat("dd/MM/yyyy", Locale.US),
-            SimpleDateFormat("dd-MM-yyyy", Locale.US)
-        )
-
-        for (fmt in formats) {
-            try {
-                val d = fmt.parse(dobStr)
-                if (d != null) {
-                    cal.time = d
-                    return cal
-                }
-            } catch (_: Exception) {}
-        }
-
-        // Fallback parsing year
-        val yearMatch = Regex("\\d{4}").find(dobStr)
-        val year = yearMatch?.value?.toIntOrNull() ?: 1995
-        cal.set(year, Calendar.JANUARY, 1)
-        return cal
-    }
-
-    private fun parseDateToCal(dateStr: String, dateFormat: SimpleDateFormat): Calendar {
-        val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-        try {
-            val d = dateFormat.parse(dateStr)
-            if (d != null) cal.time = d
-        } catch (_: Exception) {}
-        return cal
-    }
+    private fun yearsToMs(years: Double): Long =
+        (years * DAYS_PER_YEAR * MS_PER_DAY).roundToLong()
 
     fun formatDurationYears(yearsDouble: Double): String {
         val years = yearsDouble.toInt()
@@ -293,7 +236,20 @@ object VimshottariDashaCalculator {
         return parts.joinToString(", ")
     }
 
-    private fun roundToOneDecimal(value: Double): Double {
-        return (value * 10.0).roundToInt() / 10.0
+    private fun roundToOneDecimal(value: Double): Double = (value * 10.0).roundToInt() / 10.0
+
+    /** Legacy entry point kept for tests that pass a date string; assumes midnight IST. */
+    @Deprecated("Pass the exact birth Julian Day instead — the birth time matters.")
+    fun calculateVimshottariDasha(
+        moonLongitude: Double,
+        birthDateStr: String,
+        currentTimeMs: Long = System.currentTimeMillis()
+    ): VimshottariDashaResult {
+        val parts = birthDateStr.trim().split("-")
+        val y = parts.getOrNull(0)?.toIntOrNull() ?: 1995
+        val m = parts.getOrNull(1)?.toIntOrNull() ?: 1
+        val d = parts.getOrNull(2)?.toIntOrNull() ?: 1
+        val jd = AstroTime.julianDayFromLocal(y, m, d, 0, 0, TimeZone.getTimeZone("Asia/Kolkata"))
+        return calculateVimshottariDasha(moonLongitude, jd, currentTimeMs)
     }
 }

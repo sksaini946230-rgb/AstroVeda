@@ -358,17 +358,48 @@ class AstroVedaComprehensiveQATest {
     }
 
     @Test
-    fun testKundaliCalculatorMalformedInputGracefulHandling() {
-        // Completely corrupt input strings should not crash the engine
-        val fallbackKundali = KundaliCalculator.generateKundali(
-            name = "Test",
-            dobString = "invalid-date",
-            tobString = "invalid-time",
-            placeName = "Unknown"
+    fun testKundaliCalculatorRejectsMalformedInput() {
+        // This test used to assert the opposite: that corrupt input still produced
+        // a chart. That WAS the bug. "invalid-date" silently became 1995-01-01 at
+        // 12:00, and the app showed a complete, confident, entirely fictional
+        // Lagna, Moon sign, Nakshatra and Dasha. Bad input must now be refused so
+        // the screen can tell the user what to correct.
+        val corrupt = listOf(
+            Triple("invalid-date", "invalid-time", "unparseable"),
+            Triple("25-08-1994", "14:15", "day-month-year, the order Indian users type first"),
+            Triple("1994-08-25", "25:99", "hour and minute out of range"),
+            Triple("1994-13-25", "14:15", "month 13"),
+            Triple("1994-02-30", "14:15", "30th of February"),
+            Triple("abcd", "xy", "not digits at all")
         )
-        assertNotNull(fallbackKundali)
-        assertEquals(9, fallbackKundali.planets.size)
-        assertEquals(12, fallbackKundali.housePlanetsMap.size)
+
+        for ((dob, tob, why) in corrupt) {
+            try {
+                KundaliCalculator.generateKundali(
+                    name = "Test", dobString = dob, tobString = tob, placeName = "Unknown"
+                )
+                fail("Expected rejection for $why (dob=$dob tob=$tob) but a chart was returned")
+            } catch (e: com.example.astro.BirthDataException) {
+                // Every message must be usable on screen, in both languages.
+                assertTrue("Hindi message missing for $why", e.messageHi.isNotBlank())
+                assertTrue("English message missing for $why", e.messageEn.isNotBlank())
+            }
+        }
+    }
+
+    @Test
+    fun testKundaliCalculatorAcceptsValidInput() {
+        val chart = KundaliCalculator.generateKundali(
+            name = "Test",
+            dobString = "1994-08-25",
+            tobString = "14:15",
+            placeName = "Jhunjhunu",
+            lat = 28.1289,
+            lng = 75.3995
+        )
+        assertNotNull(chart)
+        assertEquals(9, chart.planets.size)
+        assertEquals(12, chart.housePlanetsMap.size)
     }
 
     // --- 12. Full Hindi / English Localization Integrity ---

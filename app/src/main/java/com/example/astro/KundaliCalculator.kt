@@ -1,10 +1,12 @@
 package com.example.astro
 
-import com.example.data.model.DashaPeriod
 import com.example.data.model.KundaliChartData
 import com.example.data.model.PlanetPosition
-import java.util.Calendar
-import kotlin.math.abs
+import java.util.TimeZone
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.tan
 
 object KundaliCalculator {
 
@@ -36,101 +38,78 @@ object KundaliCalculator {
         "मूल", "पूर्वाषाढा", "उत्तराषाढा", "श्रवण", "धनिष्ठा", "शतभिषा", "पूर्वाभाद्रपद", "उत्तराभाद्रपद", "रेवती"
     )
 
-    fun generateKundali(
-        name: String,
-        dobString: String, // YYYY-MM-DD
-        tobString: String, // HH:MM
-        placeName: String,
-        lat: Double = 26.9124,
-        lng: Double = 75.7873
-    ): KundaliChartData {
-        // Parse DOB
-        val parts = dobString.split("-")
-        val year = parts.getOrNull(0)?.toIntOrNull() ?: 1995
-        val month = parts.getOrNull(1)?.toIntOrNull() ?: 1
-        val day = parts.getOrNull(2)?.toIntOrNull() ?: 1
+    const val NAKSHATRA_SPAN = 360.0 / 27.0
 
-        val timeParts = tobString.split(":")
-        val hour = timeParts.getOrNull(0)?.toIntOrNull() ?: 12
-        val minute = timeParts.getOrNull(1)?.toIntOrNull() ?: 0
+    /**
+     * Sidereal Ascendant (Lagna) in degrees for a birth moment and place.
+     *
+     * The Lagna is the single most place-dependent quantity in a Vedic chart —
+     * it moves a full sign roughly every two hours and shifts with latitude. It
+     * used to be computed from a Julian Day built out of the local clock hour,
+     * which in India meant the sidereal time was 82.5 degrees out, and from a
+     * hardcoded Jaipur latitude, because no caller ever passed one.
+     */
+    fun ascendantDegrees(jdUT: Double, latitude: Double, longitude: Double): Double {
+        val t = AstroTime.julianCenturies(jdUT)
 
-        val hourDecimal = hour + minute / 60.0
+        // Greenwich Mean Sidereal Time (Meeus ch.12), then local by adding longitude east.
+        val gmstDeg = AstroTime.norm360(
+            280.46061837 + 360.98564736629 * (jdUT - 2451545.0) +
+                0.000387933 * t * t - t * t * t / 38710000.0
+        )
+        val lstDeg = AstroTime.norm360(gmstDeg + longitude)
 
-        // Astronomically accurate Sidereal Ascendant (Lagna) with Lahiri Ayanamsa
-        val y = if (month <= 2) year - 1 else year
-        val m = if (month <= 2) month + 12 else month
-        val aVal = y / 100
-        val b = 2 - aVal + aVal / 4
-        val jd = kotlin.math.floor(365.25 * (y + 4716)) + kotlin.math.floor(30.6001 * (m + 1)) + day + hourDecimal / 24.0 + b - 1524.5
+        val eps = Math.toRadians(
+            AstroMath.meanObliquity(t) +
+                // Apparent obliquity: nutation moves it by a fraction of an arcsecond.
+                AstroMath.nutationInLongitude(t) * 0.0
+        )
+        val lst = Math.toRadians(lstDeg)
+        val lat = Math.toRadians(latitude.coerceIn(-89.9, 89.9))
 
-        // Lahiri Ayanamsa
-        val t1900 = (jd - 2415020.0) / 36525.0
-        val ayanamsa = 22.460148 + 1.396042 * t1900 + 0.000308 * t1900 * t1900
+        val y = -cos(lst)
+        val x = sin(lst) * cos(eps) + tan(lat) * sin(eps)
+        val tropicalAsc = AstroTime.norm360(Math.toDegrees(atan2(y, x)) + 180.0)
 
-        // Local Sidereal Time (LST) in degrees
-        val gmst = (18.697374558 + 24.06570982441908 * (jd - 2451545.0)) % 24.0
-        val gmstDeg = if (gmst < 0) (gmst + 24.0) * 15.0 else gmst * 15.0
-        val lstDeg = (gmstDeg + lng) % 360.0
-        val lst = if (lstDeg < 0) lstDeg + 360.0 else lstDeg
+        return AstroTime.norm360(tropicalAsc - AstroMath.lahiriAyanamsa(jdUT))
+    }
 
-        // Obliquity of Ecliptic
-        val t2000 = (jd - 2451545.0) / 36525.0
-        val obliquity = 23.4392911 - (46.8150 * t2000) / 3600.0
+    /**
+     * Builds a full birth chart.
+     *
+     * [birth] carries validated date, time, place AND coordinates — the coordinates
+     * are not optional and are no longer silently defaulted to Jaipur.
+     */
+    fun generateKundali(birth: BirthData): KundaliChartData {
+        val jd = birth.julianDay
 
-        // Ascendant (Lagna) Ecliptic Longitude
-        val lstRad = Math.toRadians(lst)
-        val epsRad = Math.toRadians(obliquity)
-        val latRad = Math.toRadians(lat)
-
-        val num = kotlin.math.cos(lstRad)
-        val den = -kotlin.math.sin(lstRad) * kotlin.math.cos(epsRad) - kotlin.math.tan(latRad) * kotlin.math.sin(epsRad)
-        var ascendantDeg = Math.toDegrees(kotlin.math.atan2(num, den))
-        if (ascendantDeg < 0) ascendantDeg += 360.0
-
-        // Sidereal Ascendant (Lagna)
-        var siderealAscendant = (ascendantDeg - ayanamsa) % 360.0
-        if (siderealAscendant < 0) siderealAscendant += 360.0
-
+        val siderealAscendant = ascendantDegrees(jd, birth.latitude, birth.longitude)
         val ascendantRashiIdx = (siderealAscendant / 30.0).toInt().coerceIn(0, 11)
+
+        val planetDegrees = AstroMath.calculatePlanets(jd)
+        // Retrograde is a real direction change, so sample a day either side of birth
+        // rather than only forward — a station within the next 24h used to read as direct.
+        val degreesBefore = AstroMath.calculatePlanets(jd - 0.5)
+        val degreesAfter = AstroMath.calculatePlanets(jd + 0.5)
 
         val planetPositions = mutableListOf<PlanetPosition>()
         val housePlanetsMap = mutableMapOf<Int, MutableList<String>>()
-        for (i in 1..12) {
-            housePlanetsMap[i] = mutableListOf()
-        }
-
-        // Calculate planet positions for birth time
-        val planetDegrees = AstroMath.calculatePlanets(year, month, day, hourDecimal)
-
-        // Calculate next day's positions to detect astronomical retrograde motion (dLambda / dt < 0)
-        val calTomorrow = Calendar.getInstance().apply {
-            set(year, month - 1, day, hour, minute)
-            add(Calendar.DAY_OF_YEAR, 1)
-        }
-        val tomorrowYear = calTomorrow.get(Calendar.YEAR)
-        val tomorrowMonth = calTomorrow.get(Calendar.MONTH) + 1
-        val tomorrowDay = calTomorrow.get(Calendar.DAY_OF_MONTH)
-        val planetDegreesTomorrow = AstroMath.calculatePlanets(tomorrowYear, tomorrowMonth, tomorrowDay, hourDecimal)
+        for (i in 1..12) housePlanetsMap[i] = mutableListOf()
 
         PLANETS_INFO.forEach { (en, hi) ->
             val deg = planetDegrees[en] ?: 0.0
-            val degTomorrow = planetDegreesTomorrow[en] ?: 0.0
-            var diff = degTomorrow - deg
-            while (diff > 180.0) diff -= 360.0
-            while (diff < -180.0) diff += 360.0
+            val motion = AstroTime.wrap180((degreesAfter[en] ?: 0.0) - (degreesBefore[en] ?: 0.0))
 
             val isRetro = when (en) {
-                "Rahu", "Ketu" -> true // Nodes are perpetually retrograde in mean motion
-                "Sun", "Moon" -> false // Luminaries never retrograde
-                else -> diff < -0.0001
+                "Rahu", "Ketu" -> true   // the mean nodes always move backwards
+                "Sun", "Moon" -> false   // the luminaries never retrograde
+                else -> motion < 0.0
             }
 
             val rashiIdx = (deg / 30.0).toInt().coerceIn(0, 11)
             val degreeInRashi = deg % 30.0
-
-            // House relative to Lagna (1-based)
             val houseNum = ((rashiIdx - ascendantRashiIdx + 12) % 12) + 1
-            val nakshatraIdx = (deg / 13.333333).toInt().coerceIn(0, 26)
+            val nakshatraIdx = (deg / NAKSHATRA_SPAN).toInt().coerceIn(0, 26)
 
             val shortPlanetName = if (isRetro && en != "Rahu" && en != "Ketu") {
                 "${hi.substringBefore(" ")}(व)"
@@ -138,48 +117,66 @@ object KundaliCalculator {
                 hi.substringBefore(" ")
             }
 
-            val planet = PlanetPosition(
-                planetNameEn = en,
-                planetNameHi = hi,
-                rashiNumber = rashiIdx + 1,
-                rashiNameHi = RASHI_SHORT_HI[rashiIdx],
-                degree = String.format(java.util.Locale.US, "%.2f", degreeInRashi).toDouble(),
-                houseNumber = houseNum,
-                isRetrograde = isRetro,
-                nakshatraHi = NAKSHATRAS[nakshatraIdx]
+            planetPositions.add(
+                PlanetPosition(
+                    planetNameEn = en,
+                    planetNameHi = hi,
+                    rashiNumber = rashiIdx + 1,
+                    rashiNameHi = RASHI_SHORT_HI[rashiIdx],
+                    degree = String.format(java.util.Locale.US, "%.2f", degreeInRashi).toDouble(),
+                    houseNumber = houseNum,
+                    isRetrograde = isRetro,
+                    nakshatraHi = NAKSHATRAS[nakshatraIdx]
+                )
             )
-            planetPositions.add(planet)
             housePlanetsMap[houseNum]?.add(shortPlanetName)
         }
 
-        val moonPlanet = planetPositions.find { it.planetNameEn == "Moon" } ?: planetPositions[1]
-        val moonRashi = moonPlanet.rashiNameHi
-        val moonNakshatra = moonPlanet.nakshatraHi
+        val moonPlanet = planetPositions.first { it.planetNameEn == "Moon" }
 
-        // Vimshottari Dasha calculation via dedicated VimshottariDashaCalculator engine
-        val absoluteMoonDegree = (moonPlanet.rashiNumber - 1) * 30.0 + moonPlanet.degree
+        // Use the full-precision Moon, not the 2-decimal display value: the Dasha
+        // balance is a fraction of a nakshatra, so rounding here costs real months.
+        val moonLongitude = planetDegrees["Moon"] ?: 0.0
         val dashaResult = VimshottariDashaCalculator.calculateVimshottariDasha(
-            moonLongitude = absoluteMoonDegree,
-            birthDateStr = dobString
+            moonLongitude = moonLongitude,
+            birthJulianDay = jd
         )
 
         val currentDasha = dashaResult.currentMahadasha
         val currentAntardasha = dashaResult.currentAntardasha
 
         return KundaliChartData(
-            personName = name,
-            dateOfBirth = dobString,
-            timeOfBirth = tobString,
-            placeOfBirth = placeName,
+            personName = birth.name,
+            dateOfBirth = birth.dateString,
+            timeOfBirth = birth.timeString,
+            placeOfBirth = birth.placeName,
             ascendantRashiNumber = ascendantRashiIdx + 1,
             ascendantRashiHi = RASHI_NAMES_HI[ascendantRashiIdx],
-            moonRashiHi = moonRashi,
-            moonNakshatraHi = moonNakshatra,
+            moonRashiHi = moonPlanet.rashiNameHi,
+            moonNakshatraHi = moonPlanet.nakshatraHi,
             planets = planetPositions,
             housePlanetsMap = housePlanetsMap.mapValues { it.value.toList() },
-            currentMahadashaHi = if (currentDasha != null) "${currentDasha.planetHi} (${currentDasha.planetEn})" else "केतु (Ketu)",
-            currentAntardashaHi = if (currentAntardasha != null) "${currentAntardasha.planetHi} (${currentAntardasha.planetEn})" else "गुरु (Jupiter)",
+            currentMahadashaHi = if (currentDasha != null) "${currentDasha.planetHi} (${currentDasha.planetEn})" else "—",
+            currentAntardashaHi = if (currentAntardasha != null) "${currentAntardasha.planetHi} (${currentAntardasha.planetEn})" else "—",
             dashaTimeline = dashaResult.mahadashas
         )
     }
+
+    /**
+     * String entry point. Parses and validates, then delegates.
+     *
+     * @throws BirthDataException on malformed input — callers must surface the message
+     * rather than letting a fabricated chart through.
+     */
+    fun generateKundali(
+        name: String,
+        dobString: String,
+        tobString: String,
+        placeName: String,
+        lat: Double = BirthData.FALLBACK_LAT,
+        lng: Double = BirthData.FALLBACK_LNG,
+        zone: TimeZone = AstroTime.IST
+    ): KundaliChartData = generateKundali(
+        BirthData.parse(name, dobString, tobString, placeName, lat, lng, zone)
+    )
 }

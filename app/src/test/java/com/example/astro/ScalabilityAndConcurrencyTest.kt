@@ -149,15 +149,21 @@ class ScalabilityAndConcurrencyTest {
             val sanitized = SecurityUtils.sanitizeTextInput(corrupted)
             assertNotNull(sanitized)
 
-            // Kundali Calculator must never crash on malformed dates/times
-            val safeChart = KundaliCalculator.generateKundali(
-                name = corrupted,
-                dobString = corrupted,
-                tobString = corrupted,
-                placeName = corrupted
-            )
-            assertNotNull("Kundali generator must return safe fallback chart on corrupted input", safeChart)
-            assertEquals(9, safeChart.planets.size)
+            // Corrupted input must be REFUSED, not absorbed into a fabricated chart.
+            // The old assertion here demanded a "safe fallback chart", which is how
+            // "9999-99-99" ended up producing a confident-looking birth chart.
+            // Refusing is the safe behaviour; inventing a chart never was.
+            try {
+                KundaliCalculator.generateKundali(
+                    name = corrupted,
+                    dobString = corrupted,
+                    tobString = corrupted,
+                    placeName = corrupted
+                )
+                fail("Kundali generator accepted corrupted input: $corrupted")
+            } catch (e: com.example.astro.BirthDataException) {
+                assertTrue(e.messageHi.isNotBlank() && e.messageEn.isNotBlank())
+            }
         }
     }
 
