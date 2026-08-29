@@ -307,17 +307,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun calculateCurrentTransits() {
         viewModelScope.launch(Dispatchers.Default) {
-            val now = java.util.Calendar.getInstance()
-            val dob = String.format(java.util.Locale.US, "%d-%02d-%02d", now.get(java.util.Calendar.YEAR), now.get(java.util.Calendar.MONTH) + 1, now.get(java.util.Calendar.DAY_OF_MONTH))
-            val tob = String.format(java.util.Locale.US, "%02d:%02d", now.get(java.util.Calendar.HOUR_OF_DAY), now.get(java.util.Calendar.MINUTE))
-            
-            val transitData = KundaliCalculator.generateKundali(
-                name = "Current Transits",
-                dobString = dob,
-                tobString = tob,
+            // A chart of this instant — no date/time strings to format and reparse.
+            val transitData = KundaliCalculator.chartForInstant(
+                label = "Current Transits",
+                jdUT = com.example.astro.AstroTime.julianDayFromMillis(System.currentTimeMillis()),
                 placeName = _selectedCity.value.cityName,
-                lat = _selectedCity.value.latitude,
-                lng = _selectedCity.value.longitude
+                latitude = _selectedCity.value.latitude,
+                longitude = _selectedCity.value.longitude
             )
             _transitKundali.value = transitData
         }
@@ -658,7 +654,29 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _isCalculating = MutableStateFlow(false)
     val isCalculating: StateFlow<Boolean> = _isCalculating.asStateFlow()
 
-    fun generateKundaliChart(name: String, dob: String, tob: String, place: String) {
+    /** Validation message for the Kundali form, in the active language. Null when clear. */
+    private val _kundaliInputError = MutableStateFlow<String?>(null)
+    val kundaliInputError: StateFlow<String?> = _kundaliInputError.asStateFlow()
+
+    fun clearKundaliInputError() { _kundaliInputError.value = null }
+
+    /**
+     * Generates a birth chart.
+     *
+     * [lat] and [lng] are the coordinates of the BIRTH place, resolved by the
+     * form's geocoder. They used to be dropped on the floor, which meant every
+     * chart in the app was cast for Jaipur regardless of where the person was
+     * actually born — and the Ascendant is the most place-sensitive point in the
+     * whole chart.
+     */
+    fun generateKundaliChart(
+        name: String,
+        dob: String,
+        tob: String,
+        place: String,
+        lat: Double,
+        lng: Double
+    ) {
         val trimmedName = name.trim()
         val trimmedDob = dob.trim()
         val trimmedTob = tob.trim()
@@ -668,18 +686,30 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         kundaliDob.value = trimmedDob
         kundaliTob.value = trimmedTob
         kundaliPlace.value = trimmedPlace
-        
-        if (trimmedName.isNotBlank() && trimmedDob.isNotBlank() && trimmedTob.isNotBlank() && trimmedPlace.isNotBlank()) {
-            addRecentSearch("KUNDALI", trimmedName, trimmedDob, trimmedTob, trimmedPlace)
-        }
-        
+        _kundaliInputError.value = null
+
         viewModelScope.launch(Dispatchers.Default) {
             _isCalculating.value = true
             try {
-                val result = KundaliCalculator.generateKundali(trimmedName, trimmedDob, trimmedTob, trimmedPlace)
+                val birth = com.example.astro.BirthData.parse(
+                    name = trimmedName,
+                    dobString = trimmedDob,
+                    tobString = trimmedTob,
+                    placeName = trimmedPlace,
+                    latitude = lat,
+                    longitude = lng
+                )
+                val result = KundaliCalculator.generateKundali(birth)
                 _generatedKundali.value = result
+                addRecentSearch("KUNDALI", trimmedName, trimmedDob, trimmedTob, trimmedPlace, lat, lng)
                 triggerInterstitial()
                 incrementLookupCount()
+            } catch (e: com.example.astro.BirthDataException) {
+                // A typo in the form is the user's to fix, not a crash to report.
+                _kundaliInputError.value = com.example.util.LanguageManager.getString(
+                    e.messageHi, e.messageEn
+                )
+                _generatedKundali.value = null
             } catch (e: Exception) {
                 reportError(e)
             } finally {
@@ -848,8 +878,28 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun addRecentSearch(type: String, name: String, dob: String, tob: String, place: String) {
-        val data = "$name|$dob|$tob|$place"
+    /**
+     * Records a search for the "recent" strip.
+     *
+     * Kundali searches carry the birth coordinates as two extra fields. Without
+     * them, replaying a recent search could not reproduce the chart — it would
+     * have to guess a location, which is the bug this whole change removes.
+     * Older rows have four fields and are still readable; the screen skips
+     * replaying those rather than casting them for the wrong place.
+     */
+    fun addRecentSearch(
+        type: String,
+        name: String,
+        dob: String,
+        tob: String,
+        place: String,
+        lat: Double? = null,
+        lng: Double? = null
+    ) {
+        val data = buildString {
+            append("$name|$dob|$tob|$place")
+            if (lat != null && lng != null) append("|$lat|$lng")
+        }
         viewModelScope.launch {
             recentSearchRepository.insertSearch(RecentSearchEntity(type = type, data = data))
         }

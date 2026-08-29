@@ -207,7 +207,8 @@ fun SavedProfilesScreen(viewModel: MainViewModel) {
                         profile = profile,
                         onOpenKundali = {
                             viewModel.generateKundaliChart(
-                                profile.name, profile.dateOfBirth, profile.timeOfBirth, profile.placeOfBirth
+                                profile.name, profile.dateOfBirth, profile.timeOfBirth, profile.placeOfBirth,
+                                profile.latitude, profile.longitude
                             )
                             viewModel.navigateToKundali(0)
                         },

@@ -867,14 +867,31 @@ fun PanchangScreen(
                                 }
 
                                 item {
-                                    val dailyLagnaChart = remember(panchang.dateString, selectedCity) {
-                                        com.example.astro.KundaliCalculator.generateKundali(
-                                            name = "Daily Lagna",
-                                            dobString = panchang.dateString.ifBlank { "2026-08-26" },
-                                            tobString = panchang.sunrise.ifBlank { "06:00" },
+                                    // The Lagna at sunrise for the selected day and city. This used to
+                                    // hand the formatted date ("Wednesday, 28 August 2026") and a
+                                    // 12-hour clock string to the birth-chart parser, which quietly
+                                    // fell back to 1995-01-01 12:00 and drew that chart instead.
+                                    val panchangDate by viewModel.selectedDate.collectAsState()
+                                    val dailyLagnaChart = remember(panchangDate, selectedCity) {
+                                        val cal = java.util.Calendar.getInstance(com.example.astro.AstroTime.IST)
+                                            .apply { time = panchangDate }
+                                        val midnightJd = com.example.astro.AstroTime.julianDayFromLocal(
+                                            cal.get(java.util.Calendar.YEAR),
+                                            cal.get(java.util.Calendar.MONTH) + 1,
+                                            cal.get(java.util.Calendar.DAY_OF_MONTH),
+                                            0, 0,
+                                            com.example.astro.AstroTime.IST
+                                        )
+                                        val sunriseJd = com.example.astro.RiseSetCalculator.sunRiseSet(
+                                            midnightJd, selectedCity.latitude, selectedCity.longitude
+                                        ).riseJd ?: (midnightJd + 0.25)
+
+                                        com.example.astro.KundaliCalculator.chartForInstant(
+                                            label = "Daily Lagna",
+                                            jdUT = sunriseJd,
                                             placeName = selectedCity.cityNameHindi,
-                                            lat = selectedCity.latitude,
-                                            lng = selectedCity.longitude
+                                            latitude = selectedCity.latitude,
+                                            longitude = selectedCity.longitude
                                         )
                                     }
 

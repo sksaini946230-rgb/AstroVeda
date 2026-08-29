@@ -19,6 +19,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -265,9 +267,25 @@ fun KundaliScreen(
     var dobInput by remember { mutableStateOf("") }
     var tobInput by remember { mutableStateOf("") }
     var placeInput by remember { mutableStateOf("") }
-    var placeSuggestions by remember { mutableStateOf<List<String>>(emptyList()) }
+    var placeSuggestions by remember { mutableStateOf<List<PlaceSuggestion>>(emptyList()) }
     var placeDropdownExpanded by remember { mutableStateOf(false) }
+    // The coordinates of the chosen birth place. Null until the user picks a
+    // suggestion — the chart cannot be cast without them, and silently falling
+    // back to Jaipur is what made every Lagna in the app wrong.
+    var placeCoords by remember { mutableStateOf<Pair<Double, Double>?>(null) }
     var formValidationError by remember { mutableStateOf<String?>(null) }
+
+    // The calculator validates too, and its complaints are more specific than the
+    // form's ("Did you enter day-month-year instead?"). Surface them in the same
+    // place and reopen the form so the user can see the field they need to fix.
+    val engineInputError by viewModel.kundaliInputError.collectAsState()
+    LaunchedEffect(engineInputError) {
+        engineInputError?.let {
+            formValidationError = it
+            showForm = true
+            viewModel.clearKundaliInputError()
+        }
+    }
 
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
@@ -329,18 +347,18 @@ fun KundaliScreen(
                     else -> {
                         val currentChart = kundali
 
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(
+                        Column(
+                            modifier = Modifier.fillMaxSize()
+                                .verticalScroll(rememberScrollState())
+                                .padding(
                                 start = 16.dp,
                                 top = 8.dp,
                                 end = 16.dp,
                                 bottom = paddingValues.calculateBottomPadding() + 16.dp
-                            ),
+                                ),
                             verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             // Section Header & Mode Toggle
-                            item {
                                 Spacer(modifier = Modifier.height(4.dp))
                                 SectionHeader(
                                     titleHi = "जन्म कुण्डली (Vedic Birth Chart D1)",
@@ -370,24 +388,39 @@ fun KundaliScreen(
                                         recentSearches = kundaliSearches,
                                         onSearchSelected = { search ->
                                             val parts = search.data.split("|")
-                                            if (parts.size == 4) {
+                                            if (parts.size >= 4) {
                                                 nameInput = parts[0]
                                                 dobInput = parts[1]
                                                 tobInput = parts[2]
                                                 placeInput = parts[3]
-                                                viewModel.generateKundaliChart(parts[0], parts[1], parts[2], parts[3])
-                                                showForm = false
+                                                val lat = parts.getOrNull(4)?.toDoubleOrNull()
+                                                val lng = parts.getOrNull(5)?.toDoubleOrNull()
+                                                if (lat != null && lng != null) {
+                                                    placeCoords = lat to lng
+                                                    viewModel.generateKundaliChart(
+                                                        parts[0], parts[1], parts[2], parts[3], lat, lng
+                                                    )
+                                                    showForm = false
+                                                } else {
+                                                    // A row saved before coordinates were recorded. Refill the
+                                                    // form and let the user re-pick the place rather than
+                                                    // casting the chart for somewhere they were not born.
+                                                    placeCoords = null
+                                                    showForm = true
+                                                    formValidationError = LanguageManager.getString(
+                                                        "कृपया जन्म स्थान दोबारा चुनें",
+                                                        "Please pick the birth place again"
+                                                    )
+                                                }
                                             }
                                         }
                                     )
                                 }
-                            }
 
                             // ─────────────────────────────────────────────────────────────
                             // INPUT FORM (Shown if no chart generated yet OR user expanded form)
                             // ─────────────────────────────────────────────────────────────
                             if (currentChart == null || showForm) {
-                                item {
                                     val savedProfiles by viewModel.savedProfiles.collectAsState()
                                     var expandedProfileList by remember { mutableStateOf(false) }
                                     var profileSearchQuery by remember { mutableStateOf("") }
@@ -474,11 +507,16 @@ fun KundaliScreen(
                                                                     dobInput = profile.dateOfBirth
                                                                     tobInput = profile.timeOfBirth
                                                                     placeInput = profile.placeOfBirth
+                                                                    // Saved profiles have carried latitude and longitude
+                                                                    // all along; nothing was ever reading them.
+                                                                    placeCoords = profile.latitude to profile.longitude
                                                                     viewModel.generateKundaliChart(
                                                                         name = profile.name,
                                                                         dob = profile.dateOfBirth,
                                                                         tob = profile.timeOfBirth,
-                                                                        place = profile.placeOfBirth
+                                                                        place = profile.placeOfBirth,
+                                                                        lat = profile.latitude,
+                                                                        lng = profile.longitude
                                                                     )
                                                                     showForm = false
                                                                 },
@@ -635,11 +673,18 @@ fun KundaliScreen(
                                                             @Suppress("DEPRECATION")
                                                             val addresses = geocoder.getFromLocationName(placeInput, 5)
                                                             addresses?.mapNotNull { addr ->
+                                                                // Keep the coordinates. The geocoder hands them over with
+                                                                // every result and this code used to throw them away, then
+                                                                // fall back to Jaipur for the actual calculation.
+                                                                if (!addr.hasLatitude() || !addr.hasLongitude()) return@mapNotNull null
                                                                 val city = addr.locality ?: addr.subAdminArea ?: addr.featureName
                                                                 val state = addr.adminArea
                                                                 val country = addr.countryName
-                                                                listOfNotNull(city, state, country).joinToString(", ").takeIf { it.isNotBlank() }
-                                                            }?.distinct() ?: emptyList()
+                                                                val label = listOfNotNull(city, state, country)
+                                                                    .joinToString(", ")
+                                                                    .takeIf { it.isNotBlank() } ?: return@mapNotNull null
+                                                                PlaceSuggestion(label, addr.latitude, addr.longitude)
+                                                            }?.distinctBy { it.label } ?: emptyList()
                                                         } catch (e: Exception) {
                                                             emptyList()
                                                         }
@@ -654,6 +699,9 @@ fun KundaliScreen(
                                                     value = placeInput,
                                                     onValueChange = {
                                                         placeInput = it
+                                                        // Typing after a pick invalidates the coordinates that
+                                                        // came with it — force a fresh selection.
+                                                        placeCoords = null
                                                         formValidationError = null
                                                     },
                                                     label = { Text(LanguageManager.getString("जन्म स्थान (Place of Birth) *", "Place of Birth *")) },
@@ -676,12 +724,13 @@ fun KundaliScreen(
                                                     ) {
                                                         placeSuggestions.forEach { suggestion ->
                                                             Text(
-                                                                text = suggestion,
+                                                                text = suggestion.label,
                                                                 style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
                                                                 modifier = Modifier
                                                                     .fillMaxWidth()
                                                                     .clickable {
-                                                                        placeInput = suggestion
+                                                                        placeInput = suggestion.label
+                                                                        placeCoords = suggestion.latitude to suggestion.longitude
                                                                         placeSuggestions = emptyList()
                                                                         placeDropdownExpanded = false
                                                                         formValidationError = null
@@ -713,16 +762,32 @@ fun KundaliScreen(
                                                 GoldGlowButton(
                                                     text = LanguageManager.getString("कुण्डली बनाएं (Generate Chart)", "Generate Birth Chart"),
                                                     onClick = {
-                                                        if (nameInput.isBlank() || dobInput.isBlank() || tobInput.isBlank() || placeInput.isBlank()) {
-                                                            formValidationError = LanguageManager.getString(
-                                                                "⚠️ कृपया सभी आवश्यक विवरण (*) भरें",
-                                                                "⚠️ Please fill all required fields (*)"
-                                                            )
-                                                        } else {
-                                                            haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                                            formValidationError = null
-                                                            viewModel.generateKundaliChart(nameInput, dobInput, tobInput, placeInput)
-                                                            showForm = false
+                                                        val coords = placeCoords
+                                                        when {
+                                                            nameInput.isBlank() || dobInput.isBlank() ||
+                                                                tobInput.isBlank() || placeInput.isBlank() -> {
+                                                                formValidationError = LanguageManager.getString(
+                                                                    "⚠️ कृपया सभी आवश्यक विवरण (*) भरें",
+                                                                    "⚠️ Please fill all required fields (*)"
+                                                                )
+                                                            }
+                                                            // Without coordinates the Ascendant is meaningless. Ask for a
+                                                            // real pick rather than quietly casting the chart for Jaipur.
+                                                            coords == null -> {
+                                                                formValidationError = LanguageManager.getString(
+                                                                    "⚠️ सूची में से जन्म स्थान चुनें — सही लग्न के लिए स्थान के निर्देशांक आवश्यक हैं",
+                                                                    "⚠️ Pick the birth place from the list — the Ascendant needs the place's coordinates"
+                                                                )
+                                                            }
+                                                            else -> {
+                                                                haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                                                formValidationError = null
+                                                                viewModel.generateKundaliChart(
+                                                                    nameInput, dobInput, tobInput, placeInput,
+                                                                    coords.first, coords.second
+                                                                )
+                                                                showForm = false
+                                                            }
                                                         }
                                                     },
                                                     modifier = Modifier.fillMaxWidth(),
@@ -731,7 +796,6 @@ fun KundaliScreen(
                                             }
                                         }
                                     }
-                                }
                             }
 
                             // ─────────────────────────────────────────────────────────────
@@ -739,7 +803,6 @@ fun KundaliScreen(
                             // ─────────────────────────────────────────────────────────────
                             if (currentChart != null) {
                                 // Header Card: Name, Details & Quick Action Buttons
-                                item {
                                     GlassCard(modifier = Modifier.fillMaxWidth()) {
                                         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                                             Row(
@@ -816,6 +879,7 @@ fun KundaliScreen(
                                                         dobInput = ""
                                                         tobInput = ""
                                                         placeInput = ""
+                                                        placeCoords = null
                                                         showForm = true
                                                         viewModel.resetKundaliForm()
                                                     },
@@ -867,10 +931,8 @@ fun KundaliScreen(
                                             }
                                         }
                                     }
-                                }
 
                                 // Chart Canvas Section (North & South Indian Styles)
-                                item {
                                     GlassCard(modifier = Modifier.fillMaxWidth()) {
                                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                             Row(
@@ -1016,10 +1078,8 @@ fun KundaliScreen(
                                             }
                                         }
                                     }
-                                }
 
                                 // Planetary Positions Table
-                                item {
                                     SectionHeader(
                                         titleHi = "ग्रह स्थिति (Planetary Positions)",
                                         titleEn = "Planetary Positions"
@@ -1043,16 +1103,11 @@ fun KundaliScreen(
                                             }
                                         }
                                     }
-                                }
 
                                 // Horizontal Vimshottari Dasha Timeline
-                                item {
                                     DashaHorizontalTimeline(dashaTimeline = currentChart.dashaTimeline)
-                                }
 
-                                item {
                                     Spacer(modifier = Modifier.height(24.dp))
-                                }
                             }
                         }
                     }
@@ -1061,3 +1116,16 @@ fun KundaliScreen(
         }
     }
 }
+
+/**
+ * A birth-place option from the geocoder, carrying the coordinates the chart needs.
+ *
+ * The autocomplete used to be a plain List<String>: the geocoder returned latitude
+ * and longitude with every result and the code kept only the display label, after
+ * which the calculator fell back to Jaipur for everyone.
+ */
+data class PlaceSuggestion(
+    val label: String,
+    val latitude: Double,
+    val longitude: Double
+)

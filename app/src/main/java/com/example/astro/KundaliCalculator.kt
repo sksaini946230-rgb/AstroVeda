@@ -80,10 +80,66 @@ object KundaliCalculator {
      * [birth] carries validated date, time, place AND coordinates — the coordinates
      * are not optional and are no longer silently defaulted to Jaipur.
      */
-    fun generateKundali(birth: BirthData): KundaliChartData {
-        val jd = birth.julianDay
+    fun generateKundali(birth: BirthData): KundaliChartData = buildChart(
+        name = birth.name,
+        dateLabel = birth.dateString,
+        timeLabel = birth.timeString,
+        placeName = birth.placeName,
+        jd = birth.julianDay,
+        latitude = birth.latitude,
+        longitude = birth.longitude
+    )
 
-        val siderealAscendant = ascendantDegrees(jd, birth.latitude, birth.longitude)
+    /**
+     * A chart for an arbitrary instant and place.
+     *
+     * Used for the transit wheel and the daily Lagna, which are charts of "now"
+     * rather than of a birth. They previously went through the string entry point
+     * by formatting a date and time and letting it parse them back, which is both
+     * wasteful and — once parsing became strict — a crash waiting to happen: the
+     * daily Lagna card was passing "Wednesday, 28 August 2026" and "06:02 AM".
+     */
+    fun chartForInstant(
+        label: String,
+        jdUT: Double,
+        placeName: String,
+        latitude: Double,
+        longitude: Double
+    ): KundaliChartData {
+        val cal = java.util.GregorianCalendar(AstroTime.IST).apply {
+            timeInMillis = AstroTime.millisFromJulianDay(jdUT)
+        }
+        return buildChart(
+            name = label,
+            dateLabel = String.format(
+                java.util.Locale.US, "%04d-%02d-%02d",
+                cal.get(java.util.Calendar.YEAR),
+                cal.get(java.util.Calendar.MONTH) + 1,
+                cal.get(java.util.Calendar.DAY_OF_MONTH)
+            ),
+            timeLabel = String.format(
+                java.util.Locale.US, "%02d:%02d",
+                cal.get(java.util.Calendar.HOUR_OF_DAY),
+                cal.get(java.util.Calendar.MINUTE)
+            ),
+            placeName = placeName,
+            jd = jdUT,
+            latitude = latitude,
+            longitude = longitude
+        )
+    }
+
+    private fun buildChart(
+        name: String,
+        dateLabel: String,
+        timeLabel: String,
+        placeName: String,
+        jd: Double,
+        latitude: Double,
+        longitude: Double
+    ): KundaliChartData {
+
+        val siderealAscendant = ascendantDegrees(jd, latitude, longitude)
         val ascendantRashiIdx = (siderealAscendant / 30.0).toInt().coerceIn(0, 11)
 
         val planetDegrees = AstroMath.calculatePlanets(jd)
@@ -146,10 +202,10 @@ object KundaliCalculator {
         val currentAntardasha = dashaResult.currentAntardasha
 
         return KundaliChartData(
-            personName = birth.name,
-            dateOfBirth = birth.dateString,
-            timeOfBirth = birth.timeString,
-            placeOfBirth = birth.placeName,
+            personName = name,
+            dateOfBirth = dateLabel,
+            timeOfBirth = timeLabel,
+            placeOfBirth = placeName,
             ascendantRashiNumber = ascendantRashiIdx + 1,
             ascendantRashiHi = RASHI_NAMES_HI[ascendantRashiIdx],
             moonRashiHi = moonPlanet.rashiNameHi,

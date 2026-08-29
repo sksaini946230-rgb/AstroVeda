@@ -57,17 +57,43 @@ object KundaliMatchingCalculator {
         "Sagittarius", "Capricorn", "Aquarius", "Pisces"
     )
 
+    /**
+     * Ashtakoot Guna Milan.
+     *
+     * The eight koots depend only on each person's Moon — sign and nakshatra —
+     * which is why the birth place does not change the 36-point score. Mangal
+     * Dosha is different: it is read from Mars' house relative to the ASCENDANT,
+     * and the Ascendant moves a whole sign every two hours and shifts with
+     * latitude. This used to pass the literal string "Default" as the place, so
+     * both charts were cast for Jaipur and the Manglik verdict was stated as fact
+     * for two people who were almost certainly not born there.
+     *
+     * Pass [boyLat]/[boyLng] and [girlLat]/[girlLng] to get a real Manglik reading.
+     * Without them the score is still correct and the Manglik section says plainly
+     * that it needs birth place and exact time, instead of guessing.
+     */
     fun matchKundali(
         boyName: String,
         boyDob: String,
         boyTob: String,
         girlName: String,
         girlDob: String,
-        girlTob: String
+        girlTob: String,
+        boyLat: Double? = null,
+        boyLng: Double? = null,
+        girlLat: Double? = null,
+        girlLng: Double? = null
     ): GunaMatchingResult {
-        // Generate planetary charts
-        val boyChart = KundaliCalculator.generateKundali(boyName, boyDob, boyTob, "Default")
-        val girlChart = KundaliCalculator.generateKundali(girlName, girlDob, girlTob, "Default")
+        val canJudgeManglik = boyLat != null && boyLng != null && girlLat != null && girlLng != null
+
+        val boyChart = KundaliCalculator.generateKundali(
+            boyName, boyDob, boyTob, "—",
+            boyLat ?: BirthData.FALLBACK_LAT, boyLng ?: BirthData.FALLBACK_LNG
+        )
+        val girlChart = KundaliCalculator.generateKundali(
+            girlName, girlDob, girlTob, "—",
+            girlLat ?: BirthData.FALLBACK_LAT, girlLng ?: BirthData.FALLBACK_LNG
+        )
 
         val boyMoonRashiIdx = boyChart.moonRashiHi.let { KundaliCalculator.RASHI_SHORT_HI.indexOf(it) }.coerceAtLeast(0)
         val girlMoonRashiIdx = girlChart.moonRashiHi.let { KundaliCalculator.RASHI_SHORT_HI.indexOf(it) }.coerceAtLeast(0)
@@ -100,17 +126,26 @@ object KundaliMatchingCalculator {
         val boyMarsHouse = boyChart.planets.find { it.planetNameEn == "Mars" }?.houseNumber ?: 0
         val girlMarsHouse = girlChart.planets.find { it.planetNameEn == "Mars" }?.houseNumber ?: 0
         val manglikHouses = listOf(1, 4, 7, 8, 12)
-        val isBoyManglik = boyMarsHouse in manglikHouses
-        val isGirlManglik = girlMarsHouse in manglikHouses
+        val isBoyManglik = canJudgeManglik && boyMarsHouse in manglikHouses
+        val isGirlManglik = canJudgeManglik && girlMarsHouse in manglikHouses
 
         val mangalStatusHi = when {
+            !canJudgeManglik ->
+                "मंगल दोष की गणना नहीं की जा सकी। इसके लिए दोनों का जन्म स्थान एवं सटीक जन्म समय आवश्यक है, " +
+                    "क्योंकि मंगल दोष लग्न से देखा जाता है और लग्न हर दो घंटे में बदलता है। " +
+                    "ऊपर दिए 36 गुण चंद्रमा पर आधारित हैं और इनके लिए जन्म स्थान आवश्यक नहीं।"
             isBoyManglik && isGirlManglik -> "दोनों मांगलिक हैं (मंगल दोष निरस्त / मांगलिक सामंजस्य)"
             isBoyManglik -> "वर मांगलिक हैं, कन्या मांगलिक नहीं हैं (सावधानी अपेक्षित)"
             isGirlManglik -> "कन्या मांगलिक हैं, वर मांगलिक नहीं हैं (सावधानी अपेक्षित)"
-            else -> "दोनों अंश-मांगलिक नहीं हैं (कोई मंगल दोष नहीं)"
+            else -> "दोनों मांगलिक नहीं हैं (कोई मंगल दोष नहीं)"
         }
 
         val mangalStatusEn = when {
+            !canJudgeManglik ->
+                "Mangal Dosha could not be determined. It is read from Mars' house relative to the " +
+                    "Ascendant, which changes every two hours and depends on the birth place, so both " +
+                    "birth places and exact birth times are needed. The 36 Guna above come from the " +
+                    "Moon and do not need the birth place."
             isBoyManglik && isGirlManglik -> "Both are Manglik (Mangal Dosha canceled / Compatible)"
             isBoyManglik -> "Boy is Manglik, Girl is Non-Manglik (Remedy Recommended)"
             isGirlManglik -> "Girl is Manglik, Boy is Non-Manglik (Remedy Recommended)"
