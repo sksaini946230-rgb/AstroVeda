@@ -140,7 +140,7 @@ fun SavedProfilesScreen(viewModel: MainViewModel) {
         item {
             Spacer(modifier = Modifier.height(8.dp))
             SectionHeader(
-                titleHi = "सहेजी गई कुण्डलियां (Saved Profiles)",
+                titleHi = "सहेजी गई कुण्डलियां",
                 titleEn = "Saved Birth Profiles",
                 subtitleHi = "स्थानीय डेटाबेस - त्वरित लोड के लिए",
                 subtitleEn = "Local Room Storage for Quick Access"
@@ -233,7 +233,7 @@ fun SavedProfilesScreen(viewModel: MainViewModel) {
         item {
             Spacer(modifier = Modifier.height(16.dp))
             SectionHeader(
-                titleHi = "सहेजी गई रिपोर्ट (Saved Reports)",
+                titleHi = "सहेजी गई रिपोर्ट",
                 titleEn = "Saved Astrology Reports",
                 subtitleHi = "ऑफ़लाइन रिपोर्ट संग्रहण",
                 subtitleEn = "Offline Stored Astrology Reports"

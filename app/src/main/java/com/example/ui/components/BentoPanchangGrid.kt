@@ -55,9 +55,14 @@ import com.example.util.LanguageManager
  * the theme.
  */
 
-/** One bento cell. [accent] tints the value and the left rail. */
+/**
+ * One bento cell — a label, a value, and an optional line under it.
+ *
+ * Public because the same tile is the unit of every bento on every screen; the
+ * point of the pattern is that the cells match wherever they appear.
+ */
 @Composable
-private fun BentoTile(
+fun BentoTile(
     label: String,
     value: String,
     modifier: Modifier = Modifier,

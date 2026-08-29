@@ -286,7 +286,7 @@ fun CalendarScreen(viewModel: MainViewModel) {
         // Upcoming 7 Festivals Section below Calendar View
         item {
             SectionHeader(
-                titleHi = "आगामी 7 प्रमुख व्रत व त्योहार (Next 7 Upcoming Festivals)",
+                titleHi = "आगामी 7 प्रमुख व्रत व त्योहार",
                 titleEn = "Next 7 Upcoming Festivals",
                 subtitleHi = "तिथि, वार व पूजा मुहूर्त सहित शीघ्र आने वाले 7 पर्व",
                 subtitleEn = "Upcoming major fasting days and festival dates"
@@ -422,7 +422,7 @@ fun CalendarScreen(viewModel: MainViewModel) {
         // Festival List Header
         item {
             SectionHeader(
-                titleHi = "प्रमुख हिन्दू पर्व एवं त्यौहार (Major Festivals)",
+                titleHi = "प्रमुख हिन्दू पर्व एवं त्यौहार",
                 titleEn = "Major Festivals & Fasting Days",
                 subtitleHi = "राजस्थान व उत्तर भारत विशेष पर्वों सहित",
                 subtitleEn = "Including regional Rajasthan & North Indian festivals"

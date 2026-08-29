@@ -126,7 +126,7 @@ fun MatchingScreen(viewModel: MainViewModel) {
             item {
                 Spacer(modifier = Modifier.height(8.dp))
                 SectionHeader(
-                    titleHi = "गुण मिलान (36 Guna Kundali Matching)",
+                    titleHi = "गुण मिलान",
                     titleEn = "Kundali Matching (Ashtakoot)"
                 )
                 val recentSearches by viewModel.recentSearches.collectAsState()
@@ -603,7 +603,7 @@ fun MatchingScreen(viewModel: MainViewModel) {
                 // Ashtakoot 8 Breakdown Table Header
                 item {
                     SectionHeader(
-                        titleHi = "अष्टकूट 36-गुण विवरण (8 Koota Breakdown)",
+                        titleHi = "अष्टकूट 36-गुण विवरण",
                         titleEn = "Ashtakoot 36-Score Breakdown"
                     )
                 }

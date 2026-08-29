@@ -31,7 +31,17 @@ class AstroCacheRepository(
         if (!forceRefresh) {
             val cached = panchangCacheDao.getCachedPanchang(cacheKey)
             if (cached != null && (now - cached.cachedAtTimestamp) < SEVEN_DAYS_MS) {
+                // The cache table has no column for the planet list, so a cached
+                // read used to hand back planets = emptyList() and the whole
+                // "ग्रह स्थिति" section rendered as a blank card. Adding a column
+                // is not an option here — this database uses
+                // fallbackToDestructiveMigration(dropAllTables = true), so a
+                // version bump would take every saved birth profile with it.
+                // Recomputing is cheap and entirely on-device.
+                val planets = com.example.astro.PanchangCalculator
+                    .calculatePanchang(date, city, use24Hour).planets
                 return@withContext PanchangData(
+                    planets = planets,
                     dateString = cached.dateString,
                     dayOfWeek = cached.dayOfWeek,
                     dayOfWeekHindi = cached.dayOfWeekHindi,

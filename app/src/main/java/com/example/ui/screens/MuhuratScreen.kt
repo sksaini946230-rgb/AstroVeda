@@ -81,7 +81,7 @@ fun MuhuratScreen(viewModel: MainViewModel) {
         item {
             Spacer(modifier = Modifier.height(8.dp))
             SectionHeader(
-                titleHi = "आज का चौघड़िया (Today's Choghadiya)",
+                titleHi = "आज का चौघड़िया",
                 titleEn = "Choghadiya Timings"
             )
         }
@@ -158,15 +158,23 @@ fun MuhuratScreen(viewModel: MainViewModel) {
             }
         }
 
-        // Choghadiya Slots List
-        items(slots) { slot ->
-            ChoghadiyaRow(slot)
+        // Choghadiya as a bento: two per row, so the whole cycle is visible
+        // without scrolling through eight identical full-width cards.
+        items(slots.chunked(2)) { pair ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                pair.forEach { slot -> ChoghadiyaTile(slot, Modifier.weight(1f)) }
+                // Keeps a lone final tile at half width instead of stretching it.
+                if (pair.size == 1) Spacer(modifier = Modifier.weight(1f))
+            }
         }
 
         // Event-Based Muhurat Finder Header
         item {
             SectionHeader(
-                titleHi = "कार्यानुसार शुभ मुहूर्त (Event Muhurat Finder)",
+                titleHi = "कार्यानुसार शुभ मुहूर्त",
                 titleEn = "Event Muhurat Finder",
                 subtitleHi = "विवाह, गृह प्रवेश, व्यापार, वाहन व यात्रा मुहूर्त",
                 subtitleEn = "Wedding, Housewarming, Business & Vehicle"
@@ -185,6 +193,25 @@ fun MuhuratScreen(viewModel: MainViewModel) {
         }
     }
 }
+}
+
+/** One Choghadiya slot as a bento tile. Colour carries the nature. */
+@Composable
+fun ChoghadiyaTile(slot: ChoghadiyaSlot, modifier: Modifier = Modifier) {
+    val statusColor = when (slot.type) {
+        ChoghadiyaType.AMRIT, ChoghadiyaType.SHUBH, ChoghadiyaType.LABH -> ShubhSuccessColor
+        ChoghadiyaType.CHAR -> DateTimeAccent
+        else -> RahuKaalDangerColor
+    }
+    com.example.ui.components.BentoTile(
+        label = LanguageManager.getString(slot.type.natureHi, slot.type.natureHi),
+        value = slot.type.nameHi,
+        sub = slot.timeSlotString,
+        accent = statusColor,
+        valueSize = 17,
+        minHeight = 92,
+        modifier = modifier
+    )
 }
 
 @Composable

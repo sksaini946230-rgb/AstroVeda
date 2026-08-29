@@ -140,7 +140,7 @@ fun SettingsScreen(
         item {
             Spacer(modifier = Modifier.height(8.dp))
             SectionHeader(
-                titleHi = "ऐप सेटिंग्स (App Settings)",
+                titleHi = "ऐप सेटिंग्स",
                 titleEn = "Settings",
                 subtitleHi = LanguageManager.getString("आपकी पसंद एवं प्राथमिकताओं का अनुकूलन करें", "Customise your preferences and alerts"),
                 subtitleEn = "Customize your preferences & notifications"

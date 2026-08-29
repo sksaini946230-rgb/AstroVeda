@@ -568,7 +568,7 @@ fun PanchangScreen(
                                 // 8. 5 Core Panchang Elements Section
                                 item {
                                     SectionHeader(
-                                        titleHi = "पंचांग के 5 मुख्य अंग (Panchang Elements)",
+                                        titleHi = "पंचांग के 5 मुख्य अंग",
                                         titleEn = "Core 5 Panchang Elements",
                                         subtitleHi = "तिथि, नक्षत्र, योग, करण एवं वार",
                                         subtitleEn = "Tithi, Nakshatra, Yoga, Karan & Var"
@@ -698,7 +698,7 @@ fun PanchangScreen(
                                 // 9. Sun & Moon Timings
                                 item {
                                     SectionHeader(
-                                        titleHi = "सूर्य एवं चन्द्र समय (Sun & Moon Timings)",
+                                        titleHi = "सूर्य एवं चन्द्र समय",
                                         titleEn = "Sun & Moon Timings"
                                     )
                                 }
@@ -720,7 +720,7 @@ fun PanchangScreen(
                                 // 10. Auspicious / Inauspicious Muhurats
                                 item {
                                     SectionHeader(
-                                        titleHi = "शुभ एवं अशुभ मुहूर्त (Auspicious & Rahu Timings)",
+                                        titleHi = "शुभ एवं अशुभ मुहूर्त",
                                         titleEn = "Auspicious & Inauspicious Times"
                                     )
                                 }
@@ -774,7 +774,7 @@ fun PanchangScreen(
                                 // 11. Choghadiya Strip Section
                                 item {
                                     SectionHeader(
-                                        titleHi = "आज का चौघड़िया (Today's Choghadiya)",
+                                        titleHi = "आज का चौघड़िया",
                                         titleEn = "Choghadiya Time Strip",
                                         subtitleHi = "शुभ, अमृत, लाभ, चर, उद्वेग, काल व रोग",
                                         subtitleEn = "Real-time Choghadiya calculations for ${panchang.locationName}"
@@ -1347,7 +1347,7 @@ fun TimingColumn(title: String, time: String, icon: ImageVector, iconColor: Colo
 fun PlanetaryPositionsCard(planets: List<com.example.data.model.PlanetPosition>) {
     Column(modifier = Modifier.fillMaxWidth()) {
         SectionHeader(
-            titleHi = "ग्रह स्थिति (Planetary Positions)",
+            titleHi = "ग्रह स्थिति",
             titleEn = "Current Astrological Positions"
         )
         Spacer(modifier = Modifier.height(12.dp))

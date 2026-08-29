@@ -166,7 +166,7 @@ fun TransitScreen(viewModel: MainViewModel) {
             val validBirthKundali = birthKundali!!
             item {
                 SectionHeader(
-                    titleHi = "वर्तमान गोचर (Current Transits)",
+                    titleHi = "वर्तमान गोचर",
                     titleEn = "Planetary Transits"
                 )
                 Text(
@@ -205,7 +205,7 @@ fun TransitScreen(viewModel: MainViewModel) {
 
             item {
                 SectionHeader(
-                    titleHi = "गोचर ग्रह स्थिति (Transit Details)",
+                    titleHi = "गोचर ग्रह स्थिति",
                     titleEn = "Transit Positions"
                 )
                 GlassCard(modifier = Modifier.fillMaxWidth()) {
@@ -367,7 +367,7 @@ fun KundaliScreen(
                             // Section Header & Mode Toggle
                                 Spacer(modifier = Modifier.height(4.dp))
                                 SectionHeader(
-                                    titleHi = "जन्म कुण्डली (Vedic Birth Chart D1)",
+                                    titleHi = "जन्म कुण्डली",
                                     titleEn = "Vedic Birth Chart Generator",
                                     actionButtonText = if (currentChart != null && !showForm) {
                                         LanguageManager.getString("विवरण बदलें", "Edit Details")
@@ -864,13 +864,34 @@ fun KundaliScreen(
                                                 )
                                             }
 
+                                            // The three headline facts of a chart, as bento
+                                            // tiles rather than badges — three long strings on
+                                            // one row could not fit, so they truncated.
                                             Row(
                                                 modifier = Modifier.fillMaxWidth(),
                                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                                             ) {
-                                                GlassBadge(text = LanguageManager.getString("लग्न: ${currentChart.ascendantRashiHi}", "Lagna: ${currentChart.ascendantRashiEn}"))
-                                                GlassBadge(text = LanguageManager.getString("चंद्र राशि: ${currentChart.moonRashiHi}", "Moon sign: ${currentChart.moonRashiEn}"))
-                                                GlassBadge(text = "नक्षत्र: ${currentChart.moonNakshatraHi}")
+                                                com.example.ui.components.BentoTile(
+                                                    label = LanguageManager.getString("लग्न", "Lagna"),
+                                                    value = LanguageManager.getString(currentChart.ascendantRashiHi, currentChart.ascendantRashiEn),
+                                                    valueSize = 15,
+                                                    minHeight = 68,
+                                                    modifier = Modifier.weight(1f)
+                                                )
+                                                com.example.ui.components.BentoTile(
+                                                    label = LanguageManager.getString("चंद्र राशि", "Moon sign"),
+                                                    value = LanguageManager.getString(currentChart.moonRashiHi, currentChart.moonRashiEn),
+                                                    valueSize = 15,
+                                                    minHeight = 68,
+                                                    modifier = Modifier.weight(1f)
+                                                )
+                                                com.example.ui.components.BentoTile(
+                                                    label = LanguageManager.getString("नक्षत्र", "Nakshatra"),
+                                                    value = LanguageManager.getString(currentChart.moonNakshatraHi, currentChart.moonNakshatraEn),
+                                                    valueSize = 15,
+                                                    minHeight = 68,
+                                                    modifier = Modifier.weight(1f)
+                                                )
                                             }
 
                                             // Action Buttons: New Chart (+), Save Profile
@@ -1087,7 +1108,7 @@ fun KundaliScreen(
 
                                 // Planetary Positions Table
                                     SectionHeader(
-                                        titleHi = "ग्रह स्थिति (Planetary Positions)",
+                                        titleHi = "ग्रह स्थिति",
                                         titleEn = "Planetary Positions"
                                     )
                                     GlassCard(modifier = Modifier.fillMaxWidth()) {

@@ -120,7 +120,7 @@ fun NumerologyScreen(viewModel: MainViewModel) {
         item {
             Spacer(modifier = Modifier.height(8.dp))
             SectionHeader(
-                titleHi = "अंक ज्योतिष (Vedic Numerology)",
+                titleHi = "अंक ज्योतिष",
                 titleEn = "Vedic Numerology"
             )
         }

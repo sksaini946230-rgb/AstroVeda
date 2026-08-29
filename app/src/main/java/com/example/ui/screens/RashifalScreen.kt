@@ -179,7 +179,7 @@ fun RashifalScreen(viewModel: MainViewModel) {
         item {
             Spacer(modifier = Modifier.height(8.dp))
             SectionHeader(
-                titleHi = "12 राशियां (Zodiac Signs)",
+                titleHi = "12 राशियां",
                 titleEn = "Select Zodiac Sign",
                 subtitleHi = "अपनी राशि चुनें व स्वाइप करके सभी फलादेश देखें",
                 subtitleEn = "Tap or swipe card left/right for next zodiac sign"
@@ -552,7 +552,7 @@ fun RashifalScreen(viewModel: MainViewModel) {
 
                     // 3: Domain Categories (Career, Health, Love, Finance) in Hindi
                     SectionHeader(
-                        titleHi = "क्षेत्रवार फलादेश (Category Readings)",
+                        titleHi = "क्षेत्रवार फलादेश",
                         titleEn = "Category Breakdown"
                     )
 
