@@ -29,23 +29,26 @@ fun OfflineStatusChip(text: String = "Offline Mode: Showing Cached Content") {
             .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .border(1.dp, MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f), RoundedCornerShape(16.dp))
-            .padding(horizontal = 12.dp, vertical = 6.dp)
+            // Sits inline beside the subtitle now, so it stays compact.
+            .padding(horizontal = 8.dp, vertical = 3.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 imageVector = Icons.Default.CloudOff,
                 contentDescription = "Offline",
                 tint = MaterialTheme.colorScheme.secondary,
-                modifier = Modifier.size(14.dp)
+                modifier = Modifier.size(11.dp)
             )
-            Spacer(modifier = Modifier.width(6.dp))
+            Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = text,
                 style = MaterialTheme.typography.labelSmall.copy(
                     color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Normal,
                     fontSize = 10.sp
-                )
+                ),
+                maxLines = 1,
+                softWrap = false
             )
         }
     }

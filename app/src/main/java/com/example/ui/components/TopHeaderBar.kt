@@ -206,10 +206,20 @@ fun TopHeaderBar(
                             color = MaterialTheme.colorScheme.primary,
                             fontSize = 20.sp,
                             letterSpacing = 0.5.sp
-                        )
+                        ),
+                        // Without these the title breaks a character per line when the
+                        // row runs out of room — which is exactly what happened the
+                        // moment the offline chip appeared beside it.
+                        maxLines = 1,
+                        softWrap = false,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                     )
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
+                        // Offline, the chip is the more useful of the two and the
+                        // tagline truncates to "वैदिक ..." anyway. Show one or the
+                        // other rather than a stub of both.
+                        if (!isOffline) {
+                            Text(
                             text = LanguageManager.getString(
                                 "वैदिक पंचांग एवं कुण्डली 2026",
                                 "Vedic Panchang & Kundali 2026"
@@ -219,18 +229,18 @@ fun TopHeaderBar(
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Normal
                             ),
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                             modifier = Modifier.weight(1f, fill = false)
-                        )
+                            )
+                        } else {
+                            OfflineStatusChip(text = LanguageManager.getString("ऑफलाइन", "Offline"))
+                        }
                         if (isCloudBackupEnabled) {
                             Spacer(modifier = Modifier.width(6.dp))
                             FirestoreSyncIndicator(isSyncing = isFirestoreSyncing)
                         }
                     }
-                }
-
-                if (isOffline) {
-                    OfflineStatusChip(text = LanguageManager.getString("ऑफलाइन", "Offline"))
-                    Spacer(modifier = Modifier.width(8.dp))
                 }
 
                 // Action Buttons Row
