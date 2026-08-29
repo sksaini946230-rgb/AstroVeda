@@ -180,6 +180,10 @@ fun NorthIndianChart(
                 .testTag("north_indian_chart_canvas"),
             contentAlignment = Alignment.Center
         ) {
+            // DrawScope is not a composable scope, so the palette is read here.
+            val goldColor = PrimaryButtonBackground
+            val textColor = TextPrimary
+            val accentColor = DateTimeAccent
             Canvas(
                 modifier = Modifier
                     .fillMaxSize()
@@ -219,8 +223,8 @@ fun NorthIndianChart(
                 val h = size.height
                 val strokeWidth = 2.5f
 
-                val chartLineColor = PrimaryButtonBackground
-                val gridBorderColor = PrimaryButtonBackground.copy(alpha = 0.45f)
+                val chartLineColor = goldColor
+                val gridBorderColor = goldColor.copy(alpha = 0.45f)
 
                 // 1. Draw Background Fills & Highlights
                 for (houseNum in 1..12) {
@@ -239,19 +243,19 @@ fun NorthIndianChart(
                         // Glowing golden highlight for selected house
                         drawPath(
                             path = path,
-                            color = PrimaryButtonBackground.copy(alpha = 0.25f),
+                            color = goldColor.copy(alpha = 0.25f),
                             style = Fill
                         )
                         drawPath(
                             path = path,
-                            color = PrimaryButtonBackground,
+                            color = goldColor,
                             style = Stroke(width = 3.5f)
                         )
                     } else if (houseNum == 1) {
                         // Soft Lagna house fill
                         drawPath(
                             path = path,
-                            color = PrimaryButtonBackground.copy(alpha = 0.08f),
+                            color = goldColor.copy(alpha = 0.08f),
                             style = Fill
                         )
                     }
@@ -310,7 +314,7 @@ fun NorthIndianChart(
                     val rashiMeas = textMeasurer.measure(
                         text = rashiText,
                         style = TextStyle(
-                            color = TextPrimary,
+                            color = textColor,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -325,7 +329,7 @@ fun NorthIndianChart(
                         val lagnaMeas = textMeasurer.measure(
                             text = "लग्न",
                             style = TextStyle(
-                                color = PrimaryButtonBackground,
+                                color = goldColor,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.ExtraBold
                             )
@@ -364,7 +368,7 @@ fun NorthIndianChart(
                             val planetMeas = textMeasurer.measure(
                                 text = detailedText,
                                 style = TextStyle(
-                                    color = DateTimeAccent,
+                                    color = accentColor,
                                     fontSize = fontSizeSp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -380,7 +384,7 @@ fun NorthIndianChart(
                         val planetMeas = textMeasurer.measure(
                             text = planetsText,
                             style = TextStyle(
-                                color = DateTimeAccent,
+                                color = accentColor,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
@@ -414,7 +418,7 @@ fun NorthIndianChart(
                         Text(
                             text = "${String.format(java.util.Locale.US, "%.1f", userScale)}x ${if (userScale > 1.25f) "• अंश/डिग्री" else ""}  रिसेट ↺",
                             style = MaterialTheme.typography.labelSmall.copy(
-                                color = PrimaryButtonBackground,
+                                color = goldColor,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Normal
                             )

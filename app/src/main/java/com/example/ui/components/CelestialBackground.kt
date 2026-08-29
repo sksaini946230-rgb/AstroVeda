@@ -31,7 +31,17 @@ fun CelestialBackground(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    // The cosmic image is a dark night sky. Behind a light theme it reads as a
+    // muddy grey wash and drags the whole screen down, so light mode gets a
+    // plain background instead of the starfield.
+    val isLight = com.example.ui.theme.LocalAstroColors.current.isLight
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        if (!isLight) {
         // Base cosmic background with smooth entry
         AnimatedVisibility(
             visible = showBackground,
@@ -45,7 +55,10 @@ fun CelestialBackground(
             )
         }
         
-        // Gradient overlay for better text readability
+        }
+
+        // Gradient overlay for better text readability. In light mode the image
+        // is absent, so this collapses to a flat wash of the background colour.
         Box(
             modifier = Modifier
                 .fillMaxSize()

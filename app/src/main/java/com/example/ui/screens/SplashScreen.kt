@@ -145,11 +145,14 @@ fun SplashScreen(
         contentAlignment = Alignment.Center
     ) {
         // Floating star particles
+        // Read outside the DrawScope, which is not composable.
+        val starColor = TextPrimary
+        val goldColor = PrimaryButtonBackground
         Canvas(modifier = Modifier.fillMaxSize()) {
             stars.forEach { star ->
                 val offsetY = sin((starTime + star.phase).toDouble()).toFloat() * 8f
                 drawCircle(
-                    color = TextPrimary.copy(alpha = star.alpha),
+                    color = starColor.copy(alpha = star.alpha),
                     radius = star.size,
                     center = Offset(
                         x = star.x * size.width,
@@ -173,8 +176,8 @@ fun SplashScreen(
                     drawCircle(
                         brush = Brush.radialGradient(
                             colors = listOf(
-                                PrimaryButtonBackground.copy(alpha = 0.4f),
-                                PrimaryButtonBackground.copy(alpha = 0.1f),
+                                goldColor.copy(alpha = 0.4f),
+                                goldColor.copy(alpha = 0.1f),
                                 Color.Transparent
                             )
                         ),

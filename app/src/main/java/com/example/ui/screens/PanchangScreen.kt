@@ -165,15 +165,7 @@ fun PanchangScreen(
         }
     }
 
-    // TEMPORARY — light preview of this screen, so the layout can be judged
-    // without the cosmic backdrop. To go back: delete this wrapper and restore
-    // CelestialBackground(deferred = !isStartupComplete) { ... }
-    AstroVedaTheme(darkTheme = false) {
-    androidx.compose.foundation.layout.Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-    ) {
+    CelestialBackground(deferred = !isStartupComplete) {
         Scaffold(
             // The outer Scaffold in MainActivity already applies the status bar inset
             // through TopHeaderBar's statusBarsPadding(). Letting this inner Scaffold
@@ -1007,7 +999,6 @@ fun PanchangScreen(
                 }
             }
         }
-    }
     }
 }
 

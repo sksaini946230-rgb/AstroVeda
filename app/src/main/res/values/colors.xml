@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--
-        Mirrors AppBackground in ui/theme/Color.kt. The window background has to
-        live in XML because it is painted before Compose starts; keep the two in
-        step if the app background ever changes.
+        The window background is painted before Compose starts, so it has to
+        live in XML. Light here, dark in values-night — these mirror
+        LightPalette/DarkPalette.appBackground in ui/theme/Color.kt. Keep the
+        three in step, or the app flashes the wrong colour on cold start.
     -->
-    <color name="app_background">#FF0B0E1A</color>
+    <color name="app_background">#FFFBFAF7</color>
 </resources>
