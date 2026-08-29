@@ -1,5 +1,7 @@
 package com.example.ui.screens
 
+import com.example.ui.components.AstroDisclaimer
+import com.example.ui.components.DisclaimerScope
 import android.content.Intent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -1106,6 +1108,8 @@ fun KundaliScreen(
 
                                 // Horizontal Vimshottari Dasha Timeline
                                     DashaHorizontalTimeline(dashaTimeline = currentChart.dashaTimeline)
+
+                                    AstroDisclaimer(scope = DisclaimerScope.READING)
 
                                     Spacer(modifier = Modifier.height(24.dp))
                             }

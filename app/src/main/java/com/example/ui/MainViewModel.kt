@@ -323,7 +323,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val moreSubTab: StateFlow<Int> = _moreSubTab.asStateFlow()
 
     fun selectTab(tab: AppTab) {
+        val previous = _selectedTab.value
         _selectedTab.value = tab
+        // Show the interstitial on a real transition — when the user is leaving a
+        // result behind — instead of on top of the chart they just asked for.
+        // AdMob's interruptive-ads policy is aimed squarely at the old placement.
+        if (previous != tab) triggerInterstitial()
     }
 
     fun setPanchangSubTab(subTab: Int) {
@@ -702,7 +707,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 val result = KundaliCalculator.generateKundali(birth)
                 _generatedKundali.value = result
                 addRecentSearch("KUNDALI", trimmedName, trimmedDob, trimmedTob, trimmedPlace, lat, lng)
-                triggerInterstitial()
                 incrementLookupCount()
             } catch (e: com.example.astro.BirthDataException) {
                 // A typo in the form is the user's to fix, not a crash to report.
@@ -750,7 +754,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     gName, gDob, gTob
                 )
                 _gunaResult.value = result
-                triggerInterstitial()
                 incrementSessionActionCount()
             } catch (e: Exception) {
                 reportError(e)

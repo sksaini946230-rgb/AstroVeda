@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.MyApplication" parent="android:Theme.DeviceDefault.NoActionBar" />
+    <!--
+        AstroVeda is a dark-only app, but this style used to be an empty
+        DeviceDefault with no windowBackground, so the window was painted in the
+        device's default colour before Compose drew anything. On a phone in light
+        mode that meant a white flash on every cold start, ahead of the dark
+        splash. Painting the window in the app's own background removes it.
+    -->
+    <style name="Theme.MyApplication" parent="android:Theme.DeviceDefault.NoActionBar">
+        <item name="android:windowBackground">@color/app_background</item>
+    </style>
+
 </resources>

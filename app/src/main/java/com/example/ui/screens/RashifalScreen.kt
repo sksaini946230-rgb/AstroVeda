@@ -1,5 +1,7 @@
 package com.example.ui.screens
 
+import com.example.ui.components.AstroDisclaimer
+import com.example.ui.components.DisclaimerScope
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -675,6 +677,8 @@ fun RashifalScreen(viewModel: MainViewModel) {
                 }
             }
         }
+
+        item { AstroDisclaimer(scope = DisclaimerScope.READING) }
 
         item {
             Spacer(modifier = Modifier.height(24.dp))

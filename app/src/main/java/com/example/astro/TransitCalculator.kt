@@ -10,14 +10,11 @@ object TransitCalculator {
      * occupies relative to a person's Moon-rashi (rashiIdx is 0-based: 0=Mesh...11=Meen).
      */
     fun getTransitHouse(rashiIdx: Int, planetName: String, date: Date): Int {
-        val cal = Calendar.getInstance()
-        cal.time = date
-        val year = cal.get(Calendar.YEAR)
-        val month = cal.get(Calendar.MONTH) + 1
-        val day = cal.get(Calendar.DAY_OF_MONTH)
-        val hour = cal.get(Calendar.HOUR_OF_DAY).toDouble()
-
-        val planetDegrees = AstroMath.calculatePlanets(year, month, day, hour)
+        // This used to pull the local clock HOUR (dropping the minutes) and pass it
+        // as if it were Universal Time — a 5.5 hour error in India, which moved the
+        // Moon by three degrees and could land it in the wrong sign entirely.
+        // A Date is already an absolute instant, so convert it directly.
+        val planetDegrees = AstroMath.calculatePlanets(AstroTime.julianDay(date))
         val deg = planetDegrees[planetName] ?: 0.0
         val planetRashiIdx = (deg / 30.0).toInt().coerceIn(0, 11)
 

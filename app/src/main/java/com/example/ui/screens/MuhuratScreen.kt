@@ -1,5 +1,7 @@
 package com.example.ui.screens
 
+import com.example.ui.components.AstroDisclaimer
+import com.example.ui.components.DisclaimerScope
 import com.example.util.LanguageManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -169,6 +171,8 @@ fun MuhuratScreen(viewModel: MainViewModel) {
         items(muhurats) { item ->
             EventMuhuratCard(item)
         }
+
+        item { AstroDisclaimer(scope = DisclaimerScope.TIMINGS) }
 
         item {
             Spacer(modifier = Modifier.height(24.dp))

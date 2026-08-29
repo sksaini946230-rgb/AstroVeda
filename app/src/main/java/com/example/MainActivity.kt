@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.example.ui.AppTab
@@ -78,44 +79,78 @@ class MainActivity : ComponentActivity() {
 
     private val requestNotificationPermissionLauncher =
         registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { isGranted ->
-            if (isGranted) {
-                com.example.worker.AstroNotificationWorker.scheduleDailyNotification(this)
-                com.example.worker.FestivalNotificationWorker.scheduleFestivalNotification(this)
-                com.example.worker.MuhuratNotificationWorker.scheduleMuhuratNotification(this)
+            if (isGranted) scheduleNotificationWorkers()
+        }
+
+    private fun scheduleNotificationWorkers() {
+        try {
+            com.example.worker.AstroNotificationWorker.scheduleDailyNotification(this)
+            com.example.worker.FestivalNotificationWorker.scheduleFestivalNotification(this)
+            com.example.worker.MuhuratNotificationWorker.scheduleMuhuratNotification(this)
+        } catch (_: Throwable) {
+            // Scheduling is best-effort; a failure here must not take the app down.
+        }
+    }
+
+    /**
+     * Asks for notification permission — but only after onboarding.
+     *
+     * This used to fire from onCreate on the very first cold start, before the
+     * splash had even cleared, so the system dialog appeared over a screen that
+     * had not yet explained what the app does. Android only ever shows that dialog
+     * once, so a reflexive "Don't allow" there is permanent.
+     */
+    private fun requestNotificationPermissionIfNeeded() {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.TIRAMISU) {
+            scheduleNotificationWorkers()
+            return
+        }
+        val granted = androidx.core.content.ContextCompat.checkSelfPermission(
+            this, android.Manifest.permission.POST_NOTIFICATIONS
+        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+
+        if (granted) {
+            scheduleNotificationWorkers()
+        } else {
+            try {
+                requestNotificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            } catch (_: Throwable) {
             }
         }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // Restore the user's language before anything composes, or the first frame
+        // renders in Hindi regardless of what they chose during onboarding.
+        com.example.util.LanguageManager.init(applicationContext)
 
         try {
             com.example.util.AstroAnalytics.init(applicationContext)
             com.example.util.AstroAnalytics.logAppOpen()
         } catch (_: Throwable) {}
 
+        // Gather ad consent BEFORE initialising the ads SDK. UMP works this out by
+        // region, so it is a no-op in India and shows the form in the EEA/UK, where
+        // serving ads without one is an AdMob policy violation.
         try {
-            MobileAds.initialize(this) {}
-            loadInterstitialAd()
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                if (androidx.core.content.ContextCompat.checkSelfPermission(
-                        this,
-                        android.Manifest.permission.POST_NOTIFICATIONS
-                    ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-                ) {
-                    com.example.worker.AstroNotificationWorker.scheduleDailyNotification(this)
-                    com.example.worker.FestivalNotificationWorker.scheduleFestivalNotification(this)
-                    com.example.worker.MuhuratNotificationWorker.scheduleMuhuratNotification(this)
-                } else {
-                    requestNotificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            com.example.service.AdConsentManager.gatherConsent(this) {
+                try {
+                    MobileAds.initialize(this) {}
+                    loadInterstitialAd()
+                } catch (e: Throwable) {
+                    // fail gracefully
                 }
-            } else {
-                com.example.worker.AstroNotificationWorker.scheduleDailyNotification(this)
-                com.example.worker.FestivalNotificationWorker.scheduleFestivalNotification(this)
-                com.example.worker.MuhuratNotificationWorker.scheduleMuhuratNotification(this)
             }
         } catch (e: Throwable) {
-            // fail gracefully
+            // If consent gathering itself blows up, do not silently lose all ads.
+            try {
+                MobileAds.initialize(this) {}
+                loadInterstitialAd()
+            } catch (_: Throwable) {
+            }
         }
 
         lifecycleScope.launch {
@@ -150,11 +185,34 @@ class MainActivity : ComponentActivity() {
                 } else if (!isOnboardingCompleted) {
                     OnboardingScreen(
                         viewModel = mainViewModel,
-                        onComplete = { mainViewModel.completeOnboarding() }
+                        onComplete = {
+                            mainViewModel.completeOnboarding()
+                            // Now the user knows what daily Panchang alerts are for.
+                            requestNotificationPermissionIfNeeded()
+                        }
                     )
                 } else if (isFirstRunSyncing) {
                     FirstRunSyncingOverlay()
                 } else {
+                    // The app had no back handling at all — no BackHandler anywhere,
+                    // and tabs are plain state rather than a nav graph — so pressing
+                    // Back on any tab but Panchang closed the app outright. Back now
+                    // dismisses whatever is open, then walks home, and only exits
+                    // from Panchang itself.
+                    androidx.activity.compose.BackHandler(enabled = true) {
+                        when {
+                            showPremium -> mainViewModel.showPremiumDialog.value = false
+                            showRateUsDialog -> mainViewModel.dismissRateUs()
+                            selectedTab != AppTab.PANCHANG -> mainViewModel.selectTab(AppTab.PANCHANG)
+                            else -> finish()
+                        }
+                    }
+
+                    // Notifications are requested once onboarding is behind us; for a
+                    // returning user that happened on an earlier launch, so make sure
+                    // the workers are scheduled either way.
+                    LaunchedEffect(Unit) { requestNotificationPermissionIfNeeded() }
+
                     Scaffold(
                         modifier = Modifier.fillMaxSize(),
                         topBar = {

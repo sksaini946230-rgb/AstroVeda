@@ -35,12 +35,13 @@
     </LinearLayout>
 
     <!-- Spiritual Divider -->
-    <View
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="1.5dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="12dp"
-        android:background="#40D4A84B" />
+        android:background="#40D4A84B"
+        android:importantForAccessibility="no" />
 
     <!-- Tithi Row -->
     <LinearLayout
@@ -54,7 +55,7 @@
             android:layout_height="wrap_content"
             android:text="CURRENT TITHI / तिथि"
             android:textColor="#D4A84B"
-            android:textSize="10sp"
+            android:textSize="11sp"
             android:textStyle="bold"
             android:letterSpacing="0.05" />
 
@@ -92,7 +93,7 @@
             android:layout_height="wrap_content"
             android:text="CURRENT NAKSHATRA / नक्षत्र"
             android:textColor="#D4A84B"
-            android:textSize="10sp"
+            android:textSize="11sp"
             android:textStyle="bold"
             android:letterSpacing="0.05" />
 
@@ -182,12 +183,13 @@
     </LinearLayout>
 
     <!-- Footer Row (Location / Status) -->
-    <View
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="2dp"
         android:layout_marginBottom="6dp"
-        android:background="#20F5EDD6" />
+        android:background="#20F5EDD6"
+        android:importantForAccessibility="no" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -213,7 +215,7 @@
             android:layout_height="wrap_content"
             android:text="Panchang"
             android:textColor="#D4A84B"
-            android:textSize="10sp"
+            android:textSize="11sp"
             android:textStyle="bold" />
     </LinearLayout>
 

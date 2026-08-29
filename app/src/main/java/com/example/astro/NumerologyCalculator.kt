@@ -22,6 +22,19 @@ object NumerologyCalculator {
         9 to Pair("मूलांक 9 के स्वामी पराक्रमी मंगल देव हैं। आप ऊर्जावान, निर्भीक, देशभक्त एवं रक्षक स्वभाव के होते हैं। सेना, पुलिस, खेल एवं रियल एस्टेट में नाम कमाते हैं।", "भाग्यशाली दिन: मंगलवार एवं रविवार। शुभ रंग: लाल एवं नारंगी।")
     )
 
+    /** Matches the "शुभ रंग" already stated in each moolank's own reading text. */
+    private val LUCKY_COLOURS_HI = mapOf(
+        1 to "पीला एवं केसरिया",
+        2 to "सफेद एवं हल्का हरा",
+        3 to "पीला एवं सुनहरा",
+        4 to "नीला एवं सलेटी",
+        5 to "हरा एवं हल्का पीला",
+        6 to "गुलाबी एवं सफेद",
+        7 to "हल्का पीला एवं सफेद",
+        8 to "गहरा नीला एवं काला",
+        9 to "लाल एवं नारंगी"
+    )
+
     fun calculateNumerology(name: String, dobString: String): NumerologyData {
         val digits = dobString.filter { it.isDigit() }
 
@@ -40,8 +53,15 @@ object NumerologyCalculator {
         }
         val bhagyank = if (bhagyankSum == 0) 1 else bhagyankSum
 
-        // Name number
-        val nameDigits = name.uppercase().map { char ->
+        // Name number.
+        // Devanagari is transliterated first: the Chaldean table below only covers
+        // A-Z, so a name typed in Hindi used to sum to zero and always come out as 1.
+        val latinName = if (DevanagariTransliterator.containsDevanagari(name)) {
+            DevanagariTransliterator.transliterate(name)
+        } else {
+            name
+        }
+        val nameDigits = latinName.uppercase().map { char ->
             when (char) {
                 'A', 'I', 'J', 'Q', 'Y' -> 1
                 'B', 'K', 'R' -> 2
@@ -95,7 +115,10 @@ object NumerologyCalculator {
             nameNumber = nameNum,
             rulingPlanetHi = rulingPlanet,
             luckyDaysHi = readingPair.second,
-            luckyColorsHi = "पीला, लाल, सफेद एवं सुनहरा",
+            // This was hardcoded to the same string for all nine moolanks, which
+            // contradicted the per-moolank "शुभ रंग" already written into each
+            // reading above — the app disagreed with itself on the same screen.
+            luckyColorsHi = LUCKY_COLOURS_HI[moolank] ?: "पीला एवं सुनहरा",
             friendlyNumbers = friendly,
             enemyNumbers = enemy,
             moolankReadingHi = readingPair.first,

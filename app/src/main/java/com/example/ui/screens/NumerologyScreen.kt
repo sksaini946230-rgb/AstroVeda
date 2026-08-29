@@ -1,5 +1,7 @@
 package com.example.ui.screens
 
+import com.example.ui.components.AstroDisclaimer
+import com.example.ui.components.DisclaimerScope
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -338,6 +340,8 @@ fun NumerologyScreen(viewModel: MainViewModel) {
                             }
                         }
                     )
+
+                    AstroDisclaimer(scope = DisclaimerScope.AI)
 
                     if (aiResponse.isNotBlank()) {
                         val isAiOffline by viewModel.isAiOffline.collectAsState()

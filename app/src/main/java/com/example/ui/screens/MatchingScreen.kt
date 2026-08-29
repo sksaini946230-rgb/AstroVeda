@@ -1,5 +1,7 @@
 package com.example.ui.screens
 
+import com.example.ui.components.AstroDisclaimer
+import com.example.ui.components.DisclaimerScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -534,6 +536,8 @@ fun MatchingScreen(viewModel: MainViewModel) {
                         }
                     }
                 }
+
+                item { AstroDisclaimer(scope = DisclaimerScope.MATCHING) }
 
                 // Birth Attributes Comparison Card
                 item {

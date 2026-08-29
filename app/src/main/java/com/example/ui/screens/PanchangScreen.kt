@@ -1,5 +1,7 @@
 package com.example.ui.screens
 
+import com.example.ui.components.AstroDisclaimer
+import com.example.ui.components.DisclaimerScope
 import android.Manifest
 import android.content.pm.PackageManager
 import android.view.HapticFeedbackConstants
@@ -957,6 +959,8 @@ fun PanchangScreen(
                                 item {
                                     PlanetaryPositionsCard(planets = panchang.planets)
                                 }
+
+                                item { AstroDisclaimer(scope = DisclaimerScope.TIMINGS) }
 
                                 item {
                                     Spacer(modifier = Modifier.height(24.dp))

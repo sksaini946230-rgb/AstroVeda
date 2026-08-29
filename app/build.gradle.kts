@@ -131,6 +131,9 @@ dependencies {
   implementation(libs.okhttp)
   implementation(libs.play.services.location)
   implementation(libs.play.services.ads)
+  // Google's consent SDK. AdMob requires a consent mechanism for EEA/UK users and
+  // there was none, which is an AdMob policy violation wherever the app is served there.
+  implementation(libs.user.messaging.platform)
   implementation(libs.play.review.ktx)
   implementation(libs.billing.ktx)
   implementation(libs.androidx.work.runtime.ktx)

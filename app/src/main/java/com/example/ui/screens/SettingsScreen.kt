@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import android.content.Intent
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
@@ -1293,10 +1294,36 @@ fun SettingsScreen(
                     AndroidView(
                         factory = { ctx ->
                             WebView(ctx).apply {
-                                webViewClient = WebViewClient()
-                                settings.javaScriptEnabled = true
-                                settings.domStorageEnabled = true
+                                // These two pages are static HTML in assets/. They have
+                                // no scripts and no links, so JavaScript and DOM storage
+                                // bought nothing and only widened the attack surface.
+                                settings.javaScriptEnabled = false
+                                settings.domStorageEnabled = false
+                                settings.allowFileAccessFromFileURLs = false
+                                settings.allowUniversalAccessFromFileURLs = false
                                 settings.cacheMode = android.webkit.WebSettings.LOAD_DEFAULT
+                                webViewClient = object : WebViewClient() {
+                                    // Keep this view pinned to the bundled legal pages;
+                                    // anything else opens in the user's browser.
+                                    override fun shouldOverrideUrlLoading(
+                                        view: WebView,
+                                        request: android.webkit.WebResourceRequest
+                                    ): Boolean {
+                                        val url = request.url.toString()
+                                        if (url == LOCAL_PRIVACY_POLICY_URL || url == LOCAL_TERMS_OF_SERVICE_URL) {
+                                            return false
+                                        }
+                                        return try {
+                                            ctx.startActivity(
+                                                Intent(Intent.ACTION_VIEW, request.url)
+                                                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                            )
+                                            true
+                                        } catch (_: Exception) {
+                                            true
+                                        }
+                                    }
+                                }
                                 loadUrl(webViewUrlToOpen ?: LOCAL_PRIVACY_POLICY_URL)
                             }
                         },

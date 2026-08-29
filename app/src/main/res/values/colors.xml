@@ -1,3 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--
+        Mirrors AppBackground in ui/theme/Color.kt. The window background has to
+        live in XML because it is painted before Compose starts; keep the two in
+        step if the app background ever changes.
+    -->
+    <color name="app_background">#FF0B0E1A</color>
 </resources>

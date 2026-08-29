@@ -199,6 +199,15 @@ class BillingManager(
                             handlePurchase(purchase)
                         }
                     }
+                    // This is the only place Pro can be taken away, and it used to
+                    // compute hasActiveSubscription and then throw it away — so an
+                    // expired, cancelled or refunded subscription stayed Pro forever
+                    // and the ads never came back. Play answered OK here, meaning
+                    // this list is authoritative, so an absent subscription is a
+                    // real absence rather than a connectivity blip.
+                    if (!hasActiveSubscription) {
+                        coroutineScope.launch { onPremiumUnlocked(false) }
+                    }
                 }
             }
         } catch (e: Throwable) {

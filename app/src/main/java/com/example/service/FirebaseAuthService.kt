@@ -65,6 +65,20 @@ class FirebaseAuthService {
             } else {
                 Result.failure(Exception("Unsupported credential type"))
             }
+        } catch (e: androidx.credentials.exceptions.NoCredentialException) {
+            // No Google account is set up on this device, or the user has none that
+            // matches. This is not an error to log as a failure — it needs a
+            // different message than "sign-in failed", which is what it used to get.
+            Log.i("FirebaseAuthService", "No Google credential available on this device")
+            Result.failure(
+                Exception(
+                    "इस डिवाइस पर कोई Google खाता नहीं मिला। कृपया Settings में Google खाता जोड़ें और दोबारा प्रयास करें। " +
+                        "(No Google account found on this device. Add one in Settings and try again.)"
+                )
+            )
+        } catch (e: androidx.credentials.exceptions.GetCredentialCancellationException) {
+            Log.i("FirebaseAuthService", "Sign-in cancelled by user")
+            Result.failure(Exception("साइन-इन रद्द किया गया। (Sign-in cancelled.)"))
         } catch (e: Exception) {
             Log.e("FirebaseAuthService", "Google Sign-In failed", e)
             Result.failure(e)
