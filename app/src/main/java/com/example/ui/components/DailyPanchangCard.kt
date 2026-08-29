@@ -1,5 +1,12 @@
 package com.example.ui.components
 
+import com.example.data.model.tithiLocal
+import com.example.data.model.nakshatraLocal
+import com.example.data.model.yogaLocal
+import com.example.data.model.karanaLocal
+import com.example.data.model.masaLocal
+import com.example.data.model.pakshaLocal
+import com.example.data.model.varaLocal
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
@@ -266,7 +273,7 @@ fun DailyPanchangCard(
                             )
                         )
                         Text(
-                            text = panchang.tithiHindi,
+                            text = panchang.tithiLocal,
                             style = MaterialTheme.typography.titleSmall.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary,
@@ -295,7 +302,7 @@ fun DailyPanchangCard(
                             )
                         )
                         Text(
-                            text = panchang.nakshatraHindi,
+                            text = panchang.nakshatraLocal,
                             style = MaterialTheme.typography.titleSmall.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.secondary,
@@ -303,7 +310,7 @@ fun DailyPanchangCard(
                             )
                         )
                         Text(
-                            text = "चरण ${panchang.nakshatraPada} • ${panchang.nakshatraEndTime}",
+                            text = LanguageManager.getString("चरण ${panchang.nakshatraPada} • ${panchang.nakshatraEndTime}", "Pada ${panchang.nakshatraPada} • ${panchang.nakshatraEndTime}"),
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontSize = 11.sp
@@ -357,7 +364,8 @@ fun DailyPanchangCard(
                             }
 
                             GlassBadge(
-                                text = if (moonPhaseInfo.isWaxing) "वर्धमान 📈" else "क्षीण 📉",
+                                text = if (moonPhaseInfo.isWaxing) LanguageManager.getString("वर्धमान 📈", "Waxing 📈")
+                                       else LanguageManager.getString("क्षीण 📉", "Waning 📉"),
                                 textColor = if (moonPhaseInfo.isWaxing) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
                                 borderColor = if (moonPhaseInfo.isWaxing) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
                             )
@@ -372,7 +380,7 @@ fun DailyPanchangCard(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = "प्रकाशिता (Illumination)",
+                                text = LanguageManager.getString("प्रकाशिता", "ILLUMINATION"),
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     fontSize = 10.sp
@@ -418,17 +426,17 @@ fun DailyPanchangCard(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     GlassBadge(
-                        text = "पक्ष: ${panchang.pakshaHindi}",
+                        text = LanguageManager.getString("पक्ष: ${panchang.pakshaLocal}", "Paksha: ${panchang.pakshaLocal}"),
                         textColor = MaterialTheme.colorScheme.primary,
                         borderColor = MaterialTheme.colorScheme.primary
                     )
                     GlassBadge(
-                        text = "मास: ${panchang.masaNameHindi}",
+                        text = LanguageManager.getString("मास: ${panchang.masaLocal}", "Month: ${panchang.masaLocal}"),
                         textColor = MaterialTheme.colorScheme.secondary,
                         borderColor = MaterialTheme.colorScheme.secondary
                     )
                     GlassBadge(
-                        text = "वार: ${panchang.dayOfWeekHindi}",
+                        text = LanguageManager.getString("वार: ${panchang.varaLocal}", "Day: ${panchang.varaLocal}"),
                         textColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         borderColor = MaterialTheme.colorScheme.outline
                     )

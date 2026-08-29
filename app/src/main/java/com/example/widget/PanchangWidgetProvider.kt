@@ -1,5 +1,12 @@
 package com.example.widget
 
+import com.example.data.model.tithiLocal
+import com.example.data.model.nakshatraLocal
+import com.example.data.model.yogaLocal
+import com.example.data.model.karanaLocal
+import com.example.data.model.masaLocal
+import com.example.data.model.pakshaLocal
+import com.example.data.model.varaLocal
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
@@ -56,13 +63,13 @@ class PanchangWidgetProvider : AppWidgetProvider() {
                 setTextViewText(R.id.widget_date, dateStr)
                 setTextViewText(R.id.widget_sunrise, panchang.sunrise)
                 setTextViewText(R.id.widget_sunset, panchang.sunset)
-                setTextViewText(R.id.widget_tithi, panchang.tithiHindi)
-                setTextViewText(R.id.widget_nakshatra, panchang.nakshatraHindi)
+                setTextViewText(R.id.widget_tithi, panchang.tithiLocal)
+                setTextViewText(R.id.widget_nakshatra, panchang.nakshatraLocal)
 
                 val moonPhase = PanchangCalculator.getMoonPhaseInfo(panchang.pakshaHindi, panchang.tithiHindi)
                 setTextViewText(R.id.widget_moon_phase, "${moonPhase.emoji} ${moonPhase.nameHindi} • ${moonPhase.illuminationPercent}%")
 
-                setTextViewText(R.id.widget_masa, "${panchang.masaNameHindi} | ${panchang.pakshaHindi}")
+                setTextViewText(R.id.widget_masa, "${panchang.masaLocal} | ${panchang.pakshaLocal}")
                 setTextViewText(R.id.widget_location, "📍 ${panchang.locationName}")
 
                 val mainIntent = Intent(context, MainActivity::class.java).apply {

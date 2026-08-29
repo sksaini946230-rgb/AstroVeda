@@ -387,10 +387,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     // Language Toggle & Selection
     fun toggleLanguage() {
         LanguageManager.toggleLanguage()
+        onLanguageChanged()
     }
 
     fun setLanguage(lang: com.example.util.AppLanguage) {
         LanguageManager.setLanguage(lang)
+        onLanguageChanged()
+    }
+
+    /**
+     * Some strings are baked in when the Panchang is computed and then cached —
+     * the Tithi and Nakshatra end times, for instance, which read "09:57 AM तक"
+     * in Hindi and "until 09:57 AM" in English. Recomposition alone cannot fix
+     * those: the cached row still holds the text from whichever language was in
+     * force when it was written. So a language change forces a recompute.
+     */
+    private fun onLanguageChanged() {
+        recalculatePanchang(forceRefresh = true)
+        loadHoroscopesWithCache(forceRefresh = true)
     }
 
     // Selected City Location for Panchang

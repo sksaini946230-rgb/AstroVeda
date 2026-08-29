@@ -69,7 +69,7 @@ fun SplashScreen(
     val nameAlpha = remember { Animatable(0f) }
     val taglineCharCount = remember { mutableIntStateOf(0) }
 
-    val fullTagline = "ज्योतिष की शक्ति"
+    val fullTagline = com.example.util.LanguageManager.getString("ज्योतिष की शक्ति", "The power of Jyotish")
 
     // Gold glow pulsing
     val infiniteTransition = rememberInfiniteTransition(label = "glow")

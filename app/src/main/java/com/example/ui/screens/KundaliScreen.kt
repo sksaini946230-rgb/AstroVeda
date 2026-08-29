@@ -224,8 +224,8 @@ fun TransitScreen(viewModel: MainViewModel) {
 
                                 Row(modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
                                     Text(text = LanguageManager.getString(transitPlanet.planetNameHi.substringBefore(" "), transitPlanet.planetNameEn), style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp), modifier = Modifier.weight(1f))
-                                    Text(text = birthPlanet?.rashiNameHi ?: "-", style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 13.sp), modifier = Modifier.weight(1f))
-                                    Text(text = transitPlanet.rashiNameHi, style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Normal), modifier = Modifier.weight(1f))
+                                    Text(text = birthPlanet?.let { LanguageManager.getString(it.rashiNameHi, it.rashiNameEn) } ?: "-", style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 13.sp), modifier = Modifier.weight(1f))
+                                    Text(text = LanguageManager.getString(transitPlanet.rashiNameHi, transitPlanet.rashiNameEn), style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Normal), modifier = Modifier.weight(1f))
 
                                     // House of transit relative to birth Lagna
                                     val transitHouse = ((transitPlanet.rashiNumber - validBirthKundali.ascendantRashiNumber + 12) % 12) + 1
@@ -864,8 +864,8 @@ fun KundaliScreen(
                                                 modifier = Modifier.fillMaxWidth(),
                                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                                             ) {
-                                                GlassBadge(text = "लग्न: ${currentChart.ascendantRashiHi}")
-                                                GlassBadge(text = "राशि: ${currentChart.moonRashiHi}")
+                                                GlassBadge(text = LanguageManager.getString("लग्न: ${currentChart.ascendantRashiHi}", "Lagna: ${currentChart.ascendantRashiEn}"))
+                                                GlassBadge(text = LanguageManager.getString("चंद्र राशि: ${currentChart.moonRashiHi}", "Moon sign: ${currentChart.moonRashiEn}"))
                                                 GlassBadge(text = "नक्षत्र: ${currentChart.moonNakshatraHi}")
                                             }
 
@@ -1098,7 +1098,7 @@ fun KundaliScreen(
                                             currentChart.planets.forEach { planet ->
                                                 Row(modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
                                                     Text(text = LanguageManager.getString(planet.planetNameHi.substringBefore(" "), planet.planetNameEn), style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp), modifier = Modifier.weight(1f))
-                                                    Text(text = planet.rashiNameHi, style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp), modifier = Modifier.weight(1.2f))
+                                                    Text(text = LanguageManager.getString(planet.rashiNameHi, planet.rashiNameEn), style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp), modifier = Modifier.weight(1.2f))
                                                     Text(text = "${planet.degree}°", style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.primary, fontSize = 14.sp, fontWeight = FontWeight.Normal), modifier = Modifier.weight(1f))
                                                     Text(text = "${planet.houseNumber} भाव", style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp), modifier = Modifier.weight(1f))
                                                 }

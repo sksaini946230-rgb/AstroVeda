@@ -1,5 +1,12 @@
 package com.example.ui.screens
 
+import com.example.data.model.tithiLocal
+import com.example.data.model.nakshatraLocal
+import com.example.data.model.yogaLocal
+import com.example.data.model.karanaLocal
+import com.example.data.model.masaLocal
+import com.example.data.model.pakshaLocal
+import com.example.data.model.varaLocal
 import com.example.ui.components.AstroDisclaimer
 import com.example.ui.components.DisclaimerScope
 import android.Manifest
@@ -185,7 +192,7 @@ fun PanchangScreen(
                         onRefresh = { viewModel.refreshPanchang() },
                         modifier = Modifier.fillMaxSize().testTag("panchang_swipe_refresh")
                     ) {
-                        if (isPanchangLoading && panchang.tithiHindi.isBlank()) {
+                        if (isPanchangLoading && panchang.tithiLocal.isBlank()) {
                             PanchangLoadingSkeleton(modifier = Modifier.fillMaxSize())
                         } else {
                             LazyColumn(
@@ -253,7 +260,7 @@ fun PanchangScreen(
                                                         )
                                                     )
                                                     Text(
-                                                        text = "${panchang.dayOfWeekHindi} | ${panchang.pakshaHindi}",
+                                                        text = "${panchang.varaLocal} | ${panchang.pakshaLocal}",
                                                         style = MaterialTheme.typography.bodyMedium.copy(
                                                             color = MaterialTheme.colorScheme.onSurface,
                                                             fontWeight = FontWeight.Normal
@@ -407,7 +414,7 @@ fun PanchangScreen(
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
                                             Text(
-                                                text = "✨ दैनिक ज्योतिष अंतर्दृष्टि (Swipe Cards) ✨",
+                                                text = LanguageManager.getString("✨ दैनिक ज्योतिष अंतर्दृष्टि ✨", "✨ Daily Insights ✨"),
                                                 style = MaterialTheme.typography.titleSmall.copy(
                                                     fontWeight = FontWeight.Bold,
                                                     color = MaterialTheme.colorScheme.primary
@@ -453,15 +460,18 @@ fun PanchangScreen(
                                                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                                                     Icon(Icons.Default.Lightbulb, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                                                                     Spacer(modifier = Modifier.width(8.dp))
-                                                                    Text("आज का शुभ विचार व पंचांग ज्ञान", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary, fontSize = 15.sp)
+                                                                    Text(LanguageManager.getString("आज का शुभ विचार व पंचांग ज्ञान", "Today’s Panchang Insight"), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary, fontSize = 15.sp)
                                                                 }
                                                                 Text(
-                                                                    text = "तिथि ${panchang.tithiHindi} (${panchang.pakshaHindi}) में शुभ कार्यों का शुभारंभ फलदायी रहता है। आज ${panchang.nakshatraHindi} नक्षत्र एवं ${panchang.yogaHindi} योग का प्रभाव रहेगा।",
+                                                                    text = LanguageManager.getString(
+                                                                        "तिथि ${panchang.tithiLocal} (${panchang.pakshaLocal}) में शुभ कार्यों का शुभारंभ फलदायी रहता है। आज ${panchang.nakshatraLocal} नक्षत्र एवं ${panchang.yogaLocal} योग का प्रभाव रहेगा।",
+                                                                        "${panchang.tithiLocal} (${panchang.pakshaLocal}) is favourable for beginning auspicious work. Today carries the influence of ${panchang.nakshatraLocal} Nakshatra and ${panchang.yogaLocal} Yoga."
+                                                                    ),
                                                                     style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 13.sp, lineHeight = 19.sp)
                                                                 )
                                                                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                                                    GlassBadge("सूर्योदय: ${panchang.sunrise}")
-                                                                    GlassBadge("सूर्यास्त: ${panchang.sunset}")
+                                                                    GlassBadge(LanguageManager.getString("सूर्योदय: ${panchang.sunrise}", "Sunrise: ${panchang.sunrise}"))
+                                                                    GlassBadge(LanguageManager.getString("सूर्यास्त: ${panchang.sunset}", "Sunset: ${panchang.sunset}"))
                                                                 }
                                                             }
                                                         }
@@ -473,11 +483,14 @@ fun PanchangScreen(
                                                                     Text("चंद्र कला व राहु काल सतर्कता", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary, fontSize = 15.sp)
                                                                 }
                                                                 Text(
-                                                                    text = "चंद्र राशि: ${panchang.moonSign} (${panchang.pakshaHindi})। चंद्रोदय: ${panchang.moonrise}।",
+                                                                    text = LanguageManager.getString(
+                                                                        "चंद्र राशि: ${panchang.moonSign} (${panchang.pakshaLocal})। चंद्रोदय: ${panchang.moonrise}।",
+                                                                        "Moon sign: ${panchang.moonSign} (${panchang.pakshaLocal}). Moonrise: ${panchang.moonrise}."
+                                                                    ),
                                                                     style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 13.sp)
                                                                 )
                                                                 GlassBadge(
-                                                                    text = "⚠️ राहु काल: ${panchang.rahuKaal} (अशुभ समय)",
+                                                                    text = LanguageManager.getString("⚠️ राहु काल: ${panchang.rahuKaal} (अशुभ समय)", "⚠️ Rahu Kaal: ${panchang.rahuKaal} (avoid)"),
                                                                     textColor = RahuKaalDangerColor,
                                                                     borderColor = RahuKaalDangerColor
                                                                 )
@@ -491,11 +504,14 @@ fun PanchangScreen(
                                                                     Text("चौघड़िया व शुभ मुहूर्त विचार", fontWeight = FontWeight.Bold, color = ShubhSuccessColor, fontSize = 15.sp)
                                                                 }
                                                                 Text(
-                                                                    text = "अभिजीत मुहूर्त: ${panchang.abhijitMuhurat} (सर्वश्रेष्ठ मुहूर्त)। आज यमगण्‍ड काल ${panchang.yamaganda} में रहेगा।",
+                                                                    text = LanguageManager.getString(
+                                                                        "अभिजीत मुहूर्त: ${panchang.abhijitMuhurat} (सर्वश्रेष्ठ मुहूर्त)। आज यमगण्‍ड काल ${panchang.yamaganda} में रहेगा।",
+                                                                        "Abhijit Muhurta: ${panchang.abhijitMuhurat} (the most auspicious window). Yamaganda runs ${panchang.yamaganda} today."
+                                                                    ),
                                                                     style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 13.sp)
                                                                 )
                                                                 GlassBadge(
-                                                                    text = "🌟 अभिजीत मुहूर्त: ${panchang.abhijitMuhurat}",
+                                                                    text = LanguageManager.getString("🌟 अभिजीत मुहूर्त: ${panchang.abhijitMuhurat}", "🌟 Abhijit Muhurta: ${panchang.abhijitMuhurat}"),
                                                                     textColor = ShubhSuccessColor,
                                                                     borderColor = ShubhSuccessColor
                                                                 )
@@ -509,7 +525,10 @@ fun PanchangScreen(
                                                                     Text("नक्षत्र ऊर्जा व गोचर प्रभाव", fontWeight = FontWeight.Bold, color = PrimaryButtonBackground, fontSize = 15.sp)
                                                                 }
                                                                 Text(
-                                                                    text = "नक्षत्र ${panchang.nakshatraHindi} (चरण ${panchang.nakshatraPada}) चंद्र प्रभाव ${panchang.moonSign} राशि में कार्यसिद्धि प्रदान करता है।",
+                                                                    text = LanguageManager.getString(
+                                                                        "नक्षत्र ${panchang.nakshatraLocal} (चरण ${panchang.nakshatraPada}) चंद्र प्रभाव ${panchang.moonSign} राशि में कार्यसिद्धि प्रदान करता है।",
+                                                                        "${panchang.nakshatraLocal} Nakshatra (Pada ${panchang.nakshatraPada}) with the Moon in ${panchang.moonSign} supports getting things done."
+                                                                    ),
                                                                     style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 13.sp)
                                                                 )
                                                                 GlassBadge("सूर्य राशि: ${panchang.sunSign}", textColor = PrimaryButtonBackground, borderColor = PrimaryButtonBackground)
@@ -530,9 +549,9 @@ fun PanchangScreen(
                                             horizontalArrangement = Arrangement.SpaceAround,
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            InfoPill("विक्रम संवत", "${panchang.vikramSamvat}")
-                                            InfoPill("शक संवत", "${panchang.sakaSamvat}")
-                                            InfoPill("मास (Month)", panchang.masaNameHindi.substringBefore(" "))
+                                            InfoPill(LanguageManager.getString("विक्रम संवत", "Vikram Samvat"), "${panchang.vikramSamvat}")
+                                            InfoPill(LanguageManager.getString("शक संवत", "Saka Samvat"), "${panchang.sakaSamvat}")
+                                            InfoPill(LanguageManager.getString("मास", "Month"), panchang.masaLocal)
                                         }
                                     }
                                 }
@@ -558,14 +577,14 @@ fun PanchangScreen(
                                                     verticalAlignment = Alignment.CenterVertically
                                                 ) {
                                                     Text(
-                                                        text = "तिथि (Tithi)",
+                                                        text = LanguageManager.getString("तिथि", "TITHI"),
                                                         style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 13.sp)
                                                     )
-                                                    GlassBadge(text = panchang.pakshaHindi.substringBefore(" "))
+                                                    GlassBadge(text = panchang.pakshaLocal.substringBefore(" "))
                                                 }
                                                 Spacer(modifier = Modifier.height(4.dp))
                                                 Text(
-                                                    text = panchang.tithiHindi,
+                                                    text = panchang.tithiLocal,
                                                     style = MaterialTheme.typography.titleMedium.copy(
                                                         fontWeight = FontWeight.Bold,
                                                         color = MaterialTheme.colorScheme.primary,
@@ -598,14 +617,14 @@ fun PanchangScreen(
                                                     verticalAlignment = Alignment.CenterVertically
                                                 ) {
                                                     Text(
-                                                        text = "नक्षत्र (Nakshatra)",
+                                                        text = LanguageManager.getString("नक्षत्र", "NAKSHATRA"),
                                                         style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 13.sp)
                                                     )
-                                                    GlassBadge(text = "चंद्र नक्षत्र: ${panchang.moonSign}")
+                                                    GlassBadge(text = LanguageManager.getString("चंद्र राशि: ${panchang.moonSign}", "Moon sign: ${panchang.moonSign}"))
                                                 }
                                                 Spacer(modifier = Modifier.height(4.dp))
                                                 Text(
-                                                    text = "${panchang.nakshatraHindi} (चरण ${panchang.nakshatraPada})",
+                                                    text = LanguageManager.getString("${panchang.nakshatraLocal} (चरण ${panchang.nakshatraPada})", "${panchang.nakshatraLocal} (Pada ${panchang.nakshatraPada})"),
                                                     style = MaterialTheme.typography.titleMedium.copy(
                                                         fontWeight = FontWeight.Bold,
                                                         color = MaterialTheme.colorScheme.primary,
@@ -634,12 +653,12 @@ fun PanchangScreen(
                                             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                                                 Column(modifier = Modifier.weight(1f)) {
                                                     Text(
-                                                        text = "योग (Yoga)",
+                                                        text = LanguageManager.getString("योग", "YOGA"),
                                                         style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
                                                     )
                                                     Spacer(modifier = Modifier.height(4.dp))
                                                     Text(
-                                                        text = panchang.yogaHindi,
+                                                        text = panchang.yogaLocal,
                                                         style = MaterialTheme.typography.titleSmall.copy(
                                                             fontWeight = FontWeight.Bold,
                                                             color = MaterialTheme.colorScheme.primary,
@@ -649,12 +668,12 @@ fun PanchangScreen(
                                                 }
                                                 Column(modifier = Modifier.weight(1f)) {
                                                     Text(
-                                                        text = "करण (Karan)",
+                                                        text = LanguageManager.getString("करण", "KARANA"),
                                                         style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
                                                     )
                                                     Spacer(modifier = Modifier.height(4.dp))
                                                     Text(
-                                                        text = panchang.karanHindi,
+                                                        text = panchang.karanaLocal,
                                                         style = MaterialTheme.typography.titleSmall.copy(
                                                             fontWeight = FontWeight.Bold,
                                                             color = MaterialTheme.colorScheme.primary,
@@ -681,10 +700,10 @@ fun PanchangScreen(
                                             modifier = Modifier.fillMaxWidth(),
                                             horizontalArrangement = Arrangement.SpaceBetween
                                         ) {
-                                            TimingColumn("सूर्योदय", panchang.sunrise, Icons.Default.WbSunny, MaterialTheme.colorScheme.primary)
-                                            TimingColumn("सूर्यास्त", panchang.sunset, Icons.Default.WbSunny, MaterialTheme.colorScheme.secondary)
-                                            TimingColumn("चन्द्रास्त", panchang.moonset, Icons.Default.NightsStay, MaterialTheme.colorScheme.onSurfaceVariant)
-                                            TimingColumn("चन्द्रोदय", panchang.moonrise, Icons.Default.NightsStay, MaterialTheme.colorScheme.primary)
+                                            TimingColumn(LanguageManager.getString("सूर्योदय", "Sunrise"), panchang.sunrise, Icons.Default.WbSunny, MaterialTheme.colorScheme.primary)
+                                            TimingColumn(LanguageManager.getString("सूर्यास्त", "Sunset"), panchang.sunset, Icons.Default.WbSunny, MaterialTheme.colorScheme.secondary)
+                                            TimingColumn(LanguageManager.getString("चन्द्रास्त", "Moonset"), panchang.moonset, Icons.Default.NightsStay, MaterialTheme.colorScheme.onSurfaceVariant)
+                                            TimingColumn(LanguageManager.getString("चन्द्रोदय", "Moonrise"), panchang.moonrise, Icons.Default.NightsStay, MaterialTheme.colorScheme.primary)
                                         }
                                     }
                                 }
@@ -776,7 +795,7 @@ fun PanchangScreen(
                                                     .padding(horizontal = 10.dp, vertical = 4.dp)
                                             ) {
                                                 Text(
-                                                    text = "दिन (Day)",
+                                                    text = LanguageManager.getString("दिन", "Day"),
                                                     style = MaterialTheme.typography.labelSmall.copy(
                                                         fontWeight = FontWeight.Normal,
                                                         color = if (isChoghadiyaDaytime) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
@@ -798,7 +817,7 @@ fun PanchangScreen(
                                                     .padding(horizontal = 10.dp, vertical = 4.dp)
                                             ) {
                                                 Text(
-                                                    text = "रात (Night)",
+                                                    text = LanguageManager.getString("रात", "Night"),
                                                     style = MaterialTheme.typography.labelSmall.copy(
                                                         fontWeight = FontWeight.Normal,
                                                         color = if (!isChoghadiyaDaytime) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
@@ -913,7 +932,7 @@ fun PanchangScreen(
                                                     )
                                                     Spacer(modifier = Modifier.width(8.dp))
                                                     Text(
-                                                        text = "लग्न: ${dailyLagnaChart.ascendantRashiHi}",
+                                                        text = LanguageManager.getString("लग्न: ${dailyLagnaChart.ascendantRashiHi}", "Lagna: ${dailyLagnaChart.ascendantRashiEn}"),
                                                         style = MaterialTheme.typography.titleMedium.copy(
                                                             fontWeight = FontWeight.Bold,
                                                             color = MaterialTheme.colorScheme.primary
@@ -925,7 +944,7 @@ fun PanchangScreen(
                                                     viewModel.selectTab(AppTab.KUNDALI)
                                                 }) {
                                                     Text(
-                                                        text = "पूर्ण कुण्डली देखें →",
+                                                        text = LanguageManager.getString("पूर्ण कुण्डली देखें →", "View full chart →"),
                                                         style = MaterialTheme.typography.labelMedium.copy(
                                                             color = TextLink,
                                                             fontWeight = FontWeight.Normal
@@ -987,10 +1006,10 @@ fun PersonalizedGreetingCard(
 ) {
     val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
     val greetingHi = when (hour) {
-        in 4..11 -> "शुभ प्रभात (Good Morning)"
-        in 12..16 -> "शुभ दोपहर (Good Afternoon)"
-        in 17..21 -> "शुभ संध्या (Good Evening)"
-        else -> "शुभ रात्रि (Good Night)"
+        in 4..11 -> LanguageManager.getString("शुभ प्रभात", "Good Morning")
+        in 12..16 -> LanguageManager.getString("शुभ दोपहर", "Good Afternoon")
+        in 17..21 -> LanguageManager.getString("शुभ संध्या", "Good Evening")
+        else -> LanguageManager.getString("शुभ रात्रि", "Good Night")
     }
 
     GlassCard(
@@ -1251,7 +1270,7 @@ fun DailyRashifalHighlightCard(
                             )
                         )
                         Text(
-                            text = LanguageManager.getString("स्वामी: ${horoscope.rulerHi}", "Ruling Planet: ${horoscope.rulerHi}"),
+                            text = LanguageManager.getString("स्वामी: ${horoscope.rulerHi}", "Ruling Planet: ${horoscope.rulerEn}"),
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontSize = 11.sp
@@ -1360,7 +1379,7 @@ fun PlanetaryPositionsCard(planets: List<com.example.data.model.PlanetPosition>)
                                     )
                                 )
                                 Text(
-                                    text = "नक्षत्र: ${planet.nakshatraHi} | राशि: ${planet.rashiNameHi}",
+                                    text = LanguageManager.getString("नक्षत्र: ${planet.nakshatraHi} | राशि: ${planet.rashiNameHi}", "Nakshatra: ${planet.nakshatraEn} | Sign: ${planet.rashiNameEn}"),
                                     style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 13.sp)
                                 )
                             }
@@ -1377,7 +1396,7 @@ fun PlanetaryPositionsCard(planets: List<com.example.data.model.PlanetPosition>)
                             )
                             if (planet.isRetrograde) {
                                 Text(
-                                    text = "Retrograde (वक्री)",
+                                    text = LanguageManager.getString("वक्री", "Retrograde"),
                                     style = MaterialTheme.typography.labelSmall.copy(
                                         color = RahuKaalDangerColor,
                                         fontSize = 11.sp,

@@ -35,6 +35,48 @@ object NumerologyCalculator {
         9 to "लाल एवं नारंगी"
     )
 
+    private val PLANETS_MAP_EN = mapOf(
+        1 to "Sun", 2 to "Moon", 3 to "Jupiter", 4 to "Rahu", 5 to "Mercury",
+        6 to "Venus", 7 to "Ketu", 8 to "Saturn", 9 to "Mars"
+    )
+
+    /** English counterparts of READINGS: reading text, then lucky days. */
+    private val READINGS_EN = mapOf(
+        1 to Pair(
+            "Moolank 1 people are bold, self-assured and natural leaders. With the Sun's favour they do well in administration, management and any role where someone has to decide and be answerable for it.",
+            "Lucky days: Sunday and Monday."),
+        2 to Pair(
+            "Moolank 2 people are imaginative, artistic and quick to feel. The Moon's influence suits creative work, writing, music and anything involving care for others.",
+            "Lucky days: Monday and Sunday."),
+        3 to Pair(
+            "Moolank 3 is ruled by Jupiter. You tend to be knowledgeable, fair-minded, drawn to the spiritual, and good at teaching. Respect in your community usually follows.",
+            "Lucky days: Thursday and Friday."),
+        4 to Pair(
+            "Moolank 4 is ruled by Rahu. You are practical, analytical and inclined to think against the grain. Technology, research and media suit you.",
+            "Lucky days: Sunday and Saturday."),
+        5 to Pair(
+            "Moolank 5 is ruled by Mercury. Quick-minded, persuasive and commercially sharp — consulting, markets and IT tend to reward you.",
+            "Lucky days: Wednesday and Friday."),
+        6 to Pair(
+            "Moolank 6 is ruled by Venus. You have an eye for beauty, an easy charm and a taste for comfort. Fashion, design and film are natural ground.",
+            "Lucky days: Friday and Tuesday."),
+        7 to Pair(
+            "Moolank 7 is ruled by Ketu. You lean towards research, philosophy, yoga and the esoteric. An independent thinker who sees further than most.",
+            "Lucky days: Sunday and Thursday."),
+        8 to Pair(
+            "Moolank 8 is ruled by Saturn, the taskmaster. Hard-working, patient and built for the long haul — the second half of life usually brings the standing and the security.",
+            "Lucky days: Saturday and Friday."),
+        9 to Pair(
+            "Moolank 9 is ruled by Mars. Energetic, fearless and protective by instinct. The forces, sport and real estate all suit that temperament.",
+            "Lucky days: Tuesday and Sunday.")
+    )
+
+    private val LUCKY_COLOURS_EN = mapOf(
+        1 to "Yellow and saffron", 2 to "White and pale green", 3 to "Yellow and gold",
+        4 to "Blue and grey", 5 to "Green and light yellow", 6 to "Pink and white",
+        7 to "Pale yellow and white", 8 to "Deep blue and black", 9 to "Red and orange"
+    )
+
     fun calculateNumerology(name: String, dobString: String): NumerologyData {
         val digits = dobString.filter { it.isDigit() }
 
@@ -81,7 +123,9 @@ object NumerologyCalculator {
         if (nameNum == 0) nameNum = 1
 
         val rulingPlanet = PLANETS_MAP[moolank] ?: "सूर्य"
+        val rulingPlanetEn = PLANETS_MAP_EN[moolank] ?: "Sun"
         val readingPair = READINGS[moolank] ?: READINGS[1]!!
+        val readingPairEn = READINGS_EN[moolank] ?: READINGS_EN[1]!!
 
         val friendly = when (moolank) {
             1 -> listOf(1, 2, 3, 5, 9)
@@ -114,15 +158,20 @@ object NumerologyCalculator {
             bhagyank = bhagyank,
             nameNumber = nameNum,
             rulingPlanetHi = rulingPlanet,
+            rulingPlanetEn = rulingPlanetEn,
             luckyDaysHi = readingPair.second,
+            luckyDaysEn = readingPairEn.second,
             // This was hardcoded to the same string for all nine moolanks, which
             // contradicted the per-moolank "शुभ रंग" already written into each
             // reading above — the app disagreed with itself on the same screen.
             luckyColorsHi = LUCKY_COLOURS_HI[moolank] ?: "पीला एवं सुनहरा",
+            luckyColorsEn = LUCKY_COLOURS_EN[moolank] ?: "Yellow and gold",
             friendlyNumbers = friendly,
             enemyNumbers = enemy,
             moolankReadingHi = readingPair.first,
-            bhagyankReadingHi = "भाग्यांक $bhagyank आपके जीवन पथ को दर्शाती है। व्यवसाय एवं व्यक्तिगत जीवन में मूलांक $moolank के स्वामी $rulingPlanet की दशा शुभ फल देगी।"
+            moolankReadingEn = readingPairEn.first,
+            bhagyankReadingHi = "भाग्यांक $bhagyank आपके जीवन पथ को दर्शाती है। व्यवसाय एवं व्यक्तिगत जीवन में मूलांक $moolank के स्वामी $rulingPlanet की दशा शुभ फल देगी।",
+            bhagyankReadingEn = "Bhagyank $bhagyank describes the path your life tends to take. In work and in personal matters, periods ruled by $rulingPlanetEn — the lord of Moolank $moolank — should go well for you."
         )
     }
 }

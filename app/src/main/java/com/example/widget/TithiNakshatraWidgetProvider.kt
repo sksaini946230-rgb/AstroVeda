@@ -1,5 +1,12 @@
 package com.example.widget
 
+import com.example.data.model.tithiLocal
+import com.example.data.model.nakshatraLocal
+import com.example.data.model.yogaLocal
+import com.example.data.model.karanaLocal
+import com.example.data.model.masaLocal
+import com.example.data.model.pakshaLocal
+import com.example.data.model.varaLocal
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
@@ -54,12 +61,12 @@ class TithiNakshatraWidgetProvider : AppWidgetProvider() {
 
             val views = RemoteViews(context.packageName, R.layout.tithi_nakshatra_widget).apply {
                 setTextViewText(R.id.widget_date, dateStr)
-                setTextViewText(R.id.widget_tithi, panchang.tithiHindi)
+                setTextViewText(R.id.widget_tithi, panchang.tithiLocal)
                 setTextViewText(
                     R.id.widget_tithi_details,
-                    "${panchang.pakshaHindi} • समाप्ति: ${panchang.tithiEndTime}"
+                    "${panchang.pakshaLocal} • समाप्ति: ${panchang.tithiEndTime}"
                 )
-                setTextViewText(R.id.widget_nakshatra, panchang.nakshatraHindi)
+                setTextViewText(R.id.widget_nakshatra, panchang.nakshatraLocal)
                 setTextViewText(
                     R.id.widget_nakshatra_details,
                     "चरण ${panchang.nakshatraPada} • समाप्ति: ${panchang.nakshatraEndTime}"

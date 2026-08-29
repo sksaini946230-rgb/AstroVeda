@@ -1,5 +1,12 @@
 package com.example.ui.screens
 
+import com.example.data.model.tithiLocal
+import com.example.data.model.nakshatraLocal
+import com.example.data.model.yogaLocal
+import com.example.data.model.karanaLocal
+import com.example.data.model.masaLocal
+import com.example.data.model.pakshaLocal
+import com.example.data.model.varaLocal
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -117,7 +124,7 @@ fun CalendarScreen(viewModel: MainViewModel) {
             ) {
                 Column {
                     Text(
-                        text = "विक्रम संवत ${panchang.vikramSamvat} | ${panchang.masaNameHindi}",
+                        text = LanguageManager.getString("विक्रम संवत ${panchang.vikramSamvat} | ${panchang.masaLocal}", "Vikram Samvat ${panchang.vikramSamvat} | ${panchang.masaLocal}"),
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary,

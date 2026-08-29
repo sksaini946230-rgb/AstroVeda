@@ -45,58 +45,9 @@ object PanchangCalculator {
         CityLocation("Thiruvananthapuram", "तिरुवनन्तपुरम", "Kerala", 8.5241, 76.9366)
     )
 
-    private val TITHIS_HI = listOf(
-        "प्रतिपदा (Pratipada)", "द्वितीया (Dwitiya)", "तृतीया (Tritiya)", "चतुर्थी (Chaturthi)",
-        "पंचमी (Panchami)", "षष्ठी (Shasthi)", "सप्तमी (Saptami)", "अष्टमी (Ashtami)",
-        "नवमी (Navami)", "दशमी (Dashami)", "एकादशी (Ekadashi)", "द्वादशी (Dwadashi)",
-        "त्रयोदशी (Trayodashi)", "चतुर्दशी (Chaturdashi)", "पूर्णिमा (Purnima)"
-    )
 
-    private val NAKSHATRAS_HI = listOf(
-        "अश्विनी (Ashwini)", "भरणी (Bharani)", "कृत्तिका (Krittika)", "रोहिणी (Rohini)",
-        "मृगशिरा (Mrigashira)", "आर्द्रा (Ardra)", "पुनर्वसु (Punarvasu)", "पुष्य (Pushya)",
-        "अश्लेषा (Ashlesha)", "मघा (Magha)", "पूर्वाफाल्गुनी (Purva Phalguni)", "उत्तराफाल्गुनी (Uttara Phalguni)",
-        "हस्त (Hasta)", "चित्रा (Chitra)", "स्वाती (Swati)", "विशाखा (Vishakha)",
-        "अनुराधा (Anuradha)", "ज्येष्ठा (Jyeshtha)", "मूल (Moola)", "पूर्वाषाढा (Purva Ashadha)",
-        "उत्तराषाढा (Uttara Ashadha)", "श्रवण (Shravana)", "धनिष्ठा (Dhanishta)", "शतभिषा (Shatabhisha)",
-        "पूर्वाभाद्रपद (Purva Bhadrapada)", "उत्तराभाद्रपद (Uttara Bhadrapada)", "रेवती (Revati)"
-    )
-
-    private val YOGAS_HI = listOf(
-        "विष्कुम्भ (Vishkumbha)", "प्रीति (Priti)", "आयुष्मान (Ayushman)", "सौभाग्य (Saubhagya)",
-        "शोभन (Shobhana)", "अतिगण्ड (Atiganda)", "सुकर्मा (Sukarma)", "धृति (Dhriti)",
-        "शूल (Shoola)", "गण्ड (Ganda)", "वृद्धि (Vriddhi)", "ध्रुव (Dhruva)",
-        "व्याघात (Vyaghata)", "हर्षण (Harshana)", "वज्र (Vajra)", "सिद्धि (Siddhi)",
-        "व्यतीपात (Vyatipata)", "वरीयान (Variyan)", "परिघ (Parigha)", "शिव (Shiva)",
-        "सिद्ध (Siddha)", "साध्य (Sadhya)", "शुभ (Shubha)", "शुक्ल (Shukla)",
-        "ब्रह्म (Brahma)", "ऐन्द्र (Aindra)", "वैधृति (Vaidhriti)"
-    )
-
-    private val VARS_HI = mapOf(
-        Calendar.SUNDAY to Pair("रविवार (Ravivar)", "Sunday"),
-        Calendar.MONDAY to Pair("सोमवार (Somvar)", "Monday"),
-        Calendar.TUESDAY to Pair("मंगलवार (Mangalvar)", "Tuesday"),
-        Calendar.WEDNESDAY to Pair("बुधवार (Budhvar)", "Wednesday"),
-        Calendar.THURSDAY to Pair("गुरुवार (Guruvar)", "Thursday"),
-        Calendar.FRIDAY to Pair("शुक्रवार (Shukravar)", "Friday"),
-        Calendar.SATURDAY to Pair("शनिवार (Shanivar)", "Saturday")
-    )
-
-    private val RASHI_NAMES_HI = listOf(
-        "मेष", "वृषभ", "मिथुन", "कर्क", "सिंह", "कन्या",
-        "तुला", "वृश्चिक", "धनु", "मकर", "कुंभ", "मीन"
-    )
-
-    private val PLANETS_INFO = listOf(
-        Pair("Sun", "सूर्य (Su)"), Pair("Moon", "चन्द्र (Mo)"), Pair("Mars", "मंगल (Ma)"),
-        Pair("Mercury", "बुध (Me)"), Pair("Jupiter", "गुरु (Ju)"), Pair("Venus", "शुक्र (Ve)"),
-        Pair("Saturn", "शनि (Sa)"), Pair("Rahu", "राहु (Ra)"), Pair("Ketu", "केतु (Ke)")
-    )
-
-    private val NAKSHATRAS_SHORT = listOf(
-        "अश्विनी", "भरणी", "कृत्तिका", "रोहिणी", "मृगशिरा", "आर्द्रा", "पुनर्वसु", "पुष्य", "अश्लेषा",
-        "मघा", "पूर्वाफाल्गुनी", "उत्तराफाल्गुनी", "हस्त", "चित्रा", "स्वाती", "विशाखा", "अनुराधा", "ज्येष्ठा",
-        "मूल", "पूर्वाषाढा", "उत्तराषाढा", "श्रवण", "धनिष्ठा", "शतभिषा", "पूर्वाभाद्रपद", "उत्तराभाद्रपद", "रेवती"
+    private val PLANET_ORDER = listOf(
+        "Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"
     )
 
     /**
@@ -115,7 +66,7 @@ object PanchangCalculator {
         val month = cal.get(Calendar.MONTH) + 1
         val day = cal.get(Calendar.DAY_OF_MONTH)
         val dayOfWeek = cal.get(Calendar.DAY_OF_WEEK)
-        val varInfo = VARS_HI[dayOfWeek] ?: Pair("रविवार (Ravivar)", "Sunday")
+        val varIdx = (dayOfWeek - Calendar.SUNDAY).coerceIn(0, 6)
 
         val midnightJd = AstroTime.julianDayFromLocal(year, month, day, 0, 0, zone)
 
@@ -130,7 +81,8 @@ object PanchangCalculator {
         val tithiNum = PanchangElements.tithiNumber(sunriseJd)
         val isShukla = tithiNum <= 15
         val tithiIndex = (if (isShukla) tithiNum - 1 else tithiNum - 16).coerceIn(0, 14)
-        val tithiName = if (tithiNum == 30) "अमावस्या (Amavasya)" else TITHIS_HI[tithiIndex]
+        val tithiHi = if (tithiNum == 30) AstroNames.AMAVASYA_HI else AstroNames.TITHI_HI[tithiIndex]
+        val tithiEn = if (tithiNum == 30) AstroNames.AMAVASYA_EN else AstroNames.TITHI_EN[tithiIndex]
 
         val nakIdx = PanchangElements.nakshatraIndex(sunriseJd)
         val yogaIdx = PanchangElements.yogaIndex(sunriseJd)
@@ -188,15 +140,16 @@ object PanchangCalculator {
         val before = AstroMath.calculatePlanets(sunriseJd - 0.5)
         val after = AstroMath.calculatePlanets(sunriseJd + 0.5)
 
-        val planetPositions = PLANETS_INFO.map { (en, hi) ->
+        val planetPositions = PLANET_ORDER.map { en ->
             val deg = planetDegrees[en] ?: 0.0
             val motion = AstroTime.wrap180((after[en] ?: 0.0) - (before[en] ?: 0.0))
             val rashiIdx = (deg / 30.0).toInt().coerceIn(0, 11)
             PlanetPosition(
                 planetNameEn = en,
-                planetNameHi = hi,
+                planetNameHi = AstroNames.PLANET_HI[en] ?: en,
                 rashiNumber = rashiIdx + 1,
-                rashiNameHi = RASHI_NAMES_HI[rashiIdx],
+                rashiNameHi = AstroNames.RASHI_HI[rashiIdx],
+                rashiNameEn = AstroNames.RASHI_EN[rashiIdx],
                 degree = String.format(Locale.US, "%.2f", deg % 30.0).toDouble(),
                 houseNumber = ((rashiIdx - ascendantRashiIdx + 12) % 12) + 1,
                 isRetrograde = when (en) {
@@ -204,7 +157,8 @@ object PanchangCalculator {
                     "Sun", "Moon" -> false
                     else -> motion < 0.0
                 },
-                nakshatraHi = NAKSHATRAS_SHORT[(deg / PanchangElements.NAKSHATRA_SPAN).toInt().coerceIn(0, 26)]
+                nakshatraHi = AstroNames.NAKSHATRA_HI[(deg / PanchangElements.NAKSHATRA_SPAN).toInt().coerceIn(0, 26)],
+                nakshatraEn = AstroNames.NAKSHATRA_EN[(deg / PanchangElements.NAKSHATRA_SPAN).toInt().coerceIn(0, 26)]
             )
         }
 
@@ -216,26 +170,26 @@ object PanchangCalculator {
 
         return PanchangData(
             dateString = dateFmt.format(date),
-            dayOfWeek = varInfo.second,
-            dayOfWeekHindi = varInfo.first,
+            dayOfWeek = AstroNames.VARA_EN[varIdx],
+            dayOfWeekHindi = AstroNames.VARA_HI[varIdx],
             vikramSamvat = PanchangElements.vikramSamvat(sunriseJd, year),
             sakaSamvat = PanchangElements.sakaSamvat(sunriseJd, year),
-            masaName = PanchangElements.MASA_NAMES_EN[masaIdx],
-            masaNameHindi = PanchangElements.MASA_NAMES_HI[masaIdx],
-            paksha = if (isShukla) "Shukla Paksha" else "Krishna Paksha",
-            pakshaHindi = if (isShukla) "शुक्ल पक्ष (Shukla Paksha)" else "कृष्ण पक्ष (Krishna Paksha)",
-            tithi = tithiName,
-            tithiHindi = tithiName,
+            masaName = AstroNames.MASA_EN[masaIdx],
+            masaNameHindi = AstroNames.MASA_HI[masaIdx],
+            paksha = if (isShukla) AstroNames.SHUKLA_EN else AstroNames.KRISHNA_EN,
+            pakshaHindi = if (isShukla) AstroNames.SHUKLA_HI else AstroNames.KRISHNA_HI,
+            tithi = tithiEn,
+            tithiHindi = tithiHi,
             tithiEndTime = formatEndTime(tithiEnd, midnightJd, zone, use24Hour),
             tithiProgressPercent = tithiProgress,
-            nakshatra = NAKSHATRAS_HI[nakIdx],
-            nakshatraHindi = NAKSHATRAS_HI[nakIdx],
+            nakshatra = AstroNames.NAKSHATRA_EN[nakIdx],
+            nakshatraHindi = AstroNames.NAKSHATRA_HI[nakIdx],
             nakshatraEndTime = formatEndTime(nakEnd, midnightJd, zone, use24Hour),
             nakshatraPada = PanchangElements.nakshatraPada(sunriseJd),
-            yoga = YOGAS_HI[yogaIdx],
-            yogaHindi = YOGAS_HI[yogaIdx],
-            karan = PanchangElements.karanaName(karanaIdx),
-            karanHindi = PanchangElements.karanaName(karanaIdx),
+            yoga = AstroNames.YOGA_EN[yogaIdx],
+            yogaHindi = AstroNames.YOGA_HI[yogaIdx],
+            karan = AstroNames.karanaEn(karanaIdx),
+            karanHindi = AstroNames.karanaHi(karanaIdx),
             sunrise = formatJdTime(sunriseJd, zone, use24Hour),
             sunset = formatJdTime(sunsetJd, zone, use24Hour),
             // The Moon skips a rise or a set about once a month — say so rather
@@ -247,8 +201,8 @@ object PanchangCalculator {
             yamaganda = yamaKaalStr,
             abhijitMuhurat = abhijitStr,
             brahmaMuhurat = brahmaStr,
-            sunSign = RASHI_NAMES_HI[(sunDeg / 30.0).toInt().coerceIn(0, 11)],
-            moonSign = RASHI_NAMES_HI[(moonDeg / 30.0).toInt().coerceIn(0, 11)],
+            sunSign = localRashi((sunDeg / 30.0).toInt().coerceIn(0, 11)),
+            moonSign = localRashi((moonDeg / 30.0).toInt().coerceIn(0, 11)),
             locationName = city.cityNameHindi,
             latitude = city.latitude,
             longitude = city.longitude,
@@ -261,6 +215,10 @@ object PanchangCalculator {
     // ------------------------------------------------------------------
 
     /** Minutes since local midnight for a Julian Day. */
+    /** Sun/moon sign strings are shown as one value, so they follow the language. */
+    private fun localRashi(idx: Int) =
+        AstroNames.pick(AstroNames.RASHI_HI[idx], AstroNames.RASHI_EN[idx])
+
     private fun jdToLocalMinutes(jd: Double, zone: TimeZone): Int {
         val cal = GregorianCalendar(zone).apply { timeInMillis = AstroTime.millisFromJulianDay(jd) }
         return cal.get(Calendar.HOUR_OF_DAY) * 60 + cal.get(Calendar.MINUTE)
@@ -283,9 +241,9 @@ object PanchangCalculator {
         val time = formatJdTime(endJd, zone, use24Hour)
         val daysAhead = Math.floor(endJd - midnightJd).toInt()
         return when {
-            daysAhead <= 0 -> "$time तक"
-            daysAhead == 1 -> "अगले दिन $time तक"
-            else -> "$daysAhead दिन बाद $time तक"
+            daysAhead <= 0 -> AstroNames.pick("$time तक", "until $time")
+            daysAhead == 1 -> AstroNames.pick("अगले दिन $time तक", "until $time next day")
+            else -> AstroNames.pick("$daysAhead दिन बाद $time तक", "until $time, $daysAhead days on")
         }
     }
 
@@ -307,10 +265,10 @@ object PanchangCalculator {
         val isAmavasya = tithiHindi.contains("अमावस्या") || tithiHindi.contains("Amavasya", ignoreCase = true)
 
         if (isPurnima) {
-            return MoonPhaseInfo("🌕", "पूर्णिमा (Full Moon)", "Full Moon", 100, true)
+            return MoonPhaseInfo("🌕", AstroNames.pick("पूर्णिमा", "Full Moon"), "Full Moon", 100, true)
         }
         if (isAmavasya) {
-            return MoonPhaseInfo("🌑", "अमावस्या (New Moon)", "New Moon", 0, false)
+            return MoonPhaseInfo("🌑", AstroNames.pick("अमावस्या", "New Moon"), "New Moon", 0, false)
         }
 
         val tithiNum = TITHI_LOOKUP.entries.firstOrNull { tithiHindi.contains(it.key) }?.value ?: 7
@@ -318,16 +276,16 @@ object PanchangCalculator {
         return if (isShukla) {
             val illumination = ((tithiNum / 15.0) * 100).toInt().coerceIn(5, 95)
             when (tithiNum) {
-                in 1..3 -> MoonPhaseInfo("🌒", "शुक्ल पक्ष (Waxing Crescent)", "Waxing Crescent", illumination, true)
-                in 4..7 -> MoonPhaseInfo("🌓", "शुक्ल पक्ष (First Quarter)", "First Quarter", illumination, true)
-                else -> MoonPhaseInfo("🌔", "शुक्ल पक्ष (Waxing Gibbous)", "Waxing Gibbous", illumination, true)
+                in 1..3 -> MoonPhaseInfo("🌒", AstroNames.pick("शुक्ल पक्ष", "Waxing Crescent"), "Waxing Crescent", illumination, true)
+                in 4..7 -> MoonPhaseInfo("🌓", AstroNames.pick("शुक्ल पक्ष", "First Quarter"), "First Quarter", illumination, true)
+                else -> MoonPhaseInfo("🌔", AstroNames.pick("शुक्ल पक्ष", "Waxing Gibbous"), "Waxing Gibbous", illumination, true)
             }
         } else {
             val illumination = (((15 - tithiNum) / 15.0) * 100).toInt().coerceIn(5, 95)
             when (tithiNum) {
-                in 1..3 -> MoonPhaseInfo("🌖", "कृष्ण पक्ष (Waning Gibbous)", "Waning Gibbous", illumination, false)
-                in 4..7 -> MoonPhaseInfo("🌗", "कृष्ण पक्ष (Third Quarter)", "Third Quarter", illumination, false)
-                else -> MoonPhaseInfo("🌘", "कृष्ण पक्ष (Waning Crescent)", "Waning Crescent", illumination, false)
+                in 1..3 -> MoonPhaseInfo("🌖", AstroNames.pick("कृष्ण पक्ष", "Waning Gibbous"), "Waning Gibbous", illumination, false)
+                in 4..7 -> MoonPhaseInfo("🌗", AstroNames.pick("कृष्ण पक्ष", "Third Quarter"), "Third Quarter", illumination, false)
+                else -> MoonPhaseInfo("🌘", AstroNames.pick("कृष्ण पक्ष", "Waning Crescent"), "Waning Crescent", illumination, false)
             }
         }
     }

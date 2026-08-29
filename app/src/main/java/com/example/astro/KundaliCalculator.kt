@@ -10,35 +10,15 @@ import kotlin.math.tan
 
 object KundaliCalculator {
 
-    private val RASHI_NAMES_HI = listOf(
-        "मेष (Aries)", "वृषभ (Taurus)", "मिथुन (Gemini)", "कर्क (Cancer)",
-        "सिंह (Leo)", "कन्या (Virgo)", "तुला (Libra)", "वृश्चिक (Scorpio)",
-        "धनु (Sagittarius)", "मकर (Capricorn)", "कुंभ (Aquarius)", "मीन (Pisces)"
-    )
-
-    val RASHI_SHORT_HI = listOf(
-        "मेष", "वृषभ", "मिथुन", "कर्क", "सिंह", "कन्या", "तुला", "वृश्चिक", "धनु", "मकर", "कुंभ", "मीन"
-    )
-
-    private val PLANETS_INFO = listOf(
-        Pair("Sun", "सूर्य (Su)"),
-        Pair("Moon", "चन्द्र (Mo)"),
-        Pair("Mars", "मंगल (Ma)"),
-        Pair("Mercury", "बुध (Me)"),
-        Pair("Jupiter", "गुरु (Ju)"),
-        Pair("Venus", "शुक्र (Ve)"),
-        Pair("Saturn", "शनि (Sa)"),
-        Pair("Rahu", "राहु (Ra)"),
-        Pair("Ketu", "केतु (Ke)")
-    )
-
-    val NAKSHATRAS = listOf(
-        "अश्विनी", "भरणी", "कृत्तिका", "रोहिणी", "मृगशिरा", "आर्द्रा", "पुनर्वसु", "पुष्य", "अश्लेषा",
-        "मघा", "पूर्वाफाल्गुनी", "उत्तराफाल्गुनी", "हस्त", "चित्रा", "स्वाती", "विशाखा", "अनुराधा", "ज्येष्ठा",
-        "मूल", "पूर्वाषाढा", "उत्तराषाढा", "श्रवण", "धनिष्ठा", "शतभिषा", "पूर्वाभाद्रपद", "उत्तराभाद्रपद", "रेवती"
-    )
-
     const val NAKSHATRA_SPAN = 360.0 / 27.0
+
+    /** Kept for callers that map a Hindi rashi name back to an index. */
+    val RASHI_SHORT_HI = AstroNames.RASHI_HI
+    val NAKSHATRAS = AstroNames.NAKSHATRA_HI
+
+    private val PLANET_ORDER = listOf(
+        "Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"
+    )
 
     /**
      * Sidereal Ascendant (Lagna) in degrees for a birth moment and place.
@@ -152,7 +132,7 @@ object KundaliCalculator {
         val housePlanetsMap = mutableMapOf<Int, MutableList<String>>()
         for (i in 1..12) housePlanetsMap[i] = mutableListOf()
 
-        PLANETS_INFO.forEach { (en, hi) ->
+        PLANET_ORDER.forEach { en ->
             val deg = planetDegrees[en] ?: 0.0
             val motion = AstroTime.wrap180((degreesAfter[en] ?: 0.0) - (degreesBefore[en] ?: 0.0))
 
@@ -167,22 +147,29 @@ object KundaliCalculator {
             val houseNum = ((rashiIdx - ascendantRashiIdx + 12) % 12) + 1
             val nakshatraIdx = (deg / NAKSHATRA_SPAN).toInt().coerceIn(0, 26)
 
+            // House cells are tiny, so they carry the short form in the reader's script.
+            val baseShort = AstroNames.pick(
+                AstroNames.PLANET_HI[en] ?: en,
+                AstroNames.PLANET_SHORT[en] ?: en
+            )
             val shortPlanetName = if (isRetro && en != "Rahu" && en != "Ketu") {
-                "${hi.substringBefore(" ")}(व)"
+                "$baseShort${AstroNames.pick("(व)", "(R)")}"
             } else {
-                hi.substringBefore(" ")
+                baseShort
             }
 
             planetPositions.add(
                 PlanetPosition(
                     planetNameEn = en,
-                    planetNameHi = hi,
+                    planetNameHi = AstroNames.PLANET_HI[en] ?: en,
                     rashiNumber = rashiIdx + 1,
-                    rashiNameHi = RASHI_SHORT_HI[rashiIdx],
+                    rashiNameHi = AstroNames.RASHI_HI[rashiIdx],
+                    rashiNameEn = AstroNames.RASHI_EN[rashiIdx],
                     degree = String.format(java.util.Locale.US, "%.2f", degreeInRashi).toDouble(),
                     houseNumber = houseNum,
                     isRetrograde = isRetro,
-                    nakshatraHi = NAKSHATRAS[nakshatraIdx]
+                    nakshatraHi = AstroNames.NAKSHATRA_HI[nakshatraIdx],
+                    nakshatraEn = AstroNames.NAKSHATRA_EN[nakshatraIdx]
                 )
             )
             housePlanetsMap[houseNum]?.add(shortPlanetName)
@@ -207,13 +194,18 @@ object KundaliCalculator {
             timeOfBirth = timeLabel,
             placeOfBirth = placeName,
             ascendantRashiNumber = ascendantRashiIdx + 1,
-            ascendantRashiHi = RASHI_NAMES_HI[ascendantRashiIdx],
+            ascendantRashiHi = AstroNames.RASHI_HI[ascendantRashiIdx],
+            ascendantRashiEn = AstroNames.RASHI_EN[ascendantRashiIdx],
             moonRashiHi = moonPlanet.rashiNameHi,
+            moonRashiEn = moonPlanet.rashiNameEn,
             moonNakshatraHi = moonPlanet.nakshatraHi,
+            moonNakshatraEn = moonPlanet.nakshatraEn,
             planets = planetPositions,
             housePlanetsMap = housePlanetsMap.mapValues { it.value.toList() },
-            currentMahadashaHi = if (currentDasha != null) "${currentDasha.planetHi} (${currentDasha.planetEn})" else "—",
-            currentAntardashaHi = if (currentAntardasha != null) "${currentAntardasha.planetHi} (${currentAntardasha.planetEn})" else "—",
+            currentMahadashaHi = currentDasha?.planetHi ?: "—",
+            currentMahadashaEn = currentDasha?.planetEn ?: "—",
+            currentAntardashaHi = currentAntardasha?.planetHi ?: "—",
+            currentAntardashaEn = currentAntardasha?.planetEn ?: "—",
             dashaTimeline = dashaResult.mahadashas
         )
     }

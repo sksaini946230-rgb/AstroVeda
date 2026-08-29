@@ -338,7 +338,10 @@ fun SettingsScreen(
                                 )
                             )
                             Text(
-                                text = "${currentRashi.rashiNameHi} • स्वामी: ${currentRashi.rulerHi}",
+                                text = LanguageManager.getString(
+                                    "${currentRashi.rashiNameHi} • स्वामी: ${currentRashi.rulerHi}",
+                                    "${currentRashi.rashiNameEn} • Lord: ${currentRashi.rulerEn}"
+                                ),
                                 style = MaterialTheme.typography.bodySmall.copy(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     fontSize = 11.sp

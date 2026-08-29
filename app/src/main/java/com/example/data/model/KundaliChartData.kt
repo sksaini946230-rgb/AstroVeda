@@ -5,10 +5,12 @@ data class PlanetPosition(
     val planetNameHi: String, // सूर्य, चन्द्र, मंगल, बुध, गुरु, शुक्र, शनि, राहु, केतु
     val rashiNumber: Int, // 1 to 12
     val rashiNameHi: String, // मेष, वृषभ...
+    val rashiNameEn: String = "", // Aries, Taurus...
     val degree: Double, // 0.0 to 29.9
     val houseNumber: Int, // 1 to 12
     val isRetrograde: Boolean = false,
-    val nakshatraHi: String
+    val nakshatraHi: String,
+    val nakshatraEn: String = ""
 )
 
 data class KundaliChartData(
@@ -18,12 +20,17 @@ data class KundaliChartData(
     val placeOfBirth: String,
     val ascendantRashiNumber: Int, // Lagna Rashi (1 to 12)
     val ascendantRashiHi: String,
+    val ascendantRashiEn: String = "",
     val moonRashiHi: String,
+    val moonRashiEn: String = "",
     val moonNakshatraHi: String,
+    val moonNakshatraEn: String = "",
     val planets: List<PlanetPosition>,
     val housePlanetsMap: Map<Int, List<String>>, // House 1..12 -> List of planet short names in Hindi
     val currentMahadashaHi: String,
+    val currentMahadashaEn: String = "",
     val currentAntardashaHi: String,
+    val currentAntardashaEn: String = "",
     val dashaTimeline: List<DashaPeriod>
 )
 

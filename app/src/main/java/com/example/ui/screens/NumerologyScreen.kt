@@ -221,7 +221,7 @@ fun NumerologyScreen(viewModel: MainViewModel) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(text = "मूलांक (Moolank)", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 13.sp))
                             Text(text = "${numData.moolank}", style = MaterialTheme.typography.displayMedium.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold))
-                            Text(text = "स्वामी: ${numData.rulingPlanetHi}", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.secondary, fontSize = 12.sp, fontWeight = FontWeight.Normal))
+                            Text(text = LanguageManager.getString("स्वामी: ${numData.rulingPlanetHi}", "Ruling planet: ${numData.rulingPlanetEn}"), style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.secondary, fontSize = 12.sp, fontWeight = FontWeight.Normal))
                         }
                     }
                 }
@@ -251,12 +251,12 @@ fun NumerologyScreen(viewModel: MainViewModel) {
                     )
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
-                        text = numData.moolankReadingHi,
+                        text = LanguageManager.getString(numData.moolankReadingHi, numData.moolankReadingEn),
                         style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 15.sp, lineHeight = 21.sp)
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = numData.luckyDaysHi,
+                        text = LanguageManager.getString(numData.luckyDaysHi, numData.luckyDaysEn),
                         style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Normal, fontSize = 13.sp)
                     )
                 }

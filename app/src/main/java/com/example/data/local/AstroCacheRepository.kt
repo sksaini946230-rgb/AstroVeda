@@ -133,7 +133,12 @@ class AstroCacheRepository(
                         rashiNameHi = entity.rashiNameHi,
                         symbol = entity.symbol,
                         elementHi = entity.elementHi,
+                        // The cache table predates these columns; derive rather
+                        // than migrate, because this database drops all tables on
+                        // a version bump and that would take saved profiles with it.
+                        elementEn = com.example.astro.AstroNames.elementEnFromHi(entity.elementHi),
                         rulerHi = entity.rulerHi,
+                        rulerEn = com.example.astro.AstroNames.planetEnFromHi(entity.rulerHi),
                         ratingStars = entity.ratingStars,
                         luckyNumber = entity.luckyNumber,
                         luckyColorEn = entity.luckyColorEn,

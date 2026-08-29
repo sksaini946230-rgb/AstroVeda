@@ -861,13 +861,20 @@ object RashifalProvider {
         val luckyNum = 1 + ((rashiIdx * 7 + house * 3) % 9)
         val timeIdx = (rashiIdx * 5 + house + cal.get(Calendar.DAY_OF_MONTH)) % luckyTimesHi.size
 
+        // These arrive combined — "अग्नि (Fire)", "मंगल (Mars)", "मेष (Aries)" — so
+        // split them into the Hindi and English halves the model asks for.
+        fun hiPart(v: String) = v.substringBefore(" (").trim()
+        fun enPart(v: String) = v.substringAfter("(", "").substringBefore(")").trim().ifBlank { v }
+
         return RashifalData(
             rashiId = id,
             rashiNameEn = en,
-            rashiNameHi = hi,
+            rashiNameHi = hiPart(hi),
             symbol = sym,
-            elementHi = elem,
-            rulerHi = ruler,
+            elementHi = hiPart(elem),
+            elementEn = enPart(elem),
+            rulerHi = hiPart(ruler),
+            rulerEn = enPart(ruler),
             ratingStars = rating,
             luckyNumber = luckyNum,
             luckyColorEn = colorsEn[colorIdx],

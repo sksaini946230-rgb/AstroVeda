@@ -257,7 +257,7 @@ fun EventMuhuratCard(item: MuhuratItem) {
                 )
 
                 GlassBadge(
-                    text = item.qualityHi,
+                    text = LanguageManager.getString(item.qualityHi, item.qualityEn),
                     backgroundColor = ShubhSuccessColor.copy(alpha = 0.2f),
                     textColor = ShubhSuccessColor,
                     borderColor = ShubhSuccessColor
@@ -267,7 +267,7 @@ fun EventMuhuratCard(item: MuhuratItem) {
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = "${item.dateString} (${item.dayOfWeekHi}) | ${item.startTime} - ${item.endTime}",
+                text = "${item.dateString} (${LanguageManager.getString(item.dayOfWeekHi, item.dayOfWeekEn)}) | ${item.startTime} - ${item.endTime}",
                 style = MaterialTheme.typography.labelMedium.copy(
                     color = MaterialTheme.colorScheme.secondary,
                     fontWeight = FontWeight.Normal,
@@ -276,7 +276,7 @@ fun EventMuhuratCard(item: MuhuratItem) {
             )
 
             Text(
-                text = "${LanguageManager.getString("तिथि", "Tithi")}: ${item.tithiHi} | ${LanguageManager.getString("नक्षत्र", "Nakshatra")}: ${item.nakshatraHi}",
+                text = "${LanguageManager.getString("तिथि", "Tithi")}: ${LanguageManager.getString(item.tithiHi, item.tithiEn)} | ${LanguageManager.getString("नक्षत्र", "Nakshatra")}: ${LanguageManager.getString(item.nakshatraHi, item.nakshatraEn)}",
                 style = MaterialTheme.typography.bodySmall.copy(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 13.sp
@@ -286,7 +286,7 @@ fun EventMuhuratCard(item: MuhuratItem) {
             Spacer(modifier = Modifier.height(6.dp))
 
             Text(
-                text = item.descriptionHi,
+                text = LanguageManager.getString(item.descriptionHi, item.descriptionEn),
                 style = MaterialTheme.typography.bodySmall.copy(
                     color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 14.sp,

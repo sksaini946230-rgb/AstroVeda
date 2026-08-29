@@ -98,8 +98,8 @@ fun RashifalScreen(viewModel: MainViewModel) {
         rashiNameEn = "Aries",
         rashiNameHi = "मेष",
         symbol = "♈",
-        elementHi = "अग्नि",
-        rulerHi = "मंगल",
+        elementHi = "अग्नि", elementEn = "Fire",
+        rulerHi = "मंगल", rulerEn = "Mars",
         ratingStars = 4,
         luckyNumber = 9,
         luckyColorEn = "Red",
@@ -394,7 +394,7 @@ fun RashifalScreen(viewModel: MainViewModel) {
                                                 )
                                             )
                                             Text(
-                                                text = "${LanguageManager.getString("स्वामी", "Lord")}: ${horoscope.rulerHi} | ${LanguageManager.getString("तत्व", "Element")}: ${horoscope.elementHi}",
+                                                text = "${LanguageManager.getString("स्वामी", "Lord")}: ${LanguageManager.getString(horoscope.rulerHi, horoscope.rulerEn)} | ${LanguageManager.getString("तत्व", "Element")}: ${LanguageManager.getString(horoscope.elementHi, horoscope.elementEn)}",
                                                 style = MaterialTheme.typography.bodySmall.copy(
                                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                                     fontSize = 12.sp

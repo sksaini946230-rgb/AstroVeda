@@ -6,10 +6,15 @@ data class MuhuratItem(
     val categoryEn: String,
     val dateString: String,
     val dayOfWeekHi: String,
+    val dayOfWeekEn: String = "",
     val startTime: String,
     val endTime: String,
     val tithiHi: String,
+    val tithiEn: String = "",
     val nakshatraHi: String,
+    val nakshatraEn: String = "",
     val qualityHi: String, // अति शुभ, शुभ
-    val descriptionHi: String
+    val qualityEn: String = "",
+    val descriptionHi: String,
+    val descriptionEn: String = ""
 )

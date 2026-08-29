@@ -350,9 +350,13 @@ fun NorthIndianChart(
                             val minInt = ((p.degree - degInt) * 60).toInt()
                             val degStr = "${degInt}°${String.format(java.util.Locale.US, "%02d", minInt)}'"
                             val retroStr = if (p.isRetrograde) "(R)" else ""
-                            val nakshatraStr = if (userScale > 1.8f && p.nakshatraHi.isNotEmpty()) "[${p.nakshatraHi.take(4)}]" else ""
+                            val nakLabel = com.example.util.LanguageManager.getString(p.nakshatraHi, p.nakshatraEn)
+                            val nakshatraStr = if (userScale > 1.8f && nakLabel.isNotEmpty()) "[${nakLabel.take(4)}]" else ""
 
-                            val shortName = p.planetNameHi.substringBefore(" ")
+                            val shortName = com.example.util.LanguageManager.getString(
+                                p.planetNameHi,
+                                com.example.astro.AstroNames.PLANET_SHORT[p.planetNameEn] ?: p.planetNameEn
+                            )
                             val detailedText = listOf(shortName, degStr, retroStr, nakshatraStr)
                                 .filter { it.isNotEmpty() }
                                 .joinToString(" ")
@@ -434,7 +438,10 @@ fun NorthIndianChart(
                 )
             )
             Text(
-                text = "लग्न: ${chartData.ascendantRashiHi}",
+                text = com.example.util.LanguageManager.getString(
+                    "लग्न: ${chartData.ascendantRashiHi}",
+                    "Lagna: ${chartData.ascendantRashiEn}"
+                ),
                 style = MaterialTheme.typography.labelSmall.copy(
                     color = TextSecondary,
                     fontSize = 9.sp

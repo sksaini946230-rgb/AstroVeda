@@ -1,5 +1,12 @@
 package com.example.worker
 
+import com.example.data.model.tithiLocal
+import com.example.data.model.nakshatraLocal
+import com.example.data.model.yogaLocal
+import com.example.data.model.karanaLocal
+import com.example.data.model.masaLocal
+import com.example.data.model.pakshaLocal
+import com.example.data.model.varaLocal
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -96,11 +103,11 @@ class AstroNotificationWorker(
             val horoscope = horoscopes.find { it.rashiId == userRashiId } ?: horoscopes.first()
 
             val title = "✨ दैनिक पंचांग एवं राशिफल (${userCity.cityNameHindi})"
-            val content = "🌅 ${panchang.sunrise} | 🌇 ${panchang.sunset} • 📜 ${panchang.tithiHindi}"
+            val content = "🌅 ${panchang.sunrise} | 🌇 ${panchang.sunset} • 📜 ${panchang.tithiLocal}"
             val bigText = "🕉️ AstroVeda दैनिक पंचांग एवं राशिफल (${panchang.dateString})\n\n" +
                     "🌅 सूर्योदय: ${panchang.sunrise} | 🌇 सूर्यास्त: ${panchang.sunset}\n" +
-                    "📜 तिथि: ${panchang.tithiHindi}\n" +
-                    "✨ नक्षत्र: ${panchang.nakshatraHindi}\n" +
+                    "📜 तिथि: ${panchang.tithiLocal}\n" +
+                    "✨ नक्षत्र: ${panchang.nakshatraLocal}\n" +
                     "🌔 चंद्र कला: ${moonPhase.emoji} ${moonPhase.nameHindi}\n" +
                     "🌟 अभिजित मुहूर्त: ${panchang.abhijitMuhurat}\n" +
                     "⚠️ राहुकाल: ${panchang.rahuKaal}\n\n" +
