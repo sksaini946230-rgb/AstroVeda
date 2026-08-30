@@ -1,5 +1,6 @@
 package com.example.worker
 
+import com.example.data.model.dateLocal
 import com.example.util.LanguageManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -115,7 +116,7 @@ class MuhuratNotificationWorker(
             
             val bigText = StringBuilder().apply {
                 append(LanguageManager.getString(
-                    "🕉️ AstroVeda दैनिक शुभ मुहूर्त गाइड (${panchang.dateString})\n\n" +
+                    "🕉️ AstroVeda दैनिक शुभ मुहूर्त गाइड (${panchang.dateLocal})\n\n" +
                         "🌟 अभिजित मुहूर्त (सर्वश्रेष्ठ): ${panchang.abhijitMuhurat}\n" +
                         "🌅 ब्रह्म मुहूर्त: ${panchang.brahmaMuhurat}\n" +
                         "⚡ शुभ चौघड़िया समय: $shubhChoghadiyaSummary\n" +

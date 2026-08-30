@@ -1,5 +1,6 @@
 package com.example.ui.components
 
+import com.example.data.model.dateLocal
 import com.example.data.model.tithiLocal
 import com.example.data.model.nakshatraLocal
 import com.example.data.model.yogaLocal
@@ -134,7 +135,7 @@ fun DailyPanchangCard(
                                 )
                             )
                             Text(
-                                text = panchang.dateString,
+                                text = panchang.dateLocal,
                                 style = MaterialTheme.typography.bodySmall.copy(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     fontSize = 12.sp

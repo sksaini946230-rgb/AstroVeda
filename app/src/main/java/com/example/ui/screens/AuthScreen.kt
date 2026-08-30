@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -84,6 +85,13 @@ fun AuthScreen(viewModel: MainViewModel) {
     // A message from the previous mode is stale the moment the user switches.
     LaunchedEffect(isSignUp) { viewModel.clearAuthMessages() }
 
+    // Back on the gate should leave the app, not fall through to whatever the
+    // previous screen was — onboarding is already behind the user by here.
+    val activity = context as? android.app.Activity
+    androidx.activity.compose.BackHandler(enabled = true) {
+        if (isSignUp) isSignUp = false else activity?.finish()
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -92,6 +100,9 @@ fun AuthScreen(viewModel: MainViewModel) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                // Without this the keyboard covered the password field and the
+                // page would not scroll out from under it.
+                .imePadding()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 22.dp, vertical = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,

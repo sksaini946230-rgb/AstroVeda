@@ -208,6 +208,12 @@ object AstroNames {
     fun stoneEnFromHi(hi: String): String =
         STONE_EN_BY_HI[hi.substringBefore(" (").trim()] ?: hi
 
+    /** Gregorian month names in Hindi, for the headline date. */
+    val GREGORIAN_MONTH_HI = listOf(
+        "जनवरी", "फरवरी", "मार्च", "अप्रैल", "मई", "जून",
+        "जुलाई", "अगस्त", "सितम्बर", "अक्टूबर", "नवम्बर", "दिसम्बर"
+    )
+
     // --------------------------------------------------------------- Helper
     /** Picks the Hindi or English form for the language in force. */
     fun pick(hi: String, en: String): String = LanguageManager.getString(hi, en)

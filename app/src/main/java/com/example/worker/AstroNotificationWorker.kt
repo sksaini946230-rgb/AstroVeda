@@ -1,5 +1,6 @@
 package com.example.worker
 
+import com.example.data.model.dateLocal
 import com.example.util.LanguageManager
 import com.example.data.model.tithiLocal
 import com.example.data.model.nakshatraLocal
@@ -109,7 +110,7 @@ class AstroNotificationWorker(
             )
             val content = "🌅 ${panchang.sunrise} | 🌇 ${panchang.sunset} • 📜 ${panchang.tithiLocal}"
             val bigText = LanguageManager.getString(
-                "🕉️ AstroVeda दैनिक पंचांग एवं राशिफल (${panchang.dateString})\n\n" +
+                "🕉️ AstroVeda दैनिक पंचांग एवं राशिफल (${panchang.dateLocal})\n\n" +
                     "🌅 सूर्योदय: ${panchang.sunrise} | 🌇 सूर्यास्त: ${panchang.sunset}\n" +
                     "📜 तिथि: ${panchang.tithiLocal}\n" +
                     "✨ नक्षत्र: ${panchang.nakshatraLocal}\n" +

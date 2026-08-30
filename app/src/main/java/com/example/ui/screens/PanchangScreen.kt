@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import com.example.data.model.dateLocal
 import com.example.data.model.tithiLocal
 import com.example.data.model.nakshatraLocal
 import com.example.data.model.yogaLocal
@@ -257,7 +258,7 @@ fun PanchangScreen(
                                             ) {
                                                 Column {
                                                     Text(
-                                                        text = panchang.dateString,
+                                                        text = panchang.dateLocal,
                                                         style = MaterialTheme.typography.titleMedium.copy(
                                                             color = MaterialTheme.colorScheme.primary,
                                                             fontWeight = FontWeight.Bold,
@@ -265,7 +266,7 @@ fun PanchangScreen(
                                                         )
                                                     )
                                                     Text(
-                                                        text = "${panchang.varaLocal} | ${panchang.pakshaLocal}",
+                                                        text = "${panchang.masaLocal} | ${panchang.pakshaLocal}",
                                                         style = MaterialTheme.typography.bodyMedium.copy(
                                                             color = MaterialTheme.colorScheme.onSurface,
                                                             fontWeight = FontWeight.Normal
@@ -278,7 +279,11 @@ fun PanchangScreen(
 
                                             // City Location Picker Pill
                                             var expanded by remember { mutableStateOf(false) }
-                                            var searchQuery by remember(selectedCity) { mutableStateOf(if (viewModel.hasUserSetCity()) selectedCity.cityNameHindi else "") }
+                                            var searchQuery by remember(selectedCity, LanguageManager.currentLanguage) {
+                                                mutableStateOf(
+                                                    LanguageManager.getString(selectedCity.cityNameHindi, selectedCity.cityName)
+                                                )
+                                            }
                                             val cities = PanchangCalculator.popularCities
                                             val filteredCities = if (searchQuery.isBlank()) {
                                                 cities

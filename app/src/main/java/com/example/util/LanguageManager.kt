@@ -49,6 +49,9 @@ object LanguageManager {
             ?.apply()
     }
 
+    /** True when the app is showing Hindi. */
+    val isHindi: Boolean get() = currentLanguage == AppLanguage.HINDI
+
     /** Picks the Hindi or English variant for the active language. */
     fun getString(hi: String, en: String): String {
         return if (currentLanguage == AppLanguage.HINDI) hi else en

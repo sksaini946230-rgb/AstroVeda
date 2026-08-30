@@ -38,3 +38,25 @@ val KundaliChartData.antardashaLocal: String get() = pick(currentAntardashaHi, c
 
 val DashaPeriod.planetLocal: String get() = pick(planetHi, planetEn)
 val AntardashaPeriod.planetLocal: String get() = pick(planetHi, planetEn)
+
+/**
+ * The headline date. PanchangData stores only the English form
+ * ("Sunday, 30 August 2026"); in Hindi mode that sat above a Hindi vara and
+ * paksha line and read as half-translated. Rebuilt here from the parts the
+ * data already carries, so nothing new has to be cached.
+ */
+val PanchangData.dateLocal: String
+    get() {
+        if (!LanguageManager.isHindi) return dateString
+        val parts = dateString.split(" ")
+        if (parts.size < 4) return dateString
+        val day = parts[1]
+        val monthIdx = MONTH_INDEX[parts[2]] ?: return dateString
+        val year = parts[3]
+        return "$dayOfWeekHindi, $day ${com.example.astro.AstroNames.GREGORIAN_MONTH_HI[monthIdx]} $year"
+    }
+
+private val MONTH_INDEX = listOf(
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+).withIndex().associate { (i, m) -> m to i }
