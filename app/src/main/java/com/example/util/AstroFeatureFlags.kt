@@ -25,7 +25,7 @@ object AstroFeatureFlags {
         val supportEmail: String = "support@astroveda.app",
         val maintenanceMode: Boolean = false,
         val maintenanceMessageHi: String = "एस्ट्रोवेदा में तकनीकी सुधार कार्य चल रहा है। कृपया कुछ समय बाद पुनः प्रयास करें।",
-        val maintenanceMessageEn: String = "AstroVeda is undergoing scheduled cosmic maintenance. Please check back shortly."
+        val maintenanceMessageEn: String = "Revati is undergoing scheduled cosmic maintenance. Please check back shortly."
     )
 
     private val _flags = MutableStateFlow(FlagsState())

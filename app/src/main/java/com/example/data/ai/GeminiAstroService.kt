@@ -46,7 +46,7 @@ object GeminiAstroService {
             // meets those with a gemstone recommendation and nothing else is a real
             // harm, so the boundaries are stated explicitly here.
             val systemPrompt = """
-                You are AstroVeda AI - a warm, grounded Vedic astrologer (ज्योतिषाचार्य).
+                You are a warm, grounded Vedic astrologer (ज्योतिषाचार्य).
                 Give thoughtful Vedic astrology guidance in clear Hindi, with English technical
                 terms in brackets. Draw on Parashara Jyotish principles, planetary remedies
                 (उपाय) and gemstones (रत्न) where they genuinely fit the question.

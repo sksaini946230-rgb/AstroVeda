@@ -37,7 +37,7 @@ object AdConsentManager {
         val params = ConsentRequestParameters.Builder()
             .setTagForUnderAgeOfConsent(false)
             .apply {
-                if (com.example.BuildConfig.DEBUG) {
+                if (app.revati.jyotish.BuildConfig.DEBUG) {
                     // Lets the form be exercised on a debug build without a VPN.
                     setConsentDebugSettings(
                         ConsentDebugSettings.Builder(activity)

@@ -382,12 +382,12 @@ class MainActivity : ComponentActivity() {
 
     private fun loadInterstitialAd() {
         val interstitialId = try {
-            val id = com.example.BuildConfig.ADMOB_INTERSTITIAL_ID
+            val id = app.revati.jyotish.BuildConfig.ADMOB_INTERSTITIAL_ID
             if (id.isNotBlank()) id
-            else if (com.example.BuildConfig.DEBUG) "ca-app-pub-3940256099942544/1033173712"
+            else if (app.revati.jyotish.BuildConfig.DEBUG) "ca-app-pub-3940256099942544/1033173712"
             else ""
         } catch (e: Throwable) {
-            if (com.example.BuildConfig.DEBUG) "ca-app-pub-3940256099942544/1033173712" else ""
+            if (app.revati.jyotish.BuildConfig.DEBUG) "ca-app-pub-3940256099942544/1033173712" else ""
         }
 
         if (interstitialId.isBlank()) return

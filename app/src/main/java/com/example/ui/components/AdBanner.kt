@@ -24,12 +24,12 @@ fun AdBanner(
 ) {
     val bannerId = remember {
         try {
-            val id = com.example.BuildConfig.ADMOB_BANNER_ID
+            val id = app.revati.jyotish.BuildConfig.ADMOB_BANNER_ID
             if (id.isNotBlank()) id
-            else if (com.example.BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111"
+            else if (app.revati.jyotish.BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111"
             else ""
         } catch (e: Throwable) {
-            if (com.example.BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else ""
+            if (app.revati.jyotish.BuildConfig.DEBUG) "ca-app-pub-3940256099942544/6300978111" else ""
         }
     }
 

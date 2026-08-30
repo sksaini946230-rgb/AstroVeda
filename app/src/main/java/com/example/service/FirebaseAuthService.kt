@@ -31,7 +31,7 @@ class FirebaseAuthService {
         return try {
             val credentialManager = CredentialManager.create(context)
 
-            val defaultClientId = com.example.BuildConfig.GOOGLE_WEB_CLIENT_ID
+            val defaultClientId = app.revati.jyotish.BuildConfig.GOOGLE_WEB_CLIENT_ID
             val clientId = if (webClientId.isNotEmpty()) webClientId else defaultClientId
 
             if (clientId.isEmpty()) {

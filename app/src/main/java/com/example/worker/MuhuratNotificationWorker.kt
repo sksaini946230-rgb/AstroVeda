@@ -116,13 +116,13 @@ class MuhuratNotificationWorker(
             
             val bigText = StringBuilder().apply {
                 append(LanguageManager.getString(
-                    "🕉️ AstroVeda दैनिक शुभ मुहूर्त गाइड (${panchang.dateLocal})\n\n" +
+                    "🕉️ Revati दैनिक शुभ मुहूर्त गाइड (${panchang.dateLocal})\n\n" +
                         "🌟 अभिजित मुहूर्त (सर्वश्रेष्ठ): ${panchang.abhijitMuhurat}\n" +
                         "🌅 ब्रह्म मुहूर्त: ${panchang.brahmaMuhurat}\n" +
                         "⚡ शुभ चौघड़िया समय: $shubhChoghadiyaSummary\n" +
                         "⚠️ राहुकाल (अशुभ समय): ${panchang.rahuKaal}\n\n" +
                         "💡 टिप: नया कार्य, पूजन या यात्रा अभिजित मुहूर्त या अमृत/शुभ चौघड़िया में आरंभ करना अत्यंत फलदायी होता है।",
-                    "🕉️ AstroVeda — today's auspicious timings (${panchang.dateString})\n\n" +
+                    "🕉️ Revati — today's auspicious timings (${panchang.dateString})\n\n" +
                         "🌟 Abhijit Muhurat (the best window): ${panchang.abhijitMuhurat}\n" +
                         "🌅 Brahma Muhurta: ${panchang.brahmaMuhurat}\n" +
                         "⚡ Auspicious Choghadiya: $shubhChoghadiyaSummary\n" +
@@ -144,12 +144,12 @@ class MuhuratNotificationWorker(
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channelName = try {
-                context.getString(com.example.R.string.notif_channel_muhurat_name)
+                context.getString(app.revati.jyotish.R.string.notif_channel_muhurat_name)
             } catch (e: Throwable) {
                 "शुभ मुहूर्त अलर्ट (Auspicious Muhurta Alerts)"
             }
             val channelDesc = try {
-                context.getString(com.example.R.string.notif_channel_muhurat_desc)
+                context.getString(app.revati.jyotish.R.string.notif_channel_muhurat_desc)
             } catch (e: Throwable) {
                 "प्रतिदिन शुभ मुहूर्त, अभिजित मुहूर्त, चौघड़िया एवं ब्रह्म मुहूर्त की सूचनाएं।"
             }
@@ -180,7 +180,7 @@ class MuhuratNotificationWorker(
         )
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(com.example.R.mipmap.ic_launcher)
+            .setSmallIcon(app.revati.jyotish.R.mipmap.ic_launcher)
             .setContentTitle(title)
             .setContentText(content)
             .setStyle(NotificationCompat.BigTextStyle().bigText(bigText))

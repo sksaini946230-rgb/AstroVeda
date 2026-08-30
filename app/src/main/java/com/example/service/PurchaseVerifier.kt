@@ -20,7 +20,7 @@ import java.security.spec.X509EncodedKeySpec
  * from "install an app" to "modify the APK", which is worth having. The only
  * verification that cannot be bypassed happens on a server the attacker does not
  * control, checking the token against the Play Developer API — that needs a
- * backend AstroVeda does not have yet.
+ * backend Revati does not have yet.
  *
  * The key goes in .env (which is not in git) as PLAY_LICENSE_KEY, alongside the
  * other secrets; find it in Play Console under Monetise → Monetisation setup →
@@ -40,7 +40,7 @@ object PurchaseVerifier {
     private const val UNSET = "NOT_CONFIGURED"
 
     private val licenseKey: String
-        get() = com.example.BuildConfig.PLAY_LICENSE_KEY
+        get() = app.revati.jyotish.BuildConfig.PLAY_LICENSE_KEY
             .takeUnless { it == UNSET }
             .orEmpty()
 

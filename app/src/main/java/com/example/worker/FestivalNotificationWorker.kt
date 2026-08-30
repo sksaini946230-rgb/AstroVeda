@@ -88,8 +88,8 @@ class FestivalNotificationWorker(
                 val names = tomorrowFestivals.joinToString(", ") { LanguageManager.getString(it.nameHi, it.nameEn) }
                 val title = LanguageManager.getString("कल का त्योहार: $names", "Tomorrow: $names")
                 val content = LanguageManager.getString(
-                    "AstroVeda आपको कल के व्रत/त्योहार की याद दिला रहा है।",
-                    "A reminder from AstroVeda about tomorrow's fast or festival."
+                    "Revati आपको कल के व्रत/त्योहार की याद दिला रहा है।",
+                    "A reminder from Revati about tomorrow's fast or festival."
                 )
                 showNotification(title, content)
             }

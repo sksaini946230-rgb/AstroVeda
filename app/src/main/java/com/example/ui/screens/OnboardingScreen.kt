@@ -57,7 +57,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.R
+import app.revati.jyotish.R
 import com.example.ui.MainViewModel
 import com.example.ui.components.GlassCard
 import com.example.ui.components.GoldGlowButton
@@ -166,7 +166,7 @@ fun OnboardingScreen(
                 )
             } else {
                 GoldGlowButton(
-                    text = LanguageManager.getString("ऐप शुरू करें", "Enter AstroVeda"),
+                    text = LanguageManager.getString("ऐप शुरू करें", "Enter Revati"),
                     onClick = { onComplete() },
                     modifier = Modifier.fillMaxWidth(),
                     testTag = "onboarding_start_button"
@@ -202,7 +202,7 @@ fun LanguageSelectOnboardingPage(viewModel: MainViewModel) {
         ) {
             Image(
                 painter = painterResource(id = R.drawable.img_app_icon_1784710282310),
-                contentDescription = "AstroVeda Logo",
+                contentDescription = "Revati Logo",
                 modifier = Modifier
                     .size(76.dp)
                     .clip(CircleShape)
@@ -212,7 +212,7 @@ fun LanguageSelectOnboardingPage(viewModel: MainViewModel) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "AstroVeda",
+            text = "Revati",
             style = MaterialTheme.typography.displayMedium.copy(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,

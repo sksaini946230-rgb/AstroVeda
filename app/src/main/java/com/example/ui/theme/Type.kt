@@ -11,7 +11,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.example.R
+import app.revati.jyotish.R
 
 // Outfit → primary Latin/English typeface (res/font/outfit.xml)
 // Noto Sans Devanagari → Hindi/Sanskrit script ke liye (res/font/noto_sans_devanagari.xml)

@@ -72,7 +72,7 @@ object ShareUtils {
         if (luckyColor.isNotBlank()) sb.appendLine(LanguageManager.getString("🎨 शुभ रंग: $luckyColor", "🎨 Lucky colour: $luckyColor"))
         if (luckyTime.isNotBlank()) sb.appendLine(LanguageManager.getString("⏰ शुभ समय: $luckyTime", "⏰ Lucky time: $luckyTime"))
         sb.appendLine()
-        sb.appendLine(LanguageManager.getString("— AstroVeda ज्योतिष ऐप से", "— from the AstroVeda app"))
+        sb.appendLine(LanguageManager.getString("— Revati ज्योतिष ऐप से", "— from the Revati app"))
 
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"

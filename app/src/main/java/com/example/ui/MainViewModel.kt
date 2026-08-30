@@ -987,7 +987,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 placeOfBirth = kundaliPlace.value,
                 latitude = _selectedCity.value.latitude,
                 longitude = _selectedCity.value.longitude,
-                notes = "Saved from AstroVeda Kundali Generator"
+                notes = "Saved from Revati Kundali Generator"
             )
             repository.saveProfile(entity)
         }

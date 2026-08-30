@@ -110,7 +110,7 @@ class AstroNotificationWorker(
             )
             val content = "🌅 ${panchang.sunrise} | 🌇 ${panchang.sunset} • 📜 ${panchang.tithiLocal}"
             val bigText = LanguageManager.getString(
-                "🕉️ AstroVeda दैनिक पंचांग एवं राशिफल (${panchang.dateLocal})\n\n" +
+                "🕉️ Revati दैनिक पंचांग एवं राशिफल (${panchang.dateLocal})\n\n" +
                     "🌅 सूर्योदय: ${panchang.sunrise} | 🌇 सूर्यास्त: ${panchang.sunset}\n" +
                     "📜 तिथि: ${panchang.tithiLocal}\n" +
                     "✨ नक्षत्र: ${panchang.nakshatraLocal}\n" +
@@ -119,7 +119,7 @@ class AstroNotificationWorker(
                     "⚠️ राहुकाल: ${panchang.rahuKaal}\n\n" +
                     "🔮 दैनिक राशिफल - ${horoscope.rashiNameHi}:\n" +
                     "\"${horoscope.generalReadingHi}\"",
-                "🕉️ AstroVeda — today's Panchang & horoscope (${panchang.dateString})\n\n" +
+                "🕉️ Revati — today's Panchang & horoscope (${panchang.dateString})\n\n" +
                     "🌅 Sunrise: ${panchang.sunrise} | 🌇 Sunset: ${panchang.sunset}\n" +
                     "📜 Tithi: ${panchang.tithiLocal}\n" +
                     "✨ Nakshatra: ${panchang.nakshatraLocal}\n" +
@@ -142,8 +142,8 @@ class AstroNotificationWorker(
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channelName = context.getString(com.example.R.string.notif_channel_panchang_name)
-            val channelDesc = context.getString(com.example.R.string.notif_channel_panchang_desc)
+            val channelName = context.getString(app.revati.jyotish.R.string.notif_channel_panchang_name)
+            val channelDesc = context.getString(app.revati.jyotish.R.string.notif_channel_panchang_desc)
             val channel = NotificationChannel(
                 CHANNEL_ID,
                 channelName,
@@ -170,7 +170,7 @@ class AstroNotificationWorker(
         )
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(com.example.R.mipmap.ic_launcher)
+            .setSmallIcon(app.revati.jyotish.R.mipmap.ic_launcher)
             .setContentTitle(title)
             .setContentText(content)
             .setStyle(NotificationCompat.BigTextStyle().bigText(bigText))

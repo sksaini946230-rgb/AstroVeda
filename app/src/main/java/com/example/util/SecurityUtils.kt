@@ -2,7 +2,7 @@ package com.example.util
 
 import android.os.Build
 import android.util.Log
-import com.example.BuildConfig
+import app.revati.jyotish.BuildConfig
 import java.io.File
 import java.util.regex.Pattern
 

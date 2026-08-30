@@ -15,7 +15,7 @@ import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
 import com.example.MainActivity
-import com.example.R
+import app.revati.jyotish.R
 import com.example.astro.PanchangCalculator
 import com.example.data.model.CityLocation
 import java.text.SimpleDateFormat

@@ -177,7 +177,7 @@ object AstroAnalytics {
      * Test crash trigger for developer validation of Crashlytics console.
      */
     fun triggerTestCrash() {
-        throw RuntimeException("AstroVeda Verified Test Crash: Crashlytics Pipeline Operational.")
+        throw RuntimeException("Revati Verified Test Crash: Crashlytics Pipeline Operational.")
     }
 
     // --- Internal Helpers ---

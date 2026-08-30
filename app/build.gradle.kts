@@ -12,11 +12,16 @@ plugins {
 }
 
 android {
-  namespace = "com.example"
+  // The Kotlin sources still live under com.example; this is the applicationId
+  // namespace, which is what R and BuildConfig are generated into.
+  namespace = "app.revati.jyotish"
   compileSdk { version = release(36) { minorApiLevel = 1 } }
 
   defaultConfig {
-    applicationId = "com.aistudio.astroveda.kpvqzm"
+    // "AstroVeda" is another company's live brand on Play — five apps, some
+    // with six-figure installs. The app is renamed to Revati, and the package
+    // went with it while that was still free to do (nothing published yet).
+    applicationId = "app.revati.jyotish"
     minSdk = 24
     targetSdk = 36
     versionCode = 2

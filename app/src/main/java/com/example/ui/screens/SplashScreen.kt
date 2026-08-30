@@ -186,8 +186,8 @@ fun SplashScreen(
                 }
                 // App logo image (matches launcher icon)
                 Image(
-                    painter = painterResource(id = com.example.R.drawable.img_app_icon_1784710282310),
-                    contentDescription = "AstroVeda Logo",
+                    painter = painterResource(id = app.revati.jyotish.R.drawable.img_app_icon_1784710282310),
+                    contentDescription = "Revati Logo",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(96.dp)
@@ -201,7 +201,7 @@ fun SplashScreen(
 
             // App name with gradient gold
             Text(
-                text = "AstroVeda",
+                text = "Revati",
                 fontSize = 42.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = PrimaryButtonBackground,

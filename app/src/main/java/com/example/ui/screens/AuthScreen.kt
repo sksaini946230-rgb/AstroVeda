@@ -109,7 +109,7 @@ fun AuthScreen(viewModel: MainViewModel) {
             verticalArrangement = Arrangement.Center
         ) {
             Image(
-                painter = painterResource(id = com.example.R.drawable.img_app_icon_1784710282310),
+                painter = painterResource(id = app.revati.jyotish.R.drawable.img_app_icon_1784710282310),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -121,7 +121,7 @@ fun AuthScreen(viewModel: MainViewModel) {
             Spacer(modifier = Modifier.height(14.dp))
 
             Text(
-                text = "AstroVeda",
+                text = "Revati",
                 style = MaterialTheme.typography.headlineSmall.copy(
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold

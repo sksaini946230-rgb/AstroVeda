@@ -1065,8 +1065,8 @@ fun CloudBackupCard(
             text = {
                 Text(
                     text = LanguageManager.getString(
-                        "क्या आप अपना AstroVeda खाता एवं सभी डेटा स्थायी रूप से हटाना चाहते हैं?\n\n• क्लाउड में सहेजे गए सभी कुण्डली प्रोफाइल\n• इस डिवाइस पर सहेजे गए सभी प्रोफाइल एवं रिपोर्ट\n• गूगल साइन-इन खाता एवं क्रेडेंशियल्स\n\nयह प्रक्रिया पूरी तरह से स्थायी है।",
-                        "Are you sure you want to permanently delete your AstroVeda account and all associated data?\n\n• All cloud-backed-up Kundali profiles (Firestore)\n• All local saved profiles and reports on this device\n• Google sign-in account and credentials\n\nThis action cannot be undone."
+                        "क्या आप अपना Revati खाता एवं सभी डेटा स्थायी रूप से हटाना चाहते हैं?\n\n• क्लाउड में सहेजे गए सभी कुण्डली प्रोफाइल\n• इस डिवाइस पर सहेजे गए सभी प्रोफाइल एवं रिपोर्ट\n• गूगल साइन-इन खाता एवं क्रेडेंशियल्स\n\nयह प्रक्रिया पूरी तरह से स्थायी है।",
+                        "Are you sure you want to permanently delete your Revati account and all associated data?\n\n• All cloud-backed-up Kundali profiles (Firestore)\n• All local saved profiles and reports on this device\n• Google sign-in account and credentials\n\nThis action cannot be undone."
                     ),
                     style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface)
                 )

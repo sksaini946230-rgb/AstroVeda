@@ -186,7 +186,7 @@ fun SettingsScreen(
                             Spacer(modifier = Modifier.width(12.dp))
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = LanguageManager.getString("AstroVeda PRO", "AstroVeda PRO"),
+                                    text = LanguageManager.getString("Revati PRO", "Revati PRO"),
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         color = ProBadgeColor,
                                         fontWeight = FontWeight.Bold,
@@ -889,7 +889,7 @@ fun SettingsScreen(
                         Spacer(modifier = Modifier.width(10.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = LanguageManager.getString("AstroVeda के बारे में", "About AstroVeda"),
+                                text = LanguageManager.getString("Revati के बारे में", "About Revati"),
                                 style = MaterialTheme.typography.titleSmall.copy(
                                     color = MaterialTheme.colorScheme.primary,
                                     fontWeight = FontWeight.Bold
@@ -1274,13 +1274,13 @@ fun SettingsScreen(
         AlertDialog(
             onDismissRequest = { showAboutDialog = false },
             title = {
-                Text(text = "AstroVeda 2026", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                Text(text = "Revati 2026", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
             },
             text = {
                 Text(
                     text = LanguageManager.getString(
-                        "AstroVeda (वैदिक पंचांग एवं कुण्डली) एक सटीक पंचांग ऐप है। ग्रहों की गणना Meeus/ELP2000 खगोलीय एल्गोरिदम एवं लाहिड़ी अयनांश पर आधारित है, और पूरी तरह आपके फ़ोन पर ही होती है — इंटरनेट की आवश्यकता नहीं। इसमें 12 राशियां, चौघड़िया, राहुकाल, व्रत-त्योहार, कुण्डली, गुण मिलान व ज्योतिष परामर्श शामिल हैं।",
-                        "AstroVeda is an accurate Panchang app. Planetary positions are computed with the Meeus/ELP2000 algorithms and the Lahiri ayanamsa, entirely on your phone — no internet needed. It covers all 12 Rashis, Choghadiya, Rahu Kaal, festivals and fasts, birth charts, Guna Milan and astrological guidance."
+                        "Revati (वैदिक पंचांग एवं कुण्डली) एक सटीक पंचांग ऐप है। ग्रहों की गणना Meeus/ELP2000 खगोलीय एल्गोरिदम एवं लाहिड़ी अयनांश पर आधारित है, और पूरी तरह आपके फ़ोन पर ही होती है — इंटरनेट की आवश्यकता नहीं। इसमें 12 राशियां, चौघड़िया, राहुकाल, व्रत-त्योहार, कुण्डली, गुण मिलान व ज्योतिष परामर्श शामिल हैं।",
+                        "Revati is an accurate Panchang app. Planetary positions are computed with the Meeus/ELP2000 algorithms and the Lahiri ayanamsa, entirely on your phone — no internet needed. It covers all 12 Rashis, Choghadiya, Rahu Kaal, festivals and fasts, birth charts, Guna Milan and astrological guidance."
                     ),
                     color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 13.sp
@@ -1404,8 +1404,8 @@ fun SettingsScreen(
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
                         text = if (isGoogleUser) LanguageManager.getString(
-                            "क्या आप अपना AstroVeda खाता एवं सभी डेटा स्थायी रूप से हटाना चाहते हैं?\n\n• क्लाउड में सहेजे गए सभी कुण्डली प्रोफाइल\n• इस डिवाइस पर सहेजे गए सभी प्रोफाइल एवं रिपोर्ट\n• गूगल साइन-इन खाता एवं क्रेडेंशियल्स\n\nयह प्रक्रिया पूरी तरह से स्थायी है।",
-                            "Permanently delete your AstroVeda account and everything in it?\n\n• Every chart profile saved in the cloud\n• Every profile and report saved on this device\n• Your Google sign-in and credentials\n\nThis cannot be undone."
+                            "क्या आप अपना Revati खाता एवं सभी डेटा स्थायी रूप से हटाना चाहते हैं?\n\n• क्लाउड में सहेजे गए सभी कुण्डली प्रोफाइल\n• इस डिवाइस पर सहेजे गए सभी प्रोफाइल एवं रिपोर्ट\n• गूगल साइन-इन खाता एवं क्रेडेंशियल्स\n\nयह प्रक्रिया पूरी तरह से स्थायी है।",
+                            "Permanently delete your Revati account and everything in it?\n\n• Every chart profile saved in the cloud\n• Every profile and report saved on this device\n• Your Google sign-in and credentials\n\nThis cannot be undone."
                         ) else LanguageManager.getString(
                             "क्या आप इस डिवाइस पर सहेजे गए सभी कुण्डली प्रोफाइल और रिपोर्ट स्थायी रूप से हटाना चाहते हैं?\n\nयह प्रक्रिया पूरी तरह से स्थायी है।",
                             "Permanently delete every chart profile and report saved on this device?\n\nThis cannot be undone."

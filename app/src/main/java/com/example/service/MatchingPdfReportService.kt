@@ -86,7 +86,7 @@ object MatchingPdfReportService {
 
         // 3. Header Texts
         canvas.drawText(LanguageManager.getString(" वैदिक अष्टकूट कुण्डली गुण मिलान ", " Vedic Ashtakoot Kundali Matching "), 595f / 2f, 55f, textHeaderPaint)
-        canvas.drawText("AstroVeda 36-Guna Kundali Matching Certified Report", 595f / 2f, 78f, textSubHeaderPaint)
+        canvas.drawText("Revati 36-Guna Kundali Matching Certified Report", 595f / 2f, 78f, textSubHeaderPaint)
 
         var yPos = 130f
 
@@ -245,7 +245,7 @@ object MatchingPdfReportService {
             isAntiAlias = true
         }
         canvas.drawText(dateStr, 40f, 810f, footerPaint)
-        canvas.drawText("© AstroVeda Vedic Kundali Matching Service", 320f, 810f, footerPaint)
+        canvas.drawText("© Revati Vedic Kundali Matching Service", 320f, 810f, footerPaint)
 
         pdfDocument.finishPage(page)
 
@@ -273,8 +273,8 @@ object MatchingPdfReportService {
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "application/pdf"
             putExtra(Intent.EXTRA_STREAM, uri)
-            putExtra(Intent.EXTRA_SUBJECT, "AstroVeda Kundali Matching PDF Report")
-            putExtra(Intent.EXTRA_TEXT, "AstroVeda Vedic 36-Guna Kundali Matching PDF Report")
+            putExtra(Intent.EXTRA_SUBJECT, "Revati Kundali Matching PDF Report")
+            putExtra(Intent.EXTRA_TEXT, "Revati Vedic 36-Guna Kundali Matching PDF Report")
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
 

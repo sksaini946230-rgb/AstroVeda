@@ -57,7 +57,7 @@ object KundaliImageGenerator {
                 textAlign = Paint.Align.CENTER
                 isAntiAlias = true
             }
-            canvas.drawText("✨ AstroVeda Kundali ✨", (width / 2).toFloat(), 110f, titlePaint)
+            canvas.drawText("✨ Revati Kundali ✨", (width / 2).toFloat(), 110f, titlePaint)
 
             val subtitlePaint = Paint().apply {
                 color = Color.WHITE
@@ -212,7 +212,7 @@ object KundaliImageGenerator {
                 textAlign = Paint.Align.CENTER
                 isAntiAlias = true
             }
-            canvas.drawText("AstroVeda - Vedic Astrology App", (width / 2).toFloat(), (height - 80).toFloat(), footerPaint)
+            canvas.drawText("Revati - Vedic Astrology App", (width / 2).toFloat(), (height - 80).toFloat(), footerPaint)
 
             val watermarkPaint = Paint().apply {
                 color = Color.parseColor("#D4AF37")

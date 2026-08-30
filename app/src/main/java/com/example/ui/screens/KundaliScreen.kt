@@ -849,7 +849,7 @@ fun KundaliScreen(
                                                         .clickable {
                                                             haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                                                             val shareText = """
-                                                                ✨ AstroVeda Kundali ✨
+                                                                ✨ Revati Kundali ✨
                                                                 Name: ${currentChart.personName}
                                                                 DOB: ${currentChart.dateOfBirth} | ${currentChart.timeOfBirth}
                                                                 Place: ${currentChart.placeOfBirth}
@@ -861,7 +861,7 @@ fun KundaliScreen(
 
                                                             val shareIntent = Intent(Intent.ACTION_SEND).apply {
                                                                 type = "text/plain"
-                                                                putExtra(Intent.EXTRA_SUBJECT, "AstroVeda Kundali")
+                                                                putExtra(Intent.EXTRA_SUBJECT, "Revati Kundali")
                                                                 putExtra(Intent.EXTRA_TEXT, shareText)
                                                             }
                                                             context.startActivity(Intent.createChooser(shareIntent, "Share Kundali"))

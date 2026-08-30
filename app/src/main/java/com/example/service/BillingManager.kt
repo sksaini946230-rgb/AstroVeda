@@ -106,7 +106,7 @@ class BillingManager(
         val client = billingClient
         if (client == null) {
             _errorMessage.value = "Billing client unavailable. Please try again later."
-            if (com.example.BuildConfig.DEBUG) {
+            if (app.revati.jyotish.BuildConfig.DEBUG) {
                 onPremiumUnlocked(true)
             }
             return
@@ -115,7 +115,7 @@ class BillingManager(
         val details = _productDetails.value
         if (details == null) {
             _errorMessage.value = "Subscription is temporarily unavailable, please try again later."
-            if (com.example.BuildConfig.DEBUG) {
+            if (app.revati.jyotish.BuildConfig.DEBUG) {
                 onPremiumUnlocked(true)
             }
             return

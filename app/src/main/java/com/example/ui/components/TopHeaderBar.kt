@@ -35,7 +35,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.R
+import app.revati.jyotish.R
 import com.example.ui.theme.PrimaryButtonText
 import com.example.ui.theme.ProBadgeColor
 import com.example.ui.theme.ShubhSuccessColor
@@ -191,7 +191,7 @@ fun TopHeaderBar(
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.img_app_icon_1784710282310),
-                        contentDescription = "AstroVeda Logo",
+                        contentDescription = "Revati Logo",
                         modifier = Modifier
                             .size(31.dp)
                             .clip(CircleShape)
@@ -202,7 +202,7 @@ fun TopHeaderBar(
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "AstroVeda",
+                        text = "Revati",
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary,
