@@ -131,19 +131,78 @@ fun PremiumDialog(
                     FeatureRow(com.example.util.LanguageManager.getString(
                         "120 वर्ष की पूर्ण विंशोत्तरी दशा", "The full 120-year Vimshottari Dasha timeline"))
                 }
-                Spacer(modifier = Modifier.height(20.dp))
-                // The price comes from Play, not from a hardcoded string. This dialog
-                // said "₹199/वर्ष" while the Settings screen said "₹99/माह" — two
-                // different prices for the same subscription, and neither was read
-                // from the actual Play Console product.
+                Spacer(modifier = Modifier.height(18.dp))
+
+                // The price comes from Play, never from a string in here. This
+                // dialog once said "₹199/वर्ष" while Settings said "₹99/माह" —
+                // two prices for one subscription, neither of them real.
                 val productDetails by viewModel.subscriptionProductDetails.collectAsState()
-                val priceLabel = productDetails
+                val phase = productDetails
                     ?.subscriptionOfferDetails
                     ?.firstOrNull()
                     ?.pricingPhases
                     ?.pricingPhaseList
                     ?.firstOrNull()
-                    ?.formattedPrice
+                val priceLabel = phase?.formattedPrice
+                val periodLabel = phase?.billingPeriod?.let { billingPeriodLabel(it) }
+
+                if (priceLabel != null) {
+                    // Price, period and the fact that it renews — Play requires
+                    // the renewal to be disclosed before the purchase sheet, and
+                    // a subscription price with no period attached is meaningless.
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Row(verticalAlignment = Alignment.Bottom) {
+                            Text(
+                                text = priceLabel,
+                                style = MaterialTheme.typography.headlineMedium.copy(
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            )
+                            if (periodLabel != null) {
+                                Text(
+                                    text = " / $periodLabel",
+                                    style = MaterialTheme.typography.titleMedium.copy(
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    ),
+                                    modifier = Modifier.padding(bottom = 3.dp)
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = com.example.util.LanguageManager.getString(
+                                "स्वतः नवीनीकरण। Play Store से कभी भी रद्द कर सकते हैं।",
+                                "Renews automatically. Cancel any time in the Play Store."
+                            ),
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontSize = 11.sp,
+                                lineHeight = 15.sp
+                            ),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                    }
+                } else {
+                    // Play has not answered — the product is not live yet, or the
+                    // device is offline. Saying so beats an empty space, and
+                    // beats inventing a number.
+                    Text(
+                        text = com.example.util.LanguageManager.getString(
+                            "मूल्य Play Store से लिया जाता है। कीमत वहीं दिखेगी।",
+                            "The price comes from the Play Store and is shown there."
+                        ),
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 11.sp,
+                            lineHeight = 15.sp
+                        ),
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(14.dp))
 
                 GoldGlowButton(
                     text = if (priceLabel != null) {
@@ -151,9 +210,7 @@ fun PremiumDialog(
                             "PRO लें — $priceLabel", "Get PRO — $priceLabel"
                         )
                     } else {
-                        com.example.util.LanguageManager.getString(
-                            "PRO लें", "Get PRO"
-                        )
+                        com.example.util.LanguageManager.getString("PRO लें", "Get PRO")
                     },
                     onClick = {
                         val activity = context as? Activity
@@ -189,4 +246,18 @@ fun FeatureRow(text: String) {
             )
         )
     }
+}
+
+/**
+ * Turns Play's ISO-8601 billing period ("P1Y", "P1M", "P1W") into something a
+ * reader recognises. Anything unexpected is returned as-is rather than guessed
+ * at — a wrong period beside a real price is worse than a raw one.
+ */
+private fun billingPeriodLabel(isoPeriod: String): String = when (isoPeriod) {
+    "P1Y" -> com.example.util.LanguageManager.getString("वर्ष", "year")
+    "P6M" -> com.example.util.LanguageManager.getString("6 माह", "6 months")
+    "P3M" -> com.example.util.LanguageManager.getString("3 माह", "3 months")
+    "P1M" -> com.example.util.LanguageManager.getString("माह", "month")
+    "P1W" -> com.example.util.LanguageManager.getString("सप्ताह", "week")
+    else -> isoPeriod
 }

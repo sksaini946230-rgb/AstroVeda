@@ -235,13 +235,35 @@ fun SettingsScreen(
                             .padding(vertical = 10.dp),
                         contentAlignment = Alignment.Center
                     ) {
+                        // Carry the price here too, from Play. Sending someone to
+                        // a dialog to find out what it costs is a wasted step.
+                        val proPrice by viewModel.subscriptionProductDetails.collectAsState()
+                        val proPriceLabel = proPrice
+                            ?.subscriptionOfferDetails
+                            ?.firstOrNull()
+                            ?.pricingPhases
+                            ?.pricingPhaseList
+                            ?.firstOrNull()
+                            ?.formattedPrice
+
                         Text(
-                            text = LanguageManager.getString("अभी PRO अपग्रेड करें", "Upgrade to PRO"),
+                            text = if (proPriceLabel != null) {
+                                LanguageManager.getString(
+                                    "अभी PRO अपग्रेड करें — $proPriceLabel",
+                                    "Upgrade to PRO — $proPriceLabel"
+                                )
+                            } else {
+                                LanguageManager.getString("अभी PRO अपग्रेड करें", "Upgrade to PRO")
+                            },
                             style = MaterialTheme.typography.labelMedium.copy(
                                 color = PrimaryButtonText,
                                 fontWeight = FontWeight.Normal,
                                 fontSize = 13.sp
-                            )
+                            ),
+                            // The banner grows to fit rather than clipping a
+                            // price — a truncated amount is worse than none.
+                            maxLines = 2,
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
                         )
                     }
                 }
