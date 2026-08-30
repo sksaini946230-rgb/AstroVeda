@@ -157,6 +157,13 @@ class BillingManager(
 
     private fun handlePurchase(purchase: Purchase) {
         val client = billingClient
+        // Play signs every purchase; without checking that signature the app
+        // takes a swapped-out billing library at its word, which is exactly how
+        // Pro gets unlocked for free on a rooted device.
+        if (!PurchaseVerifier.isPurchaseValid(purchase.originalJson, purchase.signature)) {
+            _errorMessage.value = "This purchase could not be verified with Google Play."
+            return
+        }
         if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
             if (!purchase.isAcknowledged && client != null) {
                 val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()

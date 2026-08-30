@@ -135,6 +135,26 @@ class MainActivity : ComponentActivity() {
             com.example.util.AstroAnalytics.logAppOpen()
         } catch (_: Throwable) {}
 
+        // The app is written for adults reading their own charts, and it is not
+        // in the Families programme. Saying so explicitly keeps ad content at a
+        // general rating and keeps AdMob from having to guess — the Play data
+        // safety and content-rating answers have to match this.
+        try {
+            MobileAds.setRequestConfiguration(
+                com.google.android.gms.ads.RequestConfiguration.Builder()
+                    .setMaxAdContentRating(
+                        com.google.android.gms.ads.RequestConfiguration.MAX_AD_CONTENT_RATING_G
+                    )
+                    .setTagForChildDirectedTreatment(
+                        com.google.android.gms.ads.RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_FALSE
+                    )
+                    .setTagForUnderAgeOfConsent(
+                        com.google.android.gms.ads.RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_FALSE
+                    )
+                    .build()
+            )
+        } catch (_: Throwable) {}
+
         // Gather ad consent BEFORE initialising the ads SDK. UMP works this out by
         // region, so it is a no-op in India and shows the form in the EEA/UK, where
         // serving ads without one is an AdMob policy violation.
