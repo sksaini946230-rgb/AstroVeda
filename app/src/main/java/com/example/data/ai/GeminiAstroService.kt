@@ -1,5 +1,6 @@
 package com.example.data.ai
 
+import com.example.util.LanguageManager
 import android.util.Log
 import com.google.firebase.Firebase
 import com.google.firebase.ai.GenerativeModel
@@ -87,9 +88,9 @@ object GeminiAstroService {
             """.trimIndent()
 
             val fullPrompt = if (personDetails.isNotBlank()) {
-                "जात विवरण (Kundali Details): $personDetails\n\nप्रश्न (Question): $userQuestion"
+                "Kundali details: $personDetails\n\nQuestion: $userQuestion"
             } else {
-                "प्रश्न (Question): $userQuestion"
+                "Question: $userQuestion"
             }
 
             val model = modelFor(systemPrompt)
@@ -127,13 +128,25 @@ object GeminiAstroService {
         val qLower = question.lowercase()
         return when {
             qLower.contains("career") || qLower.contains("नौकरी") || qLower.contains("व्यापार") || qLower.contains("job") ->
-                "वैदिक ज्योतिष शास्त्र के अनुसार दशम भाव (10th House) एवं कर्मेश ग्रह का अध्ययन आवश्यक है। सूर्य एवं गुरु ग्रह की स्थिति अनुकूल होने पर नौकरी में शीघ्र पदोन्नति एवं व्यापार में लाभ होता है। प्रतिदिन प्रातःकाल सूर्य देव को तांबे के पात्र से जल अर्पित करें (ॐ घृणिः सूर्याय नमः)।"
+                LanguageManager.getString(
+                    "वैदिक ज्योतिष शास्त्र के अनुसार दशम भाव एवं कर्मेश ग्रह का अध्ययन आवश्यक है। सूर्य एवं गुरु ग्रह की स्थिति अनुकूल होने पर नौकरी में शीघ्र पदोन्नति एवं व्यापार में लाभ होता है। प्रतिदिन प्रातःकाल सूर्य देव को तांबे के पात्र से जल अर्पित करें (ॐ घृणिः सूर्याय नमः)।",
+                    "The 10th house and its lord are what to read here. A well-placed Sun and Jupiter bring promotion at work and gain in business. Offer water to the Sun each morning from a copper vessel, with the mantra Om Ghrini Suryaya Namah."
+                )
             qLower.contains("marriage") || qLower.contains("विवाह") || qLower.contains("शादी") || qLower.contains("love") ->
-                "सप्तम भाव (7th House) एवं शुक्र/गुरु ग्रह की शुभ दृष्टि वैवाहिक सुख का आधार है। यदि विवाह में विलम्ब हो रहा हो तो प्रत्येक गुरुवार को बेसन के लड्डू अथवा पीली वस्तु का दान करें तथा शिव-पार्वती जी का पूजन करें।"
+                LanguageManager.getString(
+                    "सप्तम भाव एवं शुक्र/गुरु ग्रह की शुभ दृष्टि वैवाहिक सुख का आधार है। यदि विवाह में विलम्ब हो रहा हो तो प्रत्येक गुरुवार को बेसन के लड्डू अथवा पीली वस्तु का दान करें तथा शिव-पार्वती जी का पूजन करें।",
+                    "The 7th house, with a benefic aspect from Venus or Jupiter, is the ground of a happy marriage. Where marriage is delayed, donate besan laddus or something yellow each Thursday and worship Shiva and Parvati."
+                )
             qLower.contains("health") || qLower.contains("स्वास्थ्य") || qLower.contains("रोग") ->
-                "प्रथम भाव (लग्न) एवं लग्नेश ग्रह का बलवान होना निरोगी काया हेतु अनिवार्य है। महामृत्युंजय मन्त्र अथवा आदित्य हृदय स्तोत्र का पाठ करने से शारीरिक एवं मानसिक ऊर्जा में वृद्धि होती है।"
+                LanguageManager.getString(
+                    "प्रथम भाव एवं लग्नेश ग्रह का बलवान होना निरोगी काया हेतु अनिवार्य है। महामृत्युंजय मन्त्र अथवा आदित्य हृदय स्तोत्र का पाठ करने से शारीरिक एवं मानसिक ऊर्जा में वृद्धि होती है।",
+                    "A strong 1st house and a strong lagna lord are what keep the body well. Reciting the Mahamrityunjaya mantra or the Aditya Hridaya Stotra lifts both physical and mental energy."
+                )
             else ->
-                "ज्योतिष शास्त्र जीवन का मार्गदर्शन करता है। नवग्रह शांति हेतु प्रतिदिन प्रातः स्नानोपरांत 'ॐ नमो भगवते वासुदेवाय' मन्त्र का जप करें तथा अपने कुलदेवता व माता-पिता का आशीर्वाद प्राप्त करें। जीवन में सर्वत्र समृद्धि प्राप्त होगी।"
+                LanguageManager.getString(
+                    "ज्योतिष शास्त्र जीवन का मार्गदर्शन करता है। नवग्रह शांति हेतु प्रतिदिन प्रातः स्नानोपरांत 'ॐ नमो भगवते वासुदेवाय' मन्त्र का जप करें तथा अपने कुलदेवता व माता-पिता का आशीर्वाद प्राप्त करें।",
+                    "Jyotish points the way rather than fixing it. To settle the nine grahas, chant 'Om Namo Bhagavate Vasudevaya' each morning after bathing, and seek the blessing of your kuladevata and your parents."
+                )
         }
     }
 
@@ -149,9 +162,10 @@ object GeminiAstroService {
         try {
             val systemPrompt = """
                 You are an astro-news curator writing for an Indian Vedic astrology app.
-                Give exactly three short highlights in Hindi about notable planetary
-                transits (गोचर), eclipses (ग्रहण) and astronomical events for the current
-                period. Each highlight gets a one-line heading and two or three sentences.
+                Give exactly three short highlights, in ${LanguageManager.getString("Hindi", "English")},
+                about notable planetary transits, eclipses and astronomical events for
+                the current period. Each highlight gets a one-line heading and two or
+                three sentences.
 
                 Be careful with facts. If you are not confident about a specific date,
                 describe the event without pinning a date to it rather than inventing one.
@@ -172,16 +186,26 @@ object GeminiAstroService {
         }
     }
 
-    fun getOfflineAstroNews(): String {
-        return """
-            • 🪐 गुरु ग्रह का अतिचारी गोचर (Jupiter Transit):
+    fun getOfflineAstroNews(): String = LanguageManager.getString(
+        """
+            • 🪐 गुरु ग्रह का अतिचारी गोचर:
               देवगुरु बृहस्पति इस माह मिथुन राशि से कर्क राशि में प्रवेश करेंगे। उच्च के गुरु से हंस महापुरुष योग निर्मित होगा, जिससे ज्ञान व शिक्षा क्षेत्र में उन्नति होगी।
 
-            • 🌘 सूर्य ग्रहण एवं खगोलीय स्थिति (Solar Eclipse Info):
+            • 🌘 सूर्य ग्रहण एवं खगोलीय स्थिति:
               वर्ष 2026 का आगामी कंकणाकृति सूर्य ग्रहण अत्यंत दुर्लभ होगा। खगोलशास्त्रियों एवं ज्योतिषियों के अनुसार इस दौरान आकाश में 'रिंग ऑफ फायर' का भव्य नज़ारा देखने को मिलेगा।
 
-            • 🌌 नासा जेम्स वेब टेलीस्कोप की खोज (Space & Astronomy News):
+            • 🌌 नासा जेम्स वेब टेलीस्कोप की खोज:
               हाल ही में खगोलशास्त्रियों ने दीप अंतरिक्ष में नवजात नक्षत्र मंडल की खोज की है, जो वैदिक ब्रह्मांड विज्ञान के 'हिरण्यगर्भ' सिद्धांत की पुष्टि करता है।
+        """.trimIndent(),
+        """
+            • 🪐 Jupiter's transit:
+              Jupiter moves from Gemini into Cancer this month. Exalted there, it forms the Hamsa Mahapurusha yoga, held to favour learning and education.
+
+            • 🌘 Solar eclipse:
+              The annular solar eclipse ahead in 2026 is a rare one. Astronomers and astrologers alike expect the "ring of fire" to be visible at its peak.
+
+            • 🌌 From the James Webb telescope:
+              Astronomers recently found a newborn cluster of stars in deep space — an image many read alongside the Vedic Hiranyagarbha idea of a cosmic seed.
         """.trimIndent()
-    }
+    )
 }

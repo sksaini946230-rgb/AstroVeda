@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -263,6 +265,20 @@ fun MatchingScreen(viewModel: MainViewModel) {
                         }
 
                         val isCalculating by viewModel.isCalculating.collectAsState()
+                        val inputError by viewModel.matchingInputError.collectAsState()
+                        inputError?.let { message ->
+                            Text(
+                                text = message,
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    color = RahuKaalDangerColor,
+                                    fontSize = 13.sp
+                                ),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 8.dp)
+                            )
+                        }
+
                         if (isCalculating) {
                             AstroLoadingIndicator()
                         } else {
@@ -294,7 +310,7 @@ fun MatchingScreen(viewModel: MainViewModel) {
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Text(
-                                text = "✨ वैदिक अष्टकूट मिलान (36 Gunas Matching)",
+                                text = LanguageManager.getString("✨ वैदिक अष्टकूट मिलान", "✨ Vedic Ashtakoot matching — 36 gunas"),
                                 style = MaterialTheme.typography.titleMedium.copy(
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.primary,
@@ -608,59 +624,44 @@ fun MatchingScreen(viewModel: MainViewModel) {
                     )
                 }
 
-                // Detailed 8 Kootas Cards
+                // The eight koots as a bento. Each was a full-width card with a
+                // progress bar and a paragraph, so reading the breakdown meant
+                // eight scrolls. Two per row shows the whole score at once; the
+                // description moves into the tile's sub-line.
                 item {
                     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        result.kootDetails.forEach { koot ->
-                            val kootColor = if (koot.obtainedPoints == koot.maxPoints) {
-                                ShubhSuccessColor
-                            } else if (koot.obtainedPoints > 0.0) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                RahuKaalDangerColor
-                            }
-
-                            GlassCard(modifier = Modifier.fillMaxWidth()) {
-                                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text(
-                                            text = LanguageManager.getString(koot.kootNameHi, koot.kootNameEn),
-                                            style = MaterialTheme.typography.titleSmall.copy(
-                                                color = MaterialTheme.colorScheme.onSurface,
-                                                fontWeight = FontWeight.Bold,
-                                                fontSize = 14.5.sp
-                                            )
-                                        )
-                                        GlassBadge(
-                                            text = "${koot.obtainedPoints} / ${koot.maxPoints}",
-                                            textColor = kootColor,
-                                            borderColor = kootColor
-                                        )
+                        result.kootDetails.chunked(2).forEach { pair ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(IntrinsicSize.Min),
+                                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                pair.forEach { koot ->
+                                    val kootColor = when {
+                                        koot.obtainedPoints == koot.maxPoints -> ShubhSuccessColor
+                                        koot.obtainedPoints > 0.0 -> MaterialTheme.colorScheme.primary
+                                        else -> RahuKaalDangerColor
                                     }
-
-                                    LinearProgressIndicator(
-                                        progress = { (koot.obtainedPoints / koot.maxPoints).toFloat().coerceIn(0f, 1f) },
+                                    com.example.ui.components.BentoTile(
+                                        label = LanguageManager.getString(koot.kootNameHi, koot.kootNameEn),
+                                        value = "${koot.obtainedPoints} / ${koot.maxPoints}",
+                                        // The descriptions end in "(Boy: X, Girl: Y)",
+                                        // which the comparison table above already
+                                        // shows; in a tile it only ate the line.
+                                        sub = LanguageManager.getString(koot.descriptionHi, koot.descriptionEn)
+                                            .substringBefore(" (").trim(),
+                                        accent = kootColor,
+                                        valueSize = 20,
+                                        minHeight = 108,
+                                        singleLineValue = true,
                                         modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(4.dp)
-                                            .clip(RoundedCornerShape(2.dp)),
-                                        color = kootColor,
-                                        trackColor = MaterialTheme.colorScheme.surfaceVariant
-                                    )
-
-                                    Text(
-                                        text = LanguageManager.getString(koot.descriptionHi, koot.descriptionEn),
-                                        style = MaterialTheme.typography.bodySmall.copy(
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            fontSize = 12.5.sp,
-                                            lineHeight = 17.sp
-                                        )
+                                            .weight(1f)
+                                            .fillMaxHeight()
                                     )
                                 }
+                                // Eight is even, but guard a lone tile anyway.
+                                if (pair.size == 1) Spacer(modifier = Modifier.weight(1f))
                             }
                         }
                     }

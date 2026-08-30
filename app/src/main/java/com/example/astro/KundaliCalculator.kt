@@ -147,15 +147,13 @@ object KundaliCalculator {
             val houseNum = ((rashiIdx - ascendantRashiIdx + 12) % 12) + 1
             val nakshatraIdx = (deg / NAKSHATRA_SPAN).toInt().coerceIn(0, 26)
 
-            // House cells are tiny, so they carry the short form in the reader's script.
-            val baseShort = AstroNames.pick(
-                AstroNames.PLANET_HI[en] ?: en,
-                AstroNames.PLANET_SHORT[en] ?: en
-            )
+            // Store a language-neutral token — "Sun", "Mars|R" — and let each
+            // renderer localise it. Baking the Hindi in here meant a chart drawn
+            // in Hindi kept Devanagari glyphs after the user switched to English.
             val shortPlanetName = if (isRetro && en != "Rahu" && en != "Ketu") {
-                "$baseShort${AstroNames.pick("(व)", "(R)")}"
+                "$en${AstroNames.RETROGRADE_MARK}"
             } else {
-                baseShort
+                en
             }
 
             planetPositions.add(

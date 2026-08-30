@@ -43,6 +43,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.util.LanguageManager
 import com.example.data.model.DashaPeriod
 import com.example.ui.theme.DateTimeAccent
 import com.example.ui.theme.ElevatedSurface
@@ -87,7 +88,7 @@ fun DashaHorizontalTimeline(
             ) {
                 Column {
                     Text(
-                        text = "समय चक्र (Horizontal Dasha Timeline)",
+                        text = LanguageManager.getString("समय चक्र", "Dasha timeline"),
                         style = MaterialTheme.typography.titleMedium.copy(
                             color = MaterialTheme.colorScheme.secondary,
                             fontWeight = FontWeight.Bold,
@@ -95,7 +96,7 @@ fun DashaHorizontalTimeline(
                         )
                     )
                     Text(
-                        text = "अतीत एवं भविष्य के दशा काल देखने के लिए स्वाइप करें:",
+                        text = LanguageManager.getString("अतीत एवं भविष्य के दशा काल देखने के लिए स्वाइप करें:", "Swipe to see past and future dasha periods:"),
                         style = MaterialTheme.typography.labelSmall.copy(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 11.sp
@@ -113,7 +114,7 @@ fun DashaHorizontalTimeline(
                     border = androidx.compose.foundation.BorderStroke(1.dp, GlassCardBorder)
                 ) {
                     Text(
-                        text = "वर्तमान 🎯",
+                        text = LanguageManager.getString("वर्तमान 🎯", "Now 🎯"),
                         style = MaterialTheme.typography.labelSmall.copy(
                             color = PrimaryButtonBackground,
                             fontSize = 11.sp,
@@ -203,7 +204,7 @@ fun DashaHorizontalTimeline(
                                         }
                                         Spacer(modifier = Modifier.width(4.dp))
                                         Text(
-                                            text = "सक्रिय",
+                                            text = LanguageManager.getString("सक्रिय", "Active"),
                                             style = MaterialTheme.typography.labelSmall.copy(
                                                 color = PrimaryButtonBackground,
                                                 fontWeight = FontWeight.Normal,
@@ -219,7 +220,7 @@ fun DashaHorizontalTimeline(
                                         )
                                         Spacer(modifier = Modifier.width(2.dp))
                                         Text(
-                                            text = "पूर्ण",
+                                            text = LanguageManager.getString("पूर्ण", "Done"),
                                             style = MaterialTheme.typography.labelSmall.copy(
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                                                 fontSize = 10.sp
@@ -227,7 +228,7 @@ fun DashaHorizontalTimeline(
                                         )
                                     } else {
                                         Text(
-                                            text = "भावी",
+                                            text = LanguageManager.getString("भावी", "Ahead"),
                                             style = MaterialTheme.typography.labelSmall.copy(
                                                 color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
                                                 fontSize = 10.sp
@@ -265,7 +266,7 @@ fun DashaHorizontalTimeline(
                                     modifier = Modifier.padding(top = 2.dp)
                                 ) {
                                     Text(
-                                        text = "${dasha.durationYears} वर्ष",
+                                        text = LanguageManager.getString("${dasha.durationYears} वर्ष", "${dasha.durationYears} yr"),
                                         style = MaterialTheme.typography.labelSmall.copy(
                                             color = if (isCurrent) DateTimeAccent else MaterialTheme.colorScheme.onSurfaceVariant,
                                             fontWeight = FontWeight.Normal,
@@ -324,7 +325,7 @@ fun DashaHorizontalTimeline(
                     ) {
                         Column {
                             Text(
-                                text = "महादशा: ${selectedDasha.planetHi} (${selectedDasha.planetEn})",
+                                text = LanguageManager.getString("महादशा: ${selectedDasha.planetHi}", "Mahadasha: ${selectedDasha.planetEn}"),
                                 style = MaterialTheme.typography.titleSmall.copy(
                                     color = MaterialTheme.colorScheme.primary,
                                     fontWeight = FontWeight.Bold,
@@ -332,7 +333,10 @@ fun DashaHorizontalTimeline(
                                 )
                             )
                             Text(
-                                text = "अवधि: ${selectedDasha.startDate} से ${selectedDasha.endDate} (${selectedDasha.durationYears} वर्ष)",
+                                text = LanguageManager.getString(
+                            "अवधि: ${selectedDasha.startDate} से ${selectedDasha.endDate} (${selectedDasha.durationYears} वर्ष)",
+                            "Runs ${selectedDasha.startDate} to ${selectedDasha.endDate} (${selectedDasha.durationYears} yrs)"
+                        ),
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     fontSize = 12.sp
@@ -347,7 +351,7 @@ fun DashaHorizontalTimeline(
                                 border = androidx.compose.foundation.BorderStroke(1.dp, DateTimeAccent)
                             ) {
                                 Text(
-                                    text = "★ वर्तमान प्रभाव",
+                                    text = LanguageManager.getString("★ वर्तमान प्रभाव", "★ Running now"),
                                     style = MaterialTheme.typography.labelSmall.copy(
                                         color = DateTimeAccent,
                                         fontWeight = FontWeight.Normal,
@@ -361,7 +365,7 @@ fun DashaHorizontalTimeline(
 
                     if (selectedDasha.antardashas.isNotEmpty()) {
                         Text(
-                            text = "अंतर्दशा विवरण (Bhukti Sub-periods):",
+                            text = LanguageManager.getString("अंतर्दशा विवरण:", "Antardasha (bhukti) sub-periods:"),
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.secondary,
                                 fontWeight = FontWeight.Normal,
@@ -392,7 +396,10 @@ fun DashaHorizontalTimeline(
                                     )
                                 )
                                 Text(
-                                    text = "${sub.startDate} - ${sub.endDate} (${sub.durationMonths} माह)",
+                                    text = LanguageManager.getString(
+                                    "${sub.startDate} - ${sub.endDate} (${sub.durationMonths} माह)",
+                                    "${sub.startDate} - ${sub.endDate} (${sub.durationMonths} mo)"
+                                ),
                                     style = MaterialTheme.typography.labelSmall.copy(
                                         color = if (sub.isCurrent) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                                         fontWeight = if (sub.isCurrent) FontWeight.Normal else FontWeight.Normal,

@@ -50,6 +50,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.util.LanguageManager
 import com.example.data.model.KundaliChartData
 import com.example.ui.theme.DateTimeAccent
 import com.example.ui.theme.ElevatedSurface
@@ -90,7 +91,17 @@ fun NorthIndianChart(
         "तुला", "वृश्चिक", "धनु", "मकर", "कुंभ", "मीन"
     )
 
-    val houseSignificances = mapOf(
+    val rashiNamesEn = listOf(
+        "", "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+        "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+    )
+
+    fun rashiName(num: Int): String = LanguageManager.getString(
+        rashiNamesHi.getOrElse(num) { "" },
+        rashiNamesEn.getOrElse(num) { "" }
+    )
+
+    val houseSignificancesHi = mapOf(
         1 to "प्रथम भाव (लग्न) • तनु भाव: व्यक्तित्व, शरीर, स्वास्थ्य, आत्म-विश्वास",
         2 to "द्वितीय भाव • धन भाव: संपत्ति, कुटुंब, वाणी, संचित धन",
         3 to "तृतीय भाव • सहज भाव: पराक्रम, भ्राता, संचार, छोटी यात्राएं",
@@ -103,6 +114,26 @@ fun NorthIndianChart(
         10 to "दशम भाव • कर्म भाव: व्यवसाय, पद-प्रतिष्ठा, राज्य, कर्म",
         11 to "एकादश भाव • आय/लाभ भाव: लाभ, इच्छा-पूर्ति, मित्र, बड़े भाई",
         12 to "द्वादश भाव • व्यय भाव: मोक्ष, व्यय, विदेश, शयन सुख"
+    )
+
+    val houseSignificancesEn = mapOf(
+        1 to "1st house (Lagna) • Tanu: personality, body, health, self-belief",
+        2 to "2nd house • Dhana: wealth, family, speech, savings",
+        3 to "3rd house • Sahaja: courage, siblings, communication, short travel",
+        4 to "4th house • Sukha: mother, home, vehicles, peace of mind",
+        5 to "5th house • Putra/Buddhi: children, learning, intellect, past merit",
+        6 to "6th house • Ripu/Roga: enemies, illness, debt, competition",
+        7 to "7th house • Kalatra: marriage, spouse, partnership, business",
+        8 to "8th house • Ayu: longevity, secrets, hidden wealth, upheaval",
+        9 to "9th house • Bhagya/Dharma: fortune, dharma, father, higher study",
+        10 to "10th house • Karma: profession, standing, authority, work",
+        11 to "11th house • Labha: gains, fulfilled wishes, friends, elder siblings",
+        12 to "12th house • Vyaya: moksha, expenses, foreign lands, rest"
+    )
+
+    fun houseSignificance(house: Int): String = LanguageManager.getString(
+        houseSignificancesHi[house] ?: "",
+        houseSignificancesEn[house] ?: ""
     )
 
     // Return list of normalized polygon vertices [0..1] x [0..1] for each house
@@ -211,7 +242,7 @@ fun NorthIndianChart(
                                     onHouseClick(
                                         houseNum,
                                         getRashiForHouse(houseNum),
-                                        chartData.housePlanetsMap[houseNum] ?: emptyList()
+                                        (chartData.housePlanetsMap[houseNum] ?: emptyList()).map { com.example.astro.AstroNames.houseGlyph(it) }
                                     )
                                     break
                                 }
@@ -305,7 +336,7 @@ fun NorthIndianChart(
                 for (houseNum in 1..12) {
                     val pos = houseCenters[houseNum] ?: Offset(0f, 0f)
                     val rashiNum = getRashiForHouse(houseNum)
-                    val planets = chartData.housePlanetsMap[houseNum] ?: emptyList()
+                    val planets = (chartData.housePlanetsMap[houseNum] ?: emptyList()).map { com.example.astro.AstroNames.houseGlyph(it) }
 
                     val rashiText = "$rashiNum"
                     val planetsText = if (planets.isNotEmpty()) planets.joinToString(" ") else ""
@@ -327,7 +358,7 @@ fun NorthIndianChart(
                     // Draw Lagna indicator tag for House 1
                     if (houseNum == 1) {
                         val lagnaMeas = textMeasurer.measure(
-                            text = "लग्न",
+                            text = LanguageManager.getString("लग्न", "Lagna"),
                             style = TextStyle(
                                 color = goldColor,
                                 fontSize = 10.sp,
@@ -416,7 +447,9 @@ fun NorthIndianChart(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "${String.format(java.util.Locale.US, "%.1f", userScale)}x ${if (userScale > 1.25f) "• अंश/डिग्री" else ""}  रिसेट ↺",
+                            text = "${String.format(java.util.Locale.US, "%.1f", userScale)}x " +
+                                (if (userScale > 1.25f) LanguageManager.getString("• अंश/डिग्री ", "• degrees ") else "") +
+                                " " + LanguageManager.getString("रिसेट ↺", "Reset ↺"),
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = goldColor,
                                 fontSize = 11.sp,
@@ -434,7 +467,7 @@ fun NorthIndianChart(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "उत्तर भारतीय कुण्डली",
+                text = LanguageManager.getString("उत्तर भारतीय कुण्डली", "North Indian chart"),
                 style = MaterialTheme.typography.labelSmall.copy(
                     color = PrimaryButtonBackground,
                     fontWeight = FontWeight.Normal,
@@ -443,7 +476,7 @@ fun NorthIndianChart(
             )
             Text(
                 text = com.example.util.LanguageManager.getString(
-                    "लग्न: ${chartData.ascendantRashiHi}",
+                    LanguageManager.getString("लग्न: ${chartData.ascendantRashiHi}", "Lagna: ${chartData.ascendantRashiEn}"),
                     "Lagna: ${chartData.ascendantRashiEn}"
                 ),
                 style = MaterialTheme.typography.labelSmall.copy(
@@ -456,9 +489,9 @@ fun NorthIndianChart(
         // Selected House Detail Sheet
         selectedHouse?.let { houseNum ->
             val rashiNum = getRashiForHouse(houseNum)
-            val rashiName = rashiNamesHi.getOrElse(rashiNum) { "" }
-            val planets = chartData.housePlanetsMap[houseNum] ?: emptyList()
-            val significance = houseSignificances[houseNum] ?: ""
+            val rashiName = rashiName(rashiNum)
+            val planets = (chartData.housePlanetsMap[houseNum] ?: emptyList()).map { com.example.astro.AstroNames.houseGlyph(it) }
+            val significance = houseSignificance(houseNum)
 
             Spacer(modifier = Modifier.height(10.dp))
 
@@ -484,7 +517,7 @@ fun NorthIndianChart(
                             )
                         )
                         Text(
-                            text = "राशि: $rashiName ($rashiNum)",
+                            text = LanguageManager.getString("राशि: $rashiName ($rashiNum)", "Sign: $rashiName ($rashiNum)"),
                             style = MaterialTheme.typography.bodySmall.copy(
                                 color = PrimaryButtonBackground,
                                 fontWeight = FontWeight.Normal
@@ -508,7 +541,7 @@ fun NorthIndianChart(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "स्थित ग्रह: ",
+                            text = LanguageManager.getString("स्थित ग्रह: ", "Planets here: "),
                             style = MaterialTheme.typography.bodySmall.copy(
                                 color = TextPrimary,
                                 fontWeight = FontWeight.Normal,
@@ -526,7 +559,7 @@ fun NorthIndianChart(
                             )
                         } else {
                             Text(
-                                text = "— इस भाव में कोई ग्रह नहीं",
+                                text = LanguageManager.getString("— इस भाव में कोई ग्रह नहीं", "— no planets in this house"),
                                 style = MaterialTheme.typography.bodySmall.copy(
                                     color = TextSecondary,
                                     fontSize = 11.sp,

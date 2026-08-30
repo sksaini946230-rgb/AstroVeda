@@ -1,5 +1,6 @@
 package com.example.worker
 
+import com.example.util.LanguageManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -84,9 +85,12 @@ class FestivalNotificationWorker(
             val tomorrowFestivals = festivals.filter { it.dateIso == dateStr }
 
             if (tomorrowFestivals.isNotEmpty()) {
-                val names = tomorrowFestivals.joinToString(", ") { it.nameHi }
-                val title = "कल का त्योहार: $names"
-                val content = "AstroVeda आपको कल के व्रत/त्योहार की याद दिला रहा है।"
+                val names = tomorrowFestivals.joinToString(", ") { LanguageManager.getString(it.nameHi, it.nameEn) }
+                val title = LanguageManager.getString("कल का त्योहार: $names", "Tomorrow: $names")
+                val content = LanguageManager.getString(
+                    "AstroVeda आपको कल के व्रत/त्योहार की याद दिला रहा है।",
+                    "A reminder from AstroVeda about tomorrow's fast or festival."
+                )
                 showNotification(title, content)
             }
 

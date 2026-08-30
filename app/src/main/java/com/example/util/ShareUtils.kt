@@ -37,49 +37,49 @@ object ShareUtils {
     ) {
         val stars = "⭐".repeat(score)
         val periodLabel = when (period.uppercase()) {
-            "TODAY" -> "आज का"
-            "WEEK" -> "इस हफ्ते का"
-            "MONTH" -> "इस महीने का"
-            else -> "आज का"
+            "TODAY" -> LanguageManager.getString("आज का", "today's")
+            "WEEK" -> LanguageManager.getString("इस हफ्ते का", "this week's")
+            "MONTH" -> LanguageManager.getString("इस महीने का", "this month's")
+            else -> LanguageManager.getString("आज का", "today's")
         }
 
         val sb = StringBuilder()
-        sb.appendLine("🔮 *$rashiNameHi ($rashiName) — $periodLabel राशिफल*")
+        sb.appendLine(LanguageManager.getString("🔮 *$rashiNameHi — $periodLabel राशिफल*", "🔮 *$rashiName — $periodLabel horoscope*"))
         sb.appendLine()
         if (stars.isNotEmpty()) sb.appendLine("$stars ($score/5)")
         sb.appendLine()
         if (general.isNotBlank()) {
-            sb.appendLine("📋 *सामान्य फलादेश:* $general")
+            sb.appendLine(LanguageManager.getString("📋 *सामान्य फलादेश:* $general", "📋 *Overall:* $general"))
             sb.appendLine()
         }
         if (career.isNotBlank()) {
-            sb.appendLine("💼 *करियर व व्यवसाय:* $career")
+            sb.appendLine(LanguageManager.getString("💼 *करियर व व्यवसाय:* $career", "💼 *Work & business:* $career"))
             sb.appendLine()
         }
         if (finance.isNotBlank()) {
-            sb.appendLine("💰 *वित्त व धन लाभ:* $finance")
+            sb.appendLine(LanguageManager.getString("💰 *वित्त व धन लाभ:* $finance", "💰 *Money:* $finance"))
             sb.appendLine()
         }
         if (love.isNotBlank()) {
-            sb.appendLine("💑 *प्रेम व संबंध:* $love")
+            sb.appendLine(LanguageManager.getString("💑 *प्रेम व संबंध:* $love", "💑 *Love & relationships:* $love"))
             sb.appendLine()
         }
         if (health.isNotBlank()) {
-            sb.appendLine("🌿 *स्वास्थ्य एवं ऊर्जा:* $health")
+            sb.appendLine(LanguageManager.getString("🌿 *स्वास्थ्य एवं ऊर्जा:* $health", "🌿 *Health & energy:* $health"))
             sb.appendLine()
         }
-        if (luckyNumber.isNotBlank()) sb.appendLine("🔢 शुभ अंक: $luckyNumber")
-        if (luckyColor.isNotBlank()) sb.appendLine("🎨 शुभ रंग: $luckyColor")
-        if (luckyTime.isNotBlank()) sb.appendLine("⏰ शुभ समय: $luckyTime")
+        if (luckyNumber.isNotBlank()) sb.appendLine(LanguageManager.getString("🔢 शुभ अंक: $luckyNumber", "🔢 Lucky number: $luckyNumber"))
+        if (luckyColor.isNotBlank()) sb.appendLine(LanguageManager.getString("🎨 शुभ रंग: $luckyColor", "🎨 Lucky colour: $luckyColor"))
+        if (luckyTime.isNotBlank()) sb.appendLine(LanguageManager.getString("⏰ शुभ समय: $luckyTime", "⏰ Lucky time: $luckyTime"))
         sb.appendLine()
-        sb.appendLine("— AstroVeda ज्योतिष ऐप से")
+        sb.appendLine(LanguageManager.getString("— AstroVeda ज्योतिष ऐप से", "— from the AstroVeda app"))
 
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, sb.toString())
         }
         context.startActivity(
-            Intent.createChooser(shareIntent, "राशिफल शेयर करें")
+            Intent.createChooser(shareIntent, LanguageManager.getString("राशिफल शेयर करें", "Share horoscope"))
         )
     }
 }

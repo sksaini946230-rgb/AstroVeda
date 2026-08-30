@@ -86,10 +86,10 @@ fun NumerologyScreen(viewModel: MainViewModel) {
     var userQuestion by remember { mutableStateOf("") }
 
     val quickQuestions = listOf(
-        "मेरी नौकरी में पदोन्नति कब होगी?",
-        "क्या मेरा विवाह 2026 में संभव है?",
-        "धन लाभ हेतु कौन सा उपाय करें?",
-        "राहु दशा शांति के सरल उपाय क्या हैं?"
+        LanguageManager.getString("मेरी नौकरी में पदोन्नति कब होगी?", "When will I get a promotion at work?"),
+        LanguageManager.getString("क्या मेरा विवाह 2026 में संभव है?", "Is marriage likely for me in 2026?"),
+        LanguageManager.getString("धन लाभ हेतु कौन सा उपाय करें?", "Which remedy helps with money?"),
+        LanguageManager.getString("राहु दशा शांति के सरल उपाय क्या हैं?", "Simple remedies to calm a Rahu dasha?")
     )
 
     Scaffold(
@@ -150,7 +150,7 @@ fun NumerologyScreen(viewModel: MainViewModel) {
                                     nameError = NumerologyValidator.validateName(it)
                                 }
                             },
-                            label = { Text("नाम (Name)") },
+                            label = { Text(LanguageManager.getString("नाम", "Name")) },
                             isError = (nameError != null),
                             colors = tfColors,
                             modifier = Modifier.fillMaxWidth().testTag("input_num_name")
@@ -177,7 +177,7 @@ fun NumerologyScreen(viewModel: MainViewModel) {
                                     dobError = NumerologyValidator.validateDob(it)
                                 }
                             },
-                            label = { Text("जन्म तिथि (YYYY-MM-DD)") },
+                            label = { Text(LanguageManager.getString("जन्म तिथि (YYYY-MM-DD)", "Date of birth (YYYY-MM-DD)")) },
                             isError = (dobError != null),
                             colors = tfColors,
                             modifier = Modifier.fillMaxWidth().testTag("input_num_dob")
@@ -195,7 +195,7 @@ fun NumerologyScreen(viewModel: MainViewModel) {
                     }
 
                     GoldGlowButton(
-                        text = "अंक ज्योतिष गणना (Calculate Numbers)",
+                        text = LanguageManager.getString("अंक ज्योतिष गणना", "Calculate numbers"),
                         onClick = {
                             val valResult = NumerologyValidator.validateInput(nameInput, dobInput)
                             nameError = valResult.nameError
@@ -211,36 +211,51 @@ fun NumerologyScreen(viewModel: MainViewModel) {
             }
         }
 
-        // Numerology Numbers Display (Moolank & Bhagyank)
+        // Moolank / Bhagyank / name number as bento tiles. The labels used to
+        // be hardcoded Hindi even in English mode.
         item {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 AnimatedResultCard(
                     scaleKey = "${numData.moolank}_${numData.rulingPlanetHi}",
                     modifier = Modifier.weight(1f)
                 ) {
-                    GlassCard(modifier = Modifier.fillMaxWidth()) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(text = "मूलांक (Moolank)", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 13.sp))
-                            Text(text = "${numData.moolank}", style = MaterialTheme.typography.displayMedium.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold))
-                            Text(text = LanguageManager.getString("स्वामी: ${numData.rulingPlanetHi}", "Ruling planet: ${numData.rulingPlanetEn}"), style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.secondary, fontSize = 12.sp, fontWeight = FontWeight.Normal))
-                        }
-                    }
+                    com.example.ui.components.BentoTile(
+                        label = LanguageManager.getString("मूलांक", "Moolank"),
+                        value = "${numData.moolank}",
+                        sub = LanguageManager.getString(
+                            "स्वामी: ${numData.rulingPlanetHi}",
+                            "Ruler: ${numData.rulingPlanetEn}"
+                        ),
+                        accent = MaterialTheme.colorScheme.primary,
+                        valueSize = 34,
+                        minHeight = 112,
+                        emphasis = true,
+                        singleLineValue = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
 
                 AnimatedResultCard(
                     scaleKey = "${numData.bhagyank}_${numData.nameNumber}",
                     modifier = Modifier.weight(1f)
                 ) {
-                    GlassCard(modifier = Modifier.fillMaxWidth()) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(text = "भाग्यांक (Bhagyank)", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 13.sp))
-                            Text(text = "${numData.bhagyank}", style = MaterialTheme.typography.displayMedium.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold))
-                            Text(text = "नाम अंक: ${numData.nameNumber}", style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.secondary, fontSize = 12.sp, fontWeight = FontWeight.Normal))
-                        }
-                    }
+                    com.example.ui.components.BentoTile(
+                        label = LanguageManager.getString("भाग्यांक", "Bhagyank"),
+                        value = "${numData.bhagyank}",
+                        sub = LanguageManager.getString(
+                            "नाम अंक: ${numData.nameNumber}",
+                            "Name number: ${numData.nameNumber}"
+                        ),
+                        accent = MaterialTheme.colorScheme.primary,
+                        valueSize = 34,
+                        minHeight = 112,
+                        emphasis = true,
+                        singleLineValue = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
         }
@@ -250,7 +265,7 @@ fun NumerologyScreen(viewModel: MainViewModel) {
             GlassCard(modifier = Modifier.fillMaxWidth()) {
                 Column {
                     Text(
-                        text = "मूलांक ${numData.moolank} का फल:",
+                        text = LanguageManager.getString("मूलांक ${numData.moolank} का फल:", "What Moolank ${numData.moolank} means:"),
                         style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                     )
                     Spacer(modifier = Modifier.height(6.dp))
@@ -324,7 +339,7 @@ fun NumerologyScreen(viewModel: MainViewModel) {
                     OutlinedTextField(
                         value = userQuestion,
                         onValueChange = { userQuestion = it },
-                        label = { Text("अपना प्रश्न पूछें (Ask your question)") },
+                        label = { Text(LanguageManager.getString("अपना प्रश्न पूछें", "Ask your question")) },
                         colors = tfColors,
                         modifier = Modifier.fillMaxWidth().testTag("ai_chat_input"),
                         trailingIcon = {
@@ -362,7 +377,7 @@ fun NumerologyScreen(viewModel: MainViewModel) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(imageVector = Icons.Default.AutoAwesome, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(18.dp))
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text(text = "ज्योतिषाचार्य का उत्तर:", style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Normal, fontSize = 14.sp))
+                                    Text(text = LanguageManager.getString("ज्योतिषाचार्य का उत्तर:", "The answer:"), style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Normal, fontSize = 14.sp))
                                 }
                                 if (isAiOffline) {
                                     Spacer(modifier = Modifier.height(4.dp))

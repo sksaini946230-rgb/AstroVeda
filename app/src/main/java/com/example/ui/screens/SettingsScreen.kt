@@ -424,7 +424,7 @@ fun SettingsScreen(
                                         // Simulate location refresh
                                         android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
                                             isRefreshingLocation = false
-                                            Toast.makeText(context, "GPS स्थान रीफ्रेश: ${selectedCity.cityNameHindi}", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(context, LanguageManager.getString("GPS स्थान रीफ्रेश: ${selectedCity.cityNameHindi}", "Location refreshed: ${selectedCity.cityName}"), Toast.LENGTH_SHORT).show()
                                         }, 1000)
                                     }
                                     .padding(horizontal = 10.dp, vertical = 6.dp)
@@ -585,7 +585,7 @@ fun SettingsScreen(
                             val timeString = String.format("%02d:%02d %s", displayHour, notificationMinute, amPm)
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
-                                    text = "समय: $timeString",
+                                    text = LanguageManager.getString("समय: $timeString", "Time: $timeString"),
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         color = MaterialTheme.colorScheme.primary,
                                         fontSize = 12.sp,
@@ -797,7 +797,7 @@ fun SettingsScreen(
                                 }
                             } else {
                                 Text(
-                                    text = astroNews.ifBlank { "खगोलीय व ज्योतिषीय समाचार उपलब्ध हैं।" },
+                                    text = astroNews.ifBlank { LanguageManager.getString("खगोलीय व ज्योतिषीय समाचार उपलब्ध हैं।", "Sky and astrology notes are available.") },
                                     style = MaterialTheme.typography.bodyMedium.copy(
                                         color = MaterialTheme.colorScheme.onSurface,
                                         fontSize = 12.sp,
@@ -945,7 +945,7 @@ fun SettingsScreen(
                                 .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
                                 .clickable {
                                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    webViewTitle = "गोपनीयता नीति (Privacy Policy)"
+                                    webViewTitle = LanguageManager.getString("गोपनीयता नीति", "Privacy Policy")
                                     webViewUrlToOpen = LOCAL_PRIVACY_POLICY_URL
                                 }
                                 .padding(vertical = 10.dp, horizontal = 8.dp)
@@ -980,7 +980,7 @@ fun SettingsScreen(
                                 .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
                                 .clickable {
                                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    webViewTitle = "सेवा की शर्तें (Terms of Service)"
+                                    webViewTitle = LanguageManager.getString("सेवा की शर्तें", "Terms of Service")
                                     webViewUrlToOpen = LOCAL_TERMS_OF_SERVICE_URL
                                 }
                                 .padding(vertical = 10.dp, horizontal = 8.dp)
@@ -1036,7 +1036,8 @@ fun SettingsScreen(
                                     )
                                 )
                                 Text(
-                                    text = if (currentUser != null) "साइन इन: ${currentUser?.email}" else "स्थानीय डेटा (Local Storage)",
+                                    text = if (currentUser != null) LanguageManager.getString("साइन इन: ${currentUser?.email}", "Signed in: ${currentUser?.email}")
+                        else LanguageManager.getString("स्थानीय डेटा", "Stored on this device"),
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         fontSize = 11.sp
@@ -1069,7 +1070,8 @@ fun SettingsScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = if (currentUser != null) "खाता एवं सभी डेटा हटाएं (Delete Account & Data)" else "सभी सहेजा गया डेटा हटाएं (Delete Local Data)",
+                                text = if (currentUser != null) LanguageManager.getString("खाता एवं सभी डेटा हटाएं", "Delete account & all data")
+                        else LanguageManager.getString("सभी सहेजा गया डेटा हटाएं", "Delete all saved data"),
                                 style = MaterialTheme.typography.labelMedium.copy(
                                     color = RahuKaalDangerColor,
                                     fontWeight = FontWeight.Normal,
@@ -1140,7 +1142,7 @@ fun SettingsScreen(
             },
             confirmButton = {
                 TextButton(onClick = { showRashiDialog = false }) {
-                    Text("बंद करें (Close)", color = MaterialTheme.colorScheme.primary)
+                    Text(LanguageManager.getString("बंद करें", "Close"), color = MaterialTheme.colorScheme.primary)
                 }
             },
             containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -1173,7 +1175,7 @@ fun SettingsScreen(
                     OutlinedTextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
-                        placeholder = { Text("शहर का नाम लिखें (e.g. Jaipur, Varanasi)", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp) },
+                        placeholder = { Text(LanguageManager.getString("शहर का नाम लिखें (जैसे जयपुर, वाराणसी)", "Type a city name (e.g. Jaipur, Varanasi)"), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp) },
                         leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                         singleLine = true,
                         colors = OutlinedTextFieldDefaults.colors(
@@ -1200,7 +1202,7 @@ fun SettingsScreen(
                                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                         viewModel.setCity(city)
                                         showLocationModal = false
-                                        Toast.makeText(context, "स्थान सेट किया: ${city.cityNameHindi}", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, LanguageManager.getString("स्थान सेट किया: ${city.cityNameHindi}", "Location set: ${city.cityName}"), Toast.LENGTH_SHORT).show()
                                     }
                                     .padding(horizontal = 12.dp, vertical = 8.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -1238,7 +1240,7 @@ fun SettingsScreen(
             },
             confirmButton = {
                 TextButton(onClick = { showLocationModal = false }) {
-                    Text("रद्द करें (Cancel)", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(LanguageManager.getString("रद्द करें", "Cancel"), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             },
             containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -1264,7 +1266,7 @@ fun SettingsScreen(
             },
             confirmButton = {
                 TextButton(onClick = { showAboutDialog = false }) {
-                    Text("ठीक है (OK)", color = MaterialTheme.colorScheme.primary)
+                    Text(LanguageManager.getString("ठीक है", "OK"), color = MaterialTheme.colorScheme.primary)
                 }
             },
             containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -1346,7 +1348,7 @@ fun SettingsScreen(
             },
             confirmButton = {
                 TextButton(onClick = { webViewUrlToOpen = null }) {
-                    Text("बंद करें (Close)", color = MaterialTheme.colorScheme.primary)
+                    Text(LanguageManager.getString("बंद करें", "Close"), color = MaterialTheme.colorScheme.primary)
                 }
             },
             containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -1368,7 +1370,8 @@ fun SettingsScreen(
             },
             title = {
                 Text(
-                    text = if (isGoogleUser) "खाता एवं डेटा स्थायी रूप से हटाएँ?" else "स्थानीय डेटा स्थायी रूप से हटाएँ?",
+                    text = if (isGoogleUser) LanguageManager.getString("खाता एवं डेटा स्थायी रूप से हटाएँ?", "Delete your account and all data?")
+                else LanguageManager.getString("स्थानीय डेटा स्थायी रूप से हटाएँ?", "Delete all data on this device?"),
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -1378,10 +1381,13 @@ fun SettingsScreen(
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
-                        text = if (isGoogleUser)
-                            "क्या आप अपना AstroVeda खाता एवं सभी डेटा स्थायी रूप से हटाना चाहते हैं?\n\n• क्लाउड में सहेजे गए सभी कुण्डली प्रोफाइल (Firestore)\n• इस डिवाइस पर सहेजे गए सभी प्रोफाइल एवं रिपोर्ट\n• गूगल साइन-इन खाता एवं क्रेडेंशियल्स\n\nयह प्रक्रिया पूरी तरह से स्थायी (Irreversible) है।"
-                        else
-                            "क्या आप इस डिवाइस पर सहेजे गए सभी कुण्डली प्रोफाइल और रिपोर्ट स्थायी रूप से हटाना चाहते हैं?\n\nयह प्रक्रिया पूरी तरह से स्थायी (Irreversible) है।",
+                        text = if (isGoogleUser) LanguageManager.getString(
+                            "क्या आप अपना AstroVeda खाता एवं सभी डेटा स्थायी रूप से हटाना चाहते हैं?\n\n• क्लाउड में सहेजे गए सभी कुण्डली प्रोफाइल\n• इस डिवाइस पर सहेजे गए सभी प्रोफाइल एवं रिपोर्ट\n• गूगल साइन-इन खाता एवं क्रेडेंशियल्स\n\nयह प्रक्रिया पूरी तरह से स्थायी है।",
+                            "Permanently delete your AstroVeda account and everything in it?\n\n• Every chart profile saved in the cloud\n• Every profile and report saved on this device\n• Your Google sign-in and credentials\n\nThis cannot be undone."
+                        ) else LanguageManager.getString(
+                            "क्या आप इस डिवाइस पर सहेजे गए सभी कुण्डली प्रोफाइल और रिपोर्ट स्थायी रूप से हटाना चाहते हैं?\n\nयह प्रक्रिया पूरी तरह से स्थायी है।",
+                            "Permanently delete every chart profile and report saved on this device?\n\nThis cannot be undone."
+                        ),
                         style = MaterialTheme.typography.bodyMedium.copy(
                             color = MaterialTheme.colorScheme.onSurface,
                             fontSize = 12.sp
@@ -1401,12 +1407,12 @@ fun SettingsScreen(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = RahuKaalDangerColor)
                 ) {
-                    Text("हां, हटाएँ (Delete)", color = TextPrimary, fontWeight = FontWeight.Bold)
+                    Text(LanguageManager.getString("हां, हटाएँ", "Yes, delete"), color = TextPrimary, fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteAccountDialog = false }) {
-                    Text("रद्द करें (Cancel)", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(LanguageManager.getString("रद्द करें", "Cancel"), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             },
             containerColor = MaterialTheme.colorScheme.surfaceVariant

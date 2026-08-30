@@ -37,6 +37,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.util.LanguageManager
 import com.example.data.model.KundaliChartData
 import com.example.ui.theme.DateTimeAccent
 import com.example.ui.theme.ElevatedSurface
@@ -75,13 +76,14 @@ fun SouthIndianChart(
     )
 
     val rashiShortHi = listOf("", "मेष", "वृष", "मिथुन", "कर्क", "सिंह", "कन्या", "तुला", "वृश्चिक", "धनु", "मकर", "कुंभ", "मीन")
+    val rashiShortEn = listOf("", "Ari", "Tau", "Gem", "Can", "Leo", "Vir", "Lib", "Sco", "Sag", "Cap", "Aqu", "Pis")
 
     // Map rashi to planets
     val rashiPlanetsMap = mutableMapOf<Int, MutableList<String>>()
     for (r in 1..12) rashiPlanetsMap[r] = mutableListOf()
 
     chartData.planets.forEach { p ->
-        val shortName = p.planetNameHi.substringBefore(" ")
+        val shortName = com.example.astro.AstroNames.houseGlyph(p.planetNameEn)
         rashiPlanetsMap[p.rashiNumber]?.add(shortName)
     }
 
@@ -152,7 +154,7 @@ fun SouthIndianChart(
                                 ) {
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                         Text(
-                                            text = "दक्षिण भारतीय कुण्डली",
+                                            text = LanguageManager.getString("दक्षिण भारतीय कुण्डली", "South Indian chart"),
                                             style = MaterialTheme.typography.labelSmall.copy(
                                                 color = PrimaryButtonBackground,
                                                 fontWeight = FontWeight.Normal,
@@ -160,7 +162,7 @@ fun SouthIndianChart(
                                             )
                                         )
                                         Text(
-                                            text = "लग्न: ${chartData.ascendantRashiHi}",
+                                            text = LanguageManager.getString("लग्न: ${chartData.ascendantRashiHi}", "Lagna: ${chartData.ascendantRashiEn}"),
                                             style = MaterialTheme.typography.labelSmall.copy(
                                                 color = TextSecondary,
                                                 fontSize = 10.sp
@@ -183,7 +185,7 @@ fun SouthIndianChart(
                                 Column {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Text(
-                                            text = "${rashiShortHi.getOrElse(rashiNum) { "" }} ($rashiNum)",
+                                            text = "${LanguageManager.getString(rashiShortHi.getOrElse(rashiNum) { "" }, rashiShortEn.getOrElse(rashiNum) { "" })} ($rashiNum)",
                                             style = MaterialTheme.typography.labelSmall.copy(
                                                 color = PrimaryButtonBackground,
                                                 fontSize = 9.sp,
@@ -192,7 +194,7 @@ fun SouthIndianChart(
                                         )
                                         if (isLagna) {
                                             Text(
-                                                text = " [ल]",
+                                                text = LanguageManager.getString(" [ल]", " [La]"),
                                                 style = MaterialTheme.typography.labelSmall.copy(
                                                     color = DateTimeAccent,
                                                     fontWeight = FontWeight.Normal,
@@ -237,7 +239,8 @@ fun SouthIndianChart(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "${String.format(java.util.Locale.US, "%.1f", userScale)}x  रिसेट ↺",
+                        text = "${String.format(java.util.Locale.US, "%.1f", userScale)}x  " +
+                        LanguageManager.getString("रिसेट ↺", "Reset ↺"),
                         style = MaterialTheme.typography.labelSmall.copy(
                             color = PrimaryButtonBackground,
                             fontSize = 11.sp,

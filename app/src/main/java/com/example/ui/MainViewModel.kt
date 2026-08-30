@@ -755,6 +755,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     var matchGirlDob = MutableStateFlow("")
     var matchGirlTob = MutableStateFlow("12:00")
 
+    private val _matchingInputError = MutableStateFlow<String?>(null)
+    val matchingInputError: StateFlow<String?> = _matchingInputError.asStateFlow()
+
+    fun clearMatchingInputError() { _matchingInputError.value = null }
+
     private val _gunaResult = MutableStateFlow<GunaMatchingResult?>(null)
     val gunaResult: StateFlow<GunaMatchingResult?> = _gunaResult.asStateFlow()
 
@@ -770,6 +775,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             addRecentSearch("MATCHING", bName, bDob, gName, gDob)
         }
 
+        _matchingInputError.value = null
+
         viewModelScope.launch(Dispatchers.Default) {
             _isCalculating.value = true
             try {
@@ -779,6 +786,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 )
                 _gunaResult.value = result
                 incrementSessionActionCount()
+            } catch (e: com.example.astro.BirthDataException) {
+                // A blank name is the user's to fix in the form; it used to take
+                // down the whole screen with "Something went wrong".
+                _matchingInputError.value = com.example.util.LanguageManager.getString(
+                    e.messageHi, e.messageEn
+                )
+                _gunaResult.value = null
             } catch (e: Exception) {
                 reportError(e)
             } finally {
@@ -1054,15 +1068,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun signInWithGoogle(context: android.content.Context, webClientId: String = "") {
         viewModelScope.launch {
-            _backupStatusMessage.value = "Google से साइन-इन हो रहा है... (Signing in with Google...)"
+            _backupStatusMessage.value = LanguageManager.getString("Google से साइन-इन हो रहा है...", "Signing in with Google...")
             val result = authService.signInWithGoogle(context, webClientId)
             result.onSuccess { user ->
                 _currentUser.value = user
-                _backupStatusMessage.value = "साइन इन सफल: ${user.displayName ?: user.email}"
+                _backupStatusMessage.value = LanguageManager.getString("साइन इन सफल: ${user.displayName ?: user.email}", "Signed in: ${user.displayName ?: user.email}")
                 Firebase.crashlytics.setUserId(user.uid)
                 syncCloudAndLocalProfiles()
             }.onFailure { err ->
-                _backupStatusMessage.value = "साइन-इन विफल: ${err.message}"
+                _backupStatusMessage.value = LanguageManager.getString("साइन-इन विफल: ${err.message}", "Sign-in failed: ${err.message}")
                 Firebase.crashlytics.recordException(err)
             }
         }
@@ -1071,7 +1085,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun signOutFirebase() {
         authService.signOut()
         _currentUser.value = null
-        _backupStatusMessage.value = "साइन-आउट सफल। स्थानीय प्रोफाइल डिवाइस पर सुरक्षित हैं। (Signed out. Local profiles retained.)"
+        _backupStatusMessage.value = LanguageManager.getString("साइन-आउट सफल। स्थानीय प्रोफाइल डिवाइस पर सुरक्षित हैं।", "Signed out. Your profiles stay on this device.")
     }
 
     fun syncCloudAndLocalProfiles() {
@@ -1101,16 +1115,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 val backupResult = authService.backupProfilesToCloud(updatedLocalProfiles)
                 backupResult.onSuccess { totalSynced ->
                     if (newlyRestored > 0) {
-                        _backupStatusMessage.value = "क्लाउड सिंक पूर्ण: $newlyRestored नए प्रोफाइल डाउनलोड हुए, कुल $totalSynced क्लाउड पर सुरक्षित।"
+                        _backupStatusMessage.value = LanguageManager.getString(
+                    "क्लाउड सिंक पूर्ण: $newlyRestored नए प्रोफाइल डाउनलोड हुए, कुल $totalSynced क्लाउड पर सुरक्षित।",
+                    "Sync complete: $newlyRestored new profiles downloaded, $totalSynced backed up."
+                )
                     } else {
-                        _backupStatusMessage.value = "क्लाउड सिंक पूर्ण: कुल $totalSynced प्रोफाइल सुरक्षित।"
+                        _backupStatusMessage.value = LanguageManager.getString("क्लाउड सिंक पूर्ण: कुल $totalSynced प्रोफाइल सुरक्षित।", "Sync complete: $totalSynced profiles backed up.")
                     }
                 }.onFailure { err ->
-                    _backupStatusMessage.value = "क्लाउड बैकअप में समस्या: ${err.message}"
+                    _backupStatusMessage.value = LanguageManager.getString("क्लाउड बैकअप में समस्या: ${err.message}", "Cloud backup problem: ${err.message}")
                 }
             } catch (e: Exception) {
                 android.util.Log.e("MainViewModel", "Sync failed", e)
-                _backupStatusMessage.value = "सिंक त्रुटि: ${e.message}"
+                _backupStatusMessage.value = LanguageManager.getString("सिंक त्रुटि: ${e.message}", "Sync error: ${e.message}")
             } finally {
                 _isFirestoreSyncing.value = false
             }
@@ -1120,7 +1137,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun backupProfilesToCloud() {
         val user = _currentUser.value
         if (user == null) {
-            _backupStatusMessage.value = "कृपया पहले Google से साइन-इन करें। (Please sign in with Google first.)"
+            _backupStatusMessage.value = LanguageManager.getString("कृपया पहले Google से साइन-इन करें।", "Please sign in with Google first.")
             return
         }
         syncCloudAndLocalProfiles()
@@ -1129,7 +1146,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun restoreProfilesFromCloud() {
         val user = _currentUser.value
         if (user == null) {
-            _backupStatusMessage.value = "कृपया पहले Google से साइन-इन करें। (Please sign in with Google first.)"
+            _backupStatusMessage.value = LanguageManager.getString("कृपया पहले Google से साइन-इन करें।", "Please sign in with Google first.")
             return
         }
         syncCloudAndLocalProfiles()
@@ -1142,7 +1159,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
         viewModelScope.launch {
-            _backupStatusMessage.value = "खाता और डेटा हटाया जा रहा है... (Deleting account and data...)"
+            _backupStatusMessage.value = LanguageManager.getString("खाता और डेटा हटाया जा रहा है...", "Deleting account and data...")
             val result = authService.deleteUserDataAndAccount()
             result.onSuccess {
                 try {
@@ -1153,9 +1170,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     android.util.Log.e("MainViewModel", "Error clearing local DB", e)
                 }
                 _currentUser.value = null
-                _backupStatusMessage.value = "आपका खाता और सभी डेटा सफलतापूर्वक हटा दिया गया है। (Account & data deleted successfully.)"
+                _backupStatusMessage.value = LanguageManager.getString("आपका खाता और सभी डेटा सफलतापूर्वक हटा दिया गया है।", "Your account and all data have been deleted.")
             }.onFailure { err ->
-                _backupStatusMessage.value = "हटाने में त्रुटि: ${err.message}"
+                _backupStatusMessage.value = LanguageManager.getString("हटाने में त्रुटि: ${err.message}", "Delete failed: ${err.message}")
             }
         }
     }
@@ -1166,9 +1183,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 repository.deleteAllProfiles()
                 reportRepository.deleteAllReports()
                 recentSearchRepository.clearAllSearches()
-                _backupStatusMessage.value = "सभी स्थानीय डेटा और सहेजे गए प्रोफाइल हटा दिए गए हैं। (Local data deleted successfully.)"
+                _backupStatusMessage.value = LanguageManager.getString("सभी स्थानीय डेटा और सहेजे गए प्रोफाइल हटा दिए गए हैं।", "All local data and saved profiles have been deleted.")
             } catch (e: Exception) {
-                _backupStatusMessage.value = "स्थानीय डेटा हटाने में त्रुटि: ${e.message}"
+                _backupStatusMessage.value = LanguageManager.getString("स्थानीय डेटा हटाने में त्रुटि: ${e.message}", "Could not delete local data: ${e.message}")
             }
         }
     }

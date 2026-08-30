@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
+import com.example.util.LanguageManager
 import com.example.data.local.KundaliEntity
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
@@ -72,13 +73,15 @@ class FirebaseAuthService {
             Log.i("FirebaseAuthService", "No Google credential available on this device")
             Result.failure(
                 Exception(
-                    "इस डिवाइस पर कोई Google खाता नहीं मिला। कृपया Settings में Google खाता जोड़ें और दोबारा प्रयास करें। " +
-                        "(No Google account found on this device. Add one in Settings and try again.)"
+                    LanguageManager.getString(
+                        "इस डिवाइस पर कोई Google खाता नहीं मिला। कृपया Settings में Google खाता जोड़ें और दोबारा प्रयास करें।",
+                        "No Google account found on this device. Add one in Settings and try again."
+                    )
                 )
             )
         } catch (e: androidx.credentials.exceptions.GetCredentialCancellationException) {
             Log.i("FirebaseAuthService", "Sign-in cancelled by user")
-            Result.failure(Exception("साइन-इन रद्द किया गया। (Sign-in cancelled.)"))
+            Result.failure(Exception(LanguageManager.getString("साइन-इन रद्द किया गया।", "Sign-in cancelled.")))
         } catch (e: Exception) {
             Log.e("FirebaseAuthService", "Google Sign-In failed", e)
             Result.failure(e)
@@ -178,7 +181,10 @@ class FirebaseAuthService {
             Result.success(Unit)
         } catch (e: com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException) {
             Log.e("FirebaseAuthService", "Re-authentication required before deleting account", e)
-            Result.failure(Exception("सुरक्षा के लिए, खाता हटाने से पहले कृपया पुनः साइन-इन करें। (For security, please sign in again before deleting your account.)"))
+            Result.failure(Exception(LanguageManager.getString(
+                "सुरक्षा के लिए, खाता हटाने से पहले कृपया पुनः साइन-इन करें।",
+                "For security, please sign in again before deleting your account."
+            )))
         } catch (e: Exception) {
             Log.e("FirebaseAuthService", "Failed to delete user data and account", e)
             Result.failure(e)

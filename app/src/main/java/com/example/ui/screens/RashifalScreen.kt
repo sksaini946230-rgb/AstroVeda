@@ -19,9 +19,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -104,7 +106,7 @@ fun RashifalScreen(viewModel: MainViewModel) {
         luckyNumber = 9,
         luckyColorEn = "Red",
         luckyColorHi = "लाल",
-        luckyStoneHi = "मूंगा",
+        luckyStoneHi = "मूंगा", luckyStoneEn = "Red Coral",
         generalReadingHi = "आज का दिन अच्छा रहेगा।",
         generalReadingEn = "Today will be a good day.",
         careerReadingHi = "",
@@ -120,9 +122,9 @@ fun RashifalScreen(viewModel: MainViewModel) {
     var selectedPeriod by remember { mutableStateOf("TODAY") } // "TODAY", "WEEK", "MONTH"
 
     val dateRangeText = when (selectedPeriod) {
-        "TODAY" -> "आज का दैनिक राशिफल (Today)"
-        "WEEK" -> "इस सप्ताह का राशिफल (This Week)"
-        else -> "इस महीने का राशिफल (This Month)"
+        "TODAY" -> LanguageManager.getString("आज का दैनिक राशिफल", "Today's horoscope")
+        "WEEK" -> LanguageManager.getString("इस सप्ताह का राशिफल", "This week's horoscope")
+        else -> LanguageManager.getString("इस महीने का राशिफल", "This month's horoscope")
     }
 
     // Setup HorizontalPager State for Card Swiping
@@ -235,9 +237,9 @@ fun RashifalScreen(viewModel: MainViewModel) {
                 horizontalArrangement = Arrangement.Center
             ) {
                 listOf(
-                    Pair("TODAY", "आज का राशिफल"),
-                    Pair("WEEK", "इस सप्ताह"),
-                    Pair("MONTH", "इस महीने")
+                    Pair("TODAY", LanguageManager.getString("आज का राशिफल", "Today")),
+                    Pair("WEEK", LanguageManager.getString("इस सप्ताह", "This week")),
+                    Pair("MONTH", LanguageManager.getString("इस महीने", "This month"))
                 ).forEach { (code, label) ->
                     val isSelected = (selectedPeriod == code)
                     Box(
@@ -275,7 +277,7 @@ fun RashifalScreen(viewModel: MainViewModel) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "👈 कार्ड स्वाइप करें (Swipe for Next Rashi) 👉",
+                    text = LanguageManager.getString("👈 कार्ड स्वाइप करें 👉", "👈 Swipe for the next sign 👉"),
                     style = MaterialTheme.typography.labelSmall.copy(
                         color = MaterialTheme.colorScheme.secondary,
                         fontWeight = FontWeight.Normal,
@@ -476,33 +478,65 @@ fun RashifalScreen(viewModel: MainViewModel) {
 
                                 Spacer(modifier = Modifier.height(12.dp))
 
-                                // 5: Lucky Number, Lucky Color, Lucky Stone, Lucky Time Chips
+                                // The four "lucky" facts as bento tiles. As badges
+                                // on one row they were squeezed and truncated —
+                                // "शुभ रत्न: मो…" — because a badge cannot shrink
+                                // its content.
                                 Row(
-                                    modifier = Modifier.fillMaxWidth(),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(IntrinsicSize.Min),
                                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
-                                    GlassBadge(
-                                        text = LanguageManager.getString("शुभ अंक: ${horoscope.luckyNumber}", "Lucky No: ${horoscope.luckyNumber}"),
-                                        textColor = MaterialTheme.colorScheme.primary,
-                                        borderColor = MaterialTheme.colorScheme.primary
+                                    com.example.ui.components.BentoTile(
+                                        label = LanguageManager.getString("शुभ अंक", "Lucky number"),
+                                        value = "${horoscope.luckyNumber}",
+                                        accent = MaterialTheme.colorScheme.primary,
+                                        valueSize = 22,
+                                        minHeight = 66,
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .fillMaxHeight()
                                     )
-                                    GlassBadge(
-                                        text = LanguageManager.getString("शुभ रंग: ${horoscope.luckyColorHi}", "Color: ${horoscope.luckyColorEn}"),
-                                        textColor = MaterialTheme.colorScheme.primary,
-                                        borderColor = MaterialTheme.colorScheme.primary
-                                    )
-                                    GlassBadge(
-                                        text = LanguageManager.getString("शुभ रत्न: ${horoscope.luckyStoneHi}", "Stone: ${horoscope.luckyStoneHi}"),
-                                        textColor = MaterialTheme.colorScheme.secondary,
-                                        borderColor = MaterialTheme.colorScheme.secondary
+                                    com.example.ui.components.BentoTile(
+                                        label = LanguageManager.getString("शुभ रंग", "Lucky colour"),
+                                        value = LanguageManager.getString(horoscope.luckyColorHi, horoscope.luckyColorEn),
+                                        accent = MaterialTheme.colorScheme.primary,
+                                        valueSize = 14,
+                                        minHeight = 66,
+                                        modifier = Modifier
+                                            .weight(1.4f)
+                                            .fillMaxHeight()
                                     )
                                 }
-                                Spacer(modifier = Modifier.height(6.dp))
-                                GlassBadge(
-                                    text = LanguageManager.getString("⏰ शुभ समय: ${horoscope.luckyTimeHi}", "⏰ Lucky Time: ${horoscope.luckyTimeEn}"),
-                                    textColor = MaterialTheme.colorScheme.primary,
-                                    borderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(IntrinsicSize.Min),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    com.example.ui.components.BentoTile(
+                                        label = LanguageManager.getString("शुभ रत्न", "Lucky stone"),
+                                        value = LanguageManager.getString(horoscope.luckyStoneHi, horoscope.luckyStoneEn),
+                                        accent = MaterialTheme.colorScheme.secondary,
+                                        valueSize = 14,
+                                        minHeight = 66,
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .fillMaxHeight()
+                                    )
+                                    com.example.ui.components.BentoTile(
+                                        label = LanguageManager.getString("शुभ समय", "Lucky time"),
+                                        value = LanguageManager.getString(horoscope.luckyTimeHi, horoscope.luckyTimeEn),
+                                        accent = MaterialTheme.colorScheme.secondary,
+                                        valueSize = 13,
+                                        minHeight = 66,
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .fillMaxHeight()
+                                    )
+                                }
                             }
                         }
                     }

@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.util.LanguageManager
 import com.example.data.model.KundaliChartData
 import com.example.astro.KundaliCalculator
 import kotlin.math.cos
@@ -225,12 +226,12 @@ fun TransitWheelChart(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(modifier = Modifier.size(8.dp).clip(RoundedCornerShape(2.dp)).background(secondaryColor))
                 Spacer(modifier = Modifier.width(6.dp))
-                Text("Birth (जन्म)", style = MaterialTheme.typography.labelSmall.copy(color = onSurfaceVariant, fontSize = 9.sp))
+                Text(LanguageManager.getString("जन्म", "Birth"), style = MaterialTheme.typography.labelSmall.copy(color = onSurfaceVariant, fontSize = 9.sp))
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(modifier = Modifier.size(8.dp).clip(RoundedCornerShape(2.dp)).background(tertiaryColor))
                 Spacer(modifier = Modifier.width(6.dp))
-                Text("Transit (गोचर)", style = MaterialTheme.typography.labelSmall.copy(color = onSurfaceVariant, fontSize = 9.sp))
+                Text(LanguageManager.getString("गोचर", "Transit"), style = MaterialTheme.typography.labelSmall.copy(color = onSurfaceVariant, fontSize = 9.sp))
             }
         }
     }

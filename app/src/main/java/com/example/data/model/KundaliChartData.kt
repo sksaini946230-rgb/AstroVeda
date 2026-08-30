@@ -26,7 +26,10 @@ data class KundaliChartData(
     val moonNakshatraHi: String,
     val moonNakshatraEn: String = "",
     val planets: List<PlanetPosition>,
-    val housePlanetsMap: Map<Int, List<String>>, // House 1..12 -> List of planet short names in Hindi
+    // House 1..12 -> language-neutral planet tokens ("Sun", "Mars|R").
+    // Render them with AstroNames.houseGlyph(), which picks the reader's script;
+    // storing the Hindi here froze a chart into whatever language drew it.
+    val housePlanetsMap: Map<Int, List<String>>,
     val currentMahadashaHi: String,
     val currentMahadashaEn: String = "",
     val currentAntardashaHi: String,

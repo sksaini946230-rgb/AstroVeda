@@ -5,6 +5,7 @@ import com.example.data.model.nakshatraLocal
 import com.example.data.model.yogaLocal
 import com.example.data.model.karanaLocal
 import com.example.data.model.masaLocal
+import com.example.data.model.nameLocal
 import com.example.data.model.pakshaLocal
 import com.example.data.model.varaLocal
 import androidx.compose.foundation.background
@@ -13,9 +14,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -65,11 +68,22 @@ import androidx.compose.ui.unit.sp
 import com.example.data.model.FestivalData
 import com.example.ui.MainViewModel
 import com.example.ui.components.GlassBadge
+import com.example.data.model.dateLocal
+import com.example.data.model.masaLocal
+import com.example.data.model.nameLocal
+import com.example.data.model.pakshaLocal
+import com.example.data.model.tithiLocal
 import com.example.ui.components.GlassCard
 import com.example.ui.components.SectionHeader
 import com.example.ui.theme.GlassCardBorder
 import com.example.util.LanguageManager
 import com.example.util.AppLanguage
+
+/** Three-letter weekday for compact labels; full "THURSDAY" ellipsized a tile. */
+fun getLocalizedDayShort(dayHi: String): String {
+    val full = getLocalizedDay(dayHi)
+    return if (LanguageManager.currentLanguage == AppLanguage.HINDI) full else full.take(3)
+}
 
 fun getLocalizedDay(dayHi: String): String {
     return if (LanguageManager.currentLanguage == AppLanguage.HINDI) {
@@ -136,7 +150,10 @@ fun CalendarScreen(viewModel: MainViewModel) {
                         )
                     )
                     Text(
-                        text = "शक संवत ${panchang.sakaSamvat} • 2026 हिन्दू पंचांग कैलेण्डर",
+                        text = LanguageManager.getString(
+                            "शक संवत ${panchang.sakaSamvat} • 2026 हिन्दू पंचांग कैलेण्डर",
+                            "Saka Samvat ${panchang.sakaSamvat} • 2026 Hindu Panchang calendar"
+                        ),
                         style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
                     )
                 }
@@ -169,16 +186,18 @@ fun CalendarScreen(viewModel: MainViewModel) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "मासिक कैलेंडर (Monthly View)",
+                            text = LanguageManager.getString("मासिक कैलेंडर", "Monthly view"),
                             style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                         )
-                        GlassBadge(text = "सोम - रवि")
+                        GlassBadge(text = LanguageManager.getString("सोम - रवि", "Mon - Sun"))
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
 
                     // Days of Week Header
-                    val daysOfWeek = listOf("सोम", "मंगल", "बुध", "गुरु", "शुक्र", "शनि", "रवि")
+                    val daysOfWeek = if (LanguageManager.currentLanguage == AppLanguage.HINDI)
+        listOf("सोम", "मंगल", "बुध", "गुरु", "शुक्र", "शनि", "रवि")
+    else listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
@@ -293,79 +312,34 @@ fun CalendarScreen(viewModel: MainViewModel) {
             )
         }
 
-        itemsIndexed(filteredFestivals.take(7)) { index, festival ->
-            GlassCard(
+        // The next seven, two per row. As full-width rows this was seven
+        // screens of scrolling for what is really a date and a name each.
+        items(filteredFestivals.take(7).chunked(2)) { pair ->
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable {
-                        view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                        selectedFestivalDetail = festival
-                    }
-                    .testTag("upcoming_festival_${index + 1}")
+                    .height(IntrinsicSize.Min),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Number Badge (#1 to #7)
-                    Box(
+                pair.forEach { festival ->
+                    com.example.ui.components.BentoTile(
+                        label = "${festival.dateLocal} · ${getLocalizedDayShort(festival.dayNameHi)}",
+                        value = festival.nameLocal,
+                        sub = "${festival.masaLocal} ${festival.tithiLocal}",
+                        accent = MaterialTheme.colorScheme.primary,
+                        valueSize = 15,
+                        minHeight = 104,
                         modifier = Modifier
-                            .size(36.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f))
-                            .border(1.dp, MaterialTheme.colorScheme.primary, CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "#${index + 1}",
-                            style = MaterialTheme.typography.labelMedium.copy(
-                                fontWeight = FontWeight.Normal,
-                                color = MaterialTheme.colorScheme.primary,
-                                fontSize = 12.sp
-                            )
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(12.dp))
-
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = LanguageManager.getString(festival.nameHi, festival.nameEn),
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary,
-                                fontSize = 15.sp
-                            )
-                        )
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = "${festival.dateString} (${getLocalizedDay(festival.dayNameHi)})",
-                                style = MaterialTheme.typography.labelMedium.copy(
-                                    color = MaterialTheme.colorScheme.secondary,
-                                    fontWeight = FontWeight.Normal,
-                                    fontSize = 12.sp
-                                )
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "• ${festival.monthNameHi} ${festival.tithiHi}",
-                                style = MaterialTheme.typography.bodySmall.copy(
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    fontSize = 11.sp
-                                )
-                            )
-                        }
-                    }
-
-                    if (festival.regionFilter != "ALL") {
-                        GlassBadge(
-                            text = if (festival.regionFilter == "RAJASTHAN") LanguageManager.getString("राजस्थान", "Rajasthan") else LanguageManager.getString("उत्तर भारत", "North India"),
-                            backgroundColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f),
-                            textColor = MaterialTheme.colorScheme.secondary,
-                            borderColor = MaterialTheme.colorScheme.secondary
-                        )
-                    }
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .clickable {
+                                view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                                selectedFestivalDetail = festival
+                            }
+                            .testTag("upcoming_festival_${filteredFestivals.indexOf(festival) + 1}")
+                    )
                 }
+                if (pair.size == 1) Spacer(modifier = Modifier.weight(1f))
             }
         }
 
@@ -383,16 +357,16 @@ fun CalendarScreen(viewModel: MainViewModel) {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "क्षेत्र (Region):",
+                    text = LanguageManager.getString("क्षेत्र:", "Region:"),
                     style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
 
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     val regions = listOf(
-                        Pair("ALL", "सभी (All India)"),
-                        Pair("NORTH", "उत्तर भारत (North)"),
-                        Pair("RAJASTHAN", "राजस्थान (Rajasthan)")
+                        Pair("ALL", LanguageManager.getString("सभी", "All India")),
+                        Pair("NORTH", LanguageManager.getString("उत्तर भारत", "North India")),
+                        Pair("RAJASTHAN", LanguageManager.getString("राजस्थान", "Rajasthan"))
                     )
                     items(regions) { (code, label) ->
                         val isSelected = (selectedRegion == code)
@@ -477,7 +451,7 @@ fun FestivalCard(
                         )
                     )
                     Text(
-                        text = "${festival.dateString} (${getLocalizedDay(festival.dayNameHi)})",
+                        text = "${festival.dateLocal} (${getLocalizedDay(festival.dayNameHi)})",
                         style = MaterialTheme.typography.labelMedium.copy(
                             color = MaterialTheme.colorScheme.secondary,
                             fontWeight = FontWeight.Normal,
@@ -513,7 +487,8 @@ fun FestivalCard(
                         .padding(8.dp)
                 ) {
                     Text(
-                        text = "पूजन विधि: ${festival.pujaVidhiHi}",
+                        text = "${LanguageManager.getString("पूजन विधि", "How it is observed")}: " +
+                            LanguageManager.getString(festival.pujaVidhiHi, festival.pujaVidhiEn),
                         style = MaterialTheme.typography.bodySmall.copy(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 13.sp,
@@ -551,7 +526,7 @@ fun FestivalDetailDialog(
                         )
                     )
                     Text(
-                        text = "${festival.dateString} (${getLocalizedDay(festival.dayNameHi)})",
+                        text = "${festival.dateLocal} (${getLocalizedDay(festival.dayNameHi)})",
                         style = MaterialTheme.typography.labelMedium.copy(
                             color = MaterialTheme.colorScheme.secondary,
                             fontWeight = FontWeight.Normal,
@@ -582,8 +557,8 @@ fun FestivalDetailDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    GlassBadge(text = "${festival.monthNameHi} ${festival.pakshaHi}")
-                    GlassBadge(text = "तिथि: ${festival.tithiHi}", textColor = MaterialTheme.colorScheme.primary, borderColor = MaterialTheme.colorScheme.primary)
+                    GlassBadge(text = "${festival.masaLocal} ${festival.pakshaLocal}")
+                    GlassBadge(text = "${LanguageManager.getString("तिथि", "Tithi")}: ${festival.tithiLocal}", textColor = MaterialTheme.colorScheme.primary, borderColor = MaterialTheme.colorScheme.primary)
                     if (festival.regionFilter != "ALL") {
                         GlassBadge(
                             text = if (festival.regionFilter == "RAJASTHAN") LanguageManager.getString("राजस्थान विशेष", "Rajasthan Spl") else LanguageManager.getString("उत्तर भारत", "North India"),
@@ -612,7 +587,7 @@ fun FestivalDetailDialog(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "धार्मिक एवं आध्यात्मिक महत्व (Significance)",
+                                text = LanguageManager.getString("धार्मिक एवं आध्यात्मिक महत्व", "Significance"),
                                 style = MaterialTheme.typography.titleSmall.copy(
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.primary,
@@ -651,7 +626,7 @@ fun FestivalDetailDialog(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "पूजा विधि व नियम (Rituals & Puja Vidhi)",
+                                text = LanguageManager.getString("पूजा विधि व नियम", "Rituals & puja vidhi"),
                                 style = MaterialTheme.typography.titleSmall.copy(
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.primary,
@@ -661,7 +636,12 @@ fun FestivalDetailDialog(
                         }
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            text = if (festival.pujaVidhiHi.isNotBlank()) festival.pujaVidhiHi else "प्रातःकाल स्नान कर शुद्ध वस्त्र धारण करें एवं इष्टदेव का ध्यान करते हुए पूजन व अर्घ्य अर्पित करें।",
+                            text = if (festival.pujaVidhiHi.isNotBlank())
+                                LanguageManager.getString(festival.pujaVidhiHi, festival.pujaVidhiEn)
+                            else LanguageManager.getString(
+                                "प्रातःकाल स्नान कर शुद्ध वस्त्र धारण करें एवं इष्टदेव का ध्यान करते हुए पूजन व अर्घ्य अर्पित करें।",
+                                "Bathe at dawn, put on clean clothes, and offer puja and arghya with your ishta-devata in mind."
+                            ),
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 color = MaterialTheme.colorScheme.onSurface,
                                 fontSize = 14.sp,
@@ -690,7 +670,7 @@ fun FestivalDetailDialog(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "प्रांतीय इतिहास व लोक परंपराएं (Regional History)",
+                                text = LanguageManager.getString("प्रांतीय इतिहास व लोक परंपराएं", "Regional history"),
                                 style = MaterialTheme.typography.titleSmall.copy(
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.primary,
@@ -700,7 +680,7 @@ fun FestivalDetailDialog(
                         }
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            text = festival.regionalHistoryHi,
+                            text = LanguageManager.getString(festival.regionalHistoryHi, festival.regionalHistoryEn),
                             style = MaterialTheme.typography.bodyMedium.copy(
                                 color = MaterialTheme.colorScheme.onSurface,
                                 fontSize = 14.sp,
@@ -717,7 +697,7 @@ fun FestivalDetailDialog(
                 modifier = Modifier.testTag("close_festival_detail_button")
             ) {
                 Text(
-                    text = "बंद करें (Close)",
+                    text = LanguageManager.getString("बंद करें", "Close"),
                     style = MaterialTheme.typography.labelMedium.copy(
                         fontWeight = FontWeight.Normal,
                         color = MaterialTheme.colorScheme.primary

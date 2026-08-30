@@ -33,6 +33,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import com.example.util.LanguageManager
 import com.example.ui.AppTab
 import com.example.ui.MainViewModel
 import com.example.ui.components.AdBanner
@@ -426,7 +427,7 @@ fun FirstRunSyncingOverlay() {
             )
             androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(24.dp))
             androidx.compose.material3.Text(
-                text = "ब्रह्मांडीय डेटा सिंक हो रहा है...",
+                text = LanguageManager.getString("ब्रह्मांडीय डेटा सिंक हो रहा है...", "Getting today's sky ready..."),
                 style = androidx.compose.material3.MaterialTheme.typography.titleLarge.copy(
                     fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                     color = androidx.compose.material3.MaterialTheme.colorScheme.primary

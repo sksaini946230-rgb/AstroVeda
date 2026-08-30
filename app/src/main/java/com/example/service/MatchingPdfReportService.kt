@@ -1,5 +1,6 @@
 package com.example.service
 
+import com.example.util.LanguageManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Canvas
@@ -84,7 +85,7 @@ object MatchingPdfReportService {
         canvas.drawRect(headerRect, fillHeaderPaint)
 
         // 3. Header Texts
-        canvas.drawText(" वैदिक अष्टकूट कुण्डली गुण मिलान ", 595f / 2f, 55f, textHeaderPaint)
+        canvas.drawText(LanguageManager.getString(" वैदिक अष्टकूट कुण्डली गुण मिलान ", " Vedic Ashtakoot Kundali Matching "), 595f / 2f, 55f, textHeaderPaint)
         canvas.drawText("AstroVeda 36-Guna Kundali Matching Certified Report", 595f / 2f, 78f, textSubHeaderPaint)
 
         var yPos = 130f
@@ -97,7 +98,7 @@ object MatchingPdfReportService {
             isAntiAlias = true
             textAlign = Paint.Align.CENTER
         }
-        canvas.drawText("वर (Groom): ${result.boyName}    कन्या (Bride): ${result.girlName}", 595f / 2f, yPos, couplePaint)
+        canvas.drawText(LanguageManager.getString("वर: ${result.boyName}    कन्या: ${result.girlName}", "Groom: ${result.boyName}    Bride: ${result.girlName}"), 595f / 2f, yPos, couplePaint)
         yPos += 30f
 
         // 5. Total Guna Score Card
@@ -124,7 +125,7 @@ object MatchingPdfReportService {
             isAntiAlias = true
             textAlign = Paint.Align.CENTER
         }
-        canvas.drawText("प्राप्त कुल गुण score: ${result.totalObtainedGuna} / 36.0", 595f / 2f, yPos + 28f, scoreTextPaint)
+        canvas.drawText(LanguageManager.getString("प्राप्त कुल गुण: ${result.totalObtainedGuna} / 36.0", "Total gunas: ${result.totalObtainedGuna} / 36.0"), 595f / 2f, yPos + 28f, scoreTextPaint)
 
         val verdictTextPaint = Paint().apply {
             color = Color.parseColor("#333333")
@@ -133,27 +134,33 @@ object MatchingPdfReportService {
             isAntiAlias = true
             textAlign = Paint.Align.CENTER
         }
-        canvas.drawText("निष्कर्ष: ${result.compatibilityVerdictHi}", 595f / 2f, yPos + 52f, verdictTextPaint)
+        canvas.drawText(LanguageManager.getString("निष्कर्ष: ${result.compatibilityVerdictHi}", "Verdict: ${result.compatibilityVerdictEn}"), 595f / 2f, yPos + 52f, verdictTextPaint)
 
         yPos += 85f
 
         // 6. Dosha Analysis (Mangal, Nadi, Bhakoot)
-        canvas.drawText("1. प्रमुख दोष विचार (Dosha Analysis):", 40f, yPos, titlePaint)
+        canvas.drawText(LanguageManager.getString("1. प्रमुख दोष विचार:", "1. Dosha analysis:"), 40f, yPos, titlePaint)
         yPos += 18f
-        canvas.drawText("• मंगल दोष: ${result.mangalDoshaStatusHi}", 50f, yPos, bodyPaint)
+        canvas.drawText(LanguageManager.getString("• मंगल दोष: ${result.mangalDoshaStatusHi}", "• Mangal dosha: ${result.mangalDoshaStatusEn}"), 50f, yPos, bodyPaint)
         yPos += 16f
         val nadiColor = if (result.hasNadiDosha) Color.parseColor("#C62828") else Color.parseColor("#2E7D32")
         val nadiPaint = Paint(bodyPaint).apply { color = nadiColor }
-        canvas.drawText("• नाड़ी दोष: ${if (result.hasNadiDosha) "दोष उपस्थित (समान नाड़ी)" else "दोष मुक्त (अनुकूल)"}", 50f, yPos, nadiPaint)
+        canvas.drawText(LanguageManager.getString(
+            "• नाड़ी दोष: ${if (result.hasNadiDosha) "दोष उपस्थित (समान नाड़ी)" else "दोष मुक्त"}",
+            "• Nadi dosha: ${if (result.hasNadiDosha) "present (same nadi)" else "none"}"
+        ), 50f, yPos, nadiPaint)
         yPos += 16f
         val bhakootColor = if (result.hasBhakootDosha) Color.parseColor("#C62828") else Color.parseColor("#2E7D32")
         val bhakootPaint = Paint(bodyPaint).apply { color = bhakootColor }
-        canvas.drawText("• भकूट दोष: ${if (result.hasBhakootDosha) "दोष उपस्थित" else "दोष मुक्त (अनुकूल)"}", 50f, yPos, bhakootPaint)
+        canvas.drawText(LanguageManager.getString(
+            "• भकूट दोष: ${if (result.hasBhakootDosha) "दोष उपस्थित" else "दोष मुक्त"}",
+            "• Bhakoot dosha: ${if (result.hasBhakootDosha) "present" else "none"}"
+        ), 50f, yPos, bhakootPaint)
 
         yPos += 28f
 
         // 7. Ashtakoot Breakdown Table Header
-        canvas.drawText("2. अष्टकूट 36-गुण विवरण तालिका (Ashtakoot Score Table):", 40f, yPos, titlePaint)
+        canvas.drawText(LanguageManager.getString("2. अष्टकूट 36-गुण विवरण तालिका:", "2. Ashtakoot score table:"), 40f, yPos, titlePaint)
         yPos += 15f
 
         // Table Header Row Background
@@ -172,10 +179,10 @@ object MatchingPdfReportService {
             isAntiAlias = true
         }
 
-        canvas.drawText("अष्टकूट नाम (Koota)", 50f, yPos + 17f, thTextPaint)
-        canvas.drawText("अधिकतम गुण", 230f, yPos + 17f, thTextPaint)
-        canvas.drawText("प्राप्त गुण", 330f, yPos + 17f, thTextPaint)
-        canvas.drawText("व्याख्या व प्रभाव", 420f, yPos + 17f, thTextPaint)
+        canvas.drawText(LanguageManager.getString("अष्टकूट नाम", "Koota"), 50f, yPos + 17f, thTextPaint)
+        canvas.drawText(LanguageManager.getString("अधिकतम गुण", "Max"), 230f, yPos + 17f, thTextPaint)
+        canvas.drawText(LanguageManager.getString("प्राप्त गुण", "Scored"), 330f, yPos + 17f, thTextPaint)
+        canvas.drawText(LanguageManager.getString("व्याख्या व प्रभाव", "What it means"), 420f, yPos + 17f, thTextPaint)
 
         yPos += 25f
 
@@ -203,7 +210,7 @@ object MatchingPdfReportService {
         yPos += 25f
 
         // 8. Summary Reading
-        canvas.drawText("3. विवाह निष्कर्ष एवं परामर्श (Astrological Summary):", 40f, yPos, titlePaint)
+        canvas.drawText(LanguageManager.getString("3. विवाह निष्कर्ष एवं परामर्श:", "3. Summary and guidance:"), 40f, yPos, titlePaint)
         yPos += 22f
 
         // Text Wrapping for Summary Reading
@@ -230,7 +237,7 @@ object MatchingPdfReportService {
 
         // Footer Date and AstroVeda Stamp
         val sdf = SimpleDateFormat("dd MMMM yyyy, hh:mm a", Locale.getDefault())
-        val dateStr = "रिपोर्ट तिथि: ${sdf.format(Date())}"
+        val dateStr = LanguageManager.getString("रिपोर्ट तिथि: ${sdf.format(Date())}", "Report date: ${sdf.format(Date())}")
         val footerPaint = Paint().apply {
             color = Color.parseColor("#777777")
             textSize = 10f

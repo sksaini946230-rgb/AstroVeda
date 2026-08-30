@@ -18,12 +18,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -573,7 +575,7 @@ fun KundaliScreen(
                                                             formValidationError = null
                                                         },
                                                         readOnly = true,
-                                                        label = { Text(LanguageManager.getString("जन्म तिथि *", "Date of Birth *"), maxLines = 1, softWrap = false) },
+                                                        label = { Text(LanguageManager.getString("जन्म तिथि *", "Date *"), maxLines = 1, softWrap = false) },
                                                         placeholder = { Text("YYYY-MM-DD") },
                                                         trailingIcon = {
                                                             Icon(
@@ -608,7 +610,7 @@ fun KundaliScreen(
                                                             formValidationError = null
                                                         },
                                                         readOnly = true,
-                                                        label = { Text(LanguageManager.getString("जन्म समय *", "Time of Birth *"), maxLines = 1, softWrap = false) },
+                                                        label = { Text(LanguageManager.getString("जन्म समय *", "Time *"), maxLines = 1, softWrap = false) },
                                                         placeholder = { Text("HH:MM") },
                                                         trailingIcon = {
                                                             Icon(
@@ -826,7 +828,10 @@ fun KundaliScreen(
                                                         )
                                                     )
                                                     Text(
-                                                        text = "जन्म: ${currentChart.dateOfBirth} | ${currentChart.timeOfBirth} | ${currentChart.placeOfBirth}",
+                                                        text = LanguageManager.getString(
+                            "जन्म: ${currentChart.dateOfBirth} | ${currentChart.timeOfBirth} | ${currentChart.placeOfBirth}",
+                            "Born: ${currentChart.dateOfBirth} | ${currentChart.timeOfBirth} | ${currentChart.placeOfBirth}"
+                        ),
                                                         style = MaterialTheme.typography.bodySmall.copy(
                                                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                                                             fontSize = 12.sp
@@ -868,29 +873,37 @@ fun KundaliScreen(
                                             // tiles rather than badges — three long strings on
                                             // one row could not fit, so they truncated.
                                             Row(
-                                                modifier = Modifier.fillMaxWidth(),
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(IntrinsicSize.Min),
                                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                                             ) {
                                                 com.example.ui.components.BentoTile(
                                                     label = LanguageManager.getString("लग्न", "Lagna"),
                                                     value = LanguageManager.getString(currentChart.ascendantRashiHi, currentChart.ascendantRashiEn),
-                                                    valueSize = 15,
+                                                    valueSize = 13,
                                                     minHeight = 68,
-                                                    modifier = Modifier.weight(1f)
+                                                    modifier = Modifier
+                                                        .weight(1f)
+                                                        .fillMaxHeight()
                                                 )
                                                 com.example.ui.components.BentoTile(
                                                     label = LanguageManager.getString("चंद्र राशि", "Moon sign"),
                                                     value = LanguageManager.getString(currentChart.moonRashiHi, currentChart.moonRashiEn),
-                                                    valueSize = 15,
+                                                    valueSize = 13,
                                                     minHeight = 68,
-                                                    modifier = Modifier.weight(1f)
+                                                    modifier = Modifier
+                                                        .weight(1f)
+                                                        .fillMaxHeight()
                                                 )
                                                 com.example.ui.components.BentoTile(
                                                     label = LanguageManager.getString("नक्षत्र", "Nakshatra"),
                                                     value = LanguageManager.getString(currentChart.moonNakshatraHi, currentChart.moonNakshatraEn),
-                                                    valueSize = 15,
+                                                    valueSize = 13,
                                                     minHeight = 68,
-                                                    modifier = Modifier.weight(1f)
+                                                    modifier = Modifier
+                                                        .weight(1f)
+                                                        .fillMaxHeight()
                                                 )
                                             }
 
@@ -968,7 +981,7 @@ fun KundaliScreen(
                                                 verticalAlignment = Alignment.CenterVertically
                                             ) {
                                                 Text(
-                                                    text = "जन्म कुण्डली (Birth Chart)",
+                                                    text = LanguageManager.getString("कुण्डली", "Chart"),
                                                     modifier = Modifier.weight(1f, fill = false),
                                                     maxLines = 1,
                                                     overflow = TextOverflow.Ellipsis,
@@ -1125,7 +1138,7 @@ fun KundaliScreen(
                                                     Text(text = LanguageManager.getString(planet.planetNameHi.substringBefore(" "), planet.planetNameEn), style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp), modifier = Modifier.weight(1f))
                                                     Text(text = LanguageManager.getString(planet.rashiNameHi, planet.rashiNameEn), style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp), modifier = Modifier.weight(1.2f))
                                                     Text(text = "${planet.degree}°", style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.primary, fontSize = 14.sp, fontWeight = FontWeight.Normal), modifier = Modifier.weight(1f))
-                                                    Text(text = "${planet.houseNumber} भाव", style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp), modifier = Modifier.weight(1f))
+                                                    Text(text = LanguageManager.getString("${planet.houseNumber} भाव", "House ${planet.houseNumber}"), style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp), modifier = Modifier.weight(1f))
                                                 }
                                             }
                                         }

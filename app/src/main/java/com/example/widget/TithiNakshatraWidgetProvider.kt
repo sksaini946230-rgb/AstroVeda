@@ -1,5 +1,6 @@
 package com.example.widget
 
+import com.example.util.LanguageManager
 import com.example.data.model.tithiLocal
 import com.example.data.model.nakshatraLocal
 import com.example.data.model.yogaLocal
@@ -69,15 +70,15 @@ class TithiNakshatraWidgetProvider : AppWidgetProvider() {
                 setTextViewText(R.id.widget_nakshatra, panchang.nakshatraLocal)
                 setTextViewText(
                     R.id.widget_nakshatra_details,
-                    "चरण ${panchang.nakshatraPada} • समाप्ति: ${panchang.nakshatraEndTime}"
+                    LanguageManager.getString("चरण ${panchang.nakshatraPada} • समाप्ति: ${panchang.nakshatraEndTime}", "Pada ${panchang.nakshatraPada} • ends ${panchang.nakshatraEndTime}")
                 )
-                setTextViewText(R.id.widget_sunrise, "🌅 सूर्योदय: ${panchang.sunrise}")
-                setTextViewText(R.id.widget_sunset, "🌇 सूर्यास्त: ${panchang.sunset}")
+                setTextViewText(R.id.widget_sunrise, LanguageManager.getString("🌅 सूर्योदय: ${panchang.sunrise}", "🌅 Sunrise: ${panchang.sunrise}"))
+                setTextViewText(R.id.widget_sunset, LanguageManager.getString("🌇 सूर्यास्त: ${panchang.sunset}", "🌇 Sunset: ${panchang.sunset}"))
                 val moonPhase = com.example.astro.PanchangCalculator.getMoonPhaseInfo(panchang.pakshaHindi, panchang.tithiHindi)
                 setTextViewText(R.id.widget_moon_phase, "${moonPhase.emoji} चंद्र कला: ${moonPhase.nameHindi} (${moonPhase.illuminationPercent}% प्रकाशित)")
                 setTextViewText(
                     R.id.widget_insight,
-                    "✨ शुभ: ${panchang.abhijitMuhurat} | राहूकाल: ${panchang.rahuKaal}"
+                    LanguageManager.getString("✨ शुभ: ${panchang.abhijitMuhurat} | राहुकाल: ${panchang.rahuKaal}", "✨ Abhijit: ${panchang.abhijitMuhurat} | Rahu Kaal: ${panchang.rahuKaal}")
                 )
                 setTextViewText(R.id.widget_location, "📍 ${panchang.locationName}")
 

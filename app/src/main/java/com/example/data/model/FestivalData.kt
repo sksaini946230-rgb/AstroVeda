@@ -15,5 +15,7 @@ data class FestivalData(
     val significanceEn: String,
     val significanceHi: String,
     val pujaVidhiHi: String,
-    val regionalHistoryHi: String = "वैदिक ग्रंथों एवं प्रांतीय परंपराओं के अनुसार इस पर्व का विशेष ऐतिहासिक व आध्यात्मिक महत्व है।"
+    val pujaVidhiEn: String = "",
+    val regionalHistoryHi: String = "वैदिक ग्रंथों एवं प्रांतीय परंपराओं के अनुसार इस पर्व का विशेष ऐतिहासिक व आध्यात्मिक महत्व है।",
+    val regionalHistoryEn: String = "Vedic texts and regional custom both give this festival a distinct historical and spiritual place."
 )

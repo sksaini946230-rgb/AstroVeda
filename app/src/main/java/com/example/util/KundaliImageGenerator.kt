@@ -66,7 +66,7 @@ object KundaliImageGenerator {
                 textAlign = Paint.Align.CENTER
                 isAntiAlias = true
             }
-            canvas.drawText("जन्म कुण्डली (Birth Chart)", (width / 2).toFloat(), 170f, subtitlePaint)
+            canvas.drawText(LanguageManager.getString("जन्म कुण्डली", "Birth Chart"), (width / 2).toFloat(), 170f, subtitlePaint)
 
             // Info Box / Text
             val infoPaint = Paint().apply {
@@ -75,9 +75,18 @@ object KundaliImageGenerator {
                 textAlign = Paint.Align.CENTER
                 isAntiAlias = true
             }
-            val infoText1 = "नाम: ${chartData.personName} | लग्न: ${chartData.ascendantRashiHi}"
-            val infoText2 = "जन्म: ${chartData.dateOfBirth} | ${chartData.timeOfBirth} | ${chartData.placeOfBirth}"
-            val infoText3 = "राशि: ${chartData.moonRashiHi} | नक्षत्र: ${chartData.moonNakshatraHi}"
+            val infoText1 = LanguageManager.getString(
+                "नाम: ${chartData.personName} | लग्न: ${chartData.ascendantRashiHi}",
+                "Name: ${chartData.personName} | Lagna: ${chartData.ascendantRashiEn}"
+            )
+            val infoText2 = LanguageManager.getString(
+                "जन्म: ${chartData.dateOfBirth} | ${chartData.timeOfBirth} | ${chartData.placeOfBirth}",
+                "Born: ${chartData.dateOfBirth} | ${chartData.timeOfBirth} | ${chartData.placeOfBirth}"
+            )
+            val infoText3 = LanguageManager.getString(
+                "राशि: ${chartData.moonRashiHi} | नक्षत्र: ${chartData.moonNakshatraHi}",
+                "Moon sign: ${chartData.moonRashiEn} | Nakshatra: ${chartData.moonNakshatraEn}"
+            )
 
             canvas.drawText(infoText1, (width / 2).toFloat(), 230f, infoPaint)
             canvas.drawText(infoText2, (width / 2).toFloat(), 275f, infoPaint)
@@ -175,7 +184,7 @@ object KundaliImageGenerator {
                 val canvasY = chartTop + offset.y
 
                 val rashiNum = getRashiForHouse(houseNum)
-                val planets = chartData.housePlanetsMap[houseNum] ?: emptyList()
+                val planets = (chartData.housePlanetsMap[houseNum] ?: emptyList()).map { com.example.astro.AstroNames.houseGlyph(it) }
 
                 // Draw rashi number
                 canvas.drawText("$rashiNum", canvasX, canvasY - 10f, rashiPaint)
@@ -194,7 +203,7 @@ object KundaliImageGenerator {
                 textAlign = Paint.Align.CENTER
                 isAntiAlias = true
             }
-            canvas.drawText("लग्न कुण्डली", (width / 2).toFloat(), (chartTop + chartSize / 2f + 5f), chartLabelPaint)
+            canvas.drawText(LanguageManager.getString("लग्न कुण्डली", "Lagna chart"), (width / 2).toFloat(), (chartTop + chartSize / 2f + 5f), chartLabelPaint)
 
             // 4. Footer info / watermark
             val footerPaint = Paint().apply {

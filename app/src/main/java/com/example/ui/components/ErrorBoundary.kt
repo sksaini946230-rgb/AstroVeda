@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.util.LanguageManager
 import com.example.ui.theme.AppBackground
 import com.example.ui.theme.ElevatedSurface
 import com.example.ui.theme.GlassCardBorder
@@ -151,20 +152,11 @@ fun ErrorStateUI(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
-                    text = "ब्रह्मांडीय संरेखण बाधित",
+                    text = LanguageManager.getString("ब्रह्मांडीय संरेखण बाधित", "Something went wrong"),
                     style = MaterialTheme.typography.titleLarge.copy(
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold,
                         fontSize = 22.sp,
-                        textAlign = TextAlign.Center
-                    )
-                )
-                Text(
-                    text = "Cosmic Alignment Interrupted",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.85f),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
                     )
                 )
@@ -180,7 +172,10 @@ fun ErrorStateUI(
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     Text(
-                        text = "गणना या नेटवर्क के दौरान एक अप्रत्याशित समस्या आई है। कृपया पुन: प्रयास करें।",
+                        text = LanguageManager.getString(
+                    "गणना या नेटवर्क के दौरान एक अप्रत्याशित समस्या आई है। कृपया पुन: प्रयास करें।",
+                    "An unexpected problem came up during a calculation or a network call. Please try again."
+                ),
                         style = MaterialTheme.typography.bodyMedium.copy(
                             color = TextPrimary.copy(alpha = 0.9f),
                             textAlign = TextAlign.Center,
@@ -188,14 +183,6 @@ fun ErrorStateUI(
                         )
                     )
                     
-                    Text(
-                        text = "An unexpected issue occurred during calculation or network request. Please try again.",
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center,
-                            lineHeight = 20.sp
-                        )
-                    )
                 }
             }
 
@@ -219,7 +206,7 @@ fun ErrorStateUI(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "पुनः प्रयास करें (Retry)",
+                    text = LanguageManager.getString("पुनः प्रयास करें", "Retry"),
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )
@@ -241,7 +228,8 @@ fun ErrorStateUI(
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = if (showDetails) "तकनीकी विवरण छिपाएं (Hide Details)" else "तकनीकी विवरण देखें (Show Technical Details)",
+                        text = if (showDetails) LanguageManager.getString("तकनीकी विवरण छिपाएं", "Hide technical details")
+                        else LanguageManager.getString("तकनीकी विवरण देखें", "Show technical details"),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold
                     )

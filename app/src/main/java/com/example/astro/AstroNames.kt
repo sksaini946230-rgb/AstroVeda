@@ -119,6 +119,21 @@ object AstroNames {
         "Rahu" to "Ra", "Ketu" to "Ke"
     )
 
+    /** Suffix on a house token marking a retrograde planet. */
+    const val RETROGRADE_MARK = "|R"
+
+    /**
+     * Short label for a planet token stored in KundaliChartData.housePlanetsMap
+     * ("Sun", "Mars|R"), in the reader's script. House cells are tiny, so this is
+     * the abbreviated form.
+     */
+    fun houseGlyph(token: String): String {
+        val retro = token.endsWith(RETROGRADE_MARK)
+        val en = if (retro) token.removeSuffix(RETROGRADE_MARK) else token
+        val base = pick(PLANET_HI[en] ?: en, PLANET_SHORT[en] ?: en)
+        return if (retro) base + pick("(व)", "(R)") else base
+    }
+
     // ------------------------------------------------------------- Paksha
     const val SHUKLA_HI = "शुक्ल पक्ष"
     const val SHUKLA_EN = "Shukla Paksha"
@@ -157,6 +172,41 @@ object AstroNames {
     /** English element name for a Hindi one; returns the input if unrecognised. */
     fun elementEnFromHi(hi: String): String =
         ELEMENT_EN_BY_HI[hi.substringBefore(" (").trim()] ?: hi
+
+    private val TITHI_EN_BY_HI: Map<String, String> =
+        TITHI_HI.zip(TITHI_EN).toMap() + (AMAVASYA_HI to AMAVASYA_EN)
+
+    /** English tithi name for a Hindi one; returns the input if unrecognised. */
+    fun tithiEnFromHi(hi: String): String =
+        TITHI_EN_BY_HI[hi.substringBefore(" (").trim()] ?: hi
+
+    private val MASA_EN_BY_HI: Map<String, String> = MASA_HI.zip(MASA_EN).toMap()
+
+    /** English masa name for a Hindi one; returns the input if unrecognised. */
+    fun masaEnFromHi(hi: String): String =
+        MASA_EN_BY_HI[hi.substringBefore(" (").trim()] ?: hi
+
+    private val PAKSHA_EN_BY_HI = mapOf(
+        "शुक्ल पक्ष" to "Shukla Paksha",
+        "कृष्ण पक्ष" to "Krishna Paksha",
+        AMAVASYA_HI to AMAVASYA_EN
+    )
+
+    /** English paksha name for a Hindi one; returns the input if unrecognised. */
+    fun pakshaEnFromHi(hi: String): String =
+        PAKSHA_EN_BY_HI[hi.substringBefore(" (").trim()] ?: hi
+
+    private val STONE_EN_BY_HI = mapOf(
+        "नीलम" to "Blue Sapphire", "पुखराज" to "Yellow Sapphire", "पन्ना" to "Emerald",
+        "मूंगा" to "Red Coral", "मोती" to "Pearl", "माणिक्य" to "Ruby", "हीरा" to "Diamond"
+    )
+
+    /**
+     * English gemstone name for a Hindi one. Rows cached before the split hold
+     * the combined form "मोती (Pearl)", which the substringBefore handles.
+     */
+    fun stoneEnFromHi(hi: String): String =
+        STONE_EN_BY_HI[hi.substringBefore(" (").trim()] ?: hi
 
     // --------------------------------------------------------------- Helper
     /** Picks the Hindi or English form for the language in force. */

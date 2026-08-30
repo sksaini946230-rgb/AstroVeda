@@ -1,5 +1,6 @@
 package com.example.worker
 
+import com.example.util.LanguageManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -98,21 +99,35 @@ class MuhuratNotificationWorker(
             }
 
             val shubhChoghadiyaSummary = if (auspiciousSlots.isNotEmpty()) {
-                auspiciousSlots.take(2).joinToString(", ") { "${it.type.nameHi} (${it.timeSlotString})" }
+                auspiciousSlots.take(2).joinToString(", ") { "${it.type.nameLocal} (${it.timeSlotString})" }
             } else {
-                "उपलब्ध"
+                LanguageManager.getString("उपलब्ध", "available")
             }
 
-            val title = "✨ आज के शुभ मुहूर्त एवं चौघड़िया (${userCity.cityNameHindi})"
-            val content = "🌟 अभिजित: ${panchang.abhijitMuhurat} • 🌅 ब्रह्म: ${panchang.brahmaMuhurat}"
+            val title = LanguageManager.getString(
+                "✨ आज के शुभ मुहूर्त एवं चौघड़िया (${userCity.cityNameHindi})",
+                "✨ Today's muhurats & Choghadiya (${userCity.cityName})"
+            )
+            val content = LanguageManager.getString(
+                "🌟 अभिजित: ${panchang.abhijitMuhurat} • 🌅 ब्रह्म: ${panchang.brahmaMuhurat}",
+                "🌟 Abhijit: ${panchang.abhijitMuhurat} • 🌅 Brahma: ${panchang.brahmaMuhurat}"
+            )
             
             val bigText = StringBuilder().apply {
-                append("🕉️ AstroVeda दैनिक शुभ मुहूर्त गाइड (${panchang.dateString})\n\n")
-                append("🌟 अभिजित मुहूर्त (सर्वश्रेष्ठ): ${panchang.abhijitMuhurat}\n")
-                append("🌅 ब्रह्म मुहूर्त: ${panchang.brahmaMuhurat}\n")
-                append("⚡ शुभ चौघड़िया समय: $shubhChoghadiyaSummary\n")
-                append("⚠️ राहुकाल (अशुभ समय): ${panchang.rahuKaal}\n\n")
-                append("💡 टिप: नया कार्य, पूजन या यात्रा अभिजित मुहूर्त या अमृत/शुभ चौघड़िया में आरंभ करना अत्यंत फलदायी होता है।")
+                append(LanguageManager.getString(
+                    "🕉️ AstroVeda दैनिक शुभ मुहूर्त गाइड (${panchang.dateString})\n\n" +
+                        "🌟 अभिजित मुहूर्त (सर्वश्रेष्ठ): ${panchang.abhijitMuhurat}\n" +
+                        "🌅 ब्रह्म मुहूर्त: ${panchang.brahmaMuhurat}\n" +
+                        "⚡ शुभ चौघड़िया समय: $shubhChoghadiyaSummary\n" +
+                        "⚠️ राहुकाल (अशुभ समय): ${panchang.rahuKaal}\n\n" +
+                        "💡 टिप: नया कार्य, पूजन या यात्रा अभिजित मुहूर्त या अमृत/शुभ चौघड़िया में आरंभ करना अत्यंत फलदायी होता है।",
+                    "🕉️ AstroVeda — today's auspicious timings (${panchang.dateString})\n\n" +
+                        "🌟 Abhijit Muhurat (the best window): ${panchang.abhijitMuhurat}\n" +
+                        "🌅 Brahma Muhurta: ${panchang.brahmaMuhurat}\n" +
+                        "⚡ Auspicious Choghadiya: $shubhChoghadiyaSummary\n" +
+                        "⚠️ Rahu Kaal (avoid): ${panchang.rahuKaal}\n\n" +
+                        "💡 Tip: starting new work, a puja or a journey in Abhijit, or in the Amrit/Shubh Choghadiya, is held to be most fruitful."
+                ))
             }.toString()
 
             showNotification(title, content, bigText)

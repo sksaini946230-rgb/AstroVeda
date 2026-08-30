@@ -140,11 +140,11 @@ fun PanchangScreen(
         if (fineGranted || coarseGranted) {
             viewModel.detectGPSLocation(context) { success ->
                 if (!success) {
-                    Toast.makeText(context, "स्थिति प्राप्त करने में असमर्थ (Unable to fetch location)", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, LanguageManager.getString("स्थिति प्राप्त करने में असमर्थ", "Unable to fetch location"), Toast.LENGTH_SHORT).show()
                 }
             }
         } else {
-            Toast.makeText(context, "अनुमति अस्वीकार कर दी गई (Permission Denied)", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, LanguageManager.getString("अनुमति अस्वीकार कर दी गई", "Permission denied"), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -316,14 +316,14 @@ fun PanchangScreen(
                                                     modifier = Modifier.background(MaterialTheme.colorScheme.surfaceVariant)
                                                 ) {
                                                     DropdownMenuItem(
-                                                        text = { Text("📍 वर्तमान स्थान (Current GPS)") },
+                                                        text = { Text(LanguageManager.getString("📍 वर्तमान स्थान", "📍 Current location (GPS)")) },
                                                         onClick = {
                                                             expanded = false
                                                             if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
                                                                 ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                                                                 viewModel.detectGPSLocation(context) { success ->
                                                                     if (!success) {
-                                                                        Toast.makeText(context, "स्थिति प्राप्त करने में असमर्थ (Unable to fetch location)", Toast.LENGTH_SHORT).show()
+                                                                        Toast.makeText(context, LanguageManager.getString("स्थिति प्राप्त करने में असमर्थ", "Unable to fetch location"), Toast.LENGTH_SHORT).show()
                                                                     }
                                                                 }
                                                             } else {
@@ -369,7 +369,7 @@ fun PanchangScreen(
                                                 ) {
                                                     Icon(Icons.Default.ChevronLeft, contentDescription = "Previous Day", tint = MaterialTheme.colorScheme.primary)
                                                     Spacer(modifier = Modifier.width(2.dp))
-                                                    Text("पिछला दिन", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
+                                                    Text(LanguageManager.getString("पिछला दिन", "Previous"), fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
                                                 }
 
                                                 TextButton(
@@ -380,7 +380,7 @@ fun PanchangScreen(
                                                 ) {
                                                     Icon(Icons.Default.Today, contentDescription = "Today", tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(16.dp))
                                                     Spacer(modifier = Modifier.width(4.dp))
-                                                    Text("आज (Today)", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
+                                                    Text(LanguageManager.getString("आज (Today)", "Today"), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
                                                 }
 
                                                 TextButton(
@@ -391,7 +391,7 @@ fun PanchangScreen(
                                                     },
                                                     modifier = Modifier.testTag("panchang_next_day_button")
                                                 ) {
-                                                    Text("अगला दिन", fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
+                                                    Text(LanguageManager.getString("अगला दिन", "Next"), fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
                                                     Spacer(modifier = Modifier.width(2.dp))
                                                     Icon(Icons.Default.ChevronRight, contentDescription = "Next Day", tint = MaterialTheme.colorScheme.primary)
                                                 }
@@ -489,7 +489,7 @@ fun PanchangScreen(
                                                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                                                     Icon(Icons.Default.NightsStay, contentDescription = null, tint = MaterialTheme.colorScheme.secondary)
                                                                     Spacer(modifier = Modifier.width(8.dp))
-                                                                    Text("चंद्र कला व राहु काल सतर्कता", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary, fontSize = 15.sp)
+                                                                    Text(LanguageManager.getString("चंद्र कला व राहु काल सतर्कता", "Moon phase & Rahu Kaal warning"), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary, fontSize = 15.sp)
                                                                 }
                                                                 Text(
                                                                     text = LanguageManager.getString(
@@ -510,7 +510,7 @@ fun PanchangScreen(
                                                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                                                     Icon(Icons.Default.Schedule, contentDescription = null, tint = ShubhSuccessColor)
                                                                     Spacer(modifier = Modifier.width(8.dp))
-                                                                    Text("चौघड़िया व शुभ मुहूर्त विचार", fontWeight = FontWeight.Bold, color = ShubhSuccessColor, fontSize = 15.sp)
+                                                                    Text(LanguageManager.getString("चौघड़िया व शुभ मुहूर्त विचार", "Choghadiya & auspicious timings"), fontWeight = FontWeight.Bold, color = ShubhSuccessColor, fontSize = 15.sp)
                                                                 }
                                                                 Text(
                                                                     text = LanguageManager.getString(
@@ -531,7 +531,7 @@ fun PanchangScreen(
                                                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                                                     Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = PrimaryButtonBackground)
                                                                     Spacer(modifier = Modifier.width(8.dp))
-                                                                    Text("नक्षत्र ऊर्जा व गोचर प्रभाव", fontWeight = FontWeight.Bold, color = PrimaryButtonBackground, fontSize = 15.sp)
+                                                                    Text(LanguageManager.getString("नक्षत्र ऊर्जा व गोचर प्रभाव", "Nakshatra energy & transit effect"), fontWeight = FontWeight.Bold, color = PrimaryButtonBackground, fontSize = 15.sp)
                                                                 }
                                                                 Text(
                                                                     text = LanguageManager.getString(
@@ -540,7 +540,7 @@ fun PanchangScreen(
                                                                     ),
                                                                     style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 13.sp)
                                                                 )
-                                                                GlassBadge("सूर्य राशि: ${panchang.sunSign}", textColor = PrimaryButtonBackground, borderColor = PrimaryButtonBackground)
+                                                                GlassBadge(LanguageManager.getString("सूर्य राशि: ${panchang.sunSign}", "Sun sign: ${panchang.sunSign}"), textColor = PrimaryButtonBackground, borderColor = PrimaryButtonBackground)
                                                             }
                                                         }
                                                     }
@@ -729,10 +729,10 @@ fun PanchangScreen(
                                     GlassCard(modifier = Modifier.fillMaxWidth()) {
                                         Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
                                             val timings = listOf(
-                                                Triple("अभिजित मुहूर्त (Abhijit)", panchang.abhijitMuhurat, Pair("अति शुभ (Best)", ShubhSuccessColor)),
-                                                Triple("राहुकाल (Rahu Kaal)", panchang.rahuKaal, Pair("अशुभ (Avoid)", RahuKaalDangerColor)),
-                                                Triple("गुलिक काल (Gulika)", panchang.gulikaKaal, Pair("अशुभ (Avoid)", RahuKaalDangerColor)),
-                                                Triple("यमगण्ड (Yamaganda)", panchang.yamaganda, Pair("अशुभ (Avoid)", RahuKaalDangerColor))
+                                                Triple(LanguageManager.getString("अभिजित मुहूर्त", "Abhijit Muhurat"), panchang.abhijitMuhurat, Pair(LanguageManager.getString("अति शुभ", "Best"), ShubhSuccessColor)),
+                                                Triple(LanguageManager.getString("राहुकाल", "Rahu Kaal"), panchang.rahuKaal, Pair(LanguageManager.getString("अशुभ", "Avoid"), RahuKaalDangerColor)),
+                                                Triple(LanguageManager.getString("गुलिक काल", "Gulika Kaal"), panchang.gulikaKaal, Pair(LanguageManager.getString("अशुभ", "Avoid"), RahuKaalDangerColor)),
+                                                Triple(LanguageManager.getString("यमगण्ड", "Yamaganda"), panchang.yamaganda, Pair(LanguageManager.getString("अशुभ", "Avoid"), RahuKaalDangerColor))
                                             )
 
                                             timings.forEachIndexed { index, timing ->
@@ -788,7 +788,8 @@ fun PanchangScreen(
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
-                                            text = if (isChoghadiyaDaytime) "दिन का चौघड़िया (Day)" else "रात्रि चौघड़िया (Night)",
+                                            text = if (isChoghadiyaDaytime) LanguageManager.getString("दिन का चौघड़िया", "Day Choghadiya")
+                        else LanguageManager.getString("रात्रि चौघड़िया", "Night Choghadiya"),
                                             style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                                         )
 
@@ -858,7 +859,7 @@ fun PanchangScreen(
                                             ) {
                                                 Column {
                                                     Text(
-                                                        text = slot.type.nameHi,
+                                                        text = slot.type.nameLocal,
                                                         style = MaterialTheme.typography.titleSmall.copy(
                                                             fontWeight = FontWeight.Bold,
                                                             color = MaterialTheme.colorScheme.primary,
@@ -866,7 +867,7 @@ fun PanchangScreen(
                                                         )
                                                     )
                                                     Text(
-                                                        text = slot.type.natureHi,
+                                                        text = slot.type.natureLocal,
                                                         style = MaterialTheme.typography.labelSmall.copy(
                                                             color = statusColor,
                                                             fontWeight = FontWeight.Normal,
@@ -1041,7 +1042,8 @@ fun PersonalizedGreetingCard(
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                    text = if (!userName.isNullOrBlank()) "नमस्ते, $userName 🙏" else "ॐ नमः शिवाय 🙏",
+                    text = if (!userName.isNullOrBlank()) LanguageManager.getString("नमस्ते, $userName 🙏", "Namaste, $userName 🙏")
+                        else "ॐ नमः शिवाय 🙏",
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary,
@@ -1141,8 +1143,8 @@ fun DashboardQuickShortcutsGrid(
         ) {
             // Shortcut 1: Rashifal
             ShortcutTile(
-                title = LanguageManager.getString("दैनिक राशिफल", "Daily Horoscope"),
-                subtitle = LanguageManager.getString("12 राशियां व भविष्य", "12 Signs & Transits"),
+                title = LanguageManager.getString("दैनिक राशिफल", "Horoscope"),
+                subtitle = LanguageManager.getString("12 राशियां व भविष्य", "All 12 signs"),
                 icon = Icons.Default.AutoAwesome,
                 iconColor = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.weight(1f),
@@ -1176,8 +1178,8 @@ fun DashboardQuickShortcutsGrid(
 
             // Shortcut 4: Auspicious Muhurat
             ShortcutTile(
-                title = LanguageManager.getString("शुभ मुहूर्त", "Muhurat Timings"),
-                subtitle = LanguageManager.getString("चौघड़िया व राहुकाल", "Choghadiya & Rahu"),
+                title = LanguageManager.getString("शुभ मुहूर्त", "Muhurat"),
+                subtitle = LanguageManager.getString("चौघड़िया व राहुकाल", "Choghadiya"),
                 icon = Icons.Default.Schedule,
                 iconColor = ShubhSuccessColor,
                 modifier = Modifier.weight(1f),

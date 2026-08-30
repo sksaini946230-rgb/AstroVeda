@@ -20,7 +20,8 @@ object FestivalProvider {
                 regionFilter = "ALL",
                 significanceEn = "Festival of sibling bond and protection.",
                 significanceHi = "भाई-बहन के पवित्र प्रेम एवं रक्षा सूत्र बांधने का पावन पर्व।",
-                pujaVidhiHi = "भद्रा रहित समय में बहनें अपने भाइयों को तिलक लगाकर दाहिनी कलाई पर राखी बांधें।"
+                pujaVidhiHi = "भद्रा रहित समय में बहनें अपने भाइयों को तिलक लगाकर दाहिनी कलाई पर राखी बांधें।",
+                pujaVidhiEn = "Sisters apply a tilak and tie the rakhi on the brother's right wrist, in a period free of Bhadra."
             ),
             FestivalData(
                 id = "f2",
@@ -36,7 +37,8 @@ object FestivalProvider {
                 regionFilter = "ALL",
                 significanceEn = "Birth anniversary of Lord Krishna.",
                 significanceHi = "भगवान श्री कृष्ण का रोहिणी नक्षत्र में पावन अवतरण दिवस।",
-                pujaVidhiHi = "मध्यरात्रि 12:00 बजे बाल गोपाल का पञ्चामृत स्नान कराकर माखन-मिश्री भोग अर्पित करें।"
+                pujaVidhiHi = "मध्यरात्रि 12:00 बजे बाल गोपाल का पञ्चामृत स्नान कराकर माखन-मिश्री भोग अर्पित करें।",
+                pujaVidhiEn = "At midnight, bathe the infant Krishna in panchamrit and offer makhan-mishri."
             ),
             FestivalData(
                 id = "f3",
@@ -52,7 +54,8 @@ object FestivalProvider {
                 regionFilter = "ALL",
                 significanceEn = "Festival welcoming Lord Ganesha.",
                 significanceHi = "विघ्नहर्ता भगवान श्री गणेश जी की स्थापना एवं 10 दिवसीय जन्मोत्सव।",
-                pujaVidhiHi = "शुभ मुहूर्त में गणपति जी की मिट्टी की मूर्ति स्थापित कर दुर्वा व मोदक अर्पित करें।"
+                pujaVidhiHi = "शुभ मुहूर्त में गणपति जी की मिट्टी की मूर्ति स्थापित कर दुर्वा व मोदक अर्पित करें।",
+                pujaVidhiEn = "Install the clay Ganesha at the chosen muhurat and offer durva grass and modak."
             ),
             FestivalData(
                 id = "f4",
@@ -68,7 +71,8 @@ object FestivalProvider {
                 regionFilter = "ALL",
                 significanceEn = "Beginning of 9 sacred night festival of Goddess Durga.",
                 significanceHi = "मां आदिशक्ति जगदम्बा की आराधना एवं 9 स्वरूपों का महापर्व।",
-                pujaVidhiHi = "शुभ मुहूर्त में कलश स्थापना, अखण्ड ज्योति प्रज्वलन एवं नवार्ण मन्त्र जप।"
+                pujaVidhiHi = "शुभ मुहूर्त में कलश स्थापना, अखण्ड ज्योति प्रज्वलन एवं नवार्ण मन्त्र जप।",
+                pujaVidhiEn = "Kalash sthapana at the muhurat, light the akhand jyoti and chant the Navarna mantra."
             ),
             FestivalData(
                 id = "f5",
@@ -84,7 +88,8 @@ object FestivalProvider {
                 regionFilter = "ALL",
                 significanceEn = "Victory of Good over Evil.",
                 significanceHi = "अधर्म पर धर्म एवं असत्य पर सत्य की विजय का महान प्रतीक।",
-                pujaVidhiHi = "शमी पूजन, अस्त्र-शस्त्र पूजन एवं रावण दहन के उपरांत अपराजिता देवी पूजन।"
+                pujaVidhiHi = "शमी पूजन, अस्त्र-शस्त्र पूजन एवं रावण दहन के उपरांत अपराजिता देवी पूजन।",
+                pujaVidhiEn = "Shami puja and worship of tools and weapons, then Aparajita Devi puja after the Ravana effigy is burnt."
             ),
             FestivalData(
                 id = "f6",
@@ -100,7 +105,8 @@ object FestivalProvider {
                 regionFilter = "NORTH",
                 significanceEn = "Fasting for spouse's longevity.",
                 significanceHi = "पति की दीर्घायु एवं अखण्ड सौभाग्य हेतु सुहागिनों का निर्जला व्रत।",
-                pujaVidhiHi = "सायंकाल माता पार्वती व शिव परिवार का पूजन तथा चन्द्रोदय पर अर्घ्यदान।"
+                pujaVidhiHi = "सायंकाल माता पार्वती व शिव परिवार का पूजन तथा चन्द्रोदय पर अर्घ्यदान।",
+                pujaVidhiEn = "Evening worship of Parvati and the Shiva family, then the arghya offering at moonrise."
             ),
             FestivalData(
                 id = "f7",
@@ -116,7 +122,8 @@ object FestivalProvider {
                 regionFilter = "ALL",
                 significanceEn = "Festival of prosperity and health god.",
                 significanceHi = "आरोग्य के देवता भगवान धन्वन्तरि व कुबेर देव का प्रकटीकरण पर्व।",
-                pujaVidhiHi = "नवीन आभूषण, बर्तन एवं झाड़ू क्रय मुहूर्त। प्रदोष काल में यम दीपदान।"
+                pujaVidhiHi = "नवीन आभूषण, बर्तन एवं झाड़ू क्रय मुहूर्त। प्रदोष काल में यम दीपदान।",
+                pujaVidhiEn = "An auspicious time to buy new jewellery, vessels and a broom. Offer the Yama lamp at pradosh."
             ),
             FestivalData(
                 id = "f8",
@@ -132,7 +139,8 @@ object FestivalProvider {
                 regionFilter = "ALL",
                 significanceEn = "Festival of Lights and Wealth Goddess Lakshmi.",
                 significanceHi = "प्रकाश का महापर्व, माता महालक्ष्मी एवं भगवान श्री गणेश की आराधना।",
-                pujaVidhiHi = "प्रदोष काल एवं स्थिर वृषभ लग्न में महालक्ष्मी पूजन, बही-खाता पूजन व दीपमाला प्रज्वलन।"
+                pujaVidhiHi = "प्रदोष काल एवं स्थिर वृषभ लग्न में महालक्ष्मी पूजन, बही-खाता पूजन व दीपमाला प्रज्वलन।",
+                pujaVidhiEn = "Mahalakshmi puja in pradosh kaal and the fixed Taurus lagna, worship of the account books, and rows of lamps."
             ),
             FestivalData(
                 id = "f9",
@@ -148,7 +156,8 @@ object FestivalProvider {
                 regionFilter = "NORTH",
                 significanceEn = "Worship of Govardhan hill and nature.",
                 significanceHi = "भगवान श्री कृष्ण द्वारा गोवर्धन पर्वत धारण एवं प्रकृति संवर्धन उत्सव।",
-                pujaVidhiHi = "गोबर से गोवर्धन पर्वत बनाकर पूजन, 56 भोग अथवा अन्नकूट अर्पित करें।"
+                pujaVidhiHi = "गोबर से गोवर्धन पर्वत बनाकर पूजन, 56 भोग अथवा अन्नकूट अर्पित करें।",
+                pujaVidhiEn = "Shape a Govardhan hill from cow dung and offer the 56 bhog or the annakut."
             ),
             FestivalData(
                 id = "f10",
@@ -164,7 +173,8 @@ object FestivalProvider {
                 regionFilter = "NORTH",
                 significanceEn = "Sun worship festival.",
                 significanceHi = "प्रत्यक्ष देवता भगवान सूर्य एवं छठी मइया का अति कठिन 36 घंटे का निर्जला महापर्व।",
-                pujaVidhiHi = "नदी/तालाब तट पर अस्ताचलगामी एवं उदीयमान सूर्यदेव को अर्घ्यदान।"
+                pujaVidhiHi = "नदी/तालाब तट पर अस्ताचलगामी एवं उदीयमान सूर्यदेव को अर्घ्यदान।",
+                pujaVidhiEn = "Offer arghya to the setting and then the rising Sun at a river or pond bank."
             ),
             FestivalData(
                 id = "f11",
@@ -180,7 +190,8 @@ object FestivalProvider {
                 regionFilter = "RAJASTHAN",
                 significanceEn = "Rajasthan's signature Gauri-Isar festival.",
                 significanceHi = "राजस्थान का अति प्रसिद्ध लोकपर्व - माता गवरजा (पार्वती) एवं इसर जी (शिव) की भक्ति।",
-                pujaVidhiHi = "होलिका की राख से गणगौर बनाकर 16 दिन सुहाग गीत गाकर पूजन व विसर्जन।"
+                pujaVidhiHi = "होलिका की राख से गणगौर बनाकर 16 दिन सुहाग गीत गाकर पूजन व विसर्जन।",
+                pujaVidhiEn = "Shape Gangaur from Holika ash, sing the suhag songs for sixteen days, then the visarjan."
             ),
             FestivalData(
                 id = "f12",
@@ -196,7 +207,8 @@ object FestivalProvider {
                 regionFilter = "RAJASTHAN",
                 significanceEn = "Monsoon swing festival of Rajasthan.",
                 significanceHi = "राजस्थान एवं उत्तर भारत की महिलाओं का लहरिया, झूले एवं सुहाग पर्व।",
-                pujaVidhiHi = "हरे वस्त्र-झूले धारण कर शिव-पार्वती पूजन एवं घेवर-फेणी मिष्ठान भोग।"
+                pujaVidhiHi = "हरे वस्त्र-झूले धारण कर शिव-पार्वती पूजन एवं घेवर-फेणी मिष्ठान भोग।",
+                pujaVidhiEn = "Wear green, take to the swings, worship Shiva and Parvati, and offer ghevar and pheni."
             )
         )
     }

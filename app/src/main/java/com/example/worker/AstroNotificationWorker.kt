@@ -1,5 +1,6 @@
 package com.example.worker
 
+import com.example.util.LanguageManager
 import com.example.data.model.tithiLocal
 import com.example.data.model.nakshatraLocal
 import com.example.data.model.yogaLocal
@@ -102,17 +103,31 @@ class AstroNotificationWorker(
             val userRashiId = sharedPrefs.getInt("user_rashi_id", 1)
             val horoscope = horoscopes.find { it.rashiId == userRashiId } ?: horoscopes.first()
 
-            val title = "✨ दैनिक पंचांग एवं राशिफल (${userCity.cityNameHindi})"
+            val title = LanguageManager.getString(
+                "✨ दैनिक पंचांग एवं राशिफल (${userCity.cityNameHindi})",
+                "✨ Today's Panchang & horoscope (${userCity.cityName})"
+            )
             val content = "🌅 ${panchang.sunrise} | 🌇 ${panchang.sunset} • 📜 ${panchang.tithiLocal}"
-            val bigText = "🕉️ AstroVeda दैनिक पंचांग एवं राशिफल (${panchang.dateString})\n\n" +
+            val bigText = LanguageManager.getString(
+                "🕉️ AstroVeda दैनिक पंचांग एवं राशिफल (${panchang.dateString})\n\n" +
                     "🌅 सूर्योदय: ${panchang.sunrise} | 🌇 सूर्यास्त: ${panchang.sunset}\n" +
                     "📜 तिथि: ${panchang.tithiLocal}\n" +
                     "✨ नक्षत्र: ${panchang.nakshatraLocal}\n" +
                     "🌔 चंद्र कला: ${moonPhase.emoji} ${moonPhase.nameHindi}\n" +
                     "🌟 अभिजित मुहूर्त: ${panchang.abhijitMuhurat}\n" +
                     "⚠️ राहुकाल: ${panchang.rahuKaal}\n\n" +
-                    "🔮 दैनिक राशिफल - ${horoscope.rashiNameHi} (${horoscope.rashiNameEn}):\n" +
-                    "\"${horoscope.generalReadingHi}\""
+                    "🔮 दैनिक राशिफल - ${horoscope.rashiNameHi}:\n" +
+                    "\"${horoscope.generalReadingHi}\"",
+                "🕉️ AstroVeda — today's Panchang & horoscope (${panchang.dateString})\n\n" +
+                    "🌅 Sunrise: ${panchang.sunrise} | 🌇 Sunset: ${panchang.sunset}\n" +
+                    "📜 Tithi: ${panchang.tithiLocal}\n" +
+                    "✨ Nakshatra: ${panchang.nakshatraLocal}\n" +
+                    "🌔 Moon: ${moonPhase.emoji} ${moonPhase.nameEn}\n" +
+                    "🌟 Abhijit Muhurat: ${panchang.abhijitMuhurat}\n" +
+                    "⚠️ Rahu Kaal: ${panchang.rahuKaal}\n\n" +
+                    "🔮 Horoscope — ${horoscope.rashiNameEn}:\n" +
+                    "\"${horoscope.generalReadingEn}\""
+            )
 
             showNotification(title, content, bigText)
             Result.success()

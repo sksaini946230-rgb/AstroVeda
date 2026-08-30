@@ -1,5 +1,6 @@
 package com.example.astro
 
+import com.example.util.LanguageManager
 import com.example.data.model.GunaKootDetail
 import com.example.data.model.GunaMatchingResult
 
@@ -318,20 +319,22 @@ object KundaliMatchingCalculator {
             compatibilityVerdictEn = verdictEn,
             summaryReadingHi = summaryHi,
             summaryReadingEn = summaryEn,
-            boyMoonRashi = boyRashiNameHi,
-            girlMoonRashi = girlRashiNameHi,
-            boyNakshatra = boyChart.moonNakshatraHi,
-            girlNakshatra = girlChart.moonNakshatraHi,
-            boyNadi = boyNadiStrHi,
-            girlNadi = girlNadiStrHi,
-            boyGana = GANA_NAMES_HI[NAKSHATRA_GANA[boyNakshatraIdx]],
-            girlGana = GANA_NAMES_HI[NAKSHATRA_GANA[girlNakshatraIdx]],
-            boyYoni = YONI_NAMES_HI[NAKSHATRA_YONI[boyNakshatraIdx]],
-            girlYoni = YONI_NAMES_HI[NAKSHATRA_YONI[girlNakshatraIdx]],
-            boyVarna = VARNA_NAMES_HI[VARNA_RANKS[boyMoonRashiIdx]] ?: "",
-            girlVarna = VARNA_NAMES_HI[VARNA_RANKS[girlMoonRashiIdx]] ?: "",
-            boyVashya = VASHYA_NAMES_HI[VASHYA_GROUP[boyMoonRashiIdx]],
-            girlVashya = VASHYA_NAMES_HI[VASHYA_GROUP[girlMoonRashiIdx]],
+            // The comparison table showed these raw Hindi even in English mode;
+            // every one of them already had an English table beside it.
+            boyMoonRashi = LanguageManager.getString(boyRashiNameHi, boyRashiNameEn),
+            girlMoonRashi = LanguageManager.getString(girlRashiNameHi, girlRashiNameEn),
+            boyNakshatra = LanguageManager.getString(boyChart.moonNakshatraHi, boyChart.moonNakshatraEn),
+            girlNakshatra = LanguageManager.getString(girlChart.moonNakshatraHi, girlChart.moonNakshatraEn),
+            boyNadi = LanguageManager.getString(boyNadiStrHi, boyNadiStrEn),
+            girlNadi = LanguageManager.getString(girlNadiStrHi, girlNadiStrEn),
+            boyGana = LanguageManager.getString(GANA_NAMES_HI[NAKSHATRA_GANA[boyNakshatraIdx]], GANA_NAMES_EN[NAKSHATRA_GANA[boyNakshatraIdx]]),
+            girlGana = LanguageManager.getString(GANA_NAMES_HI[NAKSHATRA_GANA[girlNakshatraIdx]], GANA_NAMES_EN[NAKSHATRA_GANA[girlNakshatraIdx]]),
+            boyYoni = LanguageManager.getString(YONI_NAMES_HI[NAKSHATRA_YONI[boyNakshatraIdx]], YONI_NAMES_EN[NAKSHATRA_YONI[boyNakshatraIdx]]),
+            girlYoni = LanguageManager.getString(YONI_NAMES_HI[NAKSHATRA_YONI[girlNakshatraIdx]], YONI_NAMES_EN[NAKSHATRA_YONI[girlNakshatraIdx]]),
+            boyVarna = LanguageManager.getString(VARNA_NAMES_HI[VARNA_RANKS[boyMoonRashiIdx]] ?: "", VARNA_NAMES_EN[VARNA_RANKS[boyMoonRashiIdx]] ?: ""),
+            girlVarna = LanguageManager.getString(VARNA_NAMES_HI[VARNA_RANKS[girlMoonRashiIdx]] ?: "", VARNA_NAMES_EN[VARNA_RANKS[girlMoonRashiIdx]] ?: ""),
+            boyVashya = LanguageManager.getString(VASHYA_NAMES_HI[VASHYA_GROUP[boyMoonRashiIdx]], VASHYA_NAMES_EN[VASHYA_GROUP[boyMoonRashiIdx]]),
+            girlVashya = LanguageManager.getString(VASHYA_NAMES_HI[VASHYA_GROUP[girlMoonRashiIdx]], VASHYA_NAMES_EN[VASHYA_GROUP[girlMoonRashiIdx]]),
             hasNadiDosha = hasNadiDosha,
             nadiDoshaStatusHi = nadiDoshaStatusHi,
             nadiDoshaStatusEn = nadiDoshaStatusEn,

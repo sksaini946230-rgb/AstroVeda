@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import com.example.astro.AstroNames
 import com.example.ui.components.AstroDisclaimer
 import com.example.ui.components.DisclaimerScope
 import com.example.util.LanguageManager
@@ -204,8 +205,8 @@ fun ChoghadiyaTile(slot: ChoghadiyaSlot, modifier: Modifier = Modifier) {
         else -> RahuKaalDangerColor
     }
     com.example.ui.components.BentoTile(
-        label = LanguageManager.getString(slot.type.natureHi, slot.type.natureHi),
-        value = slot.type.nameHi,
+        label = slot.type.natureLocal,
+        value = slot.type.nameLocal,
         sub = slot.timeSlotString,
         accent = statusColor,
         valueSize = 17,
@@ -234,7 +235,7 @@ fun ChoghadiyaRow(slot: ChoghadiyaSlot) {
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = slot.type.nameHi,
+                        text = slot.type.nameLocal,
                         style = MaterialTheme.typography.titleSmall.copy(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary,
@@ -243,7 +244,7 @@ fun ChoghadiyaRow(slot: ChoghadiyaSlot) {
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "(${slot.type.natureHi})",
+                        text = "(${slot.type.natureLocal})",
                         style = MaterialTheme.typography.labelSmall.copy(
                             color = statusColor,
                             fontWeight = FontWeight.Normal,
@@ -262,7 +263,7 @@ fun ChoghadiyaRow(slot: ChoghadiyaSlot) {
             }
 
             GlassBadge(
-                text = "स्वामी: ${slot.rulerPlanetHi}",
+                text = LanguageManager.getString("स्वामी: ${slot.rulerPlanetHi}", "Ruler: ${AstroNames.planetEnFromHi(slot.rulerPlanetHi)}"),
                 backgroundColor = statusColor.copy(alpha = 0.15f),
                 textColor = statusColor,
                 borderColor = statusColor

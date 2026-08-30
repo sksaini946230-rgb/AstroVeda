@@ -809,9 +809,13 @@ object RashifalProvider {
     private fun generateRashiData(
         id: Int, en: String, hi: String, sym: String, elem: String, ruler: String, period: String, today: Date
     ): RashifalData {
-        val stones = listOf(
-            "नीलम (Blue Sapphire)", "पुखराज (Yellow Sapphire)", "पन्ना (Emerald)",
-            "मूंगा (Red Coral)", "मोती (Pearl)", "माणिक्य (Ruby)", "हीरा (Diamond)"
+        val stonesHi = listOf(
+            "नीलम", "पुखराज", "पन्ना",
+            "मूंगा", "मोती", "माणिक्य", "हीरा"
+        )
+        val stonesEn = listOf(
+            "Blue Sapphire", "Yellow Sapphire", "Emerald",
+            "Red Coral", "Pearl", "Ruby", "Diamond"
         )
         val colorsHi = listOf(
             "लाल व गुलाबी", "सफेद व सिल्वर", "हरा व फिरोजी", "पीला व केसरिया", "नीला व आसमानी"
@@ -856,7 +860,7 @@ object RashifalProvider {
 
         // Deterministic picks based on house + rashi + date
         val colorIdx = (rashiIdx + house) % colorsHi.size
-        val stoneIdx = (rashiIdx * 3 + house) % stones.size
+        val stoneIdx = (rashiIdx * 3 + house) % stonesHi.size
         val rating = 3 + ((rashiIdx + house) % 3) // 3..5
         val luckyNum = 1 + ((rashiIdx * 7 + house * 3) % 9)
         val timeIdx = (rashiIdx * 5 + house + cal.get(Calendar.DAY_OF_MONTH)) % luckyTimesHi.size
@@ -879,7 +883,8 @@ object RashifalProvider {
             luckyNumber = luckyNum,
             luckyColorEn = colorsEn[colorIdx],
             luckyColorHi = colorsHi[colorIdx],
-            luckyStoneHi = stones[stoneIdx],
+            luckyStoneHi = stonesHi[stoneIdx],
+            luckyStoneEn = stonesEn[stoneIdx],
             luckyTimeHi = luckyTimesHi[timeIdx],
             luckyTimeEn = luckyTimesEn[timeIdx],
             generalReadingHi = GENERAL_HI[houseIdx][variationIdx].replace("{planet}", planetHi).replace("{P}", periodHi),
