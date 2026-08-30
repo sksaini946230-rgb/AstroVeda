@@ -85,7 +85,7 @@ fun BentoTile(
                 }
             )
             .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(18.dp))
-            .padding(horizontal = 14.dp, vertical = 12.dp)
+            .padding(horizontal = 12.dp, vertical = 10.dp)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
             Text(

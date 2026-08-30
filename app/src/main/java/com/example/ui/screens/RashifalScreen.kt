@@ -602,28 +602,28 @@ fun RashifalScreen(viewModel: MainViewModel) {
                             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                                 val domains = listOf(
                                     DomainItem(
-                                        LanguageManager.getString("करियर व व्यवसाय (Career & Business)", "Career & Business"),
+                                        LanguageManager.getString("करियर व व्यवसाय", "Career & Business"),
                                         horoscope.careerReadingHi,
                                         horoscope.careerReadingEn,
                                         Icons.Default.Work,
                                         MaterialTheme.colorScheme.primary
                                     ),
                                     DomainItem(
-                                        LanguageManager.getString("वित्त व धन लाभ (Finance & Money)", "Finance & Money"),
+                                        LanguageManager.getString("वित्त व धन लाभ", "Finance & Money"),
                                         horoscope.financeReadingHi,
                                         horoscope.financeReadingEn,
                                         Icons.Default.MonetizationOn,
                                         MaterialTheme.colorScheme.primary
                                     ),
                                     DomainItem(
-                                        LanguageManager.getString("प्रेम व संबंध (Love & Relationships)", "Love & Relationships"),
+                                        LanguageManager.getString("प्रेम व संबंध", "Love & Relationships"),
                                         horoscope.loveReadingHi,
                                         horoscope.loveReadingEn,
                                         Icons.Default.Favorite,
                                         MaterialTheme.colorScheme.secondary
                                     ),
                                     DomainItem(
-                                        LanguageManager.getString("स्वास्थ्य एवं ऊर्जा (Health & Fitness)", "Health & Fitness"),
+                                        LanguageManager.getString("स्वास्थ्य एवं ऊर्जा", "Health & Fitness"),
                                         horoscope.healthReadingHi,
                                         horoscope.healthReadingEn,
                                         Icons.Default.FitnessCenter,

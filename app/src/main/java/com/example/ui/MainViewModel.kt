@@ -1082,6 +1082,84 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    // ---- Sign-in gate -------------------------------------------------
+    // The app now requires an account before the first screen, so these carry
+    // the state the gate needs: whether a call is in flight, and what to show
+    // the user when it fails.
+
+    private val _isAuthInProgress = MutableStateFlow(false)
+    val isAuthInProgress: StateFlow<Boolean> = _isAuthInProgress.asStateFlow()
+
+    private val _authError = MutableStateFlow<String?>(null)
+    val authError: StateFlow<String?> = _authError.asStateFlow()
+
+    private val _authNotice = MutableStateFlow<String?>(null)
+    val authNotice: StateFlow<String?> = _authNotice.asStateFlow()
+
+    fun clearAuthMessages() {
+        _authError.value = null
+        _authNotice.value = null
+    }
+
+    fun signInWithGoogleGate(context: android.content.Context, webClientId: String = "") {
+        viewModelScope.launch {
+            _isAuthInProgress.value = true
+            _authError.value = null
+            authService.signInWithGoogle(context, webClientId)
+                .onSuccess { onSignedIn(it) }
+                .onFailure { err ->
+                    _authError.value = err.message
+                    Firebase.crashlytics.recordException(err)
+                }
+            _isAuthInProgress.value = false
+        }
+    }
+
+    fun signUpWithEmail(email: String, password: String, name: String) {
+        viewModelScope.launch {
+            _isAuthInProgress.value = true
+            _authError.value = null
+            authService.signUpWithEmail(email, password, name)
+                .onSuccess { onSignedIn(it) }
+                .onFailure { err -> _authError.value = err.message }
+            _isAuthInProgress.value = false
+        }
+    }
+
+    fun signInWithEmail(email: String, password: String) {
+        viewModelScope.launch {
+            _isAuthInProgress.value = true
+            _authError.value = null
+            authService.signInWithEmail(email, password)
+                .onSuccess { onSignedIn(it) }
+                .onFailure { err -> _authError.value = err.message }
+            _isAuthInProgress.value = false
+        }
+    }
+
+    fun sendPasswordReset(email: String) {
+        viewModelScope.launch {
+            _isAuthInProgress.value = true
+            _authError.value = null
+            authService.sendPasswordReset(email)
+                .onSuccess {
+                    _authNotice.value = LanguageManager.getString(
+                        "पासवर्ड रीसेट लिंक $email पर भेज दिया गया है।",
+                        "A password reset link is on its way to $email."
+                    )
+                }
+                .onFailure { err -> _authError.value = err.message }
+            _isAuthInProgress.value = false
+        }
+    }
+
+    private fun onSignedIn(user: com.google.firebase.auth.FirebaseUser) {
+        _currentUser.value = user
+        _authError.value = null
+        Firebase.crashlytics.setUserId(user.uid)
+        syncCloudAndLocalProfiles()
+    }
+
     fun signOutFirebase() {
         authService.signOut()
         _currentUser.value = null

@@ -80,7 +80,7 @@ fun PremiumDialog(
                     horizontalArrangement = Arrangement.End
                 ) {
                     IconButton(onClick = onDismiss, modifier = Modifier.testTag("close_premium_dialog")) {
-                        Icon(imageVector = Icons.Default.Close, contentDescription = com.example.util.LanguageManager.getString("प्रीमियम डायलॉग बंद करें (Close Premium Dialog)", "Close Premium Dialog"), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Icon(imageVector = Icons.Default.Close, contentDescription = com.example.util.LanguageManager.getString("प्रीमियम डायलॉग बंद करें", "Close Premium Dialog"), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
                 Box(

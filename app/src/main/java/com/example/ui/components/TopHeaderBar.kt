@@ -169,13 +169,15 @@ fun TopHeaderBar(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                    // Header height trimmed ~20%: this was vertical = 14.dp.
+                    // The logo came down with it so the row stays proportioned.
+                    .padding(horizontal = 16.dp, vertical = 11.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // App Icon with specialized border
                 Box(
                     modifier = Modifier
-                        .size(44.dp)
+                        .size(38.dp)
                         .clip(CircleShape)
                         .background(
                             brush = Brush.linearGradient(
@@ -191,7 +193,7 @@ fun TopHeaderBar(
                         painter = painterResource(id = R.drawable.img_app_icon_1784710282310),
                         contentDescription = "AstroVeda Logo",
                         modifier = Modifier
-                            .size(36.dp)
+                            .size(31.dp)
                             .clip(CircleShape)
                     )
                 }

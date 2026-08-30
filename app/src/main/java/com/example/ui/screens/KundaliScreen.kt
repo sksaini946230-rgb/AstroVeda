@@ -158,7 +158,7 @@ fun TransitScreen(viewModel: MainViewModel) {
                             )
                         )
                         GoldGlowButton(
-                            text = LanguageManager.getString("जन्म कुण्डली बनाएं (Enter Details)", "Enter Birth Details"),
+                            text = LanguageManager.getString("जन्म कुण्डली बनाएं", "Enter Birth Details"),
                             onClick = { viewModel.setKundaliSubTab(0) }
                         )
                     }
@@ -184,7 +184,7 @@ fun TransitScreen(viewModel: MainViewModel) {
                 GlassCard(modifier = Modifier.fillMaxWidth()) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
-                            text = LanguageManager.getString("गोचर चक्र (Transit Wheel)", "Transit Wheel Visualization"),
+                            text = LanguageManager.getString("गोचर चक्र", "Transit Wheel Visualization"),
                             style = MaterialTheme.typography.titleSmall.copy(
                                 color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.Bold
@@ -479,7 +479,7 @@ fun KundaliScreen(
                                                             profileSearchQuery = it
                                                             expandedProfileList = true
                                                         },
-                                                        label = { Text(LanguageManager.getString("सहेजे प्रोफाइल से चुनें (Saved Profile)", "Select from Saved Profiles")) },
+                                                        label = { Text(LanguageManager.getString("सहेजे प्रोफाइल से चुनें", "Select from Saved Profiles")) },
                                                         placeholder = { Text(LanguageManager.getString("प्रोफाइल खोजें...", "Search profile...")) },
                                                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedProfileList) },
                                                         colors = OutlinedTextFieldDefaults.colors(
@@ -551,7 +551,7 @@ fun KundaliScreen(
                                                     nameInput = it
                                                     formValidationError = null
                                                 },
-                                                label = { Text(LanguageManager.getString("पूरा नाम (Full Name) *", "Full Name *")) },
+                                                label = { Text(LanguageManager.getString("पूरा नाम *", "Full Name *")) },
                                                 placeholder = { Text(LanguageManager.getString("उदा. राहुल शर्मा", "e.g. Rahul Sharma")) },
                                                 shape = RoundedCornerShape(14.dp),
                                                 colors = tfColors,
@@ -712,7 +712,7 @@ fun KundaliScreen(
                                                         placeCoords = null
                                                         formValidationError = null
                                                     },
-                                                    label = { Text(LanguageManager.getString("जन्म स्थान (Place of Birth) *", "Place of Birth *")) },
+                                                    label = { Text(LanguageManager.getString("जन्म स्थान *", "Place of Birth *")) },
                                                     placeholder = { Text(LanguageManager.getString("शहर, राज्य (उदा. जयपुर, राजस्थान)", "City, State (e.g. Jaipur, Rajasthan)")) },
                                                     shape = RoundedCornerShape(14.dp),
                                                     colors = tfColors,
@@ -768,7 +768,7 @@ fun KundaliScreen(
                                                 AstroLoadingIndicator()
                                             } else {
                                                 GoldGlowButton(
-                                                    text = LanguageManager.getString("कुण्डली बनाएं (Generate Chart)", "Generate Birth Chart"),
+                                                    text = LanguageManager.getString("कुण्डली बनाएं", "Generate Birth Chart"),
                                                     onClick = {
                                                         val coords = placeCoords
                                                         when {
@@ -1005,7 +1005,7 @@ fun KundaliScreen(
                                                             .padding(horizontal = 12.dp, vertical = 6.dp)
                                                     ) {
                                                         Text(
-                                                            text = LanguageManager.getString("उत्तर भारतीय (North)", "North Indian"),
+                                                            text = LanguageManager.getString("उत्तर भारतीय", "North Indian"),
                                                             maxLines = 1,
                                                             softWrap = false,
                                                             style = MaterialTheme.typography.labelSmall.copy(
@@ -1024,7 +1024,7 @@ fun KundaliScreen(
                                                             .padding(horizontal = 12.dp, vertical = 6.dp)
                                                     ) {
                                                         Text(
-                                                            text = LanguageManager.getString("दक्षिण भारतीय (South)", "South Indian"),
+                                                            text = LanguageManager.getString("दक्षिण भारतीय", "South Indian"),
                                                             maxLines = 1,
                                                             softWrap = false,
                                                             style = MaterialTheme.typography.labelSmall.copy(

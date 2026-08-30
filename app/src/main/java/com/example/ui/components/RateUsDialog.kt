@@ -102,7 +102,7 @@ fun RateUsDialog(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = com.example.util.LanguageManager.getString("डायलॉग बंद करें (Close Dialog)", "Close Dialog"),
+                            contentDescription = com.example.util.LanguageManager.getString("डायलॉग बंद करें", "Close Dialog"),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }

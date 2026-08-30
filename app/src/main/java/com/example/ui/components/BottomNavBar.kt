@@ -112,8 +112,10 @@ fun BottomNavBar(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    // Bar height trimmed ~20%: this was vertical = 8.dp.
-                    .padding(horizontal = 4.dp, vertical = 5.dp),
+                    // Bar height trimmed twice, ~20% each time: 8.dp, then
+                    // 5.dp, now 4.dp. The paddings and gaps below came down with
+                    // it so the row stays balanced rather than just squashed.
+                    .padding(horizontal = 4.dp, vertical = 4.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -158,29 +160,29 @@ fun BottomNavBar(
                                     onTabSelected(item.tab)
                                 }
                             )
-                            .padding(vertical = 4.dp)
+                            .padding(vertical = 3.dp)
                             .testTag("nav_item_${item.tab.name.lowercase()}")
                     ) {
                         // Dot indicator for selected tab
                         Box(
                             modifier = Modifier
-                                .size(if (isSelected) 3.dp else 0.dp)
+                                .size(if (isSelected) 2.5.dp else 0.dp)
                                 .clip(CircleShape)
                                 .background(NavActiveColor)
                         )
 
-                        Spacer(modifier = Modifier.height(2.dp))
+                        Spacer(modifier = Modifier.height(1.5.dp))
 
                         Icon(
                             imageVector = item.icon,
                             contentDescription = localizedTitle,
                             modifier = Modifier
-                                .size(21.dp)
+                                .size(20.dp)
                                 .scale(iconScale),
                             tint = iconColor
                         )
 
-                        Spacer(modifier = Modifier.height(3.dp))
+                        Spacer(modifier = Modifier.height(2.dp))
 
                         Text(
                             text = localizedTitle,

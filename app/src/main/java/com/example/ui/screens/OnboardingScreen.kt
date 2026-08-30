@@ -72,7 +72,7 @@ fun OnboardingScreen(
 ) {
     val context = LocalContext.current
     var pageIndex by remember { mutableIntStateOf(0) }
-    val totalPages = 4
+    val totalPages = 3
 
     val selectedRashiId by viewModel.selectedRashiId.collectAsState()
     val selectedCity by viewModel.selectedCity.collectAsState()
@@ -120,7 +120,7 @@ fun OnboardingScreen(
                     .testTag("onboarding_skip_button")
             ) {
                 Text(
-                    text = LanguageManager.getString("छोड़ें (Skip)", "Skip"),
+                    text = LanguageManager.getString("छोड़ें", "Skip"),
                     style = MaterialTheme.typography.labelSmall.copy(
                         fontWeight = FontWeight.Normal,
                         color = MaterialTheme.colorScheme.primary,
@@ -147,11 +147,6 @@ fun OnboardingScreen(
                     onToggleLocation = { locationPermissionGranted = !locationPermissionGranted },
                     onToggleNotification = { notificationPermissionGranted = !notificationPermissionGranted }
                 )
-                3 -> CloudAccountOnboardingPage(
-                    context = context,
-                    viewModel = viewModel,
-                    onComplete = onComplete
-                )
             }
         }
 
@@ -162,16 +157,16 @@ fun OnboardingScreen(
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 12.dp)
         ) {
-            if (pageIndex < 3) {
+            if (pageIndex < totalPages - 1) {
                 GoldGlowButton(
-                    text = LanguageManager.getString("आगे बढ़ें (Next)", "Next"),
+                    text = LanguageManager.getString("आगे बढ़ें", "Next"),
                     onClick = { pageIndex++ },
                     modifier = Modifier.fillMaxWidth(),
                     testTag = "onboarding_next_button"
                 )
             } else {
                 GoldGlowButton(
-                    text = LanguageManager.getString("ऐप शुरू करें (Get Started)", "Enter AstroVeda"),
+                    text = LanguageManager.getString("ऐप शुरू करें", "Enter AstroVeda"),
                     onClick = { onComplete() },
                     modifier = Modifier.fillMaxWidth(),
                     testTag = "onboarding_start_button"
@@ -360,7 +355,7 @@ fun RashiSelectOnboardingPage(viewModel: MainViewModel) {
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
-            text = LanguageManager.getString("अपनी राशि चुनें (Select Your Rashi)", "Select Your Zodiac Sign (Rashi)"),
+            text = LanguageManager.getString("अपनी राशि चुनें", "Select Your Zodiac Sign (Rashi)"),
             style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
@@ -448,7 +443,7 @@ fun LocationNotificationOnboardingPage(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = LanguageManager.getString("अनुमतियां (Setup Permissions)", "Permissions Setup"),
+            text = LanguageManager.getString("अनुमतियां", "Permissions Setup"),
             style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
@@ -490,7 +485,7 @@ fun LocationNotificationOnboardingPage(
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text(
-                            text = LanguageManager.getString("स्थान अनुमति (GPS Location)", "GPS Location Access"),
+                            text = LanguageManager.getString("स्थान अनुमति", "GPS Location Access"),
                             style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                         )
                         Text(
@@ -549,119 +544,5 @@ fun LocationNotificationOnboardingPage(
                 )
             }
         }
-    }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Page 3: Optional Account & Cloud Sync
-// ─────────────────────────────────────────────────────────────────────────────
-@Composable
-fun CloudAccountOnboardingPage(
-    context: Context,
-    viewModel: MainViewModel,
-    onComplete: () -> Unit
-) {
-    val currentUser by viewModel.currentUser.collectAsState()
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier.padding(horizontal = 8.dp)
-    ) {
-        Icon(
-            imageVector = Icons.Default.Shield,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(46.dp)
-        )
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        Text(
-            text = LanguageManager.getString("क्लाउड बैकअप (Optional Account)", "Cloud Backup & Sync (Optional)"),
-            style = MaterialTheme.typography.titleLarge.copy(
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-                fontSize = 19.sp
-            )
-        )
-
-        Text(
-            text = LanguageManager.getString(
-                "अपनी कुण्डली प्रोफाइल को सुरक्षित रखने और अन्य उपकरणों में सिंक करने हेतु",
-                "Keep your saved Kundali charts safely synced across all your devices."
-            ),
-            style = MaterialTheme.typography.bodySmall.copy(
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                fontSize = 12.sp
-            )
-        )
-
-        Spacer(modifier = Modifier.height(18.dp))
-
-        GlassCard(modifier = Modifier.fillMaxWidth()) {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                if (currentUser != null) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.CloudDone,
-                            contentDescription = "Signed In",
-                            tint = ShubhSuccessColor,
-                            modifier = Modifier.size(22.dp)
-                        )
-                        Text(
-                            text = LanguageManager.getString("सफलतापूर्वक जुड़े: ${currentUser?.email ?: currentUser?.displayName ?: "Google User"}", "Connected as: ${currentUser?.email ?: currentUser?.displayName ?: "Google User"}"),
-                            style = MaterialTheme.typography.bodySmall.copy(color = ShubhSuccessColor, fontWeight = FontWeight.Bold)
-                        )
-                    }
-                } else {
-                    Text(
-                        text = LanguageManager.getString(
-                            "✓ 100% निजता सुरक्षित एवं ऑन-डिवाइस कार्यक्षमता\n✓ सभी ज्योतिष गणनाएं बिना इंटरनेट व खाते के भी उपलब्ध\n✓ केवल प्रोफाइल सिंक हेतु खाता ऐच्छिक है",
-                            "✓ 100% Privacy & on-device calculations\n✓ All astrology features work fully offline\n✓ Account is completely optional for cloud backup"
-                        ),
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontSize = 12.5.sp,
-                            lineHeight = 18.sp
-                        )
-                    )
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    OutlinedButton(
-                        onClick = { viewModel.signInWithGoogle(context) },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text(
-                            text = LanguageManager.getString("Google से साइन-इन करें (Optional)", "Sign in with Google (Optional)"),
-                            style = MaterialTheme.typography.labelMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        )
-                    }
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(14.dp))
-
-        Text(
-            text = LanguageManager.getString(
-                "साइन-इन नहीं करना चाहते? नीचे 'ऐप शुरू करें' पर क्लिक करें।",
-                "Don't want to sign in? Tap 'Enter AstroVeda' below to continue as guest."
-            ),
-            style = MaterialTheme.typography.bodySmall.copy(
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                fontSize = 11.5.sp
-            )
-        )
     }
 }

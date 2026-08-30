@@ -265,7 +265,7 @@ fun DailyPanchangCard(
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = LanguageManager.getString("तिथि (Tithi)", "TITHI"),
+                            text = LanguageManager.getString("तिथि", "TITHI"),
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontSize = 10.sp,
@@ -294,7 +294,7 @@ fun DailyPanchangCard(
                         horizontalAlignment = Alignment.End
                     ) {
                         Text(
-                            text = LanguageManager.getString("नक्षत्र (Nakshatra)", "NAKSHATRA"),
+                            text = LanguageManager.getString("नक्षत्र", "NAKSHATRA"),
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontSize = 10.sp,
@@ -345,7 +345,7 @@ fun DailyPanchangCard(
                                 )
                                 Column {
                                     Text(
-                                        text = LanguageManager.getString("चंद्र कला (Moon Phase)", "MOON PHASE"),
+                                        text = LanguageManager.getString("चंद्र कला", "MOON PHASE"),
                                         style = MaterialTheme.typography.labelSmall.copy(
                                             color = MaterialTheme.colorScheme.primary,
                                             fontWeight = FontWeight.Normal,

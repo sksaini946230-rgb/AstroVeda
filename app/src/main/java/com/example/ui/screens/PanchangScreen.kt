@@ -380,7 +380,7 @@ fun PanchangScreen(
                                                 ) {
                                                     Icon(Icons.Default.Today, contentDescription = "Today", tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(16.dp))
                                                     Spacer(modifier = Modifier.width(4.dp))
-                                                    Text(LanguageManager.getString("आज (Today)", "Today"), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
+                                                    Text(LanguageManager.getString("आज", "Today"), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
                                                 }
 
                                                 TextButton(
@@ -1097,7 +1097,9 @@ fun PersonalizedGreetingCard(
                         )
                         Spacer(modifier = Modifier.width(3.dp))
                         Text(
-                            text = if (userName != null) "Cloud Sync ON" else "Guest Mode",
+                            // Everyone is signed in now, so this shows who —
+                            // "Guest Mode" was no longer a state the app has.
+                            text = userName ?: LanguageManager.getString("क्लाउड सिंक चालू", "Cloud sync on"),
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = if (userName != null) ShubhSuccessColor else MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontSize = 10.sp

@@ -539,7 +539,7 @@ fun FestivalDetailDialog(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = com.example.util.LanguageManager.getString("कैलेंडर विवरण बंद करें (Close Calendar Details)", "Close Calendar Details"),
+                        contentDescription = com.example.util.LanguageManager.getString("कैलेंडर विवरण बंद करें", "Close Calendar Details"),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }

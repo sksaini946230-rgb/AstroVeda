@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The system splash icon. It is the same mandala the Compose splash shows a
+    beat later, on the same ground, so the two read as one screen instead of
+    two. Android 12+ always draws its own splash first; it cannot be removed,
+    only made to match.
+
+    The inset keeps the artwork inside the circular mask the system applies.
+-->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/img_app_icon_1784710282310"
+    android:inset="18%" />

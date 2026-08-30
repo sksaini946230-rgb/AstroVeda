@@ -194,6 +194,11 @@ class MainActivity : ComponentActivity() {
                             requestNotificationPermissionIfNeeded()
                         }
                     )
+                } else if (currentUser == null) {
+                    // The sign-in gate. It sits after onboarding so the language
+                    // is already chosen and this screen can be read; nothing past
+                    // here is reachable without an account.
+                    com.example.ui.screens.AuthScreen(viewModel = mainViewModel)
                 } else if (isFirstRunSyncing) {
                     FirstRunSyncingOverlay()
                 } else {

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Android 12+ draws its own splash before the activity exists, so the app
+        used to show two: a bare icon on the default ground, then the AstroVeda
+        splash. The system one cannot be turned off — this makes it identical to
+        the one that follows, so the user sees a single splash.
+    -->
+    <style name="Theme.MyApplication" parent="android:Theme.DeviceDefault.NoActionBar">
+        <item name="android:windowBackground">@color/app_background</item>
+        <item name="android:windowSplashScreenBackground">@color/app_background</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_logo</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@color/app_background</item>
+    </style>
+</resources>

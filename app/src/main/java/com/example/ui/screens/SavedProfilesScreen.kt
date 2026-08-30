@@ -584,7 +584,7 @@ fun DeleteProfileConfirmationDialog(
                 colors = ButtonDefaults.buttonColors(containerColor = RahuKaalDangerColor)
             ) {
                 Text(
-                    text = LanguageManager.getString("हटाएं (Delete)", "Delete"),
+                    text = LanguageManager.getString("हटाएं", "Delete"),
                     color = PrimaryButtonText,
                     fontWeight = FontWeight.Bold
                 )
@@ -674,10 +674,10 @@ fun SavedProfileCard(
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         IconButton(onClick = onEdit, modifier = Modifier.testTag("edit_profile_${profile.id}")) {
-                            Icon(imageVector = Icons.Default.Edit, contentDescription = LanguageManager.getString("प्रोफाइल संपादित करें (Edit Profile)", "Edit Profile"), tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                            Icon(imageVector = Icons.Default.Edit, contentDescription = LanguageManager.getString("प्रोफाइल संपादित करें", "Edit Profile"), tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
                         }
                         IconButton(onClick = onDelete, modifier = Modifier.testTag("delete_profile_${profile.id}")) {
-                            Icon(imageVector = Icons.Default.Delete, contentDescription = LanguageManager.getString("प्रोफाइल हटाएं (Delete Profile)", "Delete Profile"), tint = RahuKaalDangerColor, modifier = Modifier.size(20.dp))
+                            Icon(imageVector = Icons.Default.Delete, contentDescription = LanguageManager.getString("प्रोफाइल हटाएं", "Delete Profile"), tint = RahuKaalDangerColor, modifier = Modifier.size(20.dp))
                         }
                     }
                 }
@@ -696,14 +696,14 @@ fun SavedProfileCard(
                     )
 
                     GlassBadge(
-                        text = LanguageManager.getString("वर (Boy)", "Use Boy"),
+                        text = LanguageManager.getString("वर", "Use Boy"),
                         textColor = MaterialTheme.colorScheme.primary,
                         borderColor = MaterialTheme.colorScheme.outline,
                         modifier = Modifier.clickable { onUseForMatchingBoy() }
                     )
 
                     GlassBadge(
-                        text = LanguageManager.getString("कन्या (Girl)", "Use Girl"),
+                        text = LanguageManager.getString("कन्या", "Use Girl"),
                         textColor = MaterialTheme.colorScheme.secondary,
                         borderColor = MaterialTheme.colorScheme.secondary,
                         modifier = Modifier.clickable { onUseForMatchingGirl() }
@@ -858,7 +858,7 @@ fun CloudBackupCard(
                             modifier = Modifier.size(24.dp)
                         )
                         Text(
-                            text = LanguageManager.getString("क्लाउड बैकअप (Firebase)", "Firebase Cloud Sync"),
+                            text = LanguageManager.getString("क्लाउड बैकअप", "Firebase Cloud Sync"),
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
@@ -896,7 +896,7 @@ fun CloudBackupCard(
                     ) {
                         Box(modifier = Modifier.weight(1f)) {
                             GoldGlowButton(
-                                text = LanguageManager.getString("बैकअप (Backup)", "Backup to Cloud"),
+                                text = LanguageManager.getString("बैकअप", "Backup to Cloud"),
                                 onClick = { viewModel.backupProfilesToCloud() },
                                 modifier = Modifier.fillMaxWidth().testTag("backup_to_cloud_button")
                             )
@@ -910,7 +910,7 @@ fun CloudBackupCard(
                                 border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
                             ) {
                                 Text(
-                                    text = LanguageManager.getString("पुनर्प्राप्त (Restore)", "Restore"),
+                                    text = LanguageManager.getString("पुनर्प्राप्त", "Restore"),
                                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Normal)
                                 )
                             }
@@ -927,7 +927,7 @@ fun CloudBackupCard(
                             modifier = Modifier.testTag("delete_account_button")
                         ) {
                             Text(
-                                text = LanguageManager.getString("खाता एवं डेटा हटाएँ (Delete Account)", "Delete Account & Data"),
+                                text = LanguageManager.getString("खाता एवं डेटा हटाएँ", "Delete Account & Data"),
                                 style = MaterialTheme.typography.labelSmall.copy(color = RahuKaalDangerColor)
                             )
                         }
@@ -937,7 +937,7 @@ fun CloudBackupCard(
                             modifier = Modifier.testTag("sign_out_button")
                         ) {
                             Text(
-                                text = LanguageManager.getString("साइन आउट (Sign Out)", "Sign Out"),
+                                text = LanguageManager.getString("साइन आउट", "Sign Out"),
                                 style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                             )
                         }
@@ -982,7 +982,7 @@ fun CloudBackupCard(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Delete,
-                                    contentDescription = LanguageManager.getString("संदेश हटाएं (Clear Message)", "Clear Message"),
+                                    contentDescription = LanguageManager.getString("संदेश हटाएं", "Clear Message"),
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.size(18.dp)
                                 )
@@ -1024,7 +1024,7 @@ fun CloudBackupCard(
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
                     Text(
-                        text = LanguageManager.getString("साइन आउट (Sign Out)", "Sign Out"),
+                        text = LanguageManager.getString("साइन आउट", "Sign Out"),
                         color = MaterialTheme.colorScheme.onPrimary,
                         fontWeight = FontWeight.Bold
                     )
@@ -1065,7 +1065,7 @@ fun CloudBackupCard(
             text = {
                 Text(
                     text = LanguageManager.getString(
-                        "क्या आप अपना AstroVeda खाता एवं सभी डेटा स्थायी रूप से हटाना चाहते हैं?\n\n• क्लाउड में सहेजे गए सभी कुण्डली प्रोफाइल (Firestore)\n• इस डिवाइस पर सहेजे गए सभी प्रोफाइल एवं रिपोर्ट\n• गूगल साइन-इन खाता एवं क्रेडेंशियल्स\n\nयह प्रक्रिया पूरी तरह से स्थायी (Irreversible) है।",
+                        "क्या आप अपना AstroVeda खाता एवं सभी डेटा स्थायी रूप से हटाना चाहते हैं?\n\n• क्लाउड में सहेजे गए सभी कुण्डली प्रोफाइल\n• इस डिवाइस पर सहेजे गए सभी प्रोफाइल एवं रिपोर्ट\n• गूगल साइन-इन खाता एवं क्रेडेंशियल्स\n\nयह प्रक्रिया पूरी तरह से स्थायी है।",
                         "Are you sure you want to permanently delete your AstroVeda account and all associated data?\n\n• All cloud-backed-up Kundali profiles (Firestore)\n• All local saved profiles and reports on this device\n• Google sign-in account and credentials\n\nThis action cannot be undone."
                     ),
                     style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface)
@@ -1080,7 +1080,7 @@ fun CloudBackupCard(
                     colors = ButtonDefaults.buttonColors(containerColor = RahuKaalDangerColor)
                 ) {
                     Text(
-                        text = LanguageManager.getString("हां, हटाएँ (Delete)", "Delete Account"),
+                        text = LanguageManager.getString("हां, हटाएँ", "Delete Account"),
                         color = TextPrimary,
                         fontWeight = FontWeight.Bold
                     )
