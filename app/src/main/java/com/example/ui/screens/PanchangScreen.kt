@@ -216,7 +216,7 @@ fun PanchangScreen(
                                     PersonalizedGreetingCard(
                                         userName = currentUser?.displayName ?: currentUser?.email?.substringBefore("@"),
                                         selectedRashiId = selectedRashiId,
-                                        selectedCityName = selectedCity.cityNameHindi,
+                                        selectedCityName = LanguageManager.getString(selectedCity.cityNameHindi, selectedCity.cityName),
                                         onRashiClick = { viewModel.navigateToRashifal() }
                                     )
                                 }
@@ -344,10 +344,10 @@ fun PanchangScreen(
 
                                                     filteredCities.forEach { city ->
                                                         DropdownMenuItem(
-                                                            text = { Text("${city.cityNameHindi} (${city.cityName})") },
+                                                            text = { Text(LanguageManager.getString(city.cityNameHindi, city.cityName)) },
                                                             onClick = {
                                                                 viewModel.setCity(city)
-                                                                searchQuery = city.cityNameHindi
+                                                                searchQuery = LanguageManager.getString(city.cityNameHindi, city.cityName)
                                                                 expanded = false
                                                             }
                                                         )

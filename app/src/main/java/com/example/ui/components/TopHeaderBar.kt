@@ -217,10 +217,12 @@ fun TopHeaderBar(
                         overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                     )
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        // Offline, the chip is the more useful of the two and the
-                        // tagline truncates to "वैदिक ..." anyway. Show one or the
-                        // other rather than a stub of both.
-                        if (!isOffline) {
+                        // The tagline shares this row with the offline and sync
+                        // chips, and there is not width for both: with the sync
+                        // chip up it truncated to "Vedic P…", which says nothing.
+                        // Show the chips when there are chips, the tagline when
+                        // there are not.
+                        if (!isOffline && !isCloudBackupEnabled) {
                             Text(
                             text = LanguageManager.getString(
                                 "वैदिक पंचांग एवं कुण्डली 2026",
@@ -235,7 +237,7 @@ fun TopHeaderBar(
                             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                             modifier = Modifier.weight(1f, fill = false)
                             )
-                        } else {
+                        } else if (isOffline) {
                             OfflineStatusChip(text = LanguageManager.getString("ऑफलाइन", "Offline"))
                         }
                         if (isCloudBackupEnabled) {
