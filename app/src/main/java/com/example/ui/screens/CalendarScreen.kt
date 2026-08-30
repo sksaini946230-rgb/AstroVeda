@@ -221,10 +221,44 @@ fun CalendarScreen(viewModel: MainViewModel) {
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // 30 Days Grid (5 rows of 7 days)
-                    val festivalDaysList = listOf(4, 8, 14, 15, 20, 28, 29) // Days with festivals
-                    var dateCounter = 1
-                    for (row in 0 until 5) {
+                    // The grid used to be entirely made up: "today" was hardcoded
+                    // to the 22nd, the festival days were a fixed list of seven
+                    // numbers, every month was 31 days long, and day 1 always sat
+                    // in the Monday column no matter what weekday it really was.
+                    // It is built from the actual month now.
+                    val today: java.util.Calendar = remember {
+                        java.util.Calendar.getInstance(com.example.astro.AstroTime.IST)
+                    }
+                    val monthCal: java.util.Calendar = remember(today) {
+                        (today.clone() as java.util.Calendar).apply {
+                            set(java.util.Calendar.DAY_OF_MONTH, 1)
+                        }
+                    }
+                    val daysInMonth = monthCal.getActualMaximum(java.util.Calendar.DAY_OF_MONTH)
+                    // Calendar.DAY_OF_WEEK is Sunday=1; this grid starts on Monday.
+                    val leadingBlanks = (monthCal.get(java.util.Calendar.DAY_OF_WEEK) + 5) % 7
+                    val todayDayOfMonth = today.get(java.util.Calendar.DAY_OF_MONTH)
+
+                    // Festival days come from the festival list itself, matched on
+                    // the ISO date, so a day only lights up when something is
+                    // actually on it — and tapping it opens that festival.
+                    val monthPrefix = remember(monthCal) {
+                        String.format(
+                            java.util.Locale.US, "%04d-%02d-",
+                            monthCal.get(java.util.Calendar.YEAR),
+                            monthCal.get(java.util.Calendar.MONTH) + 1
+                        )
+                    }
+                    val festivalsByDay: Map<Int, FestivalData> = remember(filteredFestivals, monthPrefix) {
+                        filteredFestivals
+                            .filter { it.dateIso.startsWith(monthPrefix) }
+                            .mapNotNull { f -> f.dateIso.takeLast(2).toIntOrNull()?.let { it to f } }
+                            .toMap()
+                    }
+
+                    val totalCells = leadingBlanks + daysInMonth
+                    val rows = (totalCells + 6) / 7
+                    for (row in 0 until rows) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -232,68 +266,63 @@ fun CalendarScreen(viewModel: MainViewModel) {
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             for (col in 0 until 7) {
-                                if (dateCounter <= 31) {
-                                    val dayNum = dateCounter
-                                    val hasFestival = festivalDaysList.contains(dayNum)
-                                    val isToday = (dayNum == 22)
-                                    val festivalForDay = when (dayNum) {
-                                        4 -> viewModel.festivals.getOrNull(0)
-                                        8 -> viewModel.festivals.getOrNull(1)
-                                        14 -> viewModel.festivals.getOrNull(2)
-                                        15 -> viewModel.festivals.getOrNull(3)
-                                        20 -> viewModel.festivals.getOrNull(4)
-                                        28 -> viewModel.festivals.getOrNull(5)
-                                        29 -> viewModel.festivals.getOrNull(6)
-                                        else -> viewModel.festivals.getOrNull((dayNum - 1) % viewModel.festivals.size)
-                                    }
+                                val cell = row * 7 + col
+                                val dayNum = cell - leadingBlanks + 1
+                                if (dayNum < 1 || dayNum > daysInMonth) {
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    continue
+                                }
+                                val festivalForDay = festivalsByDay[dayNum]
+                                val hasFestival = festivalForDay != null
+                                val isToday = dayNum == todayDayOfMonth
 
-                                    Box(
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .height(42.dp)
-                                            .padding(2.dp)
-                                            .clip(RoundedCornerShape(8.dp))
-                                            .background(
-                                                when {
-                                                    isToday -> MaterialTheme.colorScheme.primary
-                                                    hasFestival -> MaterialTheme.colorScheme.surfaceVariant
-                                                    else -> MaterialTheme.colorScheme.surface
-                                                }
-                                            )
-                                            .border(
-                                                1.dp,
-                                                if (isToday) MaterialTheme.colorScheme.primary else GlassCardBorder,
-                                                RoundedCornerShape(8.dp)
-                                            )
-                                            .clickable {
-                                                view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                                                festivalForDay?.let { selectedFestivalDetail = it }
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(42.dp)
+                                        .padding(2.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(
+                                            when {
+                                                isToday -> MaterialTheme.colorScheme.primary
+                                                hasFestival -> MaterialTheme.colorScheme.surfaceVariant
+                                                else -> MaterialTheme.colorScheme.surface
                                             }
-                                            .testTag("calendar_day_$dayNum"),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                            Text(
-                                                text = "$dayNum",
-                                                style = MaterialTheme.typography.labelSmall.copy(
-                                                    fontWeight = if (isToday || hasFestival) FontWeight.Normal else FontWeight.Normal,
-                                                    color = if (isToday) MaterialTheme.colorScheme.onPrimary else if (hasFestival) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                                                    fontSize = 14.sp
-                                                )
+                                        )
+                                        .border(
+                                            1.dp,
+                                            if (isToday) MaterialTheme.colorScheme.primary else GlassCardBorder,
+                                            RoundedCornerShape(8.dp)
+                                        )
+                                        .clickable(enabled = hasFestival) {
+                                            view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                                            festivalForDay?.let { selectedFestivalDetail = it }
+                                        }
+                                        .testTag("calendar_day_$dayNum"),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Text(
+                                            text = "$dayNum",
+                                            style = MaterialTheme.typography.labelSmall.copy(
+                                                fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal,
+                                                color = when {
+                                                    isToday -> MaterialTheme.colorScheme.onPrimary
+                                                    hasFestival -> MaterialTheme.colorScheme.primary
+                                                    else -> MaterialTheme.colorScheme.onSurface
+                                                },
+                                                fontSize = 14.sp
                                             )
-                                            if (hasFestival && !isToday) {
-                                                Box(
-                                                    modifier = Modifier
-                                                        .size(4.dp)
-                                                        .clip(CircleShape)
-                                                        .background(MaterialTheme.colorScheme.secondary)
-                                                )
-                                            }
+                                        )
+                                        if (hasFestival && !isToday) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(4.dp)
+                                                    .clip(CircleShape)
+                                                    .background(MaterialTheme.colorScheme.secondary)
+                                            )
                                         }
                                     }
-                                    dateCounter++
-                                } else {
-                                    Spacer(modifier = Modifier.weight(1f))
                                 }
                             }
                         }
