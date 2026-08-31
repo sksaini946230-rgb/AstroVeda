@@ -1115,7 +1115,30 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * Blank fields are the user's to fix, and Firebase answers them with
+     * "Given String is empty or null" — a Java exception message, in English,
+     * that tells nobody anything. Catch them before the call.
+     */
+    private fun credentialsMissing(email: String, password: String): Boolean {
+        val message = when {
+            email.isBlank() && password.isBlank() -> LanguageManager.getString(
+                "ईमेल और पासवर्ड दोनों भरें।", "Enter your email and password."
+            )
+            email.isBlank() -> LanguageManager.getString("ईमेल भरें।", "Enter your email.")
+            password.isBlank() -> LanguageManager.getString("पासवर्ड भरें।", "Enter your password.")
+            !android.util.Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches() ->
+                LanguageManager.getString(
+                    "यह ईमेल पता सही नहीं लगता।", "That does not look like an email address."
+                )
+            else -> return false
+        }
+        _authError.value = message
+        return true
+    }
+
     fun signUpWithEmail(email: String, password: String, name: String) {
+        if (credentialsMissing(email, password)) return
         viewModelScope.launch {
             _isAuthInProgress.value = true
             _authError.value = null
@@ -1127,6 +1150,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun signInWithEmail(email: String, password: String) {
+        if (credentialsMissing(email, password)) return
         viewModelScope.launch {
             _isAuthInProgress.value = true
             _authError.value = null
@@ -1138,6 +1162,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun sendPasswordReset(email: String) {
+        if (email.isBlank()) {
+            _authError.value = LanguageManager.getString(
+                "रीसेट लिंक भेजने के लिए पहले ईमेल भरें।",
+                "Enter your email first, and the reset link goes there."
+            )
+            return
+        }
         viewModelScope.launch {
             _isAuthInProgress.value = true
             _authError.value = null

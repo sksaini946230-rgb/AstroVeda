@@ -7,6 +7,51 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:330378380471:android:26530bca121c6f1dcd3932",
+        "android_client_info": {
+          "package_name": "app.revati.jyotish"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "330378380471-29j3hp2ujhk8b20da02akm1rhr6n90he.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "app.revati.jyotish",
+            "certificate_hash": "d346b8a4615b856a4faf5bf264d201472bf231e1"
+          }
+        },
+        {
+          "client_id": "330378380471-hjss2fmqc75l301jqqhghgcfj1glf3c4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "app.revati.jyotish",
+            "certificate_hash": "fc5e0e60bd62311e159b1b63d27f55316484bb32"
+          }
+        },
+        {
+          "client_id": "330378380471-8ja4r1sn7i7ru6tbmov96s0kbmcsifuh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDs5nop_KAX-fI51LgoCbMbmfApAHtISio"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "330378380471-8ja4r1sn7i7ru6tbmov96s0kbmcsifuh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:330378380471:android:b8222d26248f936bcd3932",
         "android_client_info": {
           "package_name": "com.aistudio.astroveda.kpvqzm"
