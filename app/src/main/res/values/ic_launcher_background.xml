@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Sampled from the logo artwork itself, so the adaptive icon's background
+         layer matches the navy the fish are drawn on. -->
+    <color name="ic_launcher_background">#0B172D</color>
+</resources>

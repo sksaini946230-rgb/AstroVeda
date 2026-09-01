@@ -201,7 +201,7 @@ fun LanguageSelectOnboardingPage(viewModel: MainViewModel) {
             contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = painterResource(id = R.drawable.img_app_icon_1784710282310),
+                painter = painterResource(id = R.drawable.revati_logo),
                 contentDescription = "Revati Logo",
                 modifier = Modifier
                     .size(76.dp)

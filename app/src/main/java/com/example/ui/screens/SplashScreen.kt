@@ -186,7 +186,7 @@ fun SplashScreen(
                 }
                 // App logo image (matches launcher icon)
                 Image(
-                    painter = painterResource(id = app.revati.jyotish.R.drawable.img_app_icon_1784710282310),
+                    painter = painterResource(id = app.revati.jyotish.R.drawable.revati_logo),
                     contentDescription = "Revati Logo",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier

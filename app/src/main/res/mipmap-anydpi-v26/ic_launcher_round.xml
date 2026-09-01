@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    The Revati mark: the twin fish of the nakshatra, turning as an infinity.
+    The foreground carries the artwork on its own navy at 88% of the canvas, so
+    it stays inside the 72dp safe zone every launcher mask is guaranteed to
+    show; the background is that same navy, so the seam never appears.
+-->
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-    <background android:drawable="@drawable/ic_launcher_background" />
-    <foreground android:drawable="@drawable/ic_launcher_foreground" />
-    <monochrome android:drawable="@drawable/ic_launcher_foreground" />
+    <background android:drawable="@color/ic_launcher_background" />
+    <foreground android:drawable="@mipmap/ic_launcher_foreground" />
 </adaptive-icon>

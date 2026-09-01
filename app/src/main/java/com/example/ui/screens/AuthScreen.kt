@@ -109,7 +109,7 @@ fun AuthScreen(viewModel: MainViewModel) {
             verticalArrangement = Arrangement.Center
         ) {
             Image(
-                painter = painterResource(id = app.revati.jyotish.R.drawable.img_app_icon_1784710282310),
+                painter = painterResource(id = app.revati.jyotish.R.drawable.revati_logo),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
