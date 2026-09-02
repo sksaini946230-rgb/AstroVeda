@@ -127,33 +127,11 @@ fun RashifalScreen(viewModel: MainViewModel) {
         else -> LanguageManager.getString("इस महीने का राशिफल", "This month's horoscope")
     }
 
-    // Setup HorizontalPager State for Card Swiping
-    val initialPage = remember(horoscopes) {
-        horoscopes.indexOfFirst { it.rashiId == selectedRashiId }.coerceAtLeast(0)
-    }
-    val pagerState = rememberPagerState(
-        initialPage = initialPage,
-        pageCount = { horoscopes.size.coerceAtLeast(1) }
-    )
-
-    // Sync selector tap -> Pager animated scroll
-    LaunchedEffect(selectedRashiId, horoscopes) {
-        val targetIndex = horoscopes.indexOfFirst { it.rashiId == selectedRashiId }
-        if (targetIndex >= 0 && targetIndex != pagerState.currentPage && !pagerState.isScrollInProgress) {
-            pagerState.animateScrollToPage(targetIndex)
-        }
-    }
-
-    // Sync Pager swipe -> ViewModel selectedRashiId
-    LaunchedEffect(pagerState.currentPage, horoscopes) {
-        if (horoscopes.isNotEmpty() && pagerState.currentPage < horoscopes.size) {
-            val rashiId = horoscopes[pagerState.currentPage].rashiId
-            if (rashiId != selectedRashiId) {
-                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                viewModel.selectRashi(rashiId)
-            }
-        }
-    }
+    // This was a HorizontalPager of all twelve signs, with neighbours peeking in
+    // at the edges and a scale/alpha/rotationY animation on every frame. Inside a
+    // vertically scrolling page it fought the scroll and snagged mid-swipe, and
+    // half-drawn neighbouring cards read as clipped text. The sign is chosen from
+    // the row of chips above; one card, no carousel.
 
     Scaffold(
         // MainActivity's Scaffold already applies the status bar inset via
@@ -183,8 +161,8 @@ fun RashifalScreen(viewModel: MainViewModel) {
             SectionHeader(
                 titleHi = "12 राशियां",
                 titleEn = "Select Zodiac Sign",
-                subtitleHi = "अपनी राशि चुनें व स्वाइप करके सभी फलादेश देखें",
-                subtitleEn = "Tap or swipe card left/right for next zodiac sign"
+                subtitleHi = "अपनी राशि चुनें",
+                subtitleEn = "Choose your sign"
             )
         }
 
@@ -269,54 +247,10 @@ fun RashifalScreen(viewModel: MainViewModel) {
             }
         }
 
-        // Card Swipe Gesture Guidance Banner with Page Dots
+        // 6: The selected sign's reading.
         item {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 2.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = LanguageManager.getString("👈 कार्ड स्वाइप करें 👉", "👈 Swipe for the next sign 👉"),
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        color = MaterialTheme.colorScheme.secondary,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 11.sp
-                    )
-                )
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    horoscopes.indices.forEach { index ->
-                        val isSelected = pagerState.currentPage == index
-                        Box(
-                            modifier = Modifier
-                                .size(if (isSelected) 8.dp else 5.dp)
-                                .clip(CircleShape)
-                                .background(if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
-                        )
-                    }
-                }
-            }
-        }
-
-        // 6: HorizontalPager Card-Swiping Carousel for Daily Astrology Insights & Rashifal
-        item {
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("rashifal_card_pager"),
-                contentPadding = PaddingValues(horizontal = 0.dp),
-                pageSpacing = 12.dp
-            ) { page ->
-                val horoscope = horoscopes.getOrNull(page) ?: currentHoroscope
-
-                // Card Swiping Animation Parameters (Scale, Alpha, 3D Rotation)
-                val pageOffset = ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction)
-                val absOffset = pageOffset.absoluteValue
-
-                val cardScale = lerp(0.92f, 1f, 1f - absOffset.coerceIn(0f, 1f))
-                val cardAlpha = lerp(0.55f, 1f, 1f - absOffset.coerceIn(0f, 1f))
-                val cardRotation = (pageOffset * -10f).coerceIn(-18f, 18f)
+            Box(modifier = Modifier.fillMaxWidth().testTag("rashifal_card_pager")) {
+                val horoscope = currentHoroscope
 
                 val heroAlpha = remember(horoscope.rashiId, selectedPeriod) { Animatable(0f) }
                 val heroTranslationY = remember(horoscope.rashiId, selectedPeriod) { Animatable(20f) }
@@ -351,14 +285,7 @@ fun RashifalScreen(viewModel: MainViewModel) {
                 }
 
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .graphicsLayer {
-                            scaleX = cardScale
-                            scaleY = cardScale
-                            alpha = cardAlpha
-                            rotationY = cardRotation
-                        },
+                    modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     // Hero Rashi Card with 5-Star Rating & Lucky Chips
@@ -377,7 +304,12 @@ fun RashifalScreen(viewModel: MainViewModel) {
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                    // The weight keeps "Lord: Venus | Element: Earth"
+                                    // from growing into the stars beside it.
+                                    Row(
+                                        modifier = Modifier.weight(1f),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
                                         Box(
                                             modifier = Modifier
                                                 .size(52.dp)
@@ -407,6 +339,8 @@ fun RashifalScreen(viewModel: MainViewModel) {
                                             )
                                         }
                                     }
+
+                                    Spacer(modifier = Modifier.width(8.dp))
 
                                     // 4: 5-Star Score Display with animated gold fill
                                     AnimatedStarScoreDisplay(rating = horoscope.ratingStars)
