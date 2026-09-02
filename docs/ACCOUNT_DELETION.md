@@ -1,20 +1,20 @@
-# AstroVeda - Account & Data Deletion Policy
+# Revati - Account & Data Deletion Policy
 
 **Developer / Organization:** Msunjay Enterprises  
-**Application:** AstroVeda: Kundli & Panchang  
-**Contact Email:** support@astroveda.app / sksaini946230@gmail.com  
+**Application:** Revati : Kundli & Panchang  
+**Contact Email:** sksaini946230@gmail.com  
 
 ---
 
 ## How to Request Account and Associated Data Deletion
 
-At AstroVeda, we respect your right to privacy and give you full control over your personal data. You can delete your account and all associated data at any time using either of the following methods:
+At Revati, we respect your right to privacy and give you full control over your personal data. You can delete your account and all associated data at any time using either of the following methods:
 
 ---
 
-### Method 1: Delete Directly Inside the AstroVeda App (Instant)
+### Method 1: Delete Directly Inside the Revati App (Instant)
 
-1. Open the **AstroVeda** app on your Android device.
+1. Open the **Revati** app on your Android device.
 2. Navigate to **Settings** (Gear icon on the top right).
 3. Scroll down to the **Account & Privacy** section.
 4. Tap **"Delete My Account & Associated Data"**.
@@ -26,8 +26,8 @@ At AstroVeda, we respect your right to privacy and give you full control over yo
 ### Method 2: Request Deletion via Email (Web / Support Request)
 
 If you have uninstalled the app or cannot access your device:
-1. Send an email to **`support@astroveda.app`** or **`sksaini946230@gmail.com`** with the subject line: **"Account Deletion Request - AstroVeda"**.
-2. Include the Google account email address associated with your AstroVeda profile.
+1. Send an email to **`sksaini946230@gmail.com`** or **`sksaini946230@gmail.com`** with the subject line: **"Account Deletion Request - Revati"**.
+2. Include the Google account email address associated with your Revati profile.
 3. Our support team will verify your request and permanently delete all your data within **48 to 72 hours**. You will receive a confirmation email once the process is complete.
 
 ---

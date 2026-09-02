@@ -1,6 +1,6 @@
-# 🚀 AstroVeda Marketing & App Store Optimization (ASO) Playbook
+# 🚀 Revati Marketing & App Store Optimization (ASO) Playbook
 
-AstroVeda के Play Store लॉन्च, ऑर्गेनिक खोज (Organic Discovery), और वायरल विकास (Viral Growth) के लिए संपूर्ण रेडी-टू-यूज़ ASO और मार्केटिंग रणनीति।
+Revati के Play Store लॉन्च, ऑर्गेनिक खोज (Organic Discovery), और वायरल विकास (Viral Growth) के लिए संपूर्ण रेडी-टू-यूज़ ASO और मार्केटिंग रणनीति।
 
 ---
 
@@ -8,9 +8,9 @@ AstroVeda के Play Store लॉन्च, ऑर्गेनिक खोज 
 
 ### 📌 App Title (Google Play Limit: 30 Characters)
 ```text
-AstroVeda: Kundli & Panchang
+Revati : Kundli & Panchang
 ```
-*(Alternative Hindi:* `AstroVeda: कुंडली व पंचांग`*)*
+*(Alternative Hindi:* `Revati: कुंडली व पंचांग`*)*
 
 ### 📝 Short Description (Google Play Limit: 80 Characters)
 ```text
@@ -26,9 +26,9 @@ Accurate Vedic Kundli, Daily Horoscope, Panchang, Muhurat & AI Astrologer.
 ### 📄 Full Long Description (Google Play Limit: 4,000 Characters)
 
 ```text
-🌟 AstroVeda — भारत का सबसे सटीक, आधुनिक एवं प्रामाणिक वैदिक ज्योतिष व पंचांग ऐप।
+🌟 Revati — भारत का सबसे सटीक, आधुनिक एवं प्रामाणिक वैदिक ज्योतिष व पंचांग ऐप।
 
-AstroVeda प्राचीन वैदिक ज्योतिष सिद्धांतों (Vedic Astrology) और आधुनिक खगोलीय गणितीय सूत्रों (Astronomical Algorithms) का एक अनूठा संगम है। यहाँ आपको 100% सटीक जन्म कुंडली, दैनिक पंचांग, चौघड़िया, 12 राशियों का दैनिक राशिफल, 36-गुण मिलान और 24/7 AI ज्योतिष परामर्श मिलता है — वह भी पूरी तरह सुरक्षित और सुपर-फ़ास्ट।
+Revati प्राचीन वैदिक ज्योतिष सिद्धांतों (Vedic Astrology) और आधुनिक खगोलीय गणितीय सूत्रों (Astronomical Algorithms) का एक अनूठा संगम है। यहाँ आपको 100% सटीक जन्म कुंडली, दैनिक पंचांग, चौघड़िया, 12 राशियों का दैनिक राशिफल, 36-गुण मिलान और 24/7 AI ज्योतिष परामर्श मिलता है — वह भी पूरी तरह सुरक्षित और सुपर-फ़ास्ट।
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✨ मुख्य विशेषताएँ (Key Features):
@@ -65,7 +65,7 @@ AstroVeda प्राचीन वैदिक ज्योतिष सिद�
 • भाग्यशाली रत्न, अनुकूल दिशाएं, मित्र अंक और सफलता के विशेष सूत्र।
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🛡️ AstroVeda ही क्यों चुनें?
+🛡️ Revati ही क्यों चुनें?
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✅ 100% शुद्ध खगोलीय गणना — कोई फ़ेक या डमी डेटा नहीं।
 ✅ संपूर्ण डेटा गोपनीयता — आपका जन्म विवरण डिवाइस पर ही सुरक्षित रहता है।
@@ -73,7 +73,7 @@ AstroVeda प्राचीन वैदिक ज्योतिष सिद�
 ✅ डार्क मोड व लाइट मोड दोनों में शांत, सुरुचिपूर्ण और प्रीमियम कॉस्मिक डिज़ाइन।
 ✅ विज्ञापन-मुक्त एवं सहज अनुभव।
 
-📲 आज ही AstroVeda डाउनलोड करें और अपने जीवन को ग्रहों के सकारात्मक प्रभाव से आलोकित करें!
+📲 आज ही Revati डाउनलोड करें और अपने जीवन को ग्रहों के सकारात्मक प्रभाव से आलोकित करें!
 ```
 
 ---
@@ -112,7 +112,7 @@ graph TD
     A["User completes positive action (Generates Kundali / Reads Rashifal)"] --> B["Smart Rate Us Dialog"]
     B --> C{"User selects Stars"}
     C -- 4 or 5 Stars --> D["Launch Google Play In-App Review API (Public 5★ Review)"]
-    C -- 1, 2 or 3 Stars --> E["Open Private Support Form (Sends feedback to support@astroveda.app)"]
+    C -- 1, 2 or 3 Stars --> E["Open Private Support Form (Sends feedback to support@revati.app)"]
 ```
 
 - **फायदा:** पब्लिक स्टोर पर नकारात्मक 1-स्टार रिव्यूज नहीं जाते; 4-5 स्टार संतुष्ट यूज़र्स से ऐप की रेटिंग हमेशा **4.5★+** बनी रहती है।
@@ -122,7 +122,7 @@ graph TD
 ## 📲 5. Social Media & Viral Growth Loops
 
 1. **WhatsApp / Instagram Status Snippets:**
-   - ऐप में दिया गया **"शेयर करें"** बटन दैनिक पंचांग और राशिफल का सुंदर टेक्स्ट और इमोजी फ़ॉर्मेट तैयार करता है, जिसके अंत में `📲 डाउनलोड करें AstroVeda: play.google.com/store/apps/details?id=com.aistudio.astroveda.kpvqzm` स्वतः जुड़ता है।
+   - ऐप में दिया गया **"शेयर करें"** बटन दैनिक पंचांग और राशिफल का सुंदर टेक्स्ट और इमोजी फ़ॉर्मेट तैयार करता है, जिसके अंत में `📲 डाउनलोड करें Revati: play.google.com/store/apps/details?id=com.aistudio.astroveda.kpvqzm` स्वतः जुड़ता है।
 2. **दैनिक इंस्टाग्राम / फेसबुक पोस्ट शेड्यूल:**
    - सुबह 06:00 AM: आज का पंचांग, शुभ मुहूर्त और राहु काल अलर्ट।
    - सुबह 08:00 AM: 12 राशियों का आज का लकी नंबर व रंग।
@@ -135,5 +135,5 @@ graph TD
 - [x] Google Play Console ऐप लिस्टिंग, टाइटल्स, और डिस्क्रिप्शन अपडेटेड।
 - [x] सभी 7 स्क्रीनशॉट्स और फ़ीचर ग्राफ़िक (1024x500) तैयार।
 - [x] Firebase Analytics व Crashlytics लाइव ट्रैक हो रहे हैं।
-- [x] WhatsApp सपोर्ट (`+91 9462308945`) एवं ईमेल (`support@astroveda.app`) सक्रिय।
+- [x] WhatsApp सपोर्ट (`+91 9462308945`) एवं ईमेल (`support@revati.app`) सक्रिय।
 - [x] 10% Staged Rollout के साथ Google Play Production Track पर सबमिट करने हेतु तैयार।
