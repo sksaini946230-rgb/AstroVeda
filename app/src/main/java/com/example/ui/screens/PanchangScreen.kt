@@ -1102,9 +1102,10 @@ fun PersonalizedGreetingCard(
                         )
                         Spacer(modifier = Modifier.width(3.dp))
                         Text(
-                            // Everyone is signed in now, so this shows who —
-                            // "Guest Mode" was no longer a state the app has.
-                            text = userName ?: LanguageManager.getString("क्लाउड सिंक चालू", "Cloud sync on"),
+                            // Signed out is a real state again now that sign-in is
+                            // not a gate, and this chip claimed "Cloud sync on"
+                            // to a user who had no account at all.
+                            text = userName ?: LanguageManager.getString("मेहमान", "Guest"),
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = if (userName != null) ShubhSuccessColor else MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontSize = 10.sp

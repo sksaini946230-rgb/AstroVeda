@@ -89,7 +89,10 @@ fun RateUsDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Rate AstroVeda",
+                        text = com.example.util.LanguageManager.getString(
+                            "Revati को रेट करें",
+                            "Rate Revati"
+                        ),
                         style = MaterialTheme.typography.titleLarge.copy(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary,
@@ -223,7 +226,10 @@ fun RateUsDialog(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "We're thrilled that you are enjoying AstroVeda! 🌟 Please rate us on the Play Store to support our work.",
+                            text = com.example.util.LanguageManager.getString(
+                                "आपको Revati पसंद आया, यह जानकर खुशी हुई! 🌟 हमारे काम को सहयोग देने के लिए Play Store पर रेटिंग दें।",
+                                "We're thrilled that you are enjoying Revati! 🌟 Please rate us on the Play Store to support our work."
+                            ),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                             textAlign = TextAlign.Center,
@@ -277,7 +283,14 @@ private fun triggerPlayStoreReviewFlow(context: Context) {
             if (activity != null) {
                 manager.launchReviewFlow(activity, reviewInfo).addOnCompleteListener {
                     // Review flow completed (or dismissed)
-                    Toast.makeText(context, "Thank you for supporting AstroVeda!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        com.example.util.LanguageManager.getString(
+                            "Revati को सहयोग देने के लिए धन्यवाद!",
+                            "Thank you for supporting Revati!"
+                        ),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             } else {
                 launchPlayStoreFallback(context)

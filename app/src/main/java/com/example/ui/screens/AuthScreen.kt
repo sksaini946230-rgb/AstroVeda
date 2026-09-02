@@ -113,22 +113,6 @@ fun AuthScreen(viewModel: MainViewModel, onDismiss: (() -> Unit)? = null) {
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        if (onDismiss != null) {
-            IconButton(
-                onClick = onDismiss,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(8.dp)
-                    .testTag("auth_close_button")
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = LanguageManager.getString("बंद करें", "Close"),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -382,6 +366,24 @@ fun AuthScreen(viewModel: MainViewModel, onDismiss: (() -> Unit)? = null) {
                 ),
                 modifier = Modifier.widthIn(max = 320.dp)
             )
+        }
+
+        // After the Column, not before it: the Column fills the Box and would
+        // otherwise sit on top of this and swallow every tap on it.
+        if (onDismiss != null) {
+            IconButton(
+                onClick = onDismiss,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp)
+                    .testTag("auth_close_button")
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = LanguageManager.getString("बंद करें", "Close"),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }

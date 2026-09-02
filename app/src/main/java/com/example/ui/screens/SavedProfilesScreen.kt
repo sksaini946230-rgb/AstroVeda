@@ -944,8 +944,8 @@ fun CloudBackupCard(
                 } else {
                     Text(
                         text = LanguageManager.getString(
-                            "अपने कुण्डली प्रोफाइल को सुरक्षित रूप से गूगल क्लाउड पर बैकअप करने के लिए गूगल से साइन इन करें।",
-                            "Sign in with Google to securely back up and sync your Kundali profiles to Firebase Cloud."
+                            "अपने कुण्डली प्रोफाइल क्लाउड पर सुरक्षित रखने के लिए साइन इन करें — गूगल से या ईमेल से।",
+                            "Sign in — with Google or email — to back up and sync your Kundali profiles to the cloud."
                         ),
                         style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                     )

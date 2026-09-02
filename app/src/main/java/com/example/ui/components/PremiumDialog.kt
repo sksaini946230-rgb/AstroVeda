@@ -98,7 +98,7 @@ fun PremiumDialog(
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "AstroVeda PRO Gold",
+                    text = "Revati PRO Gold",
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.Bold,
                         color = ProBadgeColor,
