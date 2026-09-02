@@ -10,7 +10,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -64,7 +63,6 @@ fun SplashScreen(
     onSplashComplete: () -> Unit
 ) {
     // === Animation states ===
-    val logoScale = remember { Animatable(0f) }
     val logoAlpha = remember { Animatable(0f) }
     val nameAlpha = remember { Animatable(0f) }
     val taglineCharCount = remember { mutableIntStateOf(0) }
@@ -110,10 +108,6 @@ fun SplashScreen(
     LaunchedEffect(Unit) {
         // Logo scale in: 0→1 with overshoot-like easing (600ms)
         logoAlpha.animateTo(1f, animationSpec = tween(200))
-        logoScale.animateTo(
-            targetValue = 1f,
-            animationSpec = tween(600, easing = FastOutSlowInEasing)
-        )
         // App name fade in 600ms after logo
         delay(300)
         nameAlpha.animateTo(1f, animationSpec = tween(600))
@@ -184,15 +178,19 @@ fun SplashScreen(
                         radius = size.minDimension / 2f
                     )
                 }
-                // App logo image (matches launcher icon)
+                // The mark is handed over from the system splash, which draws the
+                // launcher icon in the launcher's own mask — a rounded square on
+                // most phones. Clipping it to a circle here meant the logo
+                // visibly changed shape a beat into every cold start, and
+                // scaling it up from nothing made the corners flick in and out.
+                // Same shape, same scale: the handover stops being visible.
                 Image(
                     painter = painterResource(id = app.revati.jyotish.R.drawable.revati_logo),
                     contentDescription = "Revati Logo",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .size(96.dp)
-                        .clip(CircleShape)
-                        .scale(logoScale.value)
+                        .size(112.dp)
+                        .clip(RoundedCornerShape(26.dp))
                         .alpha(logoAlpha.value)
                 )
             }

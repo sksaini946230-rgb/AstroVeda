@@ -82,11 +82,14 @@ fun AstroDisclaimer(
         // Kept deliberately short and quiet. It does not name a vendor or a model,
         // and it does not lead with the word "AI" — but it does say the answers are
         // generated, because letting someone believe a human astrologer replied
-        // would be a false impression, and the helpline has to survive for the
-        // person who is actually in trouble.
+        // would be a false impression.
+        //
+        // The Tele-MANAS 14416 helpline used to be on the end of this line. It was
+        // removed on the owner's instruction, twice given, after the reason for it
+        // was put to him.
         DisclaimerScope.AI -> LanguageManager.getString(
-            "उत्तर स्वतः तैयार होते हैं; त्रुटि संभव है। संकट में हों तो Tele-MANAS 14416।",
-            "Answers are generated automatically and can be wrong. In distress: Tele-MANAS 14416."
+            "उत्तर स्वतः तैयार होते हैं; त्रुटि संभव है।",
+            "Answers are generated automatically and can be wrong."
         )
     }
 

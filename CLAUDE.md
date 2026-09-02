@@ -208,5 +208,13 @@ Decided rather than pending:
 tokens. If a task might reach it, ask first.
 
 Astrology output is presented as traditional interpretation, not prediction, and
-the app must never imply a human astrologer is answering. The distress helpline
-line in `AstroDisclaimer.kt` stays.
+the app must never imply a human astrologer is answering — the "answers are
+generated automatically" line under the AI question box in `AstroDisclaimer.kt`
+stays.
+
+The Tele-MANAS 14416 helpline was on the end of that line and was removed in Sep
+2026 on the owner's instruction, given twice after the reason for it was put to
+him. It survives in two places that were not part of that instruction and should
+not be quietly swept up with it: the crisis-response rule in the model prompt in
+`GeminiAstroService.kt`, which only fires when a user sounds hopeless, and the
+privacy policy.

@@ -5,8 +5,22 @@
     two. Android 12+ always draws its own splash first; it cannot be removed,
     only made to match.
 
-    The inset keeps the artwork inside the circular mask the system applies.
+    It used to be the bare logo inset 18%. The logo carries its own navy
+    background as a square, so the splash showed a navy square that then became
+    the Compose splash's navy circle — the mark visibly changed shape on every
+    cold start. The oval below is that same navy, and the artwork is inset far
+    enough (a square inscribed in a circle needs to be under 71% of it) that its
+    own corners fall inside the oval and never show.
 -->
-<inset xmlns:android="http://schemas.android.com/apk/res/android"
-    android:drawable="@drawable/revati_logo"
-    android:inset="18%" />
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/ic_launcher_background" />
+        </shape>
+    </item>
+    <item>
+        <inset
+            android:drawable="@drawable/revati_logo"
+            android:inset="15%" />
+    </item>
+</layer-list>
