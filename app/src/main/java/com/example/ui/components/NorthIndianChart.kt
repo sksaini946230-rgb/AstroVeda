@@ -182,10 +182,21 @@ fun NorthIndianChart(
                 .clip(RoundedCornerShape(20.dp))
                 .background(ElevatedSurface)
                 .border(1.dp, GlassCardBorder, RoundedCornerShape(20.dp))
-                .pointerInput(Unit) {
-                    // panZoomLock keeps a one-finger drag from being read as a pan
-                    // while the chart sits at rest inside a scrolling page — without
-                    // it, this gesture detector swallowed the scroll.
+                // At rest the chart claims no gestures at all, so a swipe that
+                // starts on it scrolls the page like anywhere else — panZoomLock
+                // alone still left detectTransformGestures consuming the drag,
+                // and the page stopped dead under the finger. Only once the user
+                // has pinched in does panning belong to the chart; a double tap
+                // is what gets them back out.
+                .pointerInput(userScale > 1f) {
+                    if (userScale <= 1f) {
+                        detectTransformGestures(panZoomLock = true) { _, _, zoom, _ ->
+                            if (zoom != 1f) {
+                                userScale = (userScale * zoom).coerceIn(1f, 3.5f)
+                            }
+                        }
+                        return@pointerInput
+                    }
                     detectTransformGestures(panZoomLock = true) { _, pan, zoom, _ ->
                         val newScale = (userScale * zoom).coerceIn(1f, 3.5f)
                         val maxOffsetX = (size.width * (newScale - 1f)) / 2f

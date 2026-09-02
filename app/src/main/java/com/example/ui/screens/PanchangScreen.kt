@@ -932,7 +932,10 @@ fun PanchangScreen(
                                     }
 
                                     GlassCard(modifier = Modifier.fillMaxWidth()) {
-                                        Column {
+                                        // Centred: the chart is a square inside a
+                                        // full-width column, so left-aligning it left
+                                        // all the slack on one side.
+                                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                             Row(
                                                 modifier = Modifier.fillMaxWidth(),
                                                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -972,13 +975,13 @@ fun PanchangScreen(
                                             val chartModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
                                                 with(sharedTransitionScope) {
                                                     Modifier
-                                                        .fillMaxWidth(0.85f)
+                                                        .fillMaxWidth()
                                                         .sharedElement(
                                                             state = rememberSharedContentState(key = "kundali_chart_shared_element"),
                                                             animatedVisibilityScope = animatedVisibilityScope
                                                         )
                                                 }
-                                            } else Modifier.fillMaxWidth(0.85f)
+                                            } else Modifier.fillMaxWidth()
 
                                             NorthIndianChart(
                                                 chartData = dailyLagnaChart,
@@ -1370,7 +1373,14 @@ fun PlanetaryPositionsCard(planets: List<com.example.data.model.PlanetPosition>)
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        // The name/nakshatra side takes the slack; without the
+                        // weight it grew until the degree column had no room and
+                        // broke "20.4°" across two lines and "Retrograde" across
+                        // four.
+                        Row(
+                            modifier = Modifier.weight(1f),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Box(
                                 modifier = Modifier
                                     .size(36.dp)
@@ -1404,9 +1414,13 @@ fun PlanetaryPositionsCard(planets: List<com.example.data.model.PlanetPosition>)
                             }
                         }
 
+                        Spacer(modifier = Modifier.width(8.dp))
+
                         Column(horizontalAlignment = Alignment.End) {
                             Text(
                                 text = "${planet.degree}°",
+                                maxLines = 1,
+                                softWrap = false,
                                 style = MaterialTheme.typography.titleSmall.copy(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     fontWeight = FontWeight.Bold,
@@ -1416,6 +1430,8 @@ fun PlanetaryPositionsCard(planets: List<com.example.data.model.PlanetPosition>)
                             if (planet.isRetrograde) {
                                 Text(
                                     text = LanguageManager.getString("वक्री", "Retrograde"),
+                                    maxLines = 1,
+                                    softWrap = false,
                                     style = MaterialTheme.typography.labelSmall.copy(
                                         color = RahuKaalDangerColor,
                                         fontSize = 11.sp,
