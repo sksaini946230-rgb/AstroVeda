@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The launcher foreground, held back from the edges.
+
+    The artwork sits at 88% of the foreground canvas. An adaptive icon is only
+    guaranteed to show its inner 66 of 108dp — about 61% — and every launcher
+    mask crops the rest, so at 88% the mark filled its tile edge to edge and
+    read as oversized next to every other icon on the home screen. A 15% inset
+    on each side brings the art to roughly 62% of the canvas, inside the safe
+    zone. The foreground's own ground is the same navy as the background layer,
+    so shrinking it leaves no seam.
+-->
+<inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@mipmap/ic_launcher_foreground"
+    android:inset="15%" />
