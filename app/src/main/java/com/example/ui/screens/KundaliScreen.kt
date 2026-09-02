@@ -441,31 +441,6 @@ fun KundaliScreen(
 
                                     GlassCard(modifier = Modifier.fillMaxWidth()) {
                                         Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                                            // Top Helper Header
-                                            Row(
-                                                modifier = Modifier.fillMaxWidth(),
-                                                verticalAlignment = Alignment.CenterVertically
-                                            ) {
-                                                Icon(
-                                                    imageVector = Icons.Default.Info,
-                                                    contentDescription = null,
-                                                    tint = MaterialTheme.colorScheme.primary,
-                                                    modifier = Modifier.size(20.dp)
-                                                )
-                                                Spacer(modifier = Modifier.width(8.dp))
-                                                Text(
-                                                    text = LanguageManager.getString(
-                                                        "सटीक जन्म कुण्डली हेतु सही विवरण दर्ज करें (* अनिवार्य)",
-                                                        "Enter accurate birth details (* Required fields)"
-                                                    ),
-                                                    style = MaterialTheme.typography.bodySmall.copy(
-                                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                        fontWeight = FontWeight.Medium,
-                                                        fontSize = 12.sp
-                                                    )
-                                                )
-                                            }
-
                                             // Saved Profiles Dropdown Selector (Optional shortcut)
                                             if (savedProfiles.isNotEmpty()) {
                                                 ExposedDropdownMenuBox(
@@ -633,37 +608,6 @@ fun KundaliScreen(
                                                                 haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                                                                 showTimePicker = true
                                                             }
-                                                    )
-                                                }
-                                            }
-
-                                            // Approximate Time Quick Button
-                                            Row(
-                                                modifier = Modifier.fillMaxWidth(),
-                                                horizontalArrangement = Arrangement.End
-                                            ) {
-                                                Box(
-                                                    modifier = Modifier
-                                                        .clip(RoundedCornerShape(12.dp))
-                                                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f))
-                                                        .clickable {
-                                                            tobInput = "12:00"
-                                                            formValidationError = null
-                                                            Toast.makeText(
-                                                                context,
-                                                                LanguageManager.getString("समय 12:00 PM (दोपहर) सेट किया गया", "Time set to 12:00 PM (Default)"),
-                                                                Toast.LENGTH_SHORT
-                                                            ).show()
-                                                        }
-                                                        .padding(horizontal = 10.dp, vertical = 5.dp)
-                                                ) {
-                                                    Text(
-                                                        text = LanguageManager.getString("⏱️ समय ज्ञात नहीं? (12:00 PM डिफ़ॉल्ट)", "⏱️ Don't know exact time? (12:00 PM)"),
-                                                        style = MaterialTheme.typography.labelSmall.copy(
-                                                            color = MaterialTheme.colorScheme.primary,
-                                                            fontSize = 11.sp,
-                                                            fontWeight = FontWeight.Medium
-                                                        )
                                                     )
                                                 }
                                             }

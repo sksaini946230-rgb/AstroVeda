@@ -1,20 +1,34 @@
 package com.example.ui.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Keyboard
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -50,8 +64,12 @@ fun M3DatePickerDialog(
         System.currentTimeMillis()
     }
 
+    // Opens on the keyboard. A birth date is thirty years back — reaching 1995
+    // by swiping the calendar is a long trip, and the toggle in the header
+    // switches to the calendar for anyone who wants to browse.
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = initialMillis
+        initialSelectedDateMillis = initialMillis,
+        initialDisplayMode = DisplayMode.Input
     )
 
     DatePickerDialog(
@@ -133,6 +151,10 @@ fun M3TimePickerDialog(
         is24Hour = true
     )
 
+    // Typing "08:30" beats dragging a 24-hour dial to it, so the keyboard is
+    // what opens; the clock is one tap away.
+    var showDial by remember { mutableStateOf(false) }
+
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
@@ -163,27 +185,49 @@ fun M3TimePickerDialog(
             )
         },
         text = {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                TimePicker(
-                    state = timePickerState,
-                    colors = TimePickerDefaults.colors(
-                        clockDialColor = MaterialTheme.colorScheme.surfaceVariant,
-                        clockDialSelectedContentColor = MaterialTheme.colorScheme.onPrimary,
-                        clockDialUnselectedContentColor = MaterialTheme.colorScheme.primary,
-                        selectorColor = MaterialTheme.colorScheme.primary,
-                        periodSelectorSelectedContainerColor = MaterialTheme.colorScheme.primary,
-                        periodSelectorSelectedContentColor = MaterialTheme.colorScheme.onPrimary,
-                        periodSelectorUnselectedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                        periodSelectorUnselectedContentColor = MaterialTheme.colorScheme.primary,
-                        timeSelectorSelectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
-                        timeSelectorSelectedContentColor = MaterialTheme.colorScheme.primary,
-                        timeSelectorUnselectedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                        timeSelectorUnselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+            Column(modifier = Modifier.fillMaxWidth()) {
+                val pickerColors = TimePickerDefaults.colors(
+                    clockDialColor = MaterialTheme.colorScheme.surfaceVariant,
+                    clockDialSelectedContentColor = MaterialTheme.colorScheme.onPrimary,
+                    clockDialUnselectedContentColor = MaterialTheme.colorScheme.primary,
+                    selectorColor = MaterialTheme.colorScheme.primary,
+                    periodSelectorSelectedContainerColor = MaterialTheme.colorScheme.primary,
+                    periodSelectorSelectedContentColor = MaterialTheme.colorScheme.onPrimary,
+                    periodSelectorUnselectedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    periodSelectorUnselectedContentColor = MaterialTheme.colorScheme.primary,
+                    timeSelectorSelectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+                    timeSelectorSelectedContentColor = MaterialTheme.colorScheme.primary,
+                    timeSelectorUnselectedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    timeSelectorUnselectedContentColor = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (showDial) {
+                        TimePicker(state = timePickerState, colors = pickerColors)
+                    } else {
+                        TimeInput(state = timePickerState, colors = pickerColors)
+                    }
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    IconButton(onClick = { showDial = !showDial }) {
+                        Icon(
+                            imageVector = if (showDial) Icons.Default.Keyboard else Icons.Default.Schedule,
+                            contentDescription = if (showDial) {
+                                LanguageManager.getString("कीबोर्ड से समय भरें", "Enter time with the keyboard")
+                            } else {
+                                LanguageManager.getString("घड़ी से समय चुनें", "Pick time on the clock")
+                            },
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
             }
         },
         containerColor = MaterialTheme.colorScheme.surface,

@@ -190,7 +190,16 @@ fun MatchingScreen(viewModel: MainViewModel) {
                                         viewModel.matchBoyDob.value = it
                                     },
                                     readOnly = true,
-                                    label = { Text(LanguageManager.getString("जन्म तिथि", "DOB")) },
+                                    // "जन्म तिथि" does not fit this narrow field and
+                                    // wrapped to two lines, making the box taller than
+                                    // the name field beside it — only in Hindi.
+                                    label = {
+                                        Text(
+                                            LanguageManager.getString("तिथि", "DOB"),
+                                            maxLines = 1,
+                                            softWrap = false
+                                        )
+                                    },
                                     trailingIcon = {
                                         Icon(
                                             imageVector = Icons.Default.CalendarMonth,
@@ -242,7 +251,16 @@ fun MatchingScreen(viewModel: MainViewModel) {
                                         viewModel.matchGirlDob.value = it
                                     },
                                     readOnly = true,
-                                    label = { Text(LanguageManager.getString("जन्म तिथि", "DOB")) },
+                                    // "जन्म तिथि" does not fit this narrow field and
+                                    // wrapped to two lines, making the box taller than
+                                    // the name field beside it — only in Hindi.
+                                    label = {
+                                        Text(
+                                            LanguageManager.getString("तिथि", "DOB"),
+                                            maxLines = 1,
+                                            softWrap = false
+                                        )
+                                    },
                                     trailingIcon = {
                                         Icon(
                                             imageVector = Icons.Default.CalendarMonth,
