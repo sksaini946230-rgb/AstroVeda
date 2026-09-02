@@ -166,7 +166,7 @@ fun PanchangScreen(
         }
     }
 
-    CelestialBackground(deferred = !isStartupComplete) {
+    run {
         Scaffold(
             // The outer Scaffold in MainActivity already applies the status bar inset
             // through TopHeaderBar's statusBarsPadding(). Letting this inner Scaffold

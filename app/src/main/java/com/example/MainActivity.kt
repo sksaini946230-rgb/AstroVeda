@@ -302,7 +302,15 @@ class MainActivity : ComponentActivity() {
                             Box(
                                 modifier = Modifier.fillMaxSize()
                             ) {
+                                // The starfield was wrapped around Panchang and
+                                // Kundali only, so those two tabs had a cosmic
+                                // background and Horoscope, Muhurat and More were
+                                // flat — the app looked like three different apps.
+                                // One background behind every tab.
                                 @OptIn(ExperimentalSharedTransitionApi::class)
+                                com.example.ui.components.CelestialBackground(
+                                    deferred = !isStartupComplete
+                                ) {
                                 SharedTransitionLayout {
                                     AnimatedContent(
                                         targetState = selectedTab,
@@ -328,6 +336,7 @@ class MainActivity : ComponentActivity() {
                                             AppTab.MORE -> MoreScreen(mainViewModel)
                                         }
                                     }
+                                }
                                 }
 
                                 if (showPremium) {

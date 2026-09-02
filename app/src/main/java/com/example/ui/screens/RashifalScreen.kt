@@ -137,7 +137,7 @@ fun RashifalScreen(viewModel: MainViewModel) {
         // MainActivity's Scaffold already applies the status bar inset via
         // TopHeaderBar's statusBarsPadding(); applying it again leaves a gap.
         contentWindowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0),
-        containerColor = MaterialTheme.colorScheme.background,
+        containerColor = Color.Transparent,
         modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
         val isHoroscopeLoading by viewModel.isHoroscopeLoading.collectAsState()
