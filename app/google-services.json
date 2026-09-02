@@ -67,6 +67,30 @@
           }
         },
         {
+          "client_id": "330378380471-5q26tt9m4aqd9o2327v33l6d4pbimjnl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aistudio.astroveda.kpvqzm",
+            "certificate_hash": "b7d1de10ddf35efd562799faf6c4d1d038b45cc5"
+          }
+        },
+        {
+          "client_id": "330378380471-7t6ql0fh2rjcp9a66thbbrjmu3i2b64g.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aistudio.astroveda.kpvqzm",
+            "certificate_hash": "77d9c235b4eb2d478e89db2741a8d7e2069a4081"
+          }
+        },
+        {
+          "client_id": "330378380471-spfv21npcrfidd2e23use326hvorsdu6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aistudio.astroveda.kpvqzm",
+            "certificate_hash": "d346b8a4615b856a4faf5bf264d201472bf231e1"
+          }
+        },
+        {
           "client_id": "330378380471-8ja4r1sn7i7ru6tbmov96s0kbmcsifuh.apps.googleusercontent.com",
           "client_type": 3
         }

@@ -18,10 +18,11 @@ android {
   compileSdk { version = release(36) { minorApiLevel = 1 } }
 
   defaultConfig {
-    // "AstroVeda" is another company's live brand on Play — five apps, some
-    // with six-figure installs. The app is renamed to Revati, and the package
-    // went with it while that was still free to do (nothing published yet).
-    applicationId = "app.revati.jyotish"
+    // The app is called Revati; the package still says astroveda because the
+    // first production release went out under it, and an applicationId is
+    // permanent once published. Only the Play URL and Settings > App info ever
+    // show it.
+    applicationId = "com.aistudio.astroveda.kpvqzm"
     minSdk = 24
     targetSdk = 36
     versionCode = 2
