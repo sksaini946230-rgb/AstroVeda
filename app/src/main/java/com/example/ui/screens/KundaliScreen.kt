@@ -336,7 +336,7 @@ fun KundaliScreen(
                 SubTabHeader(
                     selectedTab = currentSubTab,
                     tabs = listOf(
-                        LanguageManager.getString("जन्म कुंडली", "Birth Chart"),
+                        LanguageManager.getString("जन्म कुण्डली", "Birth Chart"),
                         LanguageManager.getString("गुण मिलान", "Matching"),
                         LanguageManager.getString("अंकशास्त्र", "Numerology"),
                         LanguageManager.getString("गोचर", "Transits")
@@ -861,10 +861,18 @@ fun KundaliScreen(
 
                                                             val shareIntent = Intent(Intent.ACTION_SEND).apply {
                                                                 type = "text/plain"
-                                                                putExtra(Intent.EXTRA_SUBJECT, "Revati Kundali")
+                                                                putExtra(
+                                                                    Intent.EXTRA_SUBJECT,
+                                                                    LanguageManager.getString("Revati कुण्डली", "Revati Kundali")
+                                                                )
                                                                 putExtra(Intent.EXTRA_TEXT, shareText)
                                                             }
-                                                            context.startActivity(Intent.createChooser(shareIntent, "Share Kundali"))
+                                                            context.startActivity(
+                                                                Intent.createChooser(
+                                                                    shareIntent,
+                                                                    LanguageManager.getString("कुण्डली साझा करें", "Share Kundali")
+                                                                )
+                                                            )
                                                         }
                                                 )
                                             }
@@ -1081,9 +1089,24 @@ fun KundaliScreen(
                                                                         putExtra(Intent.EXTRA_STREAM, uri)
                                                                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                                                     }
-                                                                    context.startActivity(Intent.createChooser(shareIntent, "Share Birth Chart Image"))
+                                                                    context.startActivity(
+                                                                        Intent.createChooser(
+                                                                            shareIntent,
+                                                                            LanguageManager.getString(
+                                                                                "जन्म कुण्डली चित्र साझा करें",
+                                                                                "Share Birth Chart Image"
+                                                                            )
+                                                                        )
+                                                                    )
                                                                 } else {
-                                                                    Toast.makeText(context, "Failed to generate image", Toast.LENGTH_SHORT).show()
+                                                                    Toast.makeText(
+                                                                        context,
+                                                                        LanguageManager.getString(
+                                                                            "चित्र नहीं बन सका",
+                                                                            "Failed to generate image"
+                                                                        ),
+                                                                        Toast.LENGTH_SHORT
+                                                                    ).show()
                                                                 }
                                                             }
                                                         },

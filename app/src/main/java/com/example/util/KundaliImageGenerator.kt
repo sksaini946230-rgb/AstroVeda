@@ -220,7 +220,15 @@ object KundaliImageGenerator {
                 textAlign = Paint.Align.CENTER
                 isAntiAlias = true
             }
-            canvas.drawText("www.astroveda.app", (width / 2).toFloat(), (height - 45).toFloat(), watermarkPaint)
+            // Was "www.astroveda.app" — a domain nobody owns, under a brand name
+            // this app stopped using. Every shared chart carried it. The Play
+            // listing is the only address that actually resolves to Revati.
+            canvas.drawText(
+                "Revati : Kundli & Panchang — Google Play",
+                (width / 2).toFloat(),
+                (height - 45).toFloat(),
+                watermarkPaint
+            )
 
             // Save the bitmap to a cache file
             val cacheDir = context.cacheDir

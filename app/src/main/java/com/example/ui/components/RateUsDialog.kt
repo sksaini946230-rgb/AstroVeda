@@ -114,7 +114,10 @@ fun RateUsDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Your feedback helps us grow and provide more accurate Vedic astrology insights!",
+                    text = com.example.util.LanguageManager.getString(
+                        "आपकी राय से हम बेहतर और अधिक सटीक वैदिक ज्योतिष दे पाते हैं!",
+                        "Your feedback helps us grow and provide more accurate Vedic astrology insights!"
+                    ),
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -155,7 +158,10 @@ fun RateUsDialog(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "We are sorry you had a sub-par experience. Please tell us how we can improve:",
+                            text = com.example.util.LanguageManager.getString(
+                                "खेद है कि अनुभव अच्छा नहीं रहा। बताइए हम क्या सुधारें:",
+                                "We are sorry you had a sub-par experience. Please tell us how we can improve:"
+                            ),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface,
                             textAlign = TextAlign.Center,
@@ -165,7 +171,15 @@ fun RateUsDialog(
                         OutlinedTextField(
                             value = feedbackText,
                             onValueChange = { if (it.length <= maxChars) feedbackText = it },
-                            placeholder = { Text("Write your suggestions here...", fontSize = 14.sp) },
+                            placeholder = {
+                                Text(
+                                    com.example.util.LanguageManager.getString(
+                                        "अपने सुझाव यहाँ लिखें...",
+                                        "Write your suggestions here..."
+                                    ),
+                                    fontSize = 14.sp
+                                )
+                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(100.dp)
@@ -198,7 +212,10 @@ fun RateUsDialog(
                                 viewModel.submitFeedback(selectedStars, feedbackText)
                                 Toast.makeText(
                                     context,
-                                    "Thank you for your valuable feedback! We'll use it to improve.",
+                                    com.example.util.LanguageManager.getString(
+                                        "आपकी राय के लिए धन्यवाद! हम इससे ऐप बेहतर बनाएंगे।",
+                                        "Thank you for your valuable feedback! We'll use it to improve."
+                                    ),
                                     Toast.LENGTH_LONG
                                 ).show()
                             },
@@ -210,7 +227,10 @@ fun RateUsDialog(
                                 containerColor = MaterialTheme.colorScheme.primary
                             )
                         ) {
-                            Text("Submit Feedback", fontWeight = FontWeight.Bold)
+                            Text(
+                                com.example.util.LanguageManager.getString("सुझाव भेजें", "Submit Feedback"),
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                     }
                 }
@@ -249,7 +269,13 @@ fun RateUsDialog(
                                 containerColor = MaterialTheme.colorScheme.primary
                             )
                         ) {
-                            Text("Rate on Google Play", fontWeight = FontWeight.Bold)
+                            Text(
+                                com.example.util.LanguageManager.getString(
+                                    "Google Play पर रेटिंग दें",
+                                    "Rate on Google Play"
+                                ),
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                     }
                 }
@@ -264,7 +290,10 @@ fun RateUsDialog(
                             onClick = onDismiss,
                             modifier = Modifier.testTag("rate_later_button")
                         ) {
-                            Text("Maybe Later", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(
+                                com.example.util.LanguageManager.getString("बाद में", "Maybe Later"),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
                     }
                 }

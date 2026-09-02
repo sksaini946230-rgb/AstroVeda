@@ -65,7 +65,10 @@ class TithiNakshatraWidgetProvider : AppWidgetProvider() {
                 setTextViewText(R.id.widget_tithi, panchang.tithiLocal)
                 setTextViewText(
                     R.id.widget_tithi_details,
-                    "${panchang.pakshaLocal} • समाप्ति: ${panchang.tithiEndTime}"
+                    LanguageManager.getString(
+                        "${panchang.pakshaLocal} • समाप्ति: ${panchang.tithiEndTime}",
+                        "${panchang.pakshaLocal} • ends ${panchang.tithiEndTime}"
+                    )
                 )
                 setTextViewText(R.id.widget_nakshatra, panchang.nakshatraLocal)
                 setTextViewText(
@@ -75,7 +78,13 @@ class TithiNakshatraWidgetProvider : AppWidgetProvider() {
                 setTextViewText(R.id.widget_sunrise, LanguageManager.getString("🌅 सूर्योदय: ${panchang.sunrise}", "🌅 Sunrise: ${panchang.sunrise}"))
                 setTextViewText(R.id.widget_sunset, LanguageManager.getString("🌇 सूर्यास्त: ${panchang.sunset}", "🌇 Sunset: ${panchang.sunset}"))
                 val moonPhase = com.example.astro.PanchangCalculator.getMoonPhaseInfo(panchang.pakshaHindi, panchang.tithiHindi)
-                setTextViewText(R.id.widget_moon_phase, "${moonPhase.emoji} चंद्र कला: ${moonPhase.nameHindi} (${moonPhase.illuminationPercent}% प्रकाशित)")
+                setTextViewText(
+                    R.id.widget_moon_phase,
+                    LanguageManager.getString(
+                        "${moonPhase.emoji} चंद्र कला: ${moonPhase.nameHindi} (${moonPhase.illuminationPercent}% प्रकाशित)",
+                        "${moonPhase.emoji} Moon: ${moonPhase.nameHindi} (${moonPhase.illuminationPercent}% lit)"
+                    )
+                )
                 setTextViewText(
                     R.id.widget_insight,
                     LanguageManager.getString("✨ शुभ: ${panchang.abhijitMuhurat} | राहुकाल: ${panchang.rahuKaal}", "✨ Abhijit: ${panchang.abhijitMuhurat} | Rahu Kaal: ${panchang.rahuKaal}")

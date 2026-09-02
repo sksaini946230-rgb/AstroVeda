@@ -217,7 +217,14 @@ fun PremiumDialog(
                         if (activity != null) {
                             viewModel.makePurchase(activity)
                         } else {
-                            Toast.makeText(context, "Billing error: Activity context not available", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                com.example.util.LanguageManager.getString(
+                                    "भुगतान शुरू नहीं हो सका। ऐप दोबारा खोलकर प्रयास करें।",
+                                    "Could not start checkout. Reopen the app and try again."
+                                ),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                         onDismiss()
                     },

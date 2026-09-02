@@ -867,13 +867,13 @@ fun CloudBackupCard(
 
                     if (currentUser != null) {
                         GlassBadge(
-                            text = "Online",
+                            text = LanguageManager.getString("ऑनलाइन", "Online"),
                             backgroundColor = ShubhSuccessColor.copy(alpha = 0.2f),
                             textColor = ShubhSuccessColor
                         )
                     } else {
                         GlassBadge(
-                            text = "Offline",
+                            text = LanguageManager.getString("ऑफ़लाइन", "Offline"),
                             backgroundColor = Color.Gray.copy(alpha = 0.2f),
                             textColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )

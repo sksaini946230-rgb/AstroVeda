@@ -113,6 +113,22 @@ fun CalendarScreen(viewModel: MainViewModel) {
         selectedRegion == "ALL" || it.regionFilter == "ALL" || it.regionFilter == selectedRegion
     }
 
+    // "Next 7 Upcoming" was taking the first seven of a fixed list that starts in
+    // March, so on 2 Sep it led with Raksha Bandhan — five days gone. Anything
+    // whose ISO date is before today is not upcoming. ISO dates sort as strings.
+    val todayIso = remember {
+        val c = java.util.Calendar.getInstance()
+        String.format(
+            java.util.Locale.US, "%04d-%02d-%02d",
+            c.get(java.util.Calendar.YEAR),
+            c.get(java.util.Calendar.MONTH) + 1,
+            c.get(java.util.Calendar.DAY_OF_MONTH)
+        )
+    }
+    val upcomingFestivals = filteredFestivals
+        .filter { it.dateIso >= todayIso }
+        .sortedBy { it.dateIso }
+
     Scaffold(
         // The outer Scaffold in MainActivity already applies the status bar inset
         // through TopHeaderBar's statusBarsPadding(). Letting this inner Scaffold
@@ -343,7 +359,7 @@ fun CalendarScreen(viewModel: MainViewModel) {
 
         // The next seven, two per row. As full-width rows this was seven
         // screens of scrolling for what is really a date and a name each.
-        items(filteredFestivals.take(7).chunked(2)) { pair ->
+        items(upcomingFestivals.take(7).chunked(2)) { pair ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -365,10 +381,28 @@ fun CalendarScreen(viewModel: MainViewModel) {
                                 view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
                                 selectedFestivalDetail = festival
                             }
-                            .testTag("upcoming_festival_${filteredFestivals.indexOf(festival) + 1}")
+                            .testTag("upcoming_festival_${upcomingFestivals.indexOf(festival) + 1}")
                     )
                 }
                 if (pair.size == 1) Spacer(modifier = Modifier.weight(1f))
+            }
+        }
+
+        // The festival table is a fixed list and it ends. When everything in it
+        // is behind us, say so rather than showing an empty gap under a heading
+        // that promises seven.
+        if (upcomingFestivals.isEmpty()) {
+            item {
+                Text(
+                    text = LanguageManager.getString(
+                        "इस वर्ष के सभी प्रमुख पर्व बीत चुके हैं। अगले वर्ष की सूची शीघ्र जोड़ी जाएगी।",
+                        "Every major festival on this year's list has passed. Next year's dates are coming."
+                    ),
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    ),
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
             }
         }
 

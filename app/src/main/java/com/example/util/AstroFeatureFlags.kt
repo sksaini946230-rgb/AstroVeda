@@ -24,7 +24,7 @@ object AstroFeatureFlags {
         val supportWhatsAppNumber: String = "+919462308945",
         val supportEmail: String = "support@astroveda.app",
         val maintenanceMode: Boolean = false,
-        val maintenanceMessageHi: String = "एस्ट्रोवेदा में तकनीकी सुधार कार्य चल रहा है। कृपया कुछ समय बाद पुनः प्रयास करें।",
+        val maintenanceMessageHi: String = "Revati में तकनीकी सुधार कार्य चल रहा है। कृपया कुछ समय बाद पुनः प्रयास करें।",
         val maintenanceMessageEn: String = "Revati is undergoing scheduled cosmic maintenance. Please check back shortly."
     )
 

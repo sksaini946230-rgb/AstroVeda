@@ -34,7 +34,10 @@ fun PersonalizedInsightCard(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "AI Personalized Insight",
+                    text = com.example.util.LanguageManager.getString(
+                        "आपके लिए विशेष AI विश्लेषण",
+                        "AI Personalized Insight"
+                    ),
                     style = MaterialTheme.typography.titleSmall.copy(
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold
@@ -49,7 +52,7 @@ fun PersonalizedInsightCard(
                     onClick = onFetchInsight,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Get Daily AI Insight")
+                    Text(com.example.util.LanguageManager.getString("आज का AI विश्लेषण देखें", "Get Daily AI Insight"))
                 }
             } else {
                 Text(

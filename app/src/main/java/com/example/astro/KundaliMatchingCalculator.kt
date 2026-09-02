@@ -279,28 +279,28 @@ object KundaliMatchingCalculator {
                 scoreCategory = "EXCELLENT"
                 verdictHi = "सर्वोत्कृष्ट मिलान (Excellent Match)"
                 verdictEn = "Excellent Match"
-                summaryHi = "$boyName एवं $girlName की कुंडली में $totalGuna / 36 गुण प्राप्त हुए हैं। यह विवाह वैदिक दृष्टि से अत्यंत शुभ, समृद्ध एवं सुखद दाम्पत्य जीवन का परिचायक है।"
+                summaryHi = "$boyName एवं $girlName की कुण्डली में $totalGuna / 36 गुण प्राप्त हुए हैं। यह विवाह वैदिक दृष्टि से अत्यंत शुभ, समृद्ध एवं सुखद दाम्पत्य जीवन का परिचायक है।"
                 summaryEn = "An outstanding $totalGuna / 36 gunas match between $boyName and $girlName. Highly auspicious for lifelong marital harmony and prosperity."
             }
             totalGuna >= 25.0 -> {
                 scoreCategory = "GOOD"
                 verdictHi = "उत्तम एवं शुभ मिलान (Good Match)"
                 verdictEn = "Good Match"
-                summaryHi = "$boyName एवं $girlName की कुंडली में $totalGuna / 36 गुण प्राप्त हुए हैं। यह एक उत्तम मिलान है और विवाह के लिए पूर्णतः अनुशंसित है।"
+                summaryHi = "$boyName एवं $girlName की कुण्डली में $totalGuna / 36 गुण प्राप्त हुए हैं। यह एक उत्तम मिलान है और विवाह के लिए पूर्णतः अनुशंसित है।"
                 summaryEn = "A solid $totalGuna / 36 gunas match between $boyName and $girlName. This is a very good match and is warmly recommended for marriage."
             }
             totalGuna >= 18.0 -> {
                 scoreCategory = "AVERAGE"
                 verdictHi = "मध्यम / सामान्य मिलान (Average Match)"
                 verdictEn = "Average Match"
-                summaryHi = "$boyName एवं $girlName की कुंडली में $totalGuna / 36 गुण मिल रहे हैं। यह एक स्वीकार्य मिलान है। नाड़ी अथवा भकूट दोष होने पर शांति पूजा करवाना श्रेयस्कर रहेगा।"
+                summaryHi = "$boyName एवं $girlName की कुण्डली में $totalGuna / 36 गुण मिल रहे हैं। यह एक स्वीकार्य मिलान है। नाड़ी अथवा भकूट दोष होने पर शांति पूजा करवाना श्रेयस्कर रहेगा।"
                 summaryEn = "$totalGuna / 36 gunas match. This is an acceptable average match. If any Doshas exist, performing Vedic remedial prayers is recommended."
             }
             else -> {
                 scoreCategory = "POOR"
                 verdictHi = "अशुभ / असहमत मिलान (Poor Match - Caution)"
                 verdictEn = "Poor Match (Not Recommended)"
-                summaryHi = "$boyName एवं $girlName की कुंडली में मात्र $totalGuna / 36 गुण प्राप्त हुए हैं (18 से कम)। विवाह पूर्व वरिष्ठ ज्योतिषी से विस्तृत परामर्श एवं दोष निवारण आवश्यक है।"
+                summaryHi = "$boyName एवं $girlName की कुण्डली में मात्र $totalGuna / 36 गुण प्राप्त हुए हैं (18 से कम)। विवाह पूर्व वरिष्ठ ज्योतिषी से विस्तृत परामर्श एवं दोष निवारण आवश्यक है।"
                 summaryEn = "Only $totalGuna / 36 gunas match (below acceptable threshold of 18). Detailed astrological consultation and remedies are strongly advised."
             }
         }

@@ -70,7 +70,7 @@ fun BottomNavBar(
     val items = listOf(
         NavItem(AppTab.PANCHANG, "पंचांग", "Panchang", Icons.Default.WbSunny),
         NavItem(AppTab.RASHIFAL, "राशिफल", "Horoscope", Icons.Default.GridView),
-        NavItem(AppTab.KUNDALI, "कुंडली", "Kundali", Icons.Default.AutoAwesome),
+        NavItem(AppTab.KUNDALI, "कुण्डली", "Kundali", Icons.Default.AutoAwesome),
         NavItem(AppTab.MUHURAT, "मुहूर्त", "Muhurat", Icons.Default.Schedule),
         NavItem(AppTab.MORE, "और", "More", Icons.Default.Settings)
     )

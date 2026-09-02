@@ -78,6 +78,10 @@ class MainActivity : ComponentActivity() {
     private var mInterstitialAd: InterstitialAd? = null
     private var lastInterstitialShowTime = 0L
 
+    /** When this process started showing UI — the first ad waits for it. */
+    private val sessionStartTime = System.currentTimeMillis()
+    private var interstitialsShownThisSession = 0
+
     private val requestNotificationPermissionLauncher =
         registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) scheduleNotificationWorkers()
@@ -368,9 +372,9 @@ class MainActivity : ComponentActivity() {
                                                 icon = Icons.Default.WbSunny
                                             ),
                                             DiscoveryStep(
-                                                titleHi = "विस्तृत कुंडली",
+                                                titleHi = "विस्तृत कुण्डली",
                                                 titleEn = "Detailed Kundali",
-                                                descriptionHi = "अपने जन्म विवरण के साथ अपनी विस्तृत जन्म कुंडली और ग्रह स्थितियों का विश्लेषण करें।",
+                                                descriptionHi = "अपने जन्म विवरण के साथ अपनी विस्तृत जन्म कुण्डली और ग्रह स्थितियों का विश्लेषण करें।",
                                                 descriptionEn = "Generate and analyze your detailed birth chart and planetary positions with ease.",
                                                 icon = Icons.Default.AutoAwesome
                                             ),
@@ -423,10 +427,15 @@ class MainActivity : ComponentActivity() {
 
     private fun showInterstitialAd() {
         val currentTime = System.currentTimeMillis()
-        if (currentTime - lastInterstitialShowTime < 60_000L) {
-            // Frequency capped - do not show too often
-            return
-        }
+
+        // A minute's gap between full-screen ads meant that simply looking
+        // around the five tabs produced one every minute, and the very first
+        // one could land seconds after launch — on a Panchang app people open
+        // for ten seconds to read a tithi. Three minutes between them, and
+        // none at all until the session is 90 seconds old.
+        if (currentTime - sessionStartTime < FIRST_INTERSTITIAL_DELAY_MS) return
+        if (currentTime - lastInterstitialShowTime < INTERSTITIAL_MIN_GAP_MS) return
+        if (interstitialsShownThisSession >= MAX_INTERSTITIALS_PER_SESSION) return
 
         if (mainViewModel.isProUser.value) {
             return
@@ -437,6 +446,7 @@ class MainActivity : ComponentActivity() {
                 ad.show(this)
                 mInterstitialAd = null
                 lastInterstitialShowTime = currentTime
+                interstitialsShownThisSession++
                 loadInterstitialAd() // Preload the next one
             } ?: run {
                 loadInterstitialAd()
@@ -444,6 +454,12 @@ class MainActivity : ComponentActivity() {
         } catch (e: Throwable) {
             // fail gracefully
         }
+    }
+
+    private companion object {
+        const val FIRST_INTERSTITIAL_DELAY_MS = 90_000L
+        const val INTERSTITIAL_MIN_GAP_MS = 180_000L
+        const val MAX_INTERSTITIALS_PER_SESSION = 3
     }
 }
 
@@ -473,7 +489,10 @@ fun FirstRunSyncingOverlay() {
             )
             androidx.compose.foundation.layout.Spacer(modifier = Modifier.height(8.dp))
             androidx.compose.material3.Text(
-                text = "Syncing cosmic data for offline access...",
+                text = com.example.util.LanguageManager.getString(
+                    "ऑफ़लाइन उपयोग के लिए खगोलीय डेटा तैयार हो रहा है...",
+                    "Syncing cosmic data for offline access..."
+                ),
                 style = androidx.compose.material3.MaterialTheme.typography.bodyMedium.copy(
                     color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
                 )

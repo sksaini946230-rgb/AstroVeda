@@ -763,7 +763,10 @@ fun SettingsScreen(
                                     )
                                 )
                                 Text(
-                                    text = "Vedic Astro & Celestial News",
+                                    text = LanguageManager.getString(
+                                        "वैदिक ज्योतिष एवं खगोलीय समाचार",
+                                        "Vedic Astro & Celestial News"
+                                    ),
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         fontSize = 11.sp
@@ -773,7 +776,10 @@ fun SettingsScreen(
                         }
 
                         GlassBadge(
-                            text = "🔍 Grounded by Google",
+                            text = LanguageManager.getString(
+                                "🔍 Google से सत्यापित",
+                                "🔍 Grounded by Google"
+                            ),
                             textColor = ShubhSuccessColor,
                             borderColor = ShubhSuccessColor
                         )
@@ -790,7 +796,10 @@ fun SettingsScreen(
                         Column {
                             if (isNewsOffline) {
                                 Text(
-                                    text = "Offline Mode: AI offline, showing cached news",
+                                    text = LanguageManager.getString(
+                                        "ऑफ़लाइन: AI उपलब्ध नहीं, सहेजे गए समाचार दिखाए जा रहे हैं",
+                                        "Offline: AI unavailable, showing saved news"
+                                    ),
                                     style = MaterialTheme.typography.labelSmall.copy(
                                         color = MaterialTheme.colorScheme.secondary,
                                         fontWeight = FontWeight.Normal,

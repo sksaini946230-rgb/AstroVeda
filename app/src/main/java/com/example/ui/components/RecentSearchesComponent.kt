@@ -23,7 +23,7 @@ fun RecentSearchesComponent(
 
     Column(modifier = modifier.fillMaxWidth().padding(vertical = 8.dp)) {
         Text(
-            text = "Recent Searches",
+            text = com.example.util.LanguageManager.getString("हाल की खोजें", "Recent Searches"),
             style = MaterialTheme.typography.titleSmall.copy(
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold

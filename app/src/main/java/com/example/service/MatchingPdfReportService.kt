@@ -273,11 +273,25 @@ object MatchingPdfReportService {
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "application/pdf"
             putExtra(Intent.EXTRA_STREAM, uri)
-            putExtra(Intent.EXTRA_SUBJECT, "Revati Kundali Matching PDF Report")
+            putExtra(
+            Intent.EXTRA_SUBJECT,
+            LanguageManager.getString(
+                "Revati कुण्डली मिलान रिपोर्ट (PDF)",
+                "Revati Kundali Matching PDF Report"
+            )
+        )
             putExtra(Intent.EXTRA_TEXT, "Revati Vedic 36-Guna Kundali Matching PDF Report")
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
 
-        context.startActivity(Intent.createChooser(shareIntent, "Share Kundali Matching PDF Report"))
+        context.startActivity(
+            Intent.createChooser(
+                shareIntent,
+                LanguageManager.getString(
+                    "कुण्डली मिलान रिपोर्ट साझा करें",
+                    "Share Kundali Matching PDF Report"
+                )
+            )
+        )
     }
 }
