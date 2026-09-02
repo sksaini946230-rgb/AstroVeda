@@ -198,6 +198,7 @@ class MainActivity : ComponentActivity() {
                 val isDiscoveryCompleted by mainViewModel.isDiscoveryCompleted.collectAsState()
                 val currentUser by mainViewModel.currentUser.collectAsState()
                 val isCloudBackupEnabled = currentUser != null
+                val showAuthScreen by mainViewModel.showAuthScreen.collectAsState()
 
                 val isSplashCompleted by mainViewModel.isSplashCompleted.collectAsState()
 
@@ -214,11 +215,6 @@ class MainActivity : ComponentActivity() {
                             requestNotificationPermissionIfNeeded()
                         }
                     )
-                } else if (currentUser == null) {
-                    // The sign-in gate. It sits after onboarding so the language
-                    // is already chosen and this screen can be read; nothing past
-                    // here is reachable without an account.
-                    com.example.ui.screens.AuthScreen(viewModel = mainViewModel)
                 } else if (isFirstRunSyncing) {
                     FirstRunSyncingOverlay()
                 } else {
@@ -342,6 +338,23 @@ class MainActivity : ComponentActivity() {
                                         viewModel = mainViewModel,
                                         onDismiss = { mainViewModel.dismissRateUs() }
                                     )
+                                }
+
+                                // Sign-in is optional now — an account only buys
+                                // cloud backup — so it opens over the app instead
+                                // of standing in front of it.
+                                if (showAuthScreen) {
+                                    androidx.compose.ui.window.Dialog(
+                                        onDismissRequest = { mainViewModel.closeAuthScreen() },
+                                        properties = androidx.compose.ui.window.DialogProperties(
+                                            usePlatformDefaultWidth = false
+                                        )
+                                    ) {
+                                        com.example.ui.screens.AuthScreen(
+                                            viewModel = mainViewModel,
+                                            onDismiss = { mainViewModel.closeAuthScreen() }
+                                        )
+                                    }
                                 }
 
                                 if (!isDiscoveryCompleted && isOnboardingCompleted && !isFirstRunSyncing) {

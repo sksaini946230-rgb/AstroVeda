@@ -163,8 +163,9 @@ that is how most of the UI bugs in this app were found, not by reading code.
 
 ## Where it stands
 
-Live on Play, production, 100% rollout, `versionCode 2` / `versionName 1.1`.
-**The next upload must be versionCode 3.**
+Live on Play, production, 100% rollout — the shipped release is `versionCode 2`
+/ `versionName 1.1`. The tree is now on `versionCode 3` / `versionName 1.2`,
+unreleased.
 
 Working: on-device ephemeris, Panchang, Rashifal, Kundali, Guna Milan, Muhurat,
 numerology, festivals calendar, widgets, notifications, Firestore profile sync,
@@ -178,13 +179,26 @@ Not working / not finished:
   `astroveda_premium_pro_subscription`.
 - **`PLAY_LICENSE_KEY` is unset**, so `PurchaseVerifier` skips signature
   checking and logs a warning. Moot until the above is done.
-- **Sign-in is mandatory** (`MainActivity`, `currentUser == null` → `AuthScreen`)
-  but the Play listing says most features work without an account. One of the
-  two has to change.
-- `versionCode` in `build.gradle.kts` still reads 2.
 - Purchase verification is client-side only; a server checking tokens against
-  the Play Developer API is the real fix and there is no backend.
-- No age gate. Ads are declared general-rating, not child-directed.
+  the Play Developer API is the real fix and there is no backend. Nothing is
+  purchasable until the merchant account exists, so this is not urgent — do it
+  in the same pass as `PLAY_LICENSE_KEY`, not before.
+
+Decided rather than pending:
+
+- **Sign-in is no longer a gate.** It was `MainActivity`, `currentUser == null`
+  → `AuthScreen`, in front of everything, while the Play listing said most
+  features work without an account. The gate is gone: `AuthScreen` now takes an
+  optional `onDismiss` and opens as a full-screen dialog from
+  `MainViewModel.showAuthScreen`, reached from the Saved Profiles cloud card and
+  from Settings → Account & data controls. An account buys cloud backup and
+  nothing else, so an account is what it now asks for. Signing out leaves the
+  user inside the app rather than bouncing them to a login screen.
+- **No age gate, deliberately.** The app is not child-directed and does not
+  declare children in its Play target audience. `MainActivity` already sets
+  `MAX_AD_CONTENT_RATING_G`, `TAG_FOR_CHILD_DIRECTED_TREATMENT_FALSE` and
+  `TAG_FOR_UNDER_AGE_OF_CONSENT_FALSE`, which is what Play and AdMob actually
+  ask for here. An age gate would be a screen in the way of nothing.
 
 ---
 

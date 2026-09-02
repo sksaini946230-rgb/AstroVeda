@@ -1069,6 +1069,37 @@ fun SettingsScreen(
                         }
                     }
 
+                    // Sign-in is no longer forced at launch, so this is where a
+                    // user who wants cloud backup finds it.
+                    if (currentUser == null) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                                .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
+                                .clickable {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    viewModel.openAuthScreen()
+                                }
+                                .padding(vertical = 12.dp, horizontal = 14.dp)
+                                .testTag("settings_sign_in_button"),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = LanguageManager.getString(
+                                    "साइन इन करें — क्लाउड बैकअप के लिए",
+                                    "Sign in — for cloud backup"
+                                ),
+                                style = MaterialTheme.typography.labelMedium.copy(
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 12.sp
+                                )
+                            )
+                        }
+                    }
+
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()

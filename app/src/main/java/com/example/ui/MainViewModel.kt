@@ -1066,6 +1066,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _backupStatusMessage = MutableStateFlow<String?>(null)
     val backupStatusMessage: StateFlow<String?> = _backupStatusMessage.asStateFlow()
 
+    // Sign-in is no longer a gate in front of the app; it is a screen the user
+    // opens from Saved Profiles or Settings when they want cloud backup.
+    private val _showAuthScreen = MutableStateFlow(false)
+    val showAuthScreen: StateFlow<Boolean> = _showAuthScreen.asStateFlow()
+
+    fun openAuthScreen() {
+        clearAuthMessages()
+        _showAuthScreen.value = true
+    }
+
+    fun closeAuthScreen() { _showAuthScreen.value = false }
+
     fun signInWithGoogle(context: android.content.Context, webClientId: String = "") {
         viewModelScope.launch {
             _backupStatusMessage.value = LanguageManager.getString("Google से साइन-इन हो रहा है...", "Signing in with Google...")

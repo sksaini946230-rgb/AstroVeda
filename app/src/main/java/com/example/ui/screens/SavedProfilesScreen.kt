@@ -805,7 +805,6 @@ fun SavedReportCard(
 fun CloudBackupCard(
     viewModel: MainViewModel
 ) {
-    val context = androidx.compose.ui.platform.LocalContext.current
     val currentUser by viewModel.currentUser.collectAsState()
     val backupStatusMessage by viewModel.backupStatusMessage.collectAsState()
     var showDeleteAccountDialog by remember { mutableStateOf(false) }
@@ -951,9 +950,13 @@ fun CloudBackupCard(
                         style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                     )
 
+                    // Was a bare Google button; with the sign-in gate gone this is
+                    // one of the two ways into the auth screen, and that screen
+                    // carries email sign-in as well — a phone with no Google
+                    // account on it must still be able to back up.
                     GoldGlowButton(
-                        text = LanguageManager.getString("Google से साइन इन करें", "Sign In with Google"),
-                        onClick = { viewModel.signInWithGoogle(context) },
+                        text = LanguageManager.getString("साइन इन करें", "Sign in"),
+                        onClick = { viewModel.openAuthScreen() },
                         modifier = Modifier.fillMaxWidth().testTag("google_sign_in_button")
                     )
                 }

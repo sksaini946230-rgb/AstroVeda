@@ -76,7 +76,6 @@ fun OnboardingScreen(
 
     val selectedRashiId by viewModel.selectedRashiId.collectAsState()
     val selectedCity by viewModel.selectedCity.collectAsState()
-    val currentUser by viewModel.currentUser.collectAsState()
 
     var locationPermissionGranted by remember { mutableStateOf(true) }
     var notificationPermissionGranted by remember { mutableStateOf(true) }

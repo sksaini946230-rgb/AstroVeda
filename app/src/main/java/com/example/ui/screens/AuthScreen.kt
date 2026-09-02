@@ -25,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.CircularProgressIndicator
@@ -43,6 +44,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -61,16 +63,21 @@ import com.example.ui.theme.ShubhSuccessColor
 import com.example.util.LanguageManager
 
 /**
- * The sign-in gate. Nothing in the app is reachable until an account exists,
- * so this screen has to carry its own weight: it explains why the account is
- * wanted, offers both Google and email, and says plainly what went wrong.
+ * Sign-in. This used to be a gate in front of the whole app; it is now an
+ * optional screen opened from Saved Profiles or Settings, because an account
+ * buys the user cloud backup and nothing else. Somebody who came to read
+ * today's Tithi never has to see it.
+ *
+ * `onDismiss` is what makes it optional — when it is non-null the screen shows
+ * a close control, Back closes it instead of leaving the app, and a successful
+ * sign-in closes it too.
  *
  * Email is not decoration. A phone with no Google account on it — common enough
- * for the audience this app is written for — would otherwise be locked out of
- * an app it has already downloaded.
+ * for the audience this app is written for — would otherwise have no way to
+ * back anything up.
  */
 @Composable
-fun AuthScreen(viewModel: MainViewModel) {
+fun AuthScreen(viewModel: MainViewModel, onDismiss: (() -> Unit)? = null) {
     val context = LocalContext.current
     val isBusy by viewModel.isAuthInProgress.collectAsState()
     val error by viewModel.authError.collectAsState()
@@ -85,11 +92,20 @@ fun AuthScreen(viewModel: MainViewModel) {
     // A message from the previous mode is stale the moment the user switches.
     LaunchedEffect(isSignUp) { viewModel.clearAuthMessages() }
 
-    // Back on the gate should leave the app, not fall through to whatever the
-    // previous screen was — onboarding is already behind the user by here.
+    // Once the user is signed in there is nothing left on this screen to do.
+    val user by viewModel.currentUser.collectAsState()
+    LaunchedEffect(user) { if (user != null) onDismiss?.invoke() }
+
+    // Back closes the screen when it is optional; when it is not (no dismiss
+    // handler), it leaves the app rather than falling through to whatever was
+    // underneath.
     val activity = context as? android.app.Activity
     androidx.activity.compose.BackHandler(enabled = true) {
-        if (isSignUp) isSignUp = false else activity?.finish()
+        when {
+            isSignUp -> isSignUp = false
+            onDismiss != null -> onDismiss()
+            else -> activity?.finish()
+        }
     }
 
     Box(
@@ -97,6 +113,22 @@ fun AuthScreen(viewModel: MainViewModel) {
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
+        if (onDismiss != null) {
+            IconButton(
+                onClick = onDismiss,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp)
+                    .testTag("auth_close_button")
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = LanguageManager.getString("बंद करें", "Close"),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -130,8 +162,8 @@ fun AuthScreen(viewModel: MainViewModel) {
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = LanguageManager.getString(
-                    "अपनी कुण्डली और प्रोफाइल सुरक्षित रखने के लिए खाता बनाएं",
-                    "Create an account to keep your charts and profiles safe"
+                    "खाता बनाएं और अपनी कुण्डली व प्रोफाइल क्लाउड पर सुरक्षित रखें — बाकी ऐप बिना खाते के भी चलता है",
+                    "An account backs your charts and profiles up to the cloud. The rest of the app works without one."
                 ),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
