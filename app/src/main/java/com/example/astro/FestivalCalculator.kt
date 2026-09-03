@@ -33,8 +33,10 @@ import java.util.GregorianCalendar
  * panchang, so every user sees one national calendar rather than one that
  * shifts with the city they happen to have picked.
  *
- * Verified against published panchang for 2025-2028 in `FestivalCalculatorTest`
- * — 48 dates, all four years. If you touch this file, run that test.
+ * Verified against published panchang for 2025 through 2031 in
+ * `FestivalCalculatorTest` — seven years, chosen to include an Adhika month
+ * (2029) and the Raksha Bandhan edge case above. If you touch this file, run
+ * that test.
  */
 object FestivalCalculator {
 
