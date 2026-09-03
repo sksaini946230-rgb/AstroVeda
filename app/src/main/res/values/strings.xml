@@ -3,6 +3,13 @@
     <string name="notif_channel_panchang_name">Divine Daily Panchang</string>
     <string name="notif_channel_panchang_desc">Daily alerts for Tithi, Nakshatra, and auspicious timings.</string>
     <string name="notif_daily_panchang_title">✨ Divine Daily Panchang</string>
-    <string name="notif_channel_muhurat_name">शुभ मुहूर्त अलर्ट (Auspicious Muhurta Alerts)</string>
-    <string name="notif_channel_muhurat_desc">प्रतिदिन शुभ मुहूर्त, अभिजित मुहूर्त, चौघड़िया एवं ब्रह्म मुहूर्त की सूचनाएं।</string>
+    <!-- These two were Hindi in the default (English) file, so an English
+         device showed Hindi channel names in Android's own notification
+         settings. -->
+    <string name="notif_channel_muhurat_name">Auspicious Muhurat Alerts</string>
+    <string name="notif_channel_muhurat_desc">Daily alerts for Abhijit Muhurat, Choghadiya and Brahma Muhurat.</string>
+
+    <!-- Shown in the launcher's widget picker. -->
+    <string name="widget_panchang_label">Revati Daily Panchang</string>
+    <string name="widget_tithi_nakshatra_label">Revati Tithi &amp; Nakshatra</string>
 </resources>

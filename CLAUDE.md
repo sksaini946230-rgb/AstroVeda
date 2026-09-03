@@ -113,6 +113,12 @@ deliberately *not* bento — those are action cards, not facts.
 plugin. **The plugin cannot emit an empty string** — an unset value must be a
 sentinel, which is why `PLAY_LICENSE_KEY=NOT_CONFIGURED` rather than blank.
 
+**`support@astroveda.app` is a dead address.** It is still printed in the in-app
+privacy policy and terms (`app/src/main/assets/`). The owner is setting up a real
+mailbox and asked, on 3 Sep 2026, that it be left alone until then. Replace it
+when the new address arrives — it is the only thing in those two pages that is
+still wrong.
+
 Keys: `ADMOB_APP_ID_ANDROID`, `ADMOB_BANNER_ID`, `ADMOB_INTERSTITIAL_ID`,
 `GOOGLE_WEB_CLIENT_ID`, `PLAY_LICENSE_KEY`, `KEYSTORE_PATH`, `STORE_PASSWORD`,
 `KEY_ALIAS`, `KEY_PASSWORD`.

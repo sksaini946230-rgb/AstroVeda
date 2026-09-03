@@ -63,12 +63,21 @@ Kotlin · Jetpack Compose · Material 3 · Room · WorkManager · Firebase (Auth
 Firestore, Crashlytics, App Check, AI Logic) · Google Play Billing · AdMob with
 UMP consent.
 
+## Accounts
+
+Sign-in is optional. An account buys cloud backup of saved birth profiles and
+nothing else, so the app asks for one from the Saved Profiles cloud card and
+from Settings, not in front of the first screen. Google and email sign-in both
+work; signing out leaves you inside the app.
+
 ## Contributing notes
 
 `CLAUDE.md` in the repository root is the working handover document: identity
 quirks (the package name and the app name deliberately disagree), the bugs that
 have shipped before, and what is still unfinished. Read it before changing
-anything.
+anything. `docs/` carries the five formal documents — product requirements,
+technical architecture, security, frontend specification and the ticket list —
+all rewritten in September 2026 against the shipped code.
 
 ## Licence and data
 

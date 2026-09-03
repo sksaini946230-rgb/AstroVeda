@@ -47,7 +47,7 @@
         <receiver
             android:name="com.example.widget.PanchangWidgetProvider"
             android:exported="true"
-            android:label="Panchang Daily Widget">
+            android:label="@string/widget_panchang_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -60,7 +60,7 @@
         <receiver
             android:name="com.example.widget.TithiNakshatraWidgetProvider"
             android:exported="true"
-            android:label="Revati Tithi &amp; Nakshatra">
+            android:label="@string/widget_tithi_nakshatra_label">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
