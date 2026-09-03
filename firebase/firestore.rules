@@ -1,0 +1,31 @@
+rules_version = '2';
+
+// Revati — Firestore security rules.
+//
+// The app writes exactly one shape of data: a signed-in user's saved birth
+// profiles, under users/{uid}/kundali_profiles/{profileId}. Nothing else is
+// read or written from the client.
+//
+// Birth details — name, date, exact time, place and coordinates — are the most
+// personal thing this app holds, so the rule is the strict one: you may touch
+// your own subtree and nothing else, and only while signed in. Everything not
+// matched below is denied by default.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /users/{userId} {
+      // The parent document itself is not used by the app, but locking it
+      // to its owner keeps a stray write from creating one for someone else.
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      match /kundali_profiles/{profileId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // Anything else: no.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
