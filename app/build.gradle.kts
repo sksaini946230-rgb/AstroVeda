@@ -41,9 +41,16 @@ android {
 
   signingConfigs {
     create("release") {
-      val keystorePath = System.getenv("KEYSTORE_PATH") ?: "${rootDir}/astroveda-upload-key.jks"
-      storeFile = file(keystorePath)
       val envProps = Properties().apply { val f = rootProject.file(".env"); if (f.exists()) f.inputStream().use { load(it) } }
+      // KEYSTORE_PATH used to be read from the environment only, and fell back to
+      // astroveda-upload-key.jks — the key Play stopped accepting. .env pointed at
+      // the live keystore and was ignored, so a release build signed itself with a
+      // dead key (or, as it happened, failed on the wrong key's password). The
+      // fallback is now the keystore Play actually accepts.
+      val keystorePath = System.getenv("KEYSTORE_PATH")
+        ?: envProps.getProperty("KEYSTORE_PATH")
+        ?: "${rootDir}/upload-keystore.jks"
+      storeFile = file(keystorePath)
       storePassword = System.getenv("STORE_PASSWORD") ?: envProps.getProperty("STORE_PASSWORD") ?: error("STORE_PASSWORD is required (.env or environment variable) for release build")
       keyAlias = System.getenv("KEY_ALIAS") ?: envProps.getProperty("KEY_ALIAS") ?: error("KEY_ALIAS is required (.env or environment variable) for release build")
       keyPassword = System.getenv("KEY_PASSWORD") ?: envProps.getProperty("KEY_PASSWORD") ?: error("KEY_PASSWORD is required (.env or environment variable) for release build")
