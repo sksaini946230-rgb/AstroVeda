@@ -25,7 +25,7 @@ android {
     applicationId = "com.aistudio.astroveda.kpvqzm"
     minSdk = 24
     targetSdk = 36
-    versionCode = 3
+    versionCode = 4
     versionName = "1.2"
 
     val envProperties = Properties()
