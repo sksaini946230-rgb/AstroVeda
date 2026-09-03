@@ -165,7 +165,9 @@ class MainActivity : ComponentActivity() {
         try {
             com.example.service.AdConsentManager.gatherConsent(this) {
                 try {
-                    MobileAds.initialize(this) {}
+                    MobileAds.initialize(this) {
+                        com.example.service.AdsInitState.markReady()
+                    }
                     loadInterstitialAd()
                 } catch (e: Throwable) {
                     // fail gracefully
@@ -174,7 +176,9 @@ class MainActivity : ComponentActivity() {
         } catch (e: Throwable) {
             // If consent gathering itself blows up, do not silently lose all ads.
             try {
-                MobileAds.initialize(this) {}
+                MobileAds.initialize(this) {
+                    com.example.service.AdsInitState.markReady()
+                }
                 loadInterstitialAd()
             } catch (_: Throwable) {
             }
