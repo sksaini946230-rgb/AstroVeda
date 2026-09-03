@@ -2,30 +2,23 @@ rules_version = '2';
 
 // Revati — Firestore security rules.
 //
-// The app writes exactly one shape of data: a signed-in user's saved birth
-// profiles, under users/{uid}/kundali_profiles/{profileId}. Nothing else is
-// read or written from the client.
+// This is a copy of what is deployed on astroveda-7126b, read from the console
+// on 3 Sep 2026 and verified to match. Nothing in this repository deploys it,
+// so if you change the data model, change the console too — and update this
+// file, or it stops being worth reading.
 //
-// Birth details — name, date, exact time, place and coordinates — are the most
-// personal thing this app holds, so the rule is the strict one: you may touch
-// your own subtree and nothing else, and only while signed in. Everything not
-// matched below is denied by default.
+// The app touches exactly one shape of data: a signed-in user's saved birth
+// profiles under users/{uid}/kundali_profiles/{profileId}. Birth details are
+// the most personal thing this app holds, so the rule is the strict one — you
+// may touch your own subtree and nothing else, only while signed in. The
+// recursive wildcard covers kundali_profiles and anything nested under it.
+//
+// Everything outside users/ is denied, because Firestore denies whatever no
+// rule allows.
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    match /users/{userId} {
-      // The parent document itself is not used by the app, but locking it
-      // to its owner keeps a stray write from creating one for someone else.
+    match /users/{userId}/{document=**} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
-
-      match /kundali_profiles/{profileId} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
-      }
-    }
-
-    // Anything else: no.
-    match /{document=**} {
-      allow read, write: if false;
     }
   }
 }

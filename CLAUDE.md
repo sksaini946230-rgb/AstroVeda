@@ -147,11 +147,15 @@ fingerprint takes effect server-side — no new release needed.
 A second Firebase app, `app.revati.jyotish`, exists from the abandoned package
 rename. It is unused. Leaving it costs nothing; deleting it is fine too.
 
-**Firestore rules live in the console, and a copy is in `firebase/firestore.rules`.**
+**Firestore rules live in the console; `firebase/firestore.rules` is a copy.**
 The client only ever touches `users/{uid}/kundali_profiles/{id}`, but that
-scoping is worth nothing unless the server enforces it. The file in the repo is
-what the console should say; it is not deployed by any build here, so the two
-can drift. If you change the data model, change both.
+scoping is worth nothing unless the server enforces it. Checked in the console
+on 3 Sep 2026: the deployed rules require `request.auth != null &&
+request.auth.uid == userId` over `users/{userId}/{document=**}`, and everything
+else is denied by default. That is correct. Nothing here deploys the file, so
+the two can drift — if you change the data model, change both.
+
+Firebase Storage is not used by the app, so its rules do not matter.
 
 ---
 
