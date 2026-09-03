@@ -30,12 +30,16 @@ import kotlinx.coroutines.delay
  * It used to give up permanently on its first failure: one `onAdFailedToLoad`
  * set a flag that was never cleared, so a transient no-fill — or simply asking
  * before the ads SDK had finished initialising, which is what happens on a cold
- * start — left the app with no banner for the rest of the session. That is how
- * the ads went quiet.
+ * start — left the app with no banner for the rest of the session.
  *
- * Now it waits until the SDK is actually up, and a failure is retried a few
- * times with a widening gap before it gives up quietly. Giving up still shows
- * nothing rather than an empty grey box.
+ * The fix is the retry, not a gate. An earlier attempt at this refused to ask
+ * until [AdsInitState] said the SDK was up, and that is worse: if the signal
+ * never arrives the banner never appears at all, which is a bigger failure than
+ * the one being fixed. So this asks straight away and asks again on failure, at
+ * 4s, 12s and 36s. The readiness signal only earns an extra attempt when it
+ * arrives — it can never hold the banner back.
+ *
+ * Giving up renders nothing rather than an empty grey strip.
  */
 @Composable
 fun AdBanner(
@@ -43,21 +47,30 @@ fun AdBanner(
     modifier: Modifier = Modifier
 ) {
     val bannerId = remember {
-        try {
-            val id = app.revati.jyotish.BuildConfig.ADMOB_BANNER_ID
-            if (id.isNotBlank()) id
-            else if (app.revati.jyotish.BuildConfig.DEBUG) TEST_BANNER_ID
-            else ""
-        } catch (e: Throwable) {
-            if (app.revati.jyotish.BuildConfig.DEBUG) TEST_BANNER_ID else ""
+        // A debug build never asks for a real ad. Google's policy is explicit
+        // that development traffic must use the test units, and a device that
+        // spends a day requesting live ads and never clicking one is exactly
+        // what invalid-traffic enforcement looks for — the risk is the AdMob
+        // account, not a wasted impression. Test units also always fill, so a
+        // blank banner on debug means our integration is broken rather than
+        // demand being thin.
+        if (app.revati.jyotish.BuildConfig.DEBUG) {
+            TEST_BANNER_ID
+        } else {
+            try {
+                app.revati.jyotish.BuildConfig.ADMOB_BANNER_ID.takeIf { it.isNotBlank() } ?: ""
+            } catch (e: Throwable) {
+                ""
+            }
         }
     }
 
     val adsReady by AdsInitState.ready.collectAsState()
-
-    // Bumping this rebuilds the AdView, which is what actually re-requests.
+    
+    // Bumping this re-requests through the update block below.
     var attempt by remember { mutableIntStateOf(0) }
     var failures by remember { mutableIntStateOf(0) }
+    var loaded by remember { mutableStateOf(false) }
     var givenUp by remember { mutableStateOf(false) }
 
     LaunchedEffect(failures) {
@@ -66,13 +79,20 @@ fun AdBanner(
             givenUp = true
             return@LaunchedEffect
         }
-        // 4s, 12s, 36s — long enough for a network to come back, short enough
-        // that a user who opened the app on a bad signal still sees a banner.
-        delay(RETRY_BASE_MS * THREE_POW[failures - 1])
+        // 4s, 12s, 36s — long enough for a network or the SDK to come back,
+        // short enough that someone who opened the app on a bad signal still
+        // ends up with a banner.
+        delay(RETRY_BASE_MS * BACKOFF[failures - 1])
         attempt++
     }
 
-    if (bannerId.isBlank() || givenUp || !adsReady) {
+    // The SDK finishing initialisation is the most likely reason an early
+    // request failed, so it is worth one attempt of its own.
+    LaunchedEffect(adsReady) {
+        if (adsReady && !loaded && !givenUp) attempt++
+    }
+
+    if (bannerId.isBlank() || givenUp) {
         Box(modifier = Modifier.size(0.dp))
         return
     }
@@ -82,28 +102,36 @@ fun AdBanner(
             .fillMaxWidth()
             .padding(vertical = 4.dp)
             .testTag("ad_banner_container"),
-        // The key is what forces a fresh AdView per attempt; without it the
-        // retry would recycle the view that already failed.
         factory = { context ->
             AdView(context).apply {
                 setAdSize(AdSize.BANNER)
                 adUnitId = bannerId
                 adListener = object : AdListener() {
                     override fun onAdFailedToLoad(error: LoadAdError) {
+                        // Worth keeping: a banner that silently declines to
+                        // appear is exactly the bug that took a day to find.
+                        android.util.Log.w(
+                            "AdBanner",
+                            "load failed: code=${error.code} domain=${error.domain} " +
+                                "msg=${error.message} cause=${error.cause}"
+                        )
                         failures++
                     }
 
                     override fun onAdLoaded() {
+                        android.util.Log.i("AdBanner", "loaded")
+                        loaded = true
                         failures = 0
                     }
                 }
+                setTag(ATTEMPT_TAG, 0)
                 loadAd(AdRequest.Builder().build())
             }
         },
         update = { adView ->
             if (adView.getTag(ATTEMPT_TAG) != attempt) {
                 adView.setTag(ATTEMPT_TAG, attempt)
-                if (attempt > 0) adView.loadAd(AdRequest.Builder().build())
+                adView.loadAd(AdRequest.Builder().build())
             }
         },
         onRelease = { it.destroy() }
@@ -113,5 +141,5 @@ fun AdBanner(
 private const val TEST_BANNER_ID = "ca-app-pub-3940256099942544/6300978111"
 private const val MAX_RETRIES = 3
 private const val RETRY_BASE_MS = 4_000L
-private val THREE_POW = longArrayOf(1, 3, 9)
+private val BACKOFF = longArrayOf(1, 3, 9)
 private val ATTEMPT_TAG = "revati_ad_attempt".hashCode()
