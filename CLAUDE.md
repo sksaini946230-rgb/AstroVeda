@@ -173,9 +173,24 @@ that is how most of the UI bugs in this app were found, not by reading code.
 
 ## Where it stands
 
-Live on Play, production, 100% rollout — the shipped release is `versionCode 2`
-/ `versionName 1.1`. The tree is now on `versionCode 3` / `versionName 1.2`,
-unreleased.
+Live on Play, production — the tree is on `versionCode 5` / `versionName 1.2`,
+uploaded 3 Sep 2026 and confirmed installed on a real device.
+
+`versionCode 4` fixed AdMob serving no ads in production at all: both AdMob
+apps from the rename (old AstroVeda, current Revati) still exist, and `.env`'s
+`ADMOB_APP_ID_ANDROID`, `ADMOB_BANNER_ID` and `ADMOB_INTERSTITIAL_ID` were all
+three pointed at the old app's IDs — reference memory has the correct ones, and
+where to find them again if `.env` is ever rebuilt. `versionCode 5` fixed a
+second bug in the same area: `AdBanner` still gated its first request on
+`AdsInitState.ready`, which the fix's own doc comment had already argued
+against — a signal that never arrives should never be able to hold the banner
+back forever. It doesn't gate any more; it asks immediately and retries.
+
+Also in this pass: the festival calendar (`FestivalCalculator` /
+`FestivalProvider`) now computes dates from each festival's tithi rule instead
+of a table hardcoded to one year, verified against published panchang for
+2025-2031 including an Adhika month and a nine-minute Raksha Bandhan window.
+The old table ran out in November 2026 and had three dates wrong besides.
 
 Working: on-device ephemeris, Panchang, Rashifal, Kundali, Guna Milan, Muhurat,
 numerology, festivals calendar, widgets, notifications, Firestore profile sync,
