@@ -52,6 +52,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Date
 import com.google.firebase.Firebase
 import com.google.firebase.crashlytics.crashlytics
@@ -1352,6 +1353,127 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * Writes every saved profile to a file and hands it to the share sheet.
+     *
+     * The local database is kept out of Android's Auto Backup and out of device
+     * transfer, deliberately — birth details are the most personal thing this app
+     * holds. The cost was that a user who never signed in had no way whatsoever
+     * to carry their profiles to a new phone. This is that way, without making an
+     * account the price of not losing your data.
+     */
+    fun exportProfiles(context: Context) {
+        viewModelScope.launch {
+            try {
+                val profiles = repository.getSavedProfilesList()
+                if (profiles.isEmpty()) {
+                    _backupStatusMessage.value = LanguageManager.getString(
+                        "अभी कोई सहेजी हुई प्रोफ़ाइल नहीं है।",
+                        "There are no saved profiles yet."
+                    )
+                    return@launch
+                }
+
+                val json = com.example.data.local.ProfileTransfer.encode(profiles)
+                val dir = java.io.File(context.cacheDir, "exports").apply { mkdirs() }
+                // Anything older than this export is a file the user has already
+                // shared or abandoned; leaving them in the cache serves nobody.
+                dir.listFiles()?.forEach { it.delete() }
+
+                val stamp = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+                    .format(java.util.Date())
+                val file = java.io.File(dir, "revati-profiles-$stamp.json")
+                file.writeText(json)
+
+                val uri = androidx.core.content.FileProvider.getUriForFile(
+                    context, "${context.packageName}.fileprovider", file
+                )
+                val share = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                    type = "application/json"
+                    putExtra(android.content.Intent.EXTRA_STREAM, uri)
+                    putExtra(
+                        android.content.Intent.EXTRA_SUBJECT,
+                        LanguageManager.getString(
+                            "Revati — सहेजी हुई कुण्डली प्रोफ़ाइल",
+                            "Revati — saved Kundali profiles"
+                        )
+                    )
+                    addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+                context.startActivity(
+                    android.content.Intent.createChooser(
+                        share,
+                        LanguageManager.getString("प्रोफ़ाइल भेजें", "Send profiles")
+                    ).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                )
+                _backupStatusMessage.value = LanguageManager.getString(
+                    "${profiles.size} प्रोफ़ाइल फ़ाइल में तैयार हैं।",
+                    "${profiles.size} profiles are ready to send."
+                )
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                android.util.Log.e("MainViewModel", "Profile export failed", e)
+                _backupStatusMessage.value = LanguageManager.getString(
+                    "प्रोफ़ाइल एक्सपोर्ट नहीं हो सकीं।",
+                    "Could not export the profiles."
+                )
+            }
+        }
+    }
+
+    /** Reads an export file the user picked and adds whatever is not already here. */
+    fun importProfiles(context: Context, uri: android.net.Uri) {
+        viewModelScope.launch {
+            try {
+                val text = withContext(Dispatchers.IO) {
+                    context.contentResolver.openInputStream(uri)?.use { input ->
+                        // A picked file is arbitrary: cap what is read so a huge
+                        // one cannot take the app down before parsing even starts.
+                        input.bufferedReader().readText().take(MAX_IMPORT_CHARS)
+                    }
+                } ?: throw IllegalStateException("could not open the picked file")
+
+                val incoming = com.example.data.local.ProfileTransfer.decode(text)
+                val existing = repository.getSavedProfilesList()
+                val (fresh, duplicates) = com.example.data.local.ProfileTransfer
+                    .plan(incoming, existing)
+
+                fresh.forEach { repository.saveProfile(it) }
+
+                _backupStatusMessage.value = when {
+                    fresh.isEmpty() && duplicates > 0 -> LanguageManager.getString(
+                        "ये सभी प्रोफ़ाइल पहले से मौजूद हैं।",
+                        "All of those profiles are already here."
+                    )
+                    fresh.isEmpty() -> LanguageManager.getString(
+                        "इस फ़ाइल में कोई पढ़ी जा सकने वाली प्रोफ़ाइल नहीं मिली।",
+                        "No readable profiles were found in that file."
+                    )
+                    duplicates > 0 -> LanguageManager.getString(
+                        "${fresh.size} नई प्रोफ़ाइल जोड़ी गईं, $duplicates पहले से मौजूद थीं।",
+                        "Added ${fresh.size} new profiles; $duplicates were already here."
+                    )
+                    else -> LanguageManager.getString(
+                        "${fresh.size} प्रोफ़ाइल जोड़ी गईं।",
+                        "Added ${fresh.size} profiles."
+                    )
+                }
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: com.example.data.local.ProfileTransfer.TransferException) {
+                _backupStatusMessage.value =
+                    LanguageManager.getString(e.messageHi, e.messageEn)
+            } catch (e: Exception) {
+                android.util.Log.e("MainViewModel", "Profile import failed", e)
+                _backupStatusMessage.value = LanguageManager.getString(
+                    "फ़ाइल पढ़ी नहीं जा सकी।",
+                    "That file could not be read."
+                )
+            }
+        }
+    }
+
     fun deleteLocalDataOnly() {
         viewModelScope.launch {
             try {
@@ -1427,5 +1549,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private companion object {
         /** Collapses a burst of profile edits into a single cloud write. */
         const val BACKUP_DEBOUNCE_MS = 2_000L
+
+        /** Ceiling on a picked import file; ~2000 profiles' worth of JSON. */
+        const val MAX_IMPORT_CHARS = 4_000_000
     }
 }

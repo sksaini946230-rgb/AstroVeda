@@ -37,6 +37,8 @@ import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.PrivacyTip
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
@@ -102,6 +104,14 @@ fun SettingsScreen(
     onShowPremiumDialog: () -> Unit = {}
 ) {
     val context = LocalContext.current
+
+    // Document picker for importing a profiles file. Registered here because a
+    // launcher has to be created during composition, not inside a click handler.
+    val importProfilesLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) viewModel.importProfiles(context, uri)
+    }
     val haptic = LocalHapticFeedback.current
 
     val selectedCity by viewModel.selectedCity.collectAsState()
@@ -1164,6 +1174,91 @@ fun SettingsScreen(
                             )
                         }
                     }
+
+                    // Export / import.
+                    //
+                    // The Room database is kept out of Auto Backup and out of
+                    // device transfer on purpose — birth details are the most
+                    // personal thing here. That left anyone who does not sign in
+                    // with no way at all to move their profiles to a new phone,
+                    // and an exact birth time is not something most people can
+                    // look up again. This is the way out that does not make an
+                    // account the price of keeping your own data.
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(MaterialTheme.colorScheme.surfaceVariant)
+                                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
+                                .clickable {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    viewModel.exportProfiles(context)
+                                }
+                                .padding(vertical = 12.dp, horizontal = 10.dp)
+                                .testTag("settings_export_profiles_button"),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Default.Upload,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = LanguageManager.getString("प्रोफ़ाइल भेजें", "Export profiles"),
+                                    style = MaterialTheme.typography.labelMedium.copy(
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontWeight = FontWeight.Normal,
+                                        fontSize = 12.sp
+                                    )
+                                )
+                            }
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(MaterialTheme.colorScheme.surfaceVariant)
+                                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
+                                .clickable {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    // Any MIME type: providers disagree about what
+                                    // a .json file is, and a filter that looks
+                                    // tidy here greys the file out in the picker.
+                                    importProfilesLauncher.launch(arrayOf("*/*"))
+                                }
+                                .padding(vertical = 12.dp, horizontal = 10.dp)
+                                .testTag("settings_import_profiles_button"),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Default.Download,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = LanguageManager.getString("फ़ाइल से जोड़ें", "Import profiles"),
+                                    style = MaterialTheme.typography.labelMedium.copy(
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontWeight = FontWeight.Normal,
+                                        fontSize = 12.sp
+                                    )
+                                )
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
 
                     Box(
                         modifier = Modifier
