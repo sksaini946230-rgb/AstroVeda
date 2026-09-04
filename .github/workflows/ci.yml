@@ -1,0 +1,45 @@
+name: CI
+
+# There was no CI at all — every build, test and upload happened by hand on one
+# Mac, and gradle.properties pinned an absolute JDK path so no other machine
+# could build the repo anyway. That path is gone; this runs the same two checks
+# the README and .agents/rules already require before any commit.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      # .env is gitignored and holds the real AdMob and signing values. The
+      # example file carries Google's public test IDs and the NOT_CONFIGURED
+      # sentinel, which is all a debug build and the unit tests need.
+      - name: Provide .env from the example
+        run: cp .env.example .env
+
+      - name: Unit tests and lint
+        run: ./gradlew testDebugUnitTest lintDebug
+
+      # lintDebug is not optional here: it is what catches java.time usage, which
+      # would crash on Android 7 (minSdk 24, no core library desugaring).
+
+      - name: Upload reports on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports
+          path: |
+            app/build/reports/
+            app/build/test-results/
