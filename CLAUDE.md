@@ -121,6 +121,39 @@ fixed:
   reports these as `HardcodedText`; a widget label with a hardcoded string is a
   real bug, not noise.
 
+**A value derived from both the rashi and the transit house may not vary at
+all.** `RashifalProvider` set the rating, the lucky colour and the lucky stone
+from `(rashiIdx + house) % n`. But
+
+    house = ((planetRashiIdx - rashiIdx + 12) % 12) + 1
+
+so `rashiIdx` cancels out of that sum and what is left is the transiting
+planet's own sign — the same for all twelve readers. Every rashi was shown five
+stars out of five on the daily view, four on the weekly, and the lucky colour
+took two distinct values across the whole zodiac. It survived because the
+generated *text* was correctly per-rashi, so the screen looked varied, and
+because any single rashi looks perfectly right on its own — only comparing all
+twelve exposes it. The rating now comes from classical gochar phala for the
+driver planet, and colour and stone from the rashi lord.
+`RashifalVariesByRashiTest` compares all twelve. Any new per-rashi quantity
+wants the same treatment: check it across the zodiac, not on one sign.
+
+**Narrow phones are 320dp, and Hindi is longer than English.** Checked with
+`ScreenSizeScreenshotTest`, which renders the riskiest screens at 320dp and
+360dp (plus dark and 1.3x text) into `app/src/test/screenshots/`. It asserts
+nothing on purpose — an automated overflow walker was built first, over the
+semantics tree, and it could not be trusted: `TextLayoutResult` reached that way
+returns whichever layout pass ran last, and anything measured speculatively
+(Rows with weights, `IntrinsicSize.Min`) leaves a result describing a width
+nobody ever saw. It reported the sub-tab headers and the PRO upgrade banner as
+broken when rendering proved both fit. Look at the pictures instead. Three real
+bugs it did find, now fixed: the dashboard shortcut tiles clipped every label at
+320dp (the grid drops to one column below 300dp of *content* width — the
+threshold is on the width the grid is handed, not the screen), the kundali
+date/time fields clipped their labels (shortened to "तिथि"/"समय"), and the PRO
+badge in Settings was laid out zero pixels wide and simply never drawn, because
+the Row beside it had no `weight(1f)`.
+
 **minSdk is 24 and there is no core library desugaring.** `java.time` is off
 limits in `app/`. Lint catches it; it once got as far as a crash-on-Android-7
 before that. Use `java.util.Calendar` or parse strings.
@@ -213,9 +246,11 @@ that is how most of the UI bugs in this app were found, not by reading code.
 ## Where it stands
 
 Live on Play, production. `versionCode 5` / `1.2` was uploaded 3 Sep 2026 and
-confirmed installed on a real device. The tree is now on **`versionCode 6` /
-`versionName 1.3`**, which is the September 2026 full-codebase audit — not yet
-uploaded, and **not yet checked on a device**.
+confirmed installed on a real device. The tree is now on **`versionCode 7` /
+`versionName 1.4`** — the September 2026 full-codebase audit (which was
+versionCode 6), plus profile export/import, the narrow-phone layout fixes and
+the rashifal variation fix below. **Not yet uploaded and not yet checked on a
+device.**
 
 ### What versionCode 6 changed
 
@@ -301,9 +336,10 @@ Not working / not finished:
   level now (the device this is tested on records nothing below `E`), and
   `PurchaseVerifierTest` pins the behaviour so the switch has to be conscious.
 
-**Ads do not serve, and it is not a code problem.** Chased to the end on
-4 Sep 2026. AdMob's own Verify app page says it: *"We didn't find a developer
-website in your app listing on Google Play."* The chain is
+**Ads: the serving block was a console problem, and it is cleared.** For weeks
+no ad of any kind was served. It was never the code. AdMob's Verify app page
+said it outright: *"We didn't find a developer website in your app listing on
+Google Play."* The chain was
 
     no website on the Play listing
       -> AdMob cannot fetch app-ads.txt
@@ -311,16 +347,33 @@ website in your app listing on Google Play."* The chain is
           -> Approval status: Requires review
             -> no ads served
 
-Everything on the app side was checked on a real device and is correct: the
-installed APK carries the right IDs (`~4165183661`, banner `/8388257872`), the ad
-domains resolve to real Google addresses, `AdBanner` no longer gates its first
-request, and Play Services is current. The banner still never appeared after 75
-seconds, past all three retries. Do not go looking for this in the code again.
+Fixed 4 Sep 2026 by publishing `https://sksaini946230-rgb.github.io/` (a GitHub
+Pages user site serving `app-ads.txt` with
+`google.com, pub-5513456541171739, DIRECT, f08c47fec0942fa0`), setting it as the
+developer website on the Play listing, and running AdMob -> app -> Verify app ->
+Check for updates. AdMob now reads **App verification: Verified**. Do not go
+looking for this in the code again.
 
-`https://sksaini946230-rgb.github.io/app-ads.txt` now serves
-`google.com, pub-5513456541171739, DIRECT, f08c47fec0942fa0`. What remains is
-console work: put that URL in the Play listing as the developer website, then
-AdMob -> app -> Verify app -> Check for updates.
+Two code faults were found afterwards and fixed, both the same mistake:
+
+- **The banner was gated on `isStartupComplete`.** `AdBanner`'s own doc comment
+  argues that a signal which never arrives must never be able to hold the banner
+  back — the gate had been removed from inside `AdBanner` once already, and was
+  then reintroduced one layer up, in `MainActivity`'s `bottomBar`. That flag is
+  set at the end of a coroutine that first runs `recalculatePanchang()`, so one
+  throw out of the ephemeris meant no banner for the entire session. The gate is
+  gone, and `MainViewModel`'s startup block now sets the flag in a `finally` so
+  it arrives whether startup succeeded or not.
+- Startup *finishing* and startup *working* are different facts. Nothing should
+  gate on the second one.
+
+**Interstitials are wired to tab switches and are meant to be sparse.**
+`onBottomNavTabSelected` triggers one on every real tab change, but
+`MainActivity.showInterstitialAd` will not show one until the session is 90
+seconds old, keeps 3 minutes between them, and stops after 3 in a session. This
+is deliberate — a Panchang app is opened for ten seconds to read a tithi — so
+"I switched tabs and got no ad" is the design working, not a fault. To see one,
+use the app for over 90 seconds first.
 
 **The "native debug symbols" warning on upload cannot be fixed here.** Play warns
 that the bundle has native code with no symbols. This app has no native code of

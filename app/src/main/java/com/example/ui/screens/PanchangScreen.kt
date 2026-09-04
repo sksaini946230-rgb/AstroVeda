@@ -68,6 +68,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -1147,55 +1148,75 @@ fun DashboardQuickShortcutsGrid(
     onNavigateMatching: () -> Unit,
     onNavigateMuhurat: () -> Unit
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            // Shortcut 1: Rashifal
-            ShortcutTile(
-                title = LanguageManager.getString("दैनिक राशिफल", "Horoscope"),
-                subtitle = LanguageManager.getString("12 राशियां व भविष्य", "All 12 signs"),
-                icon = Icons.Default.AutoAwesome,
-                iconColor = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.weight(1f),
-                onClick = onNavigateRashifal
-            )
+    // Two tiles per row assumes there is room for two. On a 320dp phone there is
+    // not: each tile then gives its text column ~67dp, and every Hindi label in
+    // the grid clipped — "दैनिक राशि…", "36 गुण व दोष…", "चौघड़िया व रा…". Shrinking
+    // the type to fit would make it unreadable, so on the narrowest phones the
+    // grid becomes a single column and each tile gets the full width. Taller
+    // there, which is the right trade: the labels are the point of the tile.
+    //
+    // The threshold is on the width this grid is *given*, not the screen width —
+    // the screen's own 16dp side padding is already subtracted here. 300dp keeps
+    // the two-column layout on a 360dp phone, which is where most Android phones
+    // sit and where two columns still leave ~87dp of label; only the 320dp floor
+    // (288dp here) drops to one. Set against the screen width instead, this read
+    // 360 and turned the common case single-column too.
+    BoxWithConstraints {
+        val singleColumn = maxWidth < 300.dp
+        val perRow = if (singleColumn) 1 else 2
 
-            // Shortcut 2: Kundali
-            ShortcutTile(
-                title = LanguageManager.getString("जन्म कुण्डली", "Birth Chart"),
-                subtitle = LanguageManager.getString("लग्न चक्र व दशा", "Lagna & Dasha"),
-                icon = Icons.Default.Today,
-                iconColor = MaterialTheme.colorScheme.secondary,
-                modifier = Modifier.weight(1f),
-                onClick = onNavigateKundali
-            )
-        }
+        val tiles: List<@Composable (Modifier) -> Unit> = listOf(
+            { m ->
+                ShortcutTile(
+                    title = LanguageManager.getString("दैनिक राशिफल", "Horoscope"),
+                    subtitle = LanguageManager.getString("12 राशियां व भविष्य", "All 12 signs"),
+                    icon = Icons.Default.AutoAwesome,
+                    iconColor = MaterialTheme.colorScheme.primary,
+                    modifier = m,
+                    onClick = onNavigateRashifal
+                )
+            },
+            { m ->
+                ShortcutTile(
+                    title = LanguageManager.getString("जन्म कुण्डली", "Birth Chart"),
+                    subtitle = LanguageManager.getString("लग्न चक्र व दशा", "Lagna & Dasha"),
+                    icon = Icons.Default.Today,
+                    iconColor = MaterialTheme.colorScheme.secondary,
+                    modifier = m,
+                    onClick = onNavigateKundali
+                )
+            },
+            { m ->
+                ShortcutTile(
+                    title = LanguageManager.getString("कुण्डली मिलान", "Kundli Milan"),
+                    subtitle = LanguageManager.getString("36 गुण व दोष जांच", "36 Guna Match"),
+                    icon = Icons.Default.Favorite,
+                    iconColor = RahuKaalDangerColor,
+                    modifier = m,
+                    onClick = onNavigateMatching
+                )
+            },
+            { m ->
+                ShortcutTile(
+                    title = LanguageManager.getString("शुभ मुहूर्त", "Muhurat"),
+                    subtitle = LanguageManager.getString("चौघड़िया व राहुकाल", "Choghadiya"),
+                    icon = Icons.Default.Schedule,
+                    iconColor = ShubhSuccessColor,
+                    modifier = m,
+                    onClick = onNavigateMuhurat
+                )
+            }
+        )
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            // Shortcut 3: Kundli Milan
-            ShortcutTile(
-                title = LanguageManager.getString("कुण्डली मिलान", "Kundli Milan"),
-                subtitle = LanguageManager.getString("36 गुण व दोष जांच", "36 Guna Match"),
-                icon = Icons.Default.Favorite,
-                iconColor = RahuKaalDangerColor,
-                modifier = Modifier.weight(1f),
-                onClick = onNavigateMatching
-            )
-
-            // Shortcut 4: Auspicious Muhurat
-            ShortcutTile(
-                title = LanguageManager.getString("शुभ मुहूर्त", "Muhurat"),
-                subtitle = LanguageManager.getString("चौघड़िया व राहुकाल", "Choghadiya"),
-                icon = Icons.Default.Schedule,
-                iconColor = ShubhSuccessColor,
-                modifier = Modifier.weight(1f),
-                onClick = onNavigateMuhurat
-            )
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            tiles.chunked(perRow).forEach { row ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    row.forEach { tile -> tile(Modifier.weight(1f)) }
+                }
+            }
         }
     }
 }

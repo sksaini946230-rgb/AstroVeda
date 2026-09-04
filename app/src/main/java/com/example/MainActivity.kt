@@ -272,14 +272,20 @@ class MainActivity : ComponentActivity() {
                             Column {
                                 val isPro by mainViewModel.isProUser.collectAsState()
                                 if (!isPro) {
-                                    androidx.compose.animation.AnimatedVisibility(
-                                        visible = isStartupComplete,
-                                        enter = androidx.compose.animation.fadeIn() + androidx.compose.animation.expandVertically()
-                                    ) {
-                                        AdBanner(
-                                            onRemoveAdsClick = { mainViewModel.showPremiumDialog.value = true }
-                                        )
-                                    }
+                                    // Not gated on isStartupComplete any more, and that
+                                    // matters. AdBanner's own doc says it plainly: a
+                                    // signal that never arrives must never be able to
+                                    // hold the banner back forever. The gate was removed
+                                    // from inside AdBanner once already and then
+                                    // reintroduced here, one layer up, where it did the
+                                    // same damage — isStartupComplete is set at the end
+                                    // of a coroutine that first runs recalculatePanchang(),
+                                    // so a single throw in the ephemeris meant no banner
+                                    // for the whole session. AdBanner asks immediately and
+                                    // retries on its own; it needs no permission from us.
+                                    AdBanner(
+                                        onRemoveAdsClick = { mainViewModel.showPremiumDialog.value = true }
+                                    )
                                 }
                                 BottomNavBar(
                                     selectedTab = selectedTab,

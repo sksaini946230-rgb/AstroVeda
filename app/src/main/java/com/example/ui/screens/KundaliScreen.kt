@@ -537,6 +537,14 @@ fun KundaliScreen(
                                             )
 
                                             // 2. DOB & TOB Row
+                                            //
+                                            // The labels are "तिथि"/"समय" rather than
+                                            // "जन्म तिथि"/"जन्म समय": these two fields are
+                                            // half-width with a trailing icon, which on a
+                                            // 320dp phone leaves ~47dp for the floating
+                                            // label — the longer Hindi clipped to "जन्म ति".
+                                            // The card is already headed जन्म कुण्डली, so the
+                                            // shorter labels lose nothing.
                                             Row(
                                                 modifier = Modifier.fillMaxWidth(),
                                                 horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -550,7 +558,7 @@ fun KundaliScreen(
                                                             formValidationError = null
                                                         },
                                                         readOnly = true,
-                                                        label = { Text(LanguageManager.getString("जन्म तिथि *", "Date *"), maxLines = 1, softWrap = false) },
+                                                        label = { Text(LanguageManager.getString("तिथि *", "Date *"), maxLines = 1, softWrap = false) },
                                                         placeholder = { Text("YYYY-MM-DD") },
                                                         trailingIcon = {
                                                             Icon(
@@ -585,7 +593,7 @@ fun KundaliScreen(
                                                             formValidationError = null
                                                         },
                                                         readOnly = true,
-                                                        label = { Text(LanguageManager.getString("जन्म समय *", "Time *"), maxLines = 1, softWrap = false) },
+                                                        label = { Text(LanguageManager.getString("समय *", "Time *"), maxLines = 1, softWrap = false) },
                                                         placeholder = { Text("HH:MM") },
                                                         trailingIcon = {
                                                             Icon(

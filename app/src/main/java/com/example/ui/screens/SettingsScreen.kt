@@ -174,7 +174,15 @@ fun SettingsScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        // weight(1f) is load-bearing. Without it this inner Row is
+                        // measured against the full width — its Column child has
+                        // weight(1f) and expands into all of it — leaving the PRO
+                        // badge beside it exactly zero pixels. On a 320dp phone the
+                        // badge simply was not drawn.
+                        Row(
+                            modifier = Modifier.weight(1f),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Box(
                                 modifier = Modifier
                                     .size(40.dp)

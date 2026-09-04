@@ -1512,13 +1512,27 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         
         viewModelScope.launch {
             // 1. Critical Initialization (Immediate)
-            monitorNetwork()
-            loadSavedProfiles()
-            recalculatePanchang() // Critical for home screen
-            
-            // Allow critical UI to render first
-            kotlinx.coroutines.delay(800)
-            _isStartupComplete.value = true
+            //
+            // try/finally, not optimism. Anything gated on isStartupComplete —
+            // and the ad banner used to be — is held forever if this flag never
+            // arrives, and it would not arrive if recalculatePanchang() threw:
+            // the exception would abandon the whole launch block with the flag
+            // still false. Startup being *finished* and startup having *worked*
+            // are different facts, and only the first one belongs here.
+            try {
+                monitorNetwork()
+                loadSavedProfiles()
+                recalculatePanchang() // Critical for home screen
+
+                // Allow critical UI to render first
+                kotlinx.coroutines.delay(800)
+            } catch (ce: kotlinx.coroutines.CancellationException) {
+                throw ce
+            } catch (t: Throwable) {
+                reportError(t)
+            } finally {
+                _isStartupComplete.value = true
+            }
 
             // 2. Deferred Background Tasks (Non-critical)
             launch {

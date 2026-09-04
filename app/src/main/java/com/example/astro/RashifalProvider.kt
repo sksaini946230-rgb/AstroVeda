@@ -806,6 +806,82 @@ object RashifalProvider {
     /** Backward-compatible default — used by MainViewModel / initial states. */
     fun getDailyHoroscope(): List<RashifalData> = getHoroscope("TODAY")
 
+    /**
+     * Classical gochar phala: how the transiting planet is read from the
+     * reader's own sign.
+     *
+     * The shubha (favourable) and ashubha (unfavourable) house sets are the
+     * standard ones — Chandra gochar shubha in 1, 3, 6, 7, 10, 11 and Surya
+     * gochar shubha in 3, 6, 10, 11. Houses in neither set are the middle
+     * rating; that middle tier is a presentation choice, not something
+     * tradition specifies, and it exists so a reader in a house the texts call
+     * ordinary is not shown the same score as one the texts call adverse.
+     *
+     * This replaced `3 + ((rashiIdx + house) % 3)`, which gave all twelve
+     * rashis an identical rating — see the note at the call site.
+     */
+    internal fun gocharRating(driverPlanet: String, house: Int): Int = when (driverPlanet) {
+        "Sun" -> when (house) {
+            3, 6, 10, 11 -> 5
+            2 -> 4
+            else -> 3
+        }
+        // Moon drives both TODAY and WEEK.
+        else -> when (house) {
+            1, 3, 6, 7, 10, 11 -> 5
+            2 -> 4
+            else -> 3
+        }
+    }
+
+    // A rashi's lucky colour and gemstone belong to its lord, which is why they
+    // are looked up by ruling planet rather than computed. Every stone here is
+    // one of the seven AstroNames.stoneEnFromHi knows, so cached rows read back
+    // correctly in English.
+    private fun rulerStoneHi(rulerEn: String): String = when (rulerEn) {
+        "Sun" -> "माणिक्य"
+        "Moon" -> "मोती"
+        "Mars" -> "मूंगा"
+        "Mercury" -> "पन्ना"
+        "Jupiter" -> "पुखराज"
+        "Venus" -> "हीरा"
+        "Saturn" -> "नीलम"
+        else -> "मोती"
+    }
+
+    private fun rulerStoneEn(rulerEn: String): String = when (rulerEn) {
+        "Sun" -> "Ruby"
+        "Moon" -> "Pearl"
+        "Mars" -> "Red Coral"
+        "Mercury" -> "Emerald"
+        "Jupiter" -> "Yellow Sapphire"
+        "Venus" -> "Diamond"
+        "Saturn" -> "Blue Sapphire"
+        else -> "Pearl"
+    }
+
+    private fun rulerColourHi(rulerEn: String): String = when (rulerEn) {
+        "Sun" -> "केसरिया व सुनहरा"
+        "Moon" -> "सफेद व चांदी जैसा"
+        "Mars" -> "लाल व सिंदूरी"
+        "Mercury" -> "हरा व फिरोजी"
+        "Jupiter" -> "पीला व सुनहरा"
+        "Venus" -> "सफेद व गुलाबी"
+        "Saturn" -> "नीला व गहरा स्लेटी"
+        else -> "सफेद व चांदी जैसा"
+    }
+
+    private fun rulerColourEn(rulerEn: String): String = when (rulerEn) {
+        "Sun" -> "Saffron & Gold"
+        "Moon" -> "White & Silver"
+        "Mars" -> "Red & Vermilion"
+        "Mercury" -> "Green & Turquoise"
+        "Jupiter" -> "Yellow & Gold"
+        "Venus" -> "White & Pink"
+        "Saturn" -> "Blue & Deep Grey"
+        else -> "White & Silver"
+    }
+
     private fun generateRashiData(
         id: Int, en: String, hi: String, sym: String, elem: String, ruler: String, period: String, today: Date
     ): RashifalData {
@@ -858,17 +934,40 @@ object RashifalProvider {
             else -> (cal.get(Calendar.DAY_OF_MONTH) + rashiIdx) % 3
         }
 
-        // Deterministic picks based on house + rashi + date
-        val colorIdx = (rashiIdx + house) % colorsHi.size
-        val stoneIdx = (rashiIdx * 3 + house) % stonesHi.size
-        val rating = 3 + ((rashiIdx + house) % 3) // 3..5
-        val luckyNum = 1 + ((rashiIdx * 7 + house * 3) % 9)
-        val timeIdx = (rashiIdx * 5 + house + cal.get(Calendar.DAY_OF_MONTH)) % luckyTimesHi.size
-
+        // The rating, the colour and the stone used to be modular hashes of
+        // (rashiIdx + house). That looked varied and was not: house is itself
+        //
+        //     ((planetRashiIdx - rashiIdx + 12) % 12) + 1
+        //
+        // so rashiIdx cancels out of the sum entirely, leaving nothing but the
+        // planet's own sign. Every one of the twelve rashis got the same answer.
+        // Dumping all twelve showed it plainly — five stars for all of them on
+        // TODAY, four for all of them on WEEK, and the lucky colour taking just
+        // two distinct values across the whole zodiac.
+        //
+        // These are traditional quantities, so they are now taken from tradition
+        // rather than from arithmetic:
+        //
+        //   rating — classical gochar phala for the transiting driver planet,
+        //            counted from the reader's own sign. Varies by rashi because
+        //            the house does, and by day because the planet moves.
+        //   colour
+        //   stone  — the reader's rashi lord's own colour and ratna. Fixed per
+        //            rashi, which is what tradition actually says; the daily
+        //            change belongs in the reading and the rating, not here.
+        //
+        // colorsHi/colorsEn and stonesHi/stonesEn above are no longer indexed
+        // into, but the cache reads stone names back through
+        // AstroNames.stoneEnFromHi, which covers all seven used here.
         // These arrive combined — "अग्नि (Fire)", "मंगल (Mars)", "मेष (Aries)" — so
         // split them into the Hindi and English halves the model asks for.
         fun hiPart(v: String) = v.substringBefore(" (").trim()
         fun enPart(v: String) = v.substringAfter("(", "").substringBefore(")").trim().ifBlank { v }
+
+        val rulerEnName = enPart(ruler)
+        val rating = gocharRating(driverPlanet, house)
+        val luckyNum = 1 + ((rashiIdx * 7 + house * 3) % 9)
+        val timeIdx = (rashiIdx * 5 + house + cal.get(Calendar.DAY_OF_MONTH)) % luckyTimesHi.size
 
         return RashifalData(
             rashiId = id,
@@ -881,10 +980,10 @@ object RashifalProvider {
             rulerEn = enPart(ruler),
             ratingStars = rating,
             luckyNumber = luckyNum,
-            luckyColorEn = colorsEn[colorIdx],
-            luckyColorHi = colorsHi[colorIdx],
-            luckyStoneHi = stonesHi[stoneIdx],
-            luckyStoneEn = stonesEn[stoneIdx],
+            luckyColorEn = rulerColourEn(rulerEnName),
+            luckyColorHi = rulerColourHi(rulerEnName),
+            luckyStoneHi = rulerStoneHi(rulerEnName),
+            luckyStoneEn = rulerStoneEn(rulerEnName),
             luckyTimeHi = luckyTimesHi[timeIdx],
             luckyTimeEn = luckyTimesEn[timeIdx],
             generalReadingHi = GENERAL_HI[houseIdx][variationIdx].replace("{planet}", planetHi).replace("{P}", periodHi),
