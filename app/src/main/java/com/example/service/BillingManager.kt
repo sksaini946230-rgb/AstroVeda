@@ -167,9 +167,11 @@ class BillingManager(
             .build()
 
         try {
+            com.example.util.AstroAnalytics.logPurchaseInitiated(SUB_PRODUCT_ID_PRO)
             val billingResult = client.launchBillingFlow(activity, billingFlowParams)
             if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
                 android.util.Log.w(TAG, "launchBillingFlow: ${billingResult.debugMessage}")
+                com.example.util.AstroAnalytics.logPurchaseFailed(SUB_PRODUCT_ID_PRO, "launch_${billingResult.responseCode}")
                 _errorMessage.value = LanguageManager.getString(
                     "खरीद शुरू नहीं हो सकी।",
                     "Could not start the purchase."
@@ -177,6 +179,8 @@ class BillingManager(
             }
         } catch (e: Throwable) {
             android.util.Log.e(TAG, "Purchase flow threw", e)
+            com.example.util.AstroAnalytics.recordNonFatal(e, "launchPurchaseFlow")
+            com.example.util.AstroAnalytics.logPurchaseFailed(SUB_PRODUCT_ID_PRO, "launch_threw")
             _errorMessage.value = LanguageManager.getString(
                 "खरीद शुरू नहीं हो सकी।",
                 "Could not start the purchase."
@@ -190,12 +194,14 @@ class BillingManager(
                 handlePurchase(purchase)
             }
         } else if (billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {
+            com.example.util.AstroAnalytics.logPurchaseFailed(SUB_PRODUCT_ID_PRO, "user_cancelled")
             _errorMessage.value = LanguageManager.getString(
                 "खरीद रद्द कर दी गई।",
                 "Purchase cancelled."
             )
         } else {
             android.util.Log.w(TAG, "onPurchasesUpdated: ${billingResult.debugMessage}")
+            com.example.util.AstroAnalytics.logPurchaseFailed(SUB_PRODUCT_ID_PRO, "code_${billingResult.responseCode}")
             _errorMessage.value = LanguageManager.getString(
                 "खरीद पूरी नहीं हो सकी।",
                 "The purchase did not go through."
@@ -209,6 +215,7 @@ class BillingManager(
         // takes a swapped-out billing library at its word, which is exactly how
         // Pro gets unlocked for free on a rooted device.
         if (!PurchaseVerifier.isPurchaseValid(purchase.originalJson, purchase.signature)) {
+            com.example.util.AstroAnalytics.logPurchaseFailed(SUB_PRODUCT_ID_PRO, "signature_invalid")
             _errorMessage.value = LanguageManager.getString(
                 "यह खरीद Google Play से सत्यापित नहीं हो सकी।",
                 "This purchase could not be verified with Google Play."
@@ -223,13 +230,17 @@ class BillingManager(
                 try {
                     client.acknowledgePurchase(acknowledgePurchaseParams) { billingResult ->
                         if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                            com.example.util.AstroAnalytics.logPurchaseSuccess(SUB_PRODUCT_ID_PRO)
                             coroutineScope.launch {
                                 onPremiumUnlocked(true)
                             }
+                        } else {
+                            com.example.util.AstroAnalytics.logPurchaseFailed(SUB_PRODUCT_ID_PRO, "ack_${billingResult.responseCode}")
                         }
                     }
                 } catch (e: Throwable) {
                     android.util.Log.e(TAG, "acknowledgePurchase threw", e)
+                    com.example.util.AstroAnalytics.recordNonFatal(e, "acknowledgePurchase")
                     _errorMessage.value = LanguageManager.getString(
                         "खरीद की पुष्टि नहीं हो सकी।",
                         "Could not confirm the purchase."

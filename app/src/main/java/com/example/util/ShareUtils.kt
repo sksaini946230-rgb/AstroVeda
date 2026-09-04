@@ -78,8 +78,15 @@ object ShareUtils {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, sb.toString())
         }
-        context.startActivity(
-            Intent.createChooser(shareIntent, LanguageManager.getString("राशिफल शेयर करें", "Share horoscope"))
-        )
+        AstroAnalytics.logShareEvent(contentType = "rashifal", itemId = rashiName)
+        // A chooser with nothing behind it throws on a phone with no app that
+        // takes text. Rare, but it is a crash rather than a shrug.
+        try {
+            context.startActivity(
+                Intent.createChooser(shareIntent, LanguageManager.getString("राशिफल शेयर करें", "Share horoscope"))
+            )
+        } catch (e: android.content.ActivityNotFoundException) {
+            AstroAnalytics.recordNonFatal(e, "shareRashifal")
+        }
     }
 }

@@ -1097,7 +1097,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             } catch (e: kotlinx.coroutines.CancellationException) {
                 throw e
             } catch (e: Exception) {
+                // Log.e alone means the developer never learns this happened to
+                // a real user — the test device records nothing below E, and
+                // nobody is reading a stranger's logcat. Every path here can
+                // lose or fail to save someone's saved profiles, so each one
+                // also goes to Crashlytics as a non-fatal.
                 android.util.Log.e("MainViewModel", "Background backup failed", e)
+                com.example.util.AstroAnalytics.recordNonFatal(e, "backgroundBackup")
                 Firebase.crashlytics.recordException(e)
             } finally {
                 _isFirestoreSyncing.value = false
@@ -1228,18 +1234,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 _currentUser.value = user
                 _backupStatusMessage.value = LanguageManager.getString("साइन इन सफल: ${user.displayName ?: user.email}", "Signed in: ${user.displayName ?: user.email}")
                 Firebase.crashlytics.setUserId(user.uid)
+                com.example.util.AstroAnalytics.logLogin(method = "google", isSuccess = true)
                 syncCloudAndLocalProfiles()
             }.onFailure { err ->
                 _backupStatusMessage.value = LanguageManager.getString("साइन-इन विफल: ${err.message}", "Sign-in failed: ${err.message}")
-                Firebase.crashlytics.recordException(err)
+                com.example.util.AstroAnalytics.logLogin(method = "google", isSuccess = false)
+                com.example.util.AstroAnalytics.recordNonFatal(err, "signInWithGoogle")
             }
         }
     }
 
-    // ---- Sign-in gate -------------------------------------------------
-    // The app now requires an account before the first screen, so these carry
-    // the state the gate needs: whether a call is in flight, and what to show
-    // the user when it fails.
+    // ---- Sign-in ------------------------------------------------------
+    // Sign-in is no longer a gate in front of the app — an account buys cloud
+    // backup and nothing else, and AuthScreen opens as a dialog from Saved
+    // Profiles and from Settings. These carry what that dialog needs: whether a
+    // call is in flight, and what to say when it fails.
 
     private val _isAuthInProgress = MutableStateFlow(false)
     val isAuthInProgress: StateFlow<Boolean> = _isAuthInProgress.asStateFlow()
@@ -1260,10 +1269,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             _isAuthInProgress.value = true
             _authError.value = null
             authService.signInWithGoogle(context, webClientId)
-                .onSuccess { onSignedIn(it) }
+                .onSuccess { onSignedIn(it, method = "google") }
                 .onFailure { err ->
                     _authError.value = err.message
-                    Firebase.crashlytics.recordException(err)
+                    com.example.util.AstroAnalytics.logLogin(method = "google", isSuccess = false)
+                    com.example.util.AstroAnalytics.recordNonFatal(err, "signInWithGoogleGate")
                 }
             _isAuthInProgress.value = false
         }
@@ -1297,8 +1307,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             _isAuthInProgress.value = true
             _authError.value = null
             authService.signUpWithEmail(email, password, name)
-                .onSuccess { onSignedIn(it) }
-                .onFailure { err -> _authError.value = err.message }
+                .onSuccess { onSignedIn(it, method = "email_signup") }
+                .onFailure { err ->
+                    _authError.value = err.message
+                    com.example.util.AstroAnalytics.logLogin(method = "email_signup", isSuccess = false)
+                }
             _isAuthInProgress.value = false
         }
     }
@@ -1309,8 +1322,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             _isAuthInProgress.value = true
             _authError.value = null
             authService.signInWithEmail(email, password)
-                .onSuccess { onSignedIn(it) }
-                .onFailure { err -> _authError.value = err.message }
+                .onSuccess { onSignedIn(it, method = "email") }
+                .onFailure { err ->
+                    _authError.value = err.message
+                    com.example.util.AstroAnalytics.logLogin(method = "email", isSuccess = false)
+                }
             _isAuthInProgress.value = false
         }
     }
@@ -1338,10 +1354,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun onSignedIn(user: com.google.firebase.auth.FirebaseUser) {
+    private fun onSignedIn(user: com.google.firebase.auth.FirebaseUser, method: String) {
         _currentUser.value = user
         _authError.value = null
         Firebase.crashlytics.setUserId(user.uid)
+        com.example.util.AstroAnalytics.logLogin(method = method, isSuccess = true)
         syncCloudAndLocalProfiles()
     }
 
@@ -1391,6 +1408,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     // string — Firebase's developer-facing English pasted onto the
                     // end of a Hindi sentence, internals and all. It is logged now.
                     android.util.Log.e("MainViewModel", "Cloud backup failed", err)
+                    com.example.util.AstroAnalytics.recordNonFatal(err, "cloudBackup")
                     _backupStatusMessage.value = LanguageManager.getString(
                         "क्लाउड बैकअप नहीं हो सका। कृपया बाद में पुनः प्रयास करें।",
                         "Cloud backup did not go through. Please try again later."
@@ -1400,6 +1418,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 throw e
             } catch (e: Exception) {
                 android.util.Log.e("MainViewModel", "Sync failed", e)
+                com.example.util.AstroAnalytics.recordNonFatal(e, "profileSync")
                 _backupStatusMessage.value = LanguageManager.getString(
                     "सिंक नहीं हो सका। कृपया बाद में पुनः प्रयास करें।",
                     "Sync did not go through. Please try again later."
@@ -1446,6 +1465,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     throw e
                 } catch (e: Exception) {
                     android.util.Log.e("MainViewModel", "Error clearing local DB", e)
+                    com.example.util.AstroAnalytics.recordNonFatal(e, "clearLocalDb")
                 }
                 _currentUser.value = null
                 _backupStatusMessage.value = LanguageManager.getString("आपका खाता और सभी डेटा सफलतापूर्वक हटा दिया गया है।", "Your account and all data have been deleted.")
@@ -1516,6 +1536,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 throw e
             } catch (e: Exception) {
                 android.util.Log.e("MainViewModel", "Profile export failed", e)
+                com.example.util.AstroAnalytics.recordNonFatal(e, "profileExport")
                 _backupStatusMessage.value = LanguageManager.getString(
                     "प्रोफ़ाइल एक्सपोर्ट नहीं हो सकीं।",
                     "Could not export the profiles."
@@ -1568,6 +1589,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     LanguageManager.getString(e.messageHi, e.messageEn)
             } catch (e: Exception) {
                 android.util.Log.e("MainViewModel", "Profile import failed", e)
+                com.example.util.AstroAnalytics.recordNonFatal(e, "profileImport")
                 _backupStatusMessage.value = LanguageManager.getString(
                     "फ़ाइल पढ़ी नहीं जा सकी।",
                     "That file could not be read."
@@ -1587,6 +1609,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 throw e
             } catch (e: Exception) {
                 android.util.Log.e("MainViewModel", "Local data deletion failed", e)
+                com.example.util.AstroAnalytics.recordNonFatal(e, "localDataDeletion")
                 _backupStatusMessage.value = LanguageManager.getString(
                     "स्थानीय डेटा नहीं हट सका। कृपया पुनः प्रयास करें।",
                     "Could not delete the local data. Please try again."
