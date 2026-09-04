@@ -211,6 +211,11 @@ fun NumerologyScreen(viewModel: MainViewModel) {
             }
         }
 
+        // Results only after the user has asked for them. This block used to
+        // render unconditionally against a pre-seeded calculation, so a first-time
+        // visitor was shown a complete numerology reading for somebody else.
+        if (numData != null) {
+
         // Moolank / Bhagyank / name number as bento tiles. The labels used to
         // be hardcoded Hindi even in English mode.
         item {
@@ -219,15 +224,15 @@ fun NumerologyScreen(viewModel: MainViewModel) {
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 AnimatedResultCard(
-                    scaleKey = "${numData.moolank}_${numData.rulingPlanetHi}",
+                    scaleKey = "${numData!!.moolank}_${numData!!.rulingPlanetHi}",
                     modifier = Modifier.weight(1f)
                 ) {
                     com.example.ui.components.BentoTile(
                         label = LanguageManager.getString("मूलांक", "Moolank"),
-                        value = "${numData.moolank}",
+                        value = "${numData!!.moolank}",
                         sub = LanguageManager.getString(
-                            "स्वामी: ${numData.rulingPlanetHi}",
-                            "Ruler: ${numData.rulingPlanetEn}"
+                            "स्वामी: ${numData!!.rulingPlanetHi}",
+                            "Ruler: ${numData!!.rulingPlanetEn}"
                         ),
                         accent = MaterialTheme.colorScheme.primary,
                         valueSize = 34,
@@ -239,15 +244,15 @@ fun NumerologyScreen(viewModel: MainViewModel) {
                 }
 
                 AnimatedResultCard(
-                    scaleKey = "${numData.bhagyank}_${numData.nameNumber}",
+                    scaleKey = "${numData!!.bhagyank}_${numData!!.nameNumber}",
                     modifier = Modifier.weight(1f)
                 ) {
                     com.example.ui.components.BentoTile(
                         label = LanguageManager.getString("भाग्यांक", "Bhagyank"),
-                        value = "${numData.bhagyank}",
+                        value = "${numData!!.bhagyank}",
                         sub = LanguageManager.getString(
-                            "नाम अंक: ${numData.nameNumber}",
-                            "Name number: ${numData.nameNumber}"
+                            "नाम अंक: ${numData!!.nameNumber}",
+                            "Name number: ${numData!!.nameNumber}"
                         ),
                         accent = MaterialTheme.colorScheme.primary,
                         valueSize = 34,
@@ -265,17 +270,17 @@ fun NumerologyScreen(viewModel: MainViewModel) {
             GlassCard(modifier = Modifier.fillMaxWidth()) {
                 Column {
                     Text(
-                        text = LanguageManager.getString("मूलांक ${numData.moolank} का फल:", "What Moolank ${numData.moolank} means:"),
+                        text = LanguageManager.getString("मूलांक ${numData!!.moolank} का फल:", "What Moolank ${numData!!.moolank} means:"),
                         style = MaterialTheme.typography.titleMedium.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                     )
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
-                        text = LanguageManager.getString(numData.moolankReadingHi, numData.moolankReadingEn),
+                        text = LanguageManager.getString(numData!!.moolankReadingHi, numData!!.moolankReadingEn),
                         style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface, fontSize = 15.sp, lineHeight = 21.sp)
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text = LanguageManager.getString(numData.luckyDaysHi, numData.luckyDaysEn),
+                        text = LanguageManager.getString(numData!!.luckyDaysHi, numData!!.luckyDaysEn),
                         style = MaterialTheme.typography.labelSmall.copy(color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Normal, fontSize = 13.sp)
                     )
                 }
@@ -283,6 +288,8 @@ fun NumerologyScreen(viewModel: MainViewModel) {
         }
 
         // AI Vedic Astrologer Chat Header
+        }
+
         item {
             SectionHeader(
                 titleHi = "ज्योतिष परामर्श",

@@ -16,7 +16,9 @@ fun PersonalizedInsightCard(
     insight: String,
     isLoading: Boolean,
     onFetchInsight: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    /** Set when the last fetch for THIS sign failed; offers a retry rather than filler. */
+    failed: Boolean = false
 ) {
     GlassCard(modifier = modifier.fillMaxWidth()) {
         Column(
@@ -47,6 +49,22 @@ fun PersonalizedInsightCard(
 
             if (isLoading) {
                 AstroLoadingIndicator(modifier = Modifier.padding(8.dp), size = 24.dp)
+            } else if (failed) {
+                // Saying the reading could not be fetched beats printing generic
+                // text under a heading that promises a personalised one.
+                Text(
+                    text = com.example.util.LanguageManager.getString(
+                        "अभी विश्लेषण नहीं मिल सका। इंटरनेट जांचें और दोबारा प्रयास करें।",
+                        "Could not fetch the insight. Check your connection and try again."
+                    ),
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 14.sp
+                    )
+                )
+                Button(onClick = onFetchInsight, modifier = Modifier.fillMaxWidth()) {
+                    Text(com.example.util.LanguageManager.getString("दोबारा प्रयास करें", "Try again"))
+                }
             } else if (insight.isEmpty()) {
                 Button(
                     onClick = onFetchInsight,

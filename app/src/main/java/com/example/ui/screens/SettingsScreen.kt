@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.GridOn
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
@@ -96,6 +97,9 @@ import com.example.util.AppLanguage
 import com.example.util.LanguageManager
 
 const val LOCAL_PRIVACY_POLICY_URL = "file:///android_asset/privacy_policy.html"
+
+/** The address the privacy policy and the Play listing both name. Keep the three in step. */
+const val SUPPORT_EMAIL = "supportrevati@gmail.com"
 const val LOCAL_TERMS_OF_SERVICE_URL = "file:///android_asset/terms_of_service.html"
 
 @Composable
@@ -980,6 +984,73 @@ fun SettingsScreen(
                             fontWeight = FontWeight.Bold
                         )
                     )
+
+                    // Contact support.
+                    //
+                    // There was no way to reach anybody from inside the app at
+                    // all. The address appears in the privacy policy and on the
+                    // Play listing, but a user with a wrong Panchang or a lost
+                    // profile had nothing to tap. Play expects a support route
+                    // and, more to the point, a user who cannot report a problem
+                    // leaves a one-star review instead.
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
+                            .clickable {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                val subject = LanguageManager.getString(
+                                    "Revati सहायता", "Revati support"
+                                )
+                                // Device and version go in the body because the
+                                // first reply otherwise always asks for them.
+                                val body = "\n\n---\nApp: " +
+                                    app.revati.jyotish.BuildConfig.VERSION_NAME +
+                                    " (" + app.revati.jyotish.BuildConfig.VERSION_CODE + ")" +
+                                    "\nAndroid: " + android.os.Build.VERSION.RELEASE +
+                                    "\nDevice: " + android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL
+                                val intent = android.content.Intent(android.content.Intent.ACTION_SENDTO).apply {
+                                    data = android.net.Uri.parse("mailto:" + SUPPORT_EMAIL)
+                                    putExtra(android.content.Intent.EXTRA_SUBJECT, subject)
+                                    putExtra(android.content.Intent.EXTRA_TEXT, body)
+                                }
+                                // No mail app is a real possibility on a cheap
+                                // phone; failing silently would look like a dead
+                                // button, so fall back to saying the address.
+                                try {
+                                    context.startActivity(intent)
+                                } catch (_: android.content.ActivityNotFoundException) {
+                                    android.widget.Toast.makeText(
+                                        context, SUPPORT_EMAIL, android.widget.Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            }
+                            .padding(vertical = 10.dp, horizontal = 8.dp)
+                            .testTag("settings_contact_support_button"),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.Email,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = LanguageManager.getString(
+                                    "सहायता से संपर्क करें", "Contact support"
+                                ),
+                                style = MaterialTheme.typography.labelMedium.copy(
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 12.sp
+                                )
+                            )
+                        }
+                    }
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),

@@ -289,6 +289,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun completeOnboarding() {
         _isOnboardingCompleted.value = true
         sharedPrefs.edit().putBoolean("is_onboarding_completed", true).apply()
+        com.example.util.AstroAnalytics.logOnboardingComplete()
         completeFirstRunSync()
     }
 
@@ -343,7 +344,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun onBottomNavTabSelected(tab: AppTab) {
         val previous = _selectedTab.value
         _selectedTab.value = tab
-        if (previous != tab) triggerInterstitial()
+        if (previous != tab) {
+            triggerInterstitial()
+            com.example.util.AstroAnalytics.logScreenView(tab.name)
+        }
     }
 
     fun setPanchangSubTab(subTab: Int) {
@@ -397,6 +401,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setLanguage(lang: com.example.util.AppLanguage) {
         LanguageManager.setLanguage(lang)
+        com.example.util.AstroAnalytics.setUserProperties(
+            language = lang.name,
+            isPro = _isProUser.value,
+            theme = "system"
+        )
         onLanguageChanged()
     }
 
@@ -652,6 +661,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun selectRashi(id: Int) {
         _selectedRashiId.value = id
+        _dailyHoroscopes.value.firstOrNull { it.rashiId == id }?.let {
+            com.example.util.AstroAnalytics.logHoroscopeView(it.rashiId, it.rashiNameEn, it.period)
+        }
     }
 
     // Choghadiya
@@ -741,6 +753,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 )
                 val result = KundaliCalculator.generateKundali(birth)
                 _generatedKundali.value = result
+                com.example.util.AstroAnalytics.logKundaliGenerated(isNorthIndian = true, source = "form")
                 addRecentSearch("KUNDALI", trimmedName, trimmedDob, trimmedTob, trimmedPlace, lat, lng)
                 incrementLookupCount()
             } catch (e: com.example.astro.BirthDataException) {
@@ -798,6 +811,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     gName, gDob, gTob
                 )
                 _gunaResult.value = result
+                com.example.util.AstroAnalytics.logKundaliMatching(
+                    gunaScore = result.totalObtainedGuna,
+                    isManglikMismatch = result.isManglikBoy != result.isManglikGirl
+                )
                 incrementSessionActionCount()
             } catch (e: com.example.astro.BirthDataException) {
                 // A blank name is the user's to fix in the form; it used to take
@@ -817,17 +834,28 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     // Numerology
-    var numName = MutableStateFlow("Sunil Saini")
-    var numDob = MutableStateFlow("1995-07-22")
+    var numName = MutableStateFlow("")
+    var numDob = MutableStateFlow("")
 
-    private val _numerologyData = MutableStateFlow(
-        NumerologyCalculator.calculateNumerology("Sunil Saini", "1995-07-22")
-    )
-    val numerologyData: StateFlow<NumerologyData> = _numerologyData.asStateFlow()
+    /**
+     * Seeded with a real calculation for "Sunil Saini", born 1995-07-22 — the
+     * developer's own name, shipped to production. Every user who opened
+     * Numerology was shown someone else's Moolank, Bhagyank and reading,
+     * pre-filled and already calculated, until they typed over it. It is one of
+     * the places the app appeared to "show everyone the same data", and it is
+     * also a stranger's details on a stranger's screen.
+     *
+     * The fields start empty and the results stay hidden until the user asks
+     * for them.
+     */
+    private val _numerologyData = MutableStateFlow<NumerologyData?>(null)
+    val numerologyData: StateFlow<NumerologyData?> = _numerologyData.asStateFlow()
 
     fun calculateNumerology() {
         try {
-            _numerologyData.value = NumerologyCalculator.calculateNumerology(numName.value, numDob.value)
+            val result = NumerologyCalculator.calculateNumerology(numName.value, numDob.value)
+            _numerologyData.value = result
+            com.example.util.AstroAnalytics.logNumerologyCalculated(result.moolank, result.bhagyank)
             incrementSessionActionCount()
         } catch (e: Exception) {
             reportError(e)
@@ -845,29 +873,103 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val isAiOffline: StateFlow<Boolean> = _isAiOffline.asStateFlow()
 
     // Personalized Rashifal Insight
-    private val _aiRashifalInsight = MutableStateFlow("")
-    val aiRashifalInsight: StateFlow<String> = _aiRashifalInsight.asStateFlow()
+    /**
+     * Every model call in the app goes through this. See AiRateLimiter for why
+     * there needs to be one at all — there is no server between this app and
+     * the bill.
+     */
+    private val aiRateLimiter = com.example.util.AiRateLimiter()
 
-    private val _isRashifalAiLoading = MutableStateFlow(false)
-    val isRashifalAiLoading: StateFlow<Boolean> = _isRashifalAiLoading.asStateFlow()
+    /**
+     * Turns a refusal into something worth reading. Returns null when the call
+     * may proceed.
+     */
+    private fun aiRefusalMessage(): String? =
+        when (val d = aiRateLimiter.tryAcquire()) {
+            is com.example.util.AiRateLimiter.Decision.Allow -> null
+            is com.example.util.AiRateLimiter.Decision.TooSoon ->
+                LanguageManager.getString(
+                    "थोड़ा रुकें — कुछ ही क्षणों में दोबारा पूछ सकते हैं।",
+                    "One moment — you can ask again in a few seconds."
+                )
+            is com.example.util.AiRateLimiter.Decision.HourlyCapReached ->
+                LanguageManager.getString(
+                    "इस घंटे के प्रश्न पूरे हो गए। लगभग ${aiRateLimiter.minutesFrom(d.retryAfterMs)} मिनट बाद पुनः प्रयास करें।",
+                    "You have used this hour's questions. Please try again in about ${aiRateLimiter.minutesFrom(d.retryAfterMs)} minutes."
+                )
+        }
+
+    /**
+     * AI insights, each one kept under the rashi it was written for.
+     *
+     * This was a single String shared by all twelve signs, and the effect was
+     * that fetching an insight for Mesh then switching to Vrishabha left Mesh's
+     * text on screen under Vrishabha's heading — with no way for the card to
+     * know it was showing the wrong sign's reading. Every sign appeared to have
+     * the same "personalised" insight. Keying by sign also means switching back
+     * and forth does not re-ask the model for something already answered.
+     */
+    private val _aiRashifalInsights = MutableStateFlow<Map<String, String>>(emptyMap())
+    val aiRashifalInsights: StateFlow<Map<String, String>> = _aiRashifalInsights.asStateFlow()
+
+    /** The sign whose insight is in flight, or null. Per-sign for the same reason. */
+    private val _rashifalAiLoadingFor = MutableStateFlow<String?>(null)
+    val rashifalAiLoadingFor: StateFlow<String?> = _rashifalAiLoadingFor.asStateFlow()
+
+    /** The sign whose last fetch failed, so only that card offers a retry. */
+    private val _rashifalAiErrorFor = MutableStateFlow<String?>(null)
+    val rashifalAiErrorFor: StateFlow<String?> = _rashifalAiErrorFor.asStateFlow()
 
     fun fetchPersonalizedInsight(rashiName: String) {
+        if (_aiRashifalInsights.value.containsKey(rashiName)) return
+        if (_rashifalAiLoadingFor.value != null) return
+        if (aiRefusalMessage() != null) {
+            // The card already offers a retry; refusing quietly is the right
+            // shape here, since the user pressed a button rather than typed.
+            _rashifalAiErrorFor.value = rashiName
+            return
+        }
+
         viewModelScope.launch {
-            _isRashifalAiLoading.value = true
+            _rashifalAiLoadingFor.value = rashiName
+            _rashifalAiErrorFor.value = null
             try {
                 val question = "Provide a personalized daily horoscope insight for $rashiName."
-                _aiRashifalInsight.value = GeminiAstroService.getAiAstrologyInsight(question, "Rashi: $rashiName")
+                val answer = GeminiAstroService.getAiAstrologyInsight(question, "Rashi: $rashiName")
+
+                // getAiAstrologyInsight falls back to getOfflineVedicResponse when
+                // the model cannot be reached, and that fallback matches on
+                // keywords — "career", "marriage", "health". This question carries
+                // none of them, so every sign lands in its else branch and gets
+                // one identical paragraph. Showing that under a heading reading
+                // "AI Personalized Insight" tells the user something untrue, so
+                // it is treated as a failure rather than as an insight.
+                if (answer == GeminiAstroService.getOfflineVedicResponse(question)) {
+                    _rashifalAiErrorFor.value = rashiName
+                } else {
+                    _aiRashifalInsights.value = _aiRashifalInsights.value + (rashiName to answer)
+                }
             } catch (e: kotlinx.coroutines.CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _aiRashifalInsight.value = "Unable to fetch personalized insight at the moment."
+                _rashifalAiErrorFor.value = rashiName
             } finally {
-                _isRashifalAiLoading.value = false
+                _rashifalAiLoadingFor.value = null
             }
         }
     }
 
     fun askAiAstrologer(question: String) {
+        if (_isAiLoading.value) return
+        aiRefusalMessage()?.let { refusal ->
+            // Said plainly in the answer area, where the user is already looking.
+            _aiResponse.value = refusal
+            _isAiOffline.value = false
+            return
+        }
+
+        com.example.util.AstroAnalytics.logAiAstrologerQuery(question.length)
+
         viewModelScope.launch {
             _isAiLoading.value = true
             _isAiOffline.value = false

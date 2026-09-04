@@ -634,16 +634,18 @@ fun RashifalScreen(viewModel: MainViewModel) {
                         }
                     }
 
-                    // AI Personalized Insight
-                    val aiInsight by viewModel.aiRashifalInsight.collectAsState()
-                    val isAiLoading by viewModel.isRashifalAiLoading.collectAsState()
+                    // AI Personalized Insight, per sign. Reading a shared value
+                    // here is what made every rashi show the same paragraph.
+                    val aiInsights by viewModel.aiRashifalInsights.collectAsState()
+                    val aiLoadingFor by viewModel.rashifalAiLoadingFor.collectAsState()
+                    val aiErrorFor by viewModel.rashifalAiErrorFor.collectAsState()
+                    val sign = horoscope.rashiNameEn
 
                     PersonalizedInsightCard(
-                        insight = aiInsight,
-                        isLoading = isAiLoading,
-                        onFetchInsight = {
-                            viewModel.fetchPersonalizedInsight(horoscope.rashiNameEn)
-                        }
+                        insight = aiInsights[sign].orEmpty(),
+                        isLoading = aiLoadingFor == sign,
+                        failed = aiErrorFor == sign,
+                        onFetchInsight = { viewModel.fetchPersonalizedInsight(sign) }
                     )
                 }
             }

@@ -154,6 +154,46 @@ date/time fields clipped their labels (shortened to "तिथि"/"समय"),
 badge in Settings was laid out zero pixels wide and simply never drawn, because
 the Row beside it had no `weight(1f)`.
 
+**"Everyone sees the same data" has had four separate causes.** They are worth
+listing together because each looked different and none was visible from one
+user's screen:
+
+1. `RashifalProvider` derived values from `(rashiIdx + house)`, in which rashiIdx
+   cancels — see the note above.
+2. The horoscope **cache** kept serving those values for seven days after the
+   fix. `MIGRATION_6_7` clears it.
+3. The Rashifal **AI insight** was one shared `String` for all twelve signs, so
+   fetching for one sign left its text under every other sign's heading. It is
+   keyed by sign now.
+4. When the model cannot be reached, `getOfflineVedicResponse` picks text by
+   keyword — and the insight question carries none of them, so all twelve signs
+   got one identical paragraph under a heading promising a personalised reading.
+   That is treated as a failure now, with a retry, rather than shown as an
+   insight. `AiInsightFallbackTest` pins the premise.
+
+Also in that family: **Numerology shipped pre-filled with the developer's own
+name and date of birth**, already calculated, so every first-time visitor was
+shown a stranger's Moolank and reading. The fields start empty and the results
+stay hidden until the user asks.
+
+The general lesson: a per-user or per-item derived value cannot be judged from
+one instance. Dump the whole set and count the distinct values.
+
+**AI calls are rate limited, because nothing was limiting them.** `AiRateLimiter`
+— a 3 second minimum gap and a rolling 20 per hour — sits in front of both
+`askAiAstrologer` and `fetchPersonalizedInsight`. There is no server between this
+app and the bill, so an unbounded question box is a direct cost and a shared
+quota one user can exhaust for everyone.
+
+**Analytics were almost entirely unwired.** `AstroAnalytics` has eighteen logging
+methods; `init` and `logAppOpen` were the only two ever called, so the live app
+recorded app opens and nothing else — no screen views, no feature use, no login
+or purchase outcomes. Screen views, onboarding completion, horoscope views,
+kundali generation, guna matching, numerology and AI queries are wired now.
+Still unwired, and worth doing: `logLogin`, the three purchase events,
+`logShareEvent`, and `recordNonFatal`. `AstroFeatureFlags` has zero call sites
+and is the same pattern.
+
 **minSdk is 24 and there is no core library desugaring.** `java.time` is off
 limits in `app/`. Lint catches it; it once got as far as a crash-on-Android-7
 before that. Use `java.util.Calendar` or parse strings.
