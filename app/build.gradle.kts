@@ -70,6 +70,24 @@ android {
       isShrinkResources = true
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
       signingConfig = signingConfigs.getByName("release")
+      // Play warns on upload: "This App Bundle contains native code, and you've
+      // not uploaded debug symbols."
+      //
+      // That warning cannot be cleared from this project, and it is worth
+      // writing down why so nobody burns an afternoon on it again. This app has
+      // no native code of its own. The eight .so files arrive transitively from
+      // androidx.graphics.path and androidx.datastore, and both are shipped
+      // already stripped — checked on the versionCode 6 bundle:
+      //
+      //   libandroidx.graphics.path.so    ELF 64-bit … stripped, 0 symtab entries
+      //   libdatastore_shared_counter.so  ELF 64-bit … stripped, 0 symtab entries
+      //
+      // debugSymbolLevel extracts symbols, it cannot invent them, so there is
+      // nothing for it to package. The setting stays because it is correct in
+      // principle: if a future dependency ever ships unstripped libraries, their
+      // symbols will be picked up without anyone having to think about it. The
+      // warning itself is advisory and does not block a release.
+      ndk { debugSymbolLevel = "SYMBOL_TABLE" }
     }
     debug { signingConfig = signingConfigs.getByName("debugConfig") }
   }

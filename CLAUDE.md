@@ -301,6 +301,36 @@ Not working / not finished:
   level now (the device this is tested on records nothing below `E`), and
   `PurchaseVerifierTest` pins the behaviour so the switch has to be conscious.
 
+**Ads do not serve, and it is not a code problem.** Chased to the end on
+4 Sep 2026. AdMob's own Verify app page says it: *"We didn't find a developer
+website in your app listing on Google Play."* The chain is
+
+    no website on the Play listing
+      -> AdMob cannot fetch app-ads.txt
+        -> App verification: Not verified
+          -> Approval status: Requires review
+            -> no ads served
+
+Everything on the app side was checked on a real device and is correct: the
+installed APK carries the right IDs (`~4165183661`, banner `/8388257872`), the ad
+domains resolve to real Google addresses, `AdBanner` no longer gates its first
+request, and Play Services is current. The banner still never appeared after 75
+seconds, past all three retries. Do not go looking for this in the code again.
+
+`https://sksaini946230-rgb.github.io/app-ads.txt` now serves
+`google.com, pub-5513456541171739, DIRECT, f08c47fec0942fa0`. What remains is
+console work: put that URL in the Play listing as the developer website, then
+AdMob -> app -> Verify app -> Check for updates.
+
+**The "native debug symbols" warning on upload cannot be fixed here.** Play warns
+that the bundle has native code with no symbols. This app has no native code of
+its own; the eight `.so` files come transitively from `androidx.graphics.path`
+and `androidx.datastore`, and both ship **already stripped** — verified on the
+versionCode 6 bundle, 0 symtab entries, ELF header says `stripped`.
+`debugSymbolLevel` extracts symbols, it cannot invent them. The setting is left
+on in `app/build.gradle.kts` because it is correct in principle, but the warning
+will stay. It is advisory and does not block a release.
+
 Deliberately left alone by the September 2026 audit, with reasons:
 
 - **The four screen composables are still one function each** — `PanchangScreen`
