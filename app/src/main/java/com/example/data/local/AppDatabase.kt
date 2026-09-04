@@ -10,7 +10,7 @@ import java.util.UUID
 
 @Database(
     entities = [KundaliEntity::class, PanchangCacheEntity::class, HoroscopeCacheEntity::class, SavedReportEntity::class, RecentSearchEntity::class],
-    version = 6,
+    version = 7,
     // Schemas are recorded under app/schemas from here on. Without them a
     // migration cannot be written, let alone tested, which is how this database
     // ended up on a destructive fallback in the first place.
@@ -97,8 +97,38 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * 6 → 7. No schema change at all — this exists to throw away stale
+         * horoscope rows.
+         *
+         * RashifalProvider used to derive the rating, the lucky colour and the
+         * lucky stone from `(rashiIdx + house)`, in which rashiIdx cancels out,
+         * so all twelve rashis were handed the same answer. That is fixed, but
+         * the fix alone does not reach anybody: horoscopes are cached for seven
+         * days, the cache table survives an upgrade untouched, and a cache hit
+         * is returned without consulting the generator. An updated user would
+         * have gone on seeing five stars out of five for every sign, for up to
+         * a week, with nothing in the app to suggest anything was wrong.
+         *
+         * This was not caught by reasoning about it. It was caught by upgrading
+         * a real phone from versionCode 5 and reading the row back out:
+         *
+         *     rashiId 1..12  ->  ratingStars = 5, all twelve
+         *     lucky colour   ->  two distinct values across the whole zodiac
+         *
+         * The general rule this is an instance of: when the *content* a cache
+         * holds changes meaning, the cache is stale no matter how young its
+         * rows are, and clearing it belongs in the same change as the fix.
+         * panchang_cache is left alone — the ephemeris did not change.
+         */
+        val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("DELETE FROM horoscope_cache")
+            }
+        }
+
         /** Every schema change from version 5 onward adds its migration here. */
-        private val MIGRATIONS: Array<Migration> = arrayOf(MIGRATION_5_6)
+        private val MIGRATIONS: Array<Migration> = arrayOf(MIGRATION_5_6, MIGRATION_6_7)
 
         @Volatile
         private var INSTANCE: AppDatabase? = null

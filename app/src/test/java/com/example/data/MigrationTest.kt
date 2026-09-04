@@ -14,7 +14,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * Verifies MIGRATION_5_6 against a real version 5 database.
+ * Verifies each migration against a real database of the previous version.
  *
  * There was no migration test infrastructure at all, which is a gap that only
  * mattered once a migration existed — and this is the first one. It carries user
@@ -130,5 +130,88 @@ class MigrationTest {
         }
         assertTrue("a duplicate uuid must be refused by the index", rejected)
         assertFalse(false)
+    }
+
+    /**
+     * 6 → 7 exists only to clear horoscope_cache, and that is easy to write and
+     * easy to get wrong in the direction that matters: dropping the wrong table.
+     *
+     * The stale rows are the reason. RashifalProvider gave every rashi an
+     * identical rating until this release; a seven-day cache that survives the
+     * upgrade would keep serving that to an updated user for a week. Saved
+     * profiles and panchang rows are not stale and must not be touched.
+     */
+    @Test
+    fun `migrate 6 to 7 clears cached horoscopes`() {
+        helper.createDatabase(TEST_DB, 6).apply {
+            execSQL(
+                "INSERT INTO horoscope_cache (cacheKey, rashiId, rashiNameEn, rashiNameHi, symbol, " +
+                    "elementHi, rulerHi, ratingStars, luckyNumber, luckyColorEn, luckyColorHi, " +
+                    "luckyStoneHi, luckyTimeHi, luckyTimeEn, generalReadingHi, generalReadingEn, " +
+                    "careerReadingHi, careerReadingEn, healthReadingHi, healthReadingEn, " +
+                    "loveReadingHi, loveReadingEn, financeReadingHi, financeReadingEn, period, " +
+                    "cachedAtTimestamp) VALUES ('TODAY_1', 1, 'Aries', 'मेष', '♈', 'अग्नि', 'मंगल', " +
+                    "5, 7, 'Green & Turquoise', 'हरा व फिरोजी', 'पन्ना', 'x', 'x', 'a', 'a', 'b', 'b', " +
+                    "'c', 'c', 'd', 'd', 'e', 'e', 'TODAY', 1000)"
+            )
+            close()
+        }
+
+        val db = helper.runMigrationsAndValidate(TEST_DB, 7, true, AppDatabase.MIGRATION_6_7)
+
+        db.query("SELECT COUNT(*) FROM horoscope_cache").use {
+            it.moveToFirst()
+            assertEquals("stale horoscope rows must not survive the upgrade", 0, it.getInt(0))
+        }
+    }
+
+    @Test
+    fun `migrate 6 to 7 leaves saved profiles alone`() {
+        helper.createDatabase(TEST_DB, 6).apply {
+            execSQL(
+                "INSERT INTO saved_kundali_profiles " +
+                    "(id, uuid, name, gender, dateOfBirth, timeOfBirth, placeOfBirth, latitude, longitude, notes, createdAt) " +
+                    "VALUES (1, 'keep-me', 'सुनील', 'MALE', '1994-08-25', '14:15', 'Jaipur', 26.9, 75.7, 'note', 1)"
+            )
+            close()
+        }
+
+        val db = helper.runMigrationsAndValidate(TEST_DB, 7, true, AppDatabase.MIGRATION_6_7)
+
+        db.query("SELECT uuid, name, notes FROM saved_kundali_profiles").use {
+            assertEquals("the profile must survive", 1, it.count)
+            it.moveToFirst()
+            assertEquals("keep-me", it.getString(0))
+            assertEquals("सुनील", it.getString(1))
+            assertEquals("note", it.getString(2))
+        }
+    }
+
+    /** A user on the shipped production build arrives at 5, not 6. */
+    @Test
+    fun `a version 5 database migrates all the way to 7 with its profiles`() {
+        helper.createDatabase(TEST_DB, 5).apply {
+            execSQL(
+                "INSERT INTO saved_kundali_profiles " +
+                    "(id, name, gender, dateOfBirth, timeOfBirth, placeOfBirth, latitude, longitude, notes, createdAt) " +
+                    "VALUES (1, 'Ravi', 'MALE', '1988-01-02', '06:40', 'Noida', 28.5, 77.4, 'twin A', 1), " +
+                    "(2, 'Ravi', 'MALE', '1988-01-02', '06:45', 'Noida', 28.5, 77.4, 'twin B', 2)"
+            )
+            close()
+        }
+
+        val db = helper.runMigrationsAndValidate(
+            TEST_DB, 7, true, AppDatabase.MIGRATION_5_6, AppDatabase.MIGRATION_6_7
+        )
+
+        db.query("SELECT uuid FROM saved_kundali_profiles ORDER BY id").use {
+            assertEquals("both twins must survive 5 -> 7", 2, it.count)
+            it.moveToFirst()
+            val first = it.getString(0)
+            it.moveToNext()
+            val second = it.getString(0)
+            assertTrue("each row needs a uuid", first.isNotBlank() && second.isNotBlank())
+            assertTrue("twins must not share a uuid", first != second)
+        }
     }
 }
