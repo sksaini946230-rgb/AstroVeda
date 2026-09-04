@@ -250,14 +250,18 @@ object MatchingPdfReportService {
         pdfDocument.finishPage(page)
 
         return try {
-            val file = File(context.cacheDir, "Kundali_Matching_Report_${System.currentTimeMillis()}.pdf")
+            // Written into cacheDir/reports/ rather than straight into cacheDir,
+            // so file_paths.xml can grant that one directory instead of the whole
+            // cache tree.
+            val reportsDir = File(context.cacheDir, "reports").apply { mkdirs() }
+            val file = File(reportsDir, "Kundali_Matching_Report_${System.currentTimeMillis()}.pdf")
             val outputStream = FileOutputStream(file)
             pdfDocument.writeTo(outputStream)
             pdfDocument.close()
             outputStream.close()
             file
         } catch (e: Exception) {
-            e.printStackTrace()
+            android.util.Log.e("MatchingPdfReport", "PDF report generation failed", e)
             pdfDocument.close()
             null
         }

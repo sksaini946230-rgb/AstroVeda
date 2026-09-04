@@ -37,7 +37,9 @@ and has no Android dependencies, so it is unit-testable in isolation.
 
 ## Building
 
-Requires Android Studio and a JDK 17+.
+Requires Android Studio and a JDK 17+. Gradle provisions its own toolchain, so
+no JDK path is hardcoded anywhere — `org.gradle.java.home` used to pin one
+machine's Temurin install and is deliberately gone.
 
 1. Clone the repository and open it in Android Studio.
 2. Copy `.env.example` to `.env` and fill in the values. The AdMob and Google
@@ -54,8 +56,9 @@ project.
 ./gradlew testDebugUnitTest lintDebug
 ```
 
-Both must pass. `lintDebug` is not optional here — it is what catches `java.time`
-usage, which would crash on Android 7 (minSdk 24, no core library desugaring).
+Both must pass, and `.github/workflows/ci.yml` runs them on every push and pull
+request. `lintDebug` is not optional here — it is what catches `java.time` usage,
+which would crash on Android 7 (minSdk 24, no core library desugaring).
 
 ## Stack
 

@@ -59,7 +59,20 @@ object PurchaseVerifier {
     fun isPurchaseValid(signedData: String, signature: String): Boolean {
         val key = licenseKey
         if (key.isBlank()) {
-            Log.w(TAG, "No PLAY_LICENSE_KEY configured — purchase signatures are not being checked.")
+            // Fail-open, deliberately and narrowly: a release with no key would
+            // otherwise refuse every genuine purchase, which is worse than the
+            // exposure while nothing is purchasable at all (Play Console will not
+            // even show the Subscriptions page until the merchant account exists).
+            //
+            // The moment that changes this must not still be the behaviour. The
+            // warning is at error level so it is impossible to miss on the device —
+            // a plain Log.w was invisible on hardware whose ROM only records
+            // error-level logs, which is exactly the test device this is checked on.
+            Log.e(
+                TAG,
+                "PLAY_LICENSE_KEY is not configured — purchase signatures are NOT being " +
+                    "checked. Set it in .env before enabling subscriptions in Play Console."
+            )
             return true
         }
         if (signedData.isBlank() || signature.isBlank()) {

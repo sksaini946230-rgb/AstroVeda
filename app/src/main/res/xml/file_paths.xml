@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Both entries used to be path=".", which made the entire cache directory and
+    the entire external-files directory grantable through the provider rather
+    than just the files the app hands out. These name the two subdirectories the
+    app actually writes into, and nothing else.
+
+    The external-files-path entry is gone: nothing in the app ever called
+    getExternalFilesDir, so it exported a directory that was always empty.
+-->
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
-    <cache-path name="pdf_cache" path="." />
-    <external-files-path name="pdf_reports" path="." />
+    <!-- KundaliImageGenerator writes shared chart PNGs here. -->
+    <cache-path name="shared_images" path="shared_images/" />
+    <!-- MatchingPdfReportService writes generated PDF reports here. -->
+    <cache-path name="reports" path="reports/" />
 </paths>

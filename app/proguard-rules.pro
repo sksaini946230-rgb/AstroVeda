@@ -67,22 +67,6 @@
 -dontwarn com.google.android.gms.ads.**
 -dontwarn com.google.ads.**
 
-# Retrofit
--keep class retrofit2.** { *; }
--keepclasseswithmembers class * {
-    @retrofit2.http.* <methods>;
-}
--dontwarn retrofit2.**
-
-# Moshi
--keep class com.squareup.moshi.** { *; }
--keep class * extends com.squareup.moshi.JsonAdapter
--keep class * { @com.squareup.moshi.Json *; }
--keepclassmembers class * {
-    @com.squareup.moshi.Json <fields>;
-}
--dontwarn com.squareup.moshi.**
-
 # Kotlin Serialization / Coroutines
 -keepclassmembers class * {
     @kotlinx.serialization.Serializable *;
@@ -106,8 +90,6 @@
 # JVM & Third-Party Library Warnings Suppression
 -dontwarn java.lang.management.**
 -dontwarn io.ktor.**
--dontwarn okhttp3.**
--dontwarn okio.**
 -dontwarn com.google.android.gms.internal.**
 
 

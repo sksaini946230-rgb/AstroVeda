@@ -13,9 +13,15 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.tasks.await
 
 class FirebaseAuthService {
+
+    private companion object {
+        /** Firestore refuses a batch larger than this. */
+        const val FIRESTORE_BATCH_LIMIT = 450
+    }
 
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     private val firestore: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
@@ -82,9 +88,14 @@ class FirebaseAuthService {
         } catch (e: androidx.credentials.exceptions.GetCredentialCancellationException) {
             Log.i("FirebaseAuthService", "Sign-in cancelled by user")
             Result.failure(Exception(LanguageManager.getString("साइन-इन रद्द किया गया।", "Sign-in cancelled.")))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Log.e("FirebaseAuthService", "Google Sign-In failed", e)
-            Result.failure(e)
+            // Was Result.failure(e), which put the raw Google/Firebase exception
+            // text on screen. Callers interpolate this message, so it has to be
+            // something a user can read, in their language.
+            Result.failure(Exception(readableAuthError(e)))
         }
     }
 
@@ -111,8 +122,15 @@ class FirebaseAuthService {
                     ).await()
                 }
             }
+            // Anyone could previously sign up with an address they did not own,
+            // and that address would then start receiving password-reset mail for
+            // an account its owner never created. Best-effort: a mail server
+            // hiccup must not cost the user the account they just made.
+            runCatching { user.sendEmailVerification().await() }
             Result.success(user)
         }
+    } catch (e: CancellationException) {
+        throw e
     } catch (e: Exception) {
         Log.e("FirebaseAuthService", "Email sign-up failed", e)
         Result.failure(Exception(readableAuthError(e)))
@@ -130,6 +148,8 @@ class FirebaseAuthService {
         } else {
             Result.success(user)
         }
+    } catch (e: CancellationException) {
+        throw e
     } catch (e: Exception) {
         Log.e("FirebaseAuthService", "Email sign-in failed", e)
         Result.failure(Exception(readableAuthError(e)))
@@ -139,6 +159,8 @@ class FirebaseAuthService {
     suspend fun sendPasswordReset(email: String): Result<Unit> = try {
         auth.sendPasswordResetEmail(email.trim()).await()
         Result.success(Unit)
+    } catch (e: CancellationException) {
+        throw e
     } catch (e: Exception) {
         Log.e("FirebaseAuthService", "Password reset failed", e)
         Result.failure(Exception(readableAuthError(e)))
@@ -170,7 +192,11 @@ class FirebaseAuthService {
             "इंटरनेट कनेक्शन नहीं है। जुड़ने के बाद पुनः प्रयास करें।",
             "No internet connection. Try again once you are back online."
         )
-        else -> e.message ?: LanguageManager.getString(
+        // This used to fall through to e.message, which put Firebase's own
+        // developer-facing English ("The password is invalid or the user does not
+        // have a password") in front of a Hindi-speaking user, and leaked internal
+        // detail besides. The raw exception is logged at every call site instead.
+        else -> LanguageManager.getString(
             "कुछ गड़बड़ हो गई। कृपया पुनः प्रयास करें।",
             "Something went wrong. Please try again."
         )
@@ -184,32 +210,48 @@ class FirebaseAuthService {
         }
     }
 
+    /**
+     * Writes every profile to the signed-in user's own subtree.
+     *
+     * Documents are keyed on [KundaliEntity.uuid], never on the Room id. The id
+     * is autoGenerate, so it starts at 1 on every device; keying on it meant a
+     * second phone's first profile silently overwrote the first phone's, and the
+     * original was unrecoverable.
+     *
+     * Firestore caps a batch at 500 writes, so this chunks. It used to send them
+     * all in one batch, which threw for anyone with more than 500 saved profiles
+     * and took the whole backup down with it.
+     */
     suspend fun backupProfilesToCloud(profiles: List<KundaliEntity>): Result<Int> {
         val user = currentUser ?: return Result.failure(Exception("User not authenticated with Firebase"))
         return try {
-            val batch = firestore.batch()
             val userProfilesRef = firestore.collection("users")
                 .document(user.uid)
                 .collection("kundali_profiles")
 
-            profiles.forEach { profile ->
-                val docRef = userProfilesRef.document(profile.id.toString())
-                val data = mapOf(
-                    "id" to profile.id,
-                    "name" to profile.name,
-                    "gender" to profile.gender,
-                    "dateOfBirth" to profile.dateOfBirth,
-                    "timeOfBirth" to profile.timeOfBirth,
-                    "placeOfBirth" to profile.placeOfBirth,
-                    "latitude" to profile.latitude,
-                    "longitude" to profile.longitude,
-                    "notes" to profile.notes,
-                    "createdAt" to profile.createdAt
-                )
-                batch.set(docRef, data)
+            profiles.chunked(FIRESTORE_BATCH_LIMIT).forEach { chunk ->
+                val batch = firestore.batch()
+                chunk.forEach { profile ->
+                    val docRef = userProfilesRef.document(profile.uuid)
+                    val data = mapOf(
+                        "uuid" to profile.uuid,
+                        "name" to profile.name,
+                        "gender" to profile.gender,
+                        "dateOfBirth" to profile.dateOfBirth,
+                        "timeOfBirth" to profile.timeOfBirth,
+                        "placeOfBirth" to profile.placeOfBirth,
+                        "latitude" to profile.latitude,
+                        "longitude" to profile.longitude,
+                        "notes" to profile.notes,
+                        "createdAt" to profile.createdAt
+                    )
+                    batch.set(docRef, data)
+                }
+                batch.commit().await()
             }
-            batch.commit().await()
             Result.success(profiles.size)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Log.e("FirebaseAuthService", "Failed to backup profiles to cloud", e)
             Result.failure(e)
@@ -228,7 +270,13 @@ class FirebaseAuthService {
             val profiles = snapshot.documents.mapNotNull { doc ->
                 val name = doc.getString("name") ?: return@mapNotNull null
                 KundaliEntity(
-                    id = doc.getLong("id") ?: 0L,
+                    // id stays 0 so Room assigns a fresh local one; identity
+                    // travels in uuid. Documents written before schema 6 have no
+                    // uuid field, and the document id is the old numeric id — so
+                    // fall back to the document id, which is stable per account
+                    // even if it collided across devices.
+                    id = 0L,
+                    uuid = doc.getString("uuid") ?: doc.id,
                     name = name,
                     gender = doc.getString("gender") ?: "MALE",
                     dateOfBirth = doc.getString("dateOfBirth") ?: "",
@@ -241,30 +289,47 @@ class FirebaseAuthService {
                 )
             }
             Result.success(profiles)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Log.e("FirebaseAuthService", "Failed to restore profiles from cloud", e)
             Result.failure(e)
         }
     }
 
+    /**
+     * Deletes the cloud copy and the account, in that order — but only after the
+     * session has been proven fresh.
+     *
+     * The order used to be: wipe Firestore, then call user.delete(). If the user
+     * had signed in more than a few minutes earlier — the ordinary case — delete()
+     * threw FirebaseAuthRecentLoginRequiredException, the caller reported "delete
+     * failed", and the cloud backup was already gone. Forcing a token refresh
+     * first turns that into a clean, recoverable refusal that destroys nothing.
+     */
     suspend fun deleteUserDataAndAccount(): Result<Unit> {
         val user = currentUser ?: return Result.failure(Exception("User not authenticated with Firebase"))
         return try {
-            // 1. Delete all Firestore cloud backup data for this user
+            // 1. Prove the session is still fresh BEFORE destroying anything.
+            //    A stale session fails here, with all the data intact.
+            user.getIdToken(true).await()
+
+            // 2. Delete all Firestore cloud backup data for this user, chunked
+            //    to stay under Firestore's 500-writes-per-batch limit.
             val userProfilesRef = firestore.collection("users")
                 .document(user.uid)
                 .collection("kundali_profiles")
                 .get()
                 .await()
 
-            val batch = firestore.batch()
-            userProfilesRef.documents.forEach { doc ->
-                batch.delete(doc.reference)
+            userProfilesRef.documents.chunked(FIRESTORE_BATCH_LIMIT).forEach { chunk ->
+                val batch = firestore.batch()
+                chunk.forEach { doc -> batch.delete(doc.reference) }
+                batch.commit().await()
             }
-            batch.delete(firestore.collection("users").document(user.uid))
-            batch.commit().await()
+            firestore.collection("users").document(user.uid).delete().await()
 
-            // 2. Delete the Firebase Auth user account
+            // 3. Delete the Firebase Auth user account
             user.delete().await()
             Result.success(Unit)
         } catch (e: com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException) {
@@ -273,6 +338,8 @@ class FirebaseAuthService {
                 "सुरक्षा के लिए, खाता हटाने से पहले कृपया पुनः साइन-इन करें।",
                 "For security, please sign in again before deleting your account."
             )))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
             Log.e("FirebaseAuthService", "Failed to delete user data and account", e)
             Result.failure(e)

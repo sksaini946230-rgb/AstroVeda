@@ -18,6 +18,7 @@ import com.example.data.local.AstroCacheRepository
 import com.example.data.local.DatabaseProvider
 import com.example.data.local.KundaliEntity
 import com.example.data.local.KundaliRepository
+import com.example.data.local.ProfileMerge
 import com.example.data.local.RecentSearchEntity
 import com.example.data.local.RecentSearchRepository
 import com.example.data.local.SavedReportEntity
@@ -32,6 +33,7 @@ import com.example.data.model.NumerologyData
 import com.example.data.model.PanchangData
 import com.example.data.model.RashifalData
 import com.example.util.LanguageManager
+import com.example.util.SecurityUtils
 import com.example.service.BillingManager
 import android.content.Context
 import android.content.pm.PackageManager
@@ -145,6 +147,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 
                 // Add a small delay to simulate network/db caching of ephemeris
                 kotlinx.coroutines.delay(2000)
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
             } catch (e: Exception) {
                 // Ignore sync errors for onboarding, don't crash
             }
@@ -491,6 +495,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     cityName = address.locality ?: address.subAdminArea ?: address.adminArea ?: "Current Location"
                     stateName = address.adminArea ?: "GPS"
                 }
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
             } catch (e: Exception) {
                 // Ignore geocoding failure, fallback to default
             }
@@ -594,6 +600,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 _panchangState.value = cacheRepository.getPanchangWith7DayCache(_selectedDate.value, _selectedCity.value, use24Hour = _use24HourFormat.value, forceRefresh = forceRefresh)
                 incrementLookupCount()
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
             } catch (e: Exception) {
                 reportError(e)
             } finally {
@@ -624,6 +632,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 _dailyHoroscopes.value = cacheRepository.getHoroscopesWith7DayCache(period = period, forceRefresh = forceRefresh)
                 incrementSessionActionCount()
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
             } catch (e: Exception) {
                 reportError(e)
             } finally {
@@ -738,6 +748,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     e.messageHi, e.messageEn
                 )
                 _generatedKundali.value = null
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
             } catch (e: Exception) {
                 reportError(e)
             } finally {
@@ -793,6 +805,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     e.messageHi, e.messageEn
                 )
                 _gunaResult.value = null
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
             } catch (e: Exception) {
                 reportError(e)
             } finally {
@@ -842,6 +856,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 val question = "Provide a personalized daily horoscope insight for $rashiName."
                 _aiRashifalInsight.value = GeminiAstroService.getAiAstrologyInsight(question, "Rashi: $rashiName")
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
             } catch (e: Exception) {
                 _aiRashifalInsight.value = "Unable to fetch personalized insight at the moment."
             } finally {
@@ -866,6 +882,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 if (res == com.example.data.ai.GeminiAstroService.getOfflineVedicResponse(question)) {
                     _isAiOffline.value = true
                 }
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
             } catch (e: Exception) {
                 _isAiOffline.value = true
                 _aiResponse.value = com.example.data.ai.GeminiAstroService.getOfflineVedicResponse(question)
@@ -893,6 +911,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 if (news == com.example.data.ai.GeminiAstroService.getOfflineAstroNews()) {
                     _isNewsOffline.value = true
                 }
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
             } catch (e: Exception) {
                 _isNewsOffline.value = true
                 _astroNews.value = com.example.data.ai.GeminiAstroService.getOfflineAstroNews()
@@ -951,12 +971,28 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private var backupJob: kotlinx.coroutines.Job? = null
 
+    /**
+     * What was last written to Firestore, so an emission that changed nothing
+     * does not pay for a round of writes.
+     */
+    private var lastBackedUpSnapshot: List<KundaliEntity> = emptyList()
+
     private fun triggerBackgroundBackup(profiles: List<KundaliEntity>) {
+        // This is driven by a Room Flow, which emits on every write — so editing
+        // one note re-uploaded every profile the user has. Skip an emission that
+        // is identical to what the cloud already holds, and let the debounce
+        // below collapse a burst of edits into one upload.
+        if (profiles == lastBackedUpSnapshot) return
+
         backupJob?.cancel()
         backupJob = viewModelScope.launch {
+            kotlinx.coroutines.delay(BACKUP_DEBOUNCE_MS)
             _isFirestoreSyncing.value = true
             try {
                 authService.backupProfilesToCloud(profiles)
+                    .onSuccess { lastBackedUpSnapshot = profiles }
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
             } catch (e: Exception) {
                 android.util.Log.e("MainViewModel", "Background backup failed", e)
                 Firebase.crashlytics.recordException(e)
@@ -980,11 +1016,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun saveCurrentKundaliProfile() {
         viewModelScope.launch {
             val entity = KundaliEntity(
-                name = kundaliName.value,
+                // These two save paths do not go through BirthData.parse, so they
+                // sanitise here — otherwise unbounded free text reaches Room,
+                // Firestore, the PDF and the share sheet.
+                name = SecurityUtils.sanitizeTextInput(kundaliName.value),
                 gender = "MALE",
                 dateOfBirth = kundaliDob.value,
                 timeOfBirth = kundaliTob.value,
-                placeOfBirth = kundaliPlace.value,
+                placeOfBirth = SecurityUtils.sanitizeTextInput(kundaliPlace.value),
                 latitude = _selectedCity.value.latitude,
                 longitude = _selectedCity.value.longitude,
                 notes = "Saved from Revati Kundali Generator"
@@ -996,11 +1035,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun saveNewProfile(name: String, dob: String, tob: String, place: String) {
         viewModelScope.launch {
             val entity = KundaliEntity(
-                name = name,
+                name = SecurityUtils.sanitizeTextInput(name),
                 gender = "MALE",
                 dateOfBirth = dob,
                 timeOfBirth = tob,
-                placeOfBirth = place,
+                placeOfBirth = SecurityUtils.sanitizeTextInput(place),
                 latitude = _selectedCity.value.latitude,
                 longitude = _selectedCity.value.longitude,
                 notes = "Saved Profile"
@@ -1219,17 +1258,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 val cloudProfiles = restoreResult.getOrDefault(emptyList())
                 val localProfiles = repository.getSavedProfilesList()
 
-                // 2. Merge: Insert any cloud profiles not present locally
-                var newlyRestored = 0
-                cloudProfiles.forEach { cloudProfile ->
-                    val existsLocally = localProfiles.any { 
-                        it.id == cloudProfile.id || (it.name.equals(cloudProfile.name, ignoreCase = true) && it.dateOfBirth == cloudProfile.dateOfBirth)
-                    }
-                    if (!existsLocally) {
-                        repository.saveProfile(cloudProfile)
-                        newlyRestored++
-                    }
-                }
+                // 2. Merge: insert any cloud profiles not present locally.
+                //
+                // Matching is on uuid and nothing else. It used to be
+                //   it.id == cloudProfile.id || (name matches && dateOfBirth matches)
+                // and both halves lost data. The id half: Room ids are
+                // autoGenerate, so both phones on an account have a profile with
+                // id 1 — the cloud copy was read as "already here", skipped, and
+                // then overwritten by the upload in step 3. The name+dob half
+                // silently dropped one of a pair of twins, who share both.
+                val toRestore = ProfileMerge.profilesToRestore(cloudProfiles, localProfiles)
+                toRestore.forEach { repository.saveProfile(it) }
+                val newlyRestored = toRestore.size
 
                 // 3. Backup merged complete superset to cloud
                 val updatedLocalProfiles = repository.getSavedProfilesList()
@@ -1244,11 +1284,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         _backupStatusMessage.value = LanguageManager.getString("क्लाउड सिंक पूर्ण: कुल $totalSynced प्रोफाइल सुरक्षित।", "Sync complete: $totalSynced profiles backed up.")
                     }
                 }.onFailure { err ->
-                    _backupStatusMessage.value = LanguageManager.getString("क्लाउड बैकअप में समस्या: ${err.message}", "Cloud backup problem: ${err.message}")
+                    // The raw exception used to be interpolated straight into this
+                    // string — Firebase's developer-facing English pasted onto the
+                    // end of a Hindi sentence, internals and all. It is logged now.
+                    android.util.Log.e("MainViewModel", "Cloud backup failed", err)
+                    _backupStatusMessage.value = LanguageManager.getString(
+                        "क्लाउड बैकअप नहीं हो सका। कृपया बाद में पुनः प्रयास करें।",
+                        "Cloud backup did not go through. Please try again later."
+                    )
                 }
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
             } catch (e: Exception) {
                 android.util.Log.e("MainViewModel", "Sync failed", e)
-                _backupStatusMessage.value = LanguageManager.getString("सिंक त्रुटि: ${e.message}", "Sync error: ${e.message}")
+                _backupStatusMessage.value = LanguageManager.getString(
+                    "सिंक नहीं हो सका। कृपया बाद में पुनः प्रयास करें।",
+                    "Sync did not go through. Please try again later."
+                )
             } finally {
                 _isFirestoreSyncing.value = false
             }
@@ -1287,6 +1339,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     repository.deleteAllProfiles()
                     reportRepository.deleteAllReports()
                     recentSearchRepository.clearAllSearches()
+                } catch (e: kotlinx.coroutines.CancellationException) {
+                    throw e
                 } catch (e: Exception) {
                     android.util.Log.e("MainViewModel", "Error clearing local DB", e)
                 }
@@ -1305,8 +1359,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 reportRepository.deleteAllReports()
                 recentSearchRepository.clearAllSearches()
                 _backupStatusMessage.value = LanguageManager.getString("सभी स्थानीय डेटा और सहेजे गए प्रोफाइल हटा दिए गए हैं।", "All local data and saved profiles have been deleted.")
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
             } catch (e: Exception) {
-                _backupStatusMessage.value = LanguageManager.getString("स्थानीय डेटा हटाने में त्रुटि: ${e.message}", "Could not delete local data: ${e.message}")
+                android.util.Log.e("MainViewModel", "Local data deletion failed", e)
+                _backupStatusMessage.value = LanguageManager.getString(
+                    "स्थानीय डेटा नहीं हट सका। कृपया पुनः प्रयास करें।",
+                    "Could not delete the local data. Please try again."
+                )
             }
         }
     }
@@ -1362,5 +1422,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         try {
             billingManager.destroy()
         } catch (_: Exception) {}
+    }
+
+    private companion object {
+        /** Collapses a burst of profile edits into a single cloud write. */
+        const val BACKUP_DEBOUNCE_MS = 2_000L
     }
 }

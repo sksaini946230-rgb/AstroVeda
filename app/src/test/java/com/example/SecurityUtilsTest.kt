@@ -6,6 +6,10 @@ import org.junit.Test
 
 class SecurityUtilsTest {
 
+    // These passed for months while SecurityUtils had zero call sites anywhere in
+    // the app — the tests were green and the sanitiser never ran. The wiring test
+    // at the bottom of this file is the one that actually matters.
+
     @Test
     fun testSanitizeTextInput_stripsScriptTags() {
         val malicious = "<script>alert('xss')</script>Rahul Saini"
@@ -59,5 +63,52 @@ class SecurityUtilsTest {
     fun testMaskPhone_masksCorrectly() {
         val masked = SecurityUtils.maskPhone("+919876543210")
         assertEquals("******3210", masked)
+    }
+
+    // --- Wiring: sanitisation has to be reachable from real input, not just here ---
+
+    @Test
+    fun `BirthData_parse strips markup from the name it stores`() {
+        val data = com.example.astro.BirthData.parse(
+            name = "<script>alert(1)</script>राहुल",
+            dobString = "1994-08-25",
+            tobString = "14:15",
+            placeName = "<b>Jaipur</b>",
+            latitude = 26.9124,
+            longitude = 75.7873
+        )
+        assertEquals("राहुल", data.name)
+        assertEquals("Jaipur", data.placeName)
+    }
+
+    @Test
+    fun `BirthData_parse caps a name that would otherwise reach Firestore unbounded`() {
+        val data = com.example.astro.BirthData.parse(
+            name = "अ".repeat(5000),
+            dobString = "1994-08-25",
+            tobString = "14:15",
+            placeName = "Jaipur",
+            latitude = 26.9124,
+            longitude = 75.7873
+        )
+        assertEquals(SecurityUtils.MAX_TEXT_LENGTH, data.name.length)
+    }
+
+    @Test
+    fun `a name that is only markup is still rejected as blank`() {
+        var threw = false
+        try {
+            com.example.astro.BirthData.parse(
+                name = "<b></b>",
+                dobString = "1994-08-25",
+                tobString = "14:15",
+                placeName = "Jaipur",
+                latitude = 26.9124,
+                longitude = 75.7873
+            )
+        } catch (e: com.example.astro.BirthDataException) {
+            threw = true
+        }
+        assertTrue("markup-only name must not pass validation", threw)
     }
 }

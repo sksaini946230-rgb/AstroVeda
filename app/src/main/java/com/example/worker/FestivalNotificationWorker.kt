@@ -15,6 +15,7 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import kotlinx.coroutines.CancellationException
 import com.example.MainActivity
 import com.example.astro.FestivalProvider
 import java.util.Calendar
@@ -79,7 +80,12 @@ class FestivalNotificationWorker(
             val year = calendar.get(Calendar.YEAR)
             val month = calendar.get(Calendar.MONTH) + 1 // 1-12
             val day = calendar.get(Calendar.DAY_OF_MONTH)
-            val dateStr = String.format("%04d-%02d-%02d", year, month, day)
+            // Locale.US is not cosmetic here: this string is compared against
+            // ISO dates from FestivalCalculator. Without it, a device set to a
+            // locale with Devanagari or Arabic numerals formats "२०२६-०८-२५",
+            // which matches nothing — the festival notification silently never
+            // fires for exactly the users this app is aimed at.
+            val dateStr = String.format(java.util.Locale.US, "%04d-%02d-%02d", year, month, day)
 
             val festivals = FestivalProvider.getFestivals()
             val tomorrowFestivals = festivals.filter { it.dateIso == dateStr }
@@ -95,8 +101,12 @@ class FestivalNotificationWorker(
             }
 
             Result.success()
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            Result.retry()
+            // Only a genuinely transient failure earns a retry; retry() for
+            // everything turned a permanent bug into an endless backoff loop.
+            if (e is java.io.IOException) Result.retry() else Result.failure()
         }
     }
 

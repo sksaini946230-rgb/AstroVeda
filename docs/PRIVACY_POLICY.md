@@ -102,5 +102,5 @@ the change is significant, tell you in the app.
 ## 8. Contact
 
 * **Developer / Organisation:** Msunjay Enterprises
-* **Email:** sksaini946230@gmail.com
+* **Email:** supportrevati@gmail.com
 * **Repository / support:** https://github.com/sksaini946230-rgb/AstroVeda

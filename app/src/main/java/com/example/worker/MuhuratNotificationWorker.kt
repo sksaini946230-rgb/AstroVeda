@@ -16,10 +16,11 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import kotlinx.coroutines.CancellationException
 import com.example.MainActivity
 import com.example.astro.ChoghadiyaCalculator
 import com.example.astro.PanchangCalculator
-import com.example.data.model.CityLocation
+import com.example.data.local.CityPreferences
 import com.example.data.model.ChoghadiyaType
 import java.util.Calendar
 import java.util.Date
@@ -82,18 +83,17 @@ class MuhuratNotificationWorker(
     override suspend fun doWork(): Result {
         return try {
             val context = applicationContext
-            val sharedPrefs = context.getSharedPreferences("astroveda_prefs", Context.MODE_PRIVATE)
-            val lat = sharedPrefs.getFloat("city_lat", 26.9124f).toDouble()
-            val lon = sharedPrefs.getFloat("city_lon", 75.7873f).toDouble()
-            val name = sharedPrefs.getString("city_name", "Jaipur") ?: "Jaipur"
-            val nameHi = sharedPrefs.getString("city_name_hi", "जयपुर") ?: "जयपुर"
-            val state = sharedPrefs.getString("city_state", "Rajasthan") ?: "Rajasthan"
-            val userCity = CityLocation(name, nameHi, state, lat, lon)
-
-            val use24Hour = sharedPrefs.getBoolean("use_24_hour_format", false)
+            val userCity = CityPreferences.read(context)
+            val use24Hour = CityPreferences.use24Hour(context)
             val today = Date()
             val panchang = PanchangCalculator.calculatePanchang(today, userCity, use24Hour)
-            val choghadiyaSlots = ChoghadiyaCalculator.getChoghadiyaSlots(today, isDaytime = true, lat = lat, lon = lon, use24Hour = use24Hour)
+            val choghadiyaSlots = ChoghadiyaCalculator.getChoghadiyaSlots(
+                today,
+                isDaytime = true,
+                lat = userCity.latitude,
+                lon = userCity.longitude,
+                use24Hour = use24Hour
+            )
 
             val auspiciousSlots = choghadiyaSlots.filter {
                 it.type == ChoghadiyaType.AMRIT || it.type == ChoghadiyaType.SHUBH || it.type == ChoghadiyaType.LABH
@@ -133,8 +133,12 @@ class MuhuratNotificationWorker(
 
             showNotification(title, content, bigText)
             Result.success()
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            Result.retry()
+            // Only a genuinely transient failure earns a retry; retry() for
+            // everything turned a permanent bug into an endless backoff loop.
+            if (e is java.io.IOException) Result.retry() else Result.failure()
         }
     }
 
@@ -189,7 +193,7 @@ class MuhuratNotificationWorker(
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
             .setCategory(NotificationCompat.CATEGORY_REMINDER)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
             .build()
 
         notificationManager.notify(1003, notification)

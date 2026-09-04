@@ -245,7 +245,7 @@ object KundaliImageGenerator {
             // Return Uri
             FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
         } catch (e: Exception) {
-            e.printStackTrace()
+            android.util.Log.e("KundaliImageGenerator", "Chart image share failed", e)
             null
         }
     }

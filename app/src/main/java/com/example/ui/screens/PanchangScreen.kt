@@ -850,7 +850,7 @@ fun PanchangScreen(
                                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
-                                        items(choghadiyaSlots) { slot ->
+                                        items(choghadiyaSlots, key = { it.timeSlotString }) { slot ->
                                             val statusColor = when (slot.type.name) {
                                                 "AMRIT", "SHUBH", "LABH" -> ShubhSuccessColor
                                                 "CHAR" -> DateTimeAccent

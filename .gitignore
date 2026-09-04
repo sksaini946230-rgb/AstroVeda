@@ -19,10 +19,16 @@ debug.keystore
 *.jks
 *.keystore
 
-# Scratch and patch files
-patch_*
-fix_*
-*.txt
+# Scratch and patch files.
+# These were once patch_*, fix_* and *.txt at the repository root, which is far
+# too broad — a bare "*.txt" silently swallows any legitimate text file anyone
+# adds, anywhere, with no warning. Anchored to the root and narrowed.
+/patch_*
+/fix_*
+/scratch_*
 .vscode/
 
-upload_certificate.pem
+# Signing material and certificates. *.jks and *.keystore are covered above;
+# this is the general form of the certificate rule, which used to name one file.
+*.pem
+*.p12

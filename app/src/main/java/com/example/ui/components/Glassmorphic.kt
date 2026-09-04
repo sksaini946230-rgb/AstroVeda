@@ -98,7 +98,7 @@ fun GoldGlowButton(
     val view = LocalView.current
     Surface(
         onClick = {
-            view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+            view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
             onClick()
         },
         modifier = modifier

@@ -3,8 +3,12 @@ package com.example.service
 import android.app.Activity
 import android.content.Context
 import com.android.billingclient.api.*
+import com.example.util.LanguageManager
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,6 +21,7 @@ class BillingManager(
 
     companion object {
         const val SUB_PRODUCT_ID_PRO = "astroveda_premium_pro_subscription"
+        private const val TAG = "BillingManager"
     }
 
     private var billingClient: BillingClient? = try {
@@ -38,7 +43,10 @@ class BillingManager(
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
-    private val coroutineScope = CoroutineScope(Dispatchers.Main)
+    // SupervisorJob so destroy() can actually cancel this. It used to be a bare
+    // CoroutineScope(Dispatchers.Main) that nothing ever cancelled — destroy()
+    // ended the billing connection and left the scope running.
+    private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     init {
         startConnection()
@@ -50,10 +58,17 @@ class BillingManager(
             try {
                 client.startConnection(this)
             } catch (e: Exception) {
-                _errorMessage.value = "Billing connection failed: ${e.message}"
+                    android.util.Log.e(TAG, "Billing connection failed", e)
+                _errorMessage.value = LanguageManager.getString(
+                    "Play Billing से जुड़ नहीं सका। कृपया बाद में पुनः प्रयास करें।",
+                    "Could not reach Google Play Billing. Please try again later."
+                )
             }
         } else {
-            _errorMessage.value = "Google Play Services not available. Running in offline/sandbox mode."
+            _errorMessage.value = LanguageManager.getString(
+                "इस डिवाइस पर Google Play Billing उपलब्ध नहीं है।",
+                "Google Play Billing is not available on this device."
+            )
         }
     }
 
@@ -65,7 +80,11 @@ class BillingManager(
             queryPurchases()
         } else {
             _isReady.value = false
-            _errorMessage.value = "Billing Setup Failed: ${billingResult.debugMessage}"
+            android.util.Log.w(TAG, "Billing setup failed: ${billingResult.debugMessage}")
+            _errorMessage.value = LanguageManager.getString(
+                "Play Billing तैयार नहीं हो सका।",
+                "Google Play Billing could not start."
+            )
         }
     }
 
@@ -94,18 +113,29 @@ class BillingManager(
                     val details = queryProductDetailsResult.productDetailsList.firstOrNull { it.productId == SUB_PRODUCT_ID_PRO }
                     _productDetails.value = details
                 } else {
-                    _errorMessage.value = "Query available products failed: ${billingResult.debugMessage}"
+                    android.util.Log.w(TAG, "Product query failed: ${billingResult.debugMessage}")
+                    _errorMessage.value = LanguageManager.getString(
+                        "सदस्यता की जानकारी नहीं मिल सकी।",
+                        "Could not load the subscription details."
+                    )
                 }
             }
         } catch (e: Throwable) {
-            _errorMessage.value = "Product details query exception: ${e.message}"
+            android.util.Log.e(TAG, "Product details query threw", e)
+            _errorMessage.value = LanguageManager.getString(
+                "सदस्यता की जानकारी नहीं मिल सकी।",
+                "Could not load the subscription details."
+            )
         }
     }
 
     fun launchPurchaseFlow(activity: Activity) {
         val client = billingClient
         if (client == null) {
-            _errorMessage.value = "Billing client unavailable. Please try again later."
+            _errorMessage.value = LanguageManager.getString(
+                "Play Billing उपलब्ध नहीं है। कृपया बाद में पुनः प्रयास करें।",
+                "Google Play Billing is unavailable. Please try again later."
+            )
             if (app.revati.jyotish.BuildConfig.DEBUG) {
                 onPremiumUnlocked(true)
             }
@@ -114,7 +144,10 @@ class BillingManager(
 
         val details = _productDetails.value
         if (details == null) {
-            _errorMessage.value = "Subscription is temporarily unavailable, please try again later."
+            _errorMessage.value = LanguageManager.getString(
+                "सदस्यता अभी उपलब्ध नहीं है। कृपया बाद में पुनः प्रयास करें।",
+                "The subscription is not available right now. Please try again later."
+            )
             if (app.revati.jyotish.BuildConfig.DEBUG) {
                 onPremiumUnlocked(true)
             }
@@ -136,10 +169,18 @@ class BillingManager(
         try {
             val billingResult = client.launchBillingFlow(activity, billingFlowParams)
             if (billingResult.responseCode != BillingClient.BillingResponseCode.OK) {
-                _errorMessage.value = "Error starting purchase flow: ${billingResult.debugMessage}"
+                android.util.Log.w(TAG, "launchBillingFlow: ${billingResult.debugMessage}")
+                _errorMessage.value = LanguageManager.getString(
+                    "खरीद शुरू नहीं हो सकी।",
+                    "Could not start the purchase."
+                )
             }
         } catch (e: Throwable) {
-            _errorMessage.value = "Purchase flow exception: ${e.message}"
+            android.util.Log.e(TAG, "Purchase flow threw", e)
+            _errorMessage.value = LanguageManager.getString(
+                "खरीद शुरू नहीं हो सकी।",
+                "Could not start the purchase."
+            )
         }
     }
 
@@ -149,9 +190,16 @@ class BillingManager(
                 handlePurchase(purchase)
             }
         } else if (billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {
-            _errorMessage.value = "Subscription purchase canceled by user."
+            _errorMessage.value = LanguageManager.getString(
+                "खरीद रद्द कर दी गई।",
+                "Purchase cancelled."
+            )
         } else {
-            _errorMessage.value = "Error updating purchase: ${billingResult.debugMessage}"
+            android.util.Log.w(TAG, "onPurchasesUpdated: ${billingResult.debugMessage}")
+            _errorMessage.value = LanguageManager.getString(
+                "खरीद पूरी नहीं हो सकी।",
+                "The purchase did not go through."
+            )
         }
     }
 
@@ -161,7 +209,10 @@ class BillingManager(
         // takes a swapped-out billing library at its word, which is exactly how
         // Pro gets unlocked for free on a rooted device.
         if (!PurchaseVerifier.isPurchaseValid(purchase.originalJson, purchase.signature)) {
-            _errorMessage.value = "This purchase could not be verified with Google Play."
+            _errorMessage.value = LanguageManager.getString(
+                "यह खरीद Google Play से सत्यापित नहीं हो सकी।",
+                "This purchase could not be verified with Google Play."
+            )
             return
         }
         if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
@@ -178,7 +229,11 @@ class BillingManager(
                         }
                     }
                 } catch (e: Throwable) {
-                    _errorMessage.value = "Exception acknowledging purchase."
+                    android.util.Log.e(TAG, "acknowledgePurchase threw", e)
+                    _errorMessage.value = LanguageManager.getString(
+                        "खरीद की पुष्टि नहीं हो सकी।",
+                        "Could not confirm the purchase."
+                    )
                 }
             } else if (purchase.isAcknowledged) {
                 onPremiumUnlocked(true)
@@ -226,5 +281,6 @@ class BillingManager(
         try {
             billingClient?.endConnection()
         } catch (_: Throwable) {}
+        coroutineScope.cancel()
     }
 }

@@ -1,48 +1,71 @@
-# Revati - Account & Data Deletion Policy
+# Revati — Account & Data Deletion Policy
 
-**Developer / Organization:** Msunjay Enterprises  
-**Application:** Revati : Kundli & Panchang  
-**Contact Email:** sksaini946230@gmail.com  
-
----
-
-## How to Request Account and Associated Data Deletion
-
-At Revati, we respect your right to privacy and give you full control over your personal data. You can delete your account and all associated data at any time using either of the following methods:
+**Developer / Organisation:** Msunjay Enterprises
+**Application:** Revati : Kundli & Panchang
+**Contact Email:** supportrevati@gmail.com
 
 ---
 
-### Method 1: Delete Directly Inside the Revati App (Instant)
+## How to request account and data deletion
 
-1. Open the **Revati** app on your Android device.
-2. Navigate to **Settings** (Gear icon on the top right).
-3. Scroll down to the **Account & Privacy** section.
-4. Tap **"Delete My Account & Associated Data"**.
-5. Confirm the prompt by tapping **"Delete Permanently"**.
-6. Your account, saved birth profiles, and cloud data will be **immediately and permanently purged**.
+You can delete your account and everything stored with it at any time, by either
+method below.
 
 ---
 
-### Method 2: Request Deletion via Email (Web / Support Request)
+### Method 1 — Delete inside the Revati app
 
-If you have uninstalled the app or cannot access your device:
-1. Send an email to **`sksaini946230@gmail.com`** or **`sksaini946230@gmail.com`** with the subject line: **"Account Deletion Request - Revati"**.
-2. Include the Google account email address associated with your Revati profile.
-3. Our support team will verify your request and permanently delete all your data within **48 to 72 hours**. You will receive a confirmation email once the process is complete.
+1. Open **Revati**.
+2. Go to **Settings** (the gear icon at the top right).
+3. Scroll to **Account & data controls**.
+4. Tap **Delete account & all data**.
+5. Confirm.
 
----
-
-## What Data is Deleted?
-
-When your account deletion is processed, the following data is permanently wiped from our active databases and Google Firebase cloud servers:
-* **Account Credentials:** Google Sign-In UID, Email Address, and Display Name.
-* **Astrological Data:** All saved Janam Kundali profiles (Names, Dates of Birth, Times of Birth, and Places of Birth).
-* **FCM Push Notification Tokens:** All associated device notification tokens.
-* **Chat / AI Consultation History:** Any cached AI query data.
+For your own protection, Android and Firebase require a recent sign-in before an
+account can be deleted. If you signed in some time ago, the app will ask you to
+sign in again first. Nothing is deleted until that check passes — so if you see
+that message, your data is still intact.
 
 ---
 
-## Data Retention Period
+### Method 2 — Request deletion by email
 
-* **Deleted Immediately:** Account info, saved Kundali profiles, and notification tokens are deleted immediately upon in-app request.
-* **Aggregated / Anonymous Data:** Aggregated, non-identifiable telemetry (e.g. anonymous app crash metrics without any personal information) may be retained for system reliability analysis.
+If you have uninstalled the app or cannot reach your device:
+
+1. Email **supportrevati@gmail.com** with the subject **"Account Deletion
+   Request - Revati"**.
+2. Include the email address of the account you used to sign in to Revati.
+3. We verify the request and delete the data within **48 to 72 hours**, and email
+   you once it is done.
+
+---
+
+## What is deleted
+
+* **Account credentials** — your Firebase sign-in UID, email address and display
+  name.
+* **Saved birth profiles** — every Janam Kundali profile held in your cloud
+  backup: names, dates of birth, times of birth, birth places and coordinates.
+* **Everything on the device** — saved profiles, saved reports and recent
+  searches in the app's local database.
+
+## What the app does not hold, and so cannot delete
+
+Listed for accuracy, because an earlier version of this document promised to
+delete two things the app has never collected:
+
+* **Push notification tokens.** Revati has no push messaging. Notifications are
+  generated on your device by the app itself and are never sent from a server, so
+  there is no token anywhere.
+* **AI conversation history.** Questions asked of the AI astrologer are sent to
+  Google's model to be answered and are not stored by Revati — there is no chat
+  history to delete.
+
+## Retention
+
+* **Deleted immediately:** your account, your cloud-backed birth profiles, and
+  everything the app stored on your device.
+* **Anonymous diagnostics:** aggregated, non-identifiable crash and stability
+  data (Firebase Crashlytics) may be retained for reliability analysis. It
+  carries no personal information and cannot be traced back to you once the
+  account is gone.

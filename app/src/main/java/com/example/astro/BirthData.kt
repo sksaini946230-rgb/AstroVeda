@@ -50,7 +50,10 @@ data class BirthData(
             longitude: Double,
             zone: TimeZone = AstroTime.IST
         ): BirthData {
-            val trimmedName = name.trim()
+            // Free text goes on to Room, the Firestore document, the PDF report
+            // and the share sheet, and nothing bounded or cleaned it. SecurityUtils
+            // has done this since it was written; it simply had no callers.
+            val trimmedName = com.example.util.SecurityUtils.sanitizeTextInput(name)
             if (trimmedName.isBlank()) {
                 throw BirthDataException(
                     "कृपया नाम दर्ज करें।",
@@ -132,7 +135,7 @@ data class BirthData(
                 name = trimmedName,
                 year = year, month = month, day = day,
                 hour = hour, minute = minute,
-                placeName = placeName.trim().ifBlank { "—" },
+                placeName = com.example.util.SecurityUtils.sanitizeTextInput(placeName).ifBlank { "—" },
                 latitude = latitude, longitude = longitude,
                 zone = zone
             )

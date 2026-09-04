@@ -1,77 +1,44 @@
 package com.example.util
 
-import android.os.Build
-import android.util.Log
-import app.revati.jyotish.BuildConfig
-import java.io.File
 import java.util.regex.Pattern
 
 /**
- * SecurityUtils — Core security, device integrity, and input sanitization utilities.
- * Complies with OWASP Mobile Top 10 guidelines and DPDP Act 2023.
+ * Input sanitisation and privacy masking.
+ *
+ * WHY THIS FILE SHRANK: it used to be 154 lines advertising itself as OWASP
+ * Mobile Top 10 and DPDP Act 2023 compliance, with seven passing unit tests — and
+ * **not one call site anywhere in the app**. The tests passed, the security
+ * document cited it, and none of it ran. What actually protects this app is
+ * BirthData.parse, which validates properly; this file now supports that instead
+ * of pretending to replace it.
+ *
+ * Removed, deliberately:
+ *
+ *  - `isDeviceRooted` and its three helpers. Root detection that nothing consults
+ *    is pure liability — one of them shelled out through Runtime.exec for a result
+ *    no caller read.
+ *  - `SQL_INJECTION_PATTERN`. It had never worked: in Kotlin `"\b"` is the
+ *    backspace character, not a regex word boundary, so the pattern only matched
+ *    SQL keywords wrapped in literal backspaces. It was also unnecessary — every
+ *    Room query in this app is parameterised, with no @RawQuery or execSQL
+ *    anywhere.
+ *  - `logSecure`. Nothing called it, and no logging in this app carries PII.
  */
 object SecurityUtils {
 
-    private const val TAG = "SecurityUtils"
-
-    // --- 1. Root & Device Integrity Check ---
-
-    private val KNOWN_ROOT_PATHS = arrayOf(
-        "/system/app/Superuser.apk",
-        "/sbin/su",
-        "/system/bin/su",
-        "/system/xbin/su",
-        "/data/local/xbin/su",
-        "/data/local/bin/su",
-        "/system/sd/xbin/su",
-        "/system/bin/failsafe/su",
-        "/data/local/su",
-        "/su/bin/su"
-    )
-
-    /**
-     * Checks if the host Android device shows indications of root/tampering.
-     * Returns true if root signatures or su binaries are detected.
-     */
-    fun isDeviceRooted(): Boolean {
-        return checkBuildTags() || checkRootBinaries() || checkSuCommand()
-    }
-
-    private fun checkBuildTags(): Boolean {
-        val buildTags = Build.TAGS
-        return buildTags != null && buildTags.contains("test-keys")
-    }
-
-    private fun checkRootBinaries(): Boolean {
-        return try {
-            KNOWN_ROOT_PATHS.any { path -> File(path).exists() }
-        } catch (_: Throwable) {
-            false
-        }
-    }
-
-    private fun checkSuCommand(): Boolean {
-        var process: Process? = null
-        return try {
-            process = Runtime.getRuntime().exec(arrayOf("/system/xbin/which", "su"))
-            val reader = process.inputStream.bufferedReader()
-            reader.readLine() != null
-        } catch (_: Throwable) {
-            false
-        } finally {
-            process?.destroy()
-        }
-    }
-
-    // --- 2. Input Sanitization & Attack Prevention ---
-
     private val HTML_TAG_PATTERN = Pattern.compile("<[^>]*>")
     private val SCRIPT_PATTERN = Pattern.compile("(?i)<script.*?>.*?</script.*?>")
-    private val SQL_INJECTION_PATTERN = Pattern.compile("(?i)(\b(SELECT|INSERT|UPDATE|DELETE|DROP|ALTER|UNION|OR|AND)\b|--|;)")
+
+    /** Longest free-text value accepted for a name, place or note. */
+    const val MAX_TEXT_LENGTH = 255
 
     /**
-     * Sanitizes general text input (names, places, search queries) by removing
-     * script tags, HTML markup, control characters, and excess whitespace.
+     * Cleans free text — names, places, notes — by removing script and HTML
+     * markup and control characters, and capping the length.
+     *
+     * The cap matters: `name` and `placeOfBirth` flow into Room, into the
+     * Firestore document, into the PDF report and into the share sheet, and
+     * nothing bounded them.
      */
     fun sanitizeTextInput(input: String?): String {
         if (input.isNullOrBlank()) return ""
@@ -80,12 +47,14 @@ object SecurityUtils {
         clean = HTML_TAG_PATTERN.matcher(clean).replaceAll("")
         // Strip non-printable ASCII control characters except standard whitespace
         clean = clean.replace(Regex("[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]"), "")
-        // Prevent buffer overflows by capping reasonable length
-        return clean.take(255)
+        return clean.take(MAX_TEXT_LENGTH)
     }
 
     /**
-     * Validates date string in YYYY-MM-DD format with realistic calendar bounds.
+     * Validates a date string in YYYY-MM-DD format with realistic calendar bounds.
+     *
+     * BirthData.parse is the authority for birth input and does this itself with
+     * bilingual errors; this is for callers that only need a yes or no.
      */
     fun isValidDate(dateStr: String): Boolean {
         val parts = dateStr.trim().split("-")
@@ -104,9 +73,7 @@ object SecurityUtils {
         return day in 1..maxDays
     }
 
-    /**
-     * Validates time string in HH:MM format (24-hour).
-     */
+    /** Validates a time string in HH:MM format (24-hour). */
     fun isValidTime(timeStr: String): Boolean {
         val parts = timeStr.trim().split(":")
         if (parts.size != 2) return false
@@ -115,11 +82,7 @@ object SecurityUtils {
         return hour in 0..23 && minute in 0..59
     }
 
-    // --- 3. Privacy Masking & Safe Logging ---
-
-    /**
-     * Masks an email address for privacy-compliant UI display (e.g. j***e@domain.com).
-     */
+    /** Masks an email address for privacy-compliant UI display (e.g. j***e@domain.com). */
     fun maskEmail(email: String?): String {
         if (email.isNullOrBlank() || !email.contains("@")) return "—"
         val parts = email.split("@")
@@ -132,23 +95,12 @@ object SecurityUtils {
         return "$maskedName@$domain"
     }
 
-    /**
-     * Masks a phone number for privacy display (e.g. +91 ****** 4321).
-     */
+    /** Masks a phone number for privacy display (e.g. ******4321). */
     fun maskPhone(phone: String?): String {
         if (phone.isNullOrBlank()) return "—"
         val clean = phone.filter { it.isDigit() || it == '+' }
         if (clean.length < 6) return "***"
         val visibleSuffix = clean.takeLast(4)
         return "******$visibleSuffix"
-    }
-
-    /**
-     * Secure debug logger that is automatically suppressed in Release builds to avoid PII leaks.
-     */
-    fun logSecure(tag: String, message: String) {
-        if (BuildConfig.DEBUG) {
-            Log.d(tag, message)
-        }
     }
 }

@@ -173,12 +173,10 @@ object AstroAnalytics {
         }
     }
 
-    /**
-     * Test crash trigger for developer validation of Crashlytics console.
-     */
-    fun triggerTestCrash() {
-        throw RuntimeException("Revati Verified Test Crash: Crashlytics Pipeline Operational.")
-    }
+    // triggerTestCrash() lived here — a function whose whole purpose was to throw,
+    // with zero call sites, compiled into every release build. It was used once to
+    // confirm the Crashlytics pipeline; keeping a deliberate crash reachable by
+    // reflection in a shipped binary is not worth that.
 
     // --- Internal Helpers ---
 

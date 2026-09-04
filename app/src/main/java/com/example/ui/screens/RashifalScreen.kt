@@ -173,7 +173,7 @@ fun RashifalScreen(viewModel: MainViewModel) {
                 contentPadding = PaddingValues(horizontal = 4.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                items(horoscopes) { item ->
+                items(horoscopes, key = { it.rashiId }) { item ->
                     val isSelected = (item.rashiId == selectedRashiId)
                     Box(
                         modifier = Modifier

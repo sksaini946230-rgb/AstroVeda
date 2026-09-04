@@ -18,7 +18,7 @@ import android.widget.RemoteViews
 import com.example.MainActivity
 import app.revati.jyotish.R
 import com.example.astro.PanchangCalculator
-import com.example.data.model.CityLocation
+import com.example.data.local.CityPreferences
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -45,15 +45,8 @@ class TithiNakshatraWidgetProvider : AppWidgetProvider() {
         const val ACTION_REFRESH_TITHI_WIDGET = "com.example.widget.ACTION_REFRESH_TITHI_WIDGET"
 
         fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
-            val sharedPrefs = context.getSharedPreferences("astroveda_prefs", Context.MODE_PRIVATE)
-            val lat = sharedPrefs.getFloat("city_lat", 26.9124f).toDouble()
-            val lon = sharedPrefs.getFloat("city_lon", 75.7873f).toDouble()
-            val name = sharedPrefs.getString("city_name", "Jaipur") ?: "Jaipur"
-            val nameHi = sharedPrefs.getString("city_name_hi", "जयपुर") ?: "जयपुर"
-            val state = sharedPrefs.getString("city_state", "Rajasthan") ?: "Rajasthan"
-            val city = CityLocation(name, nameHi, state, lat, lon)
-
-            val use24Hour = sharedPrefs.getBoolean("use_24_hour_format", false)
+            val city = CityPreferences.read(context)
+            val use24Hour = CityPreferences.use24Hour(context)
             val today = Date()
             val panchang = PanchangCalculator.calculatePanchang(today, city, use24Hour)
 
@@ -61,6 +54,11 @@ class TithiNakshatraWidgetProvider : AppWidgetProvider() {
             val dateStr = dateFormatter.format(today)
 
             val views = RemoteViews(context.packageName, R.layout.tithi_nakshatra_widget).apply {
+                // Two labels with no id, never set, permanently reading
+                // "CURRENT TITHI / तिथि" in both languages at once.
+                setTextViewText(R.id.widget_label_tithi, LanguageManager.getString("वर्तमान तिथि", "CURRENT TITHI"))
+                setTextViewText(R.id.widget_label_nakshatra, LanguageManager.getString("वर्तमान नक्षत्र", "CURRENT NAKSHATRA"))
+
                 setTextViewText(R.id.widget_date, dateStr)
                 setTextViewText(R.id.widget_tithi, panchang.tithiLocal)
                 setTextViewText(
@@ -120,7 +118,7 @@ class TithiNakshatraWidgetProvider : AppWidgetProvider() {
                     context.sendBroadcast(intent)
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                android.util.Log.e("TithiNakshatraWidget", "Widget update broadcast failed", e)
             }
         }
     }

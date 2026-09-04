@@ -77,6 +77,20 @@ change silently dropped saved profiles, reports and searches. It now takes real
 migrations, registered in `MIGRATIONS` in `AppDatabase.kt`, and fails loudly in
 development instead. Schemas are exported to `app/schemas/`. Bumping the version
 without writing a migration is now a crash, which is the intended pressure.
+`MigrationTest` runs every migration against a real database of the previous
+version — write one alongside the migration, not after.
+
+**A saved profile's identity is its `uuid`, never its Room `id`.** `id` is
+`autoGenerate`, so it restarts at 1 on every device. The cloud backup used to key
+its Firestore document on it, and the sync used to treat a matching `id` as "we
+already have this" — so two phones on one account each skipped restoring the
+other's first profile and then overwrote it on the next upload. One user's saved
+birth chart, gone, unrecoverably. The merge also fell back to matching on name +
+date of birth, which silently dropped one of a pair of twins.
+
+Firestore documents are keyed on `uuid`, and `ProfileMerge.profilesToRestore`
+matches on `uuid` alone. `ProfileMergeTest` covers both failure modes. Do not
+reintroduce an id comparison or a name-based one.
 
 **Both languages, always.** Nothing user-facing may be a bare string.
 `LanguageManager.getString(hi, en)` or a `*Local` extension
@@ -87,6 +101,25 @@ reintroduce them. Chart planet glyphs in particular are stored as
 language-neutral tokens (`"Sun"`, `"Mars|R"`) and localised at draw time by
 `AstroNames.houseGlyph()`; baking the Hindi in froze charts into whatever
 language drew them.
+
+That sweep missed two whole categories, both found in the Sep 2026 audit and both
+fixed:
+
+- **`LanguageManager.init` has to run for every process entry, not just
+  MainActivity.** It was called only from `MainActivity.onCreate`, but the process
+  also starts from two `AppWidgetProvider`s and three WorkManager workers, which
+  never touch an Activity. In those processes `currentLanguage` sat at its default
+  of Hindi, so an English user's 6:30 AM notification and both widgets came out in
+  Hindi after every reboot. **`RevatiApp`** (`android:name` on `<application>`)
+  does it now, along with App Check. `LanguageInitTest` fails if that manifest
+  registration is ever removed.
+- **XML layouts count as user-facing.** Five label `TextView`s in
+  `panchang_widget.xml` and two in `tithi_nakshatra_widget.xml` had no `android:id`
+  and were never set at runtime, so they sat at their layout defaults —
+  `"SUNRISE / सूर्योदय"`, `"TITHI / तिथि"` — showing both languages at once
+  forever. They have ids and are set from `LanguageManager` now. `lintDebug`
+  reports these as `HardcodedText`; a widget label with a hardcoded string is a
+  real bug, not noise.
 
 **minSdk is 24 and there is no core library desugaring.** `java.time` is off
 limits in `app/`. Lint catches it; it once got as far as a crash-on-Android-7
@@ -166,6 +199,12 @@ Firebase Storage is not used by the app, so its rules do not matter.
 ./gradlew installDebug                  # onto a connected device
 ```
 
+`.github/workflows/ci.yml` runs those same two on every push and pull request.
+`gradle.properties` no longer pins `org.gradle.java.home` — it used to hold an
+absolute path to one Mac's Temurin 17, so the repo could not build anywhere else,
+CI included. The toolchain is provisioned by the foojay resolver in
+`settings.gradle.kts`. Do not put that line back.
+
 Screens are best checked on a real device in **both languages and both themes** —
 that is how most of the UI bugs in this app were found, not by reading code.
 
@@ -173,8 +212,57 @@ that is how most of the UI bugs in this app were found, not by reading code.
 
 ## Where it stands
 
-Live on Play, production — the tree is on `versionCode 5` / `versionName 1.2`,
-uploaded 3 Sep 2026 and confirmed installed on a real device.
+Live on Play, production. `versionCode 5` / `1.2` was uploaded 3 Sep 2026 and
+confirmed installed on a real device. The tree is now on **`versionCode 6` /
+`versionName 1.3`**, which is the September 2026 full-codebase audit — not yet
+uploaded, and **not yet checked on a device**.
+
+### What versionCode 6 changed
+
+A line-by-line audit found one data-loss defect and a set of things that were
+written, tested and never actually wired up. The individually interesting ones
+have their own notes above ("Things that will bite you"); the shape of it:
+
+- **Saved profiles were being destroyed by cloud sync** — the Firestore document
+  was keyed on the Room autoGenerate id. See the `uuid` note above. Schema is
+  now **version 6**, with `MIGRATION_5_6` backfilling a uuid for every existing
+  row, plus the indexes the database had never had (there were none, on any
+  table). `MigrationTest` covers it.
+- **Notifications and widgets spoke Hindi to English users** — `LanguageManager`
+  was only ever initialised from `MainActivity`. `RevatiApp` fixes it; see above.
+- **`SecurityUtils` had zero call sites** while advertising OWASP and DPDP
+  compliance, with seven passing tests. Root detection and a permanently broken
+  SQL-injection regex (`"\b"` is backspace in Kotlin, not a word boundary) are
+  deleted; the sanitiser is wired into `BirthData.parse` and both profile-save
+  paths, which is where free text actually enters the app.
+- **EEA/UK users could not withdraw ad consent.** `AdConsentManager` had
+  `showPrivacyOptions` and `isPrivacyOptionsRequired` and nothing called either,
+  so consent was collected once on first launch and locked in — a UMP policy
+  violation. Settings → Legal & Privacy now shows the row, gated on the UMP
+  requirement status, so it stays invisible in India.
+- **"Delete my account" could destroy the cloud copy and then fail**, because
+  `user.delete()` throws for a stale session *after* the Firestore wipe had
+  already committed. It forces a token refresh first now, so a stale session
+  fails with everything intact.
+- **The panchang cache cost more than it saved** — a cache hit re-ran the entire
+  ephemeris to recover the planet list, then threw the rest away. `planetsJson`
+  holds them now. `deleteExpiredCache` existed in both DAOs and was never called
+  by anything, so cache rows accumulated forever; the daily worker prunes them.
+- **Settings said 7:00 AM and the notification arrived at 6:30**, because the
+  worker and the ViewModel defaulted the same preference key differently.
+- **The festival notification would never have fired on a Devanagari-numeral
+  device** — it built an ISO date with `String.format` and no `Locale`, then
+  compared it against real ISO dates.
+- Removed: Retrofit, OkHttp, Moshi and Coil (zero imports, all four), three
+  never-instantiated ViewModels, `tsconfig.json`, a stale root
+  `google-services.json` that disagreed with the real one, and a
+  `triggerTestCrash()` that shipped in release.
+- Added `.github/workflows/ci.yml`, and dropped the `org.gradle.java.home` line
+  that made the repo unbuildable on any machine but one.
+
+**Before uploading this one:** check the app on a real device in both languages
+and both themes, and specifically confirm a saved profile survives the 5 → 6
+migration on a device that already has data.
 
 `versionCode 4` fixed AdMob serving no ads in production at all: both AdMob
 apps from the rename (old AstroVeda, current Revati) still exist, and `.env`'s
@@ -207,7 +295,29 @@ Not working / not finished:
 - Purchase verification is client-side only; a server checking tokens against
   the Play Developer API is the real fix and there is no backend. Nothing is
   purchasable until the merchant account exists, so this is not urgent — do it
-  in the same pass as `PLAY_LICENSE_KEY`, not before.
+  in the same pass as `PLAY_LICENSE_KEY`, not before. `PurchaseVerifier` returns
+  **true** with no key configured — deliberate, because refusing every genuine
+  purchase would be worse while nothing is purchasable at all. It logs at error
+  level now (the device this is tested on records nothing below `E`), and
+  `PurchaseVerifierTest` pins the behaviour so the switch has to be conscious.
+
+Deliberately left alone by the September 2026 audit, with reasons:
+
+- **The four screen composables are still one function each** — `PanchangScreen`
+  is 896 lines, `KundaliScreen` 875, `MatchingScreen` 621, `RashifalScreen` 568.
+  Splitting them is the single biggest recomposition win available, and it is
+  also a large blind refactor of screens whose bugs, by this file's own account,
+  are found on a device rather than by reading code. Worth doing deliberately,
+  with a device in hand, not in a sweep.
+- **Debug still shares the production Firebase project.** There is no
+  `applicationIdSuffix`, so debug builds read and write live user Firestore data.
+  The fix is `debug { applicationIdSuffix = ".debug" }` plus a second Firebase
+  Android app — but adding the suffix *before* that app exists in the console
+  breaks Google Sign-In and App Check on every debug build. Console step first.
+- **The Room database is unencrypted**, and holds names, exact birth times and
+  coordinates. Backup and device transfer already exclude it, so this needs
+  physical device access. SQLCipher with the key in the Android Keystore is the
+  real answer; it is a migration of its own and wants its own pass.
 
 Decided rather than pending:
 

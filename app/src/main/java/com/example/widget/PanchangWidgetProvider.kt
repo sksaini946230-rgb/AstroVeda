@@ -17,7 +17,8 @@ import android.widget.RemoteViews
 import com.example.MainActivity
 import app.revati.jyotish.R
 import com.example.astro.PanchangCalculator
-import com.example.data.model.CityLocation
+import com.example.data.local.CityPreferences
+import com.example.util.LanguageManager
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -44,15 +45,8 @@ class PanchangWidgetProvider : AppWidgetProvider() {
         const val ACTION_REFRESH_WIDGET = "com.example.widget.ACTION_REFRESH_WIDGET"
 
         fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
-            val sharedPrefs = context.getSharedPreferences("astroveda_prefs", Context.MODE_PRIVATE)
-            val lat = sharedPrefs.getFloat("city_lat", 26.9124f).toDouble()
-            val lon = sharedPrefs.getFloat("city_lon", 75.7873f).toDouble()
-            val name = sharedPrefs.getString("city_name", "Jaipur") ?: "Jaipur"
-            val nameHi = sharedPrefs.getString("city_name_hi", "जयपुर") ?: "जयपुर"
-            val state = sharedPrefs.getString("city_state", "Rajasthan") ?: "Rajasthan"
-            val city = CityLocation(name, nameHi, state, lat, lon)
-
-            val use24Hour = sharedPrefs.getBoolean("use_24_hour_format", false)
+            val city = CityPreferences.read(context)
+            val use24Hour = CityPreferences.use24Hour(context)
             val today = Date()
             val panchang = PanchangCalculator.calculatePanchang(today, city, use24Hour)
 
@@ -60,6 +54,17 @@ class PanchangWidgetProvider : AppWidgetProvider() {
             val dateStr = dateFormatter.format(today)
 
             val views = RemoteViews(context.packageName, R.layout.panchang_widget).apply {
+                // These five labels had no ids and were never set, so they sat at
+                // their layout defaults — "SUNRISE / सूर्योदय", "TITHI / तिथि" and
+                // so on, both languages jammed together with a slash, whichever
+                // language the user had chosen. The Aug 2026 sweep for hardcoded
+                // strings covered Kotlin and never looked at the XML layouts.
+                setTextViewText(R.id.widget_label_sunrise, LanguageManager.getString("सूर्योदय", "SUNRISE"))
+                setTextViewText(R.id.widget_label_sunset, LanguageManager.getString("सूर्यास्त", "SUNSET"))
+                setTextViewText(R.id.widget_label_tithi, LanguageManager.getString("तिथि", "TITHI"))
+                setTextViewText(R.id.widget_label_nakshatra, LanguageManager.getString("नक्षत्र", "NAKSHATRA"))
+                setTextViewText(R.id.widget_label_moon_phase, LanguageManager.getString("चंद्र कला", "MOON PHASE"))
+
                 setTextViewText(R.id.widget_date, dateStr)
                 setTextViewText(R.id.widget_sunrise, panchang.sunrise)
                 setTextViewText(R.id.widget_sunset, panchang.sunset)
@@ -67,7 +72,14 @@ class PanchangWidgetProvider : AppWidgetProvider() {
                 setTextViewText(R.id.widget_nakshatra, panchang.nakshatraLocal)
 
                 val moonPhase = PanchangCalculator.getMoonPhaseInfo(panchang.pakshaHindi, panchang.tithiHindi)
-                setTextViewText(R.id.widget_moon_phase, "${moonPhase.emoji} ${moonPhase.nameHindi} • ${moonPhase.illuminationPercent}%")
+                // nameHindi unconditionally — an English user saw the phase name
+                // in Hindi next to English labels.
+                setTextViewText(
+                    R.id.widget_moon_phase,
+                    "${moonPhase.emoji} " +
+                        LanguageManager.getString(moonPhase.nameHindi, moonPhase.nameEn) +
+                        " • ${moonPhase.illuminationPercent}%"
+                )
 
                 setTextViewText(R.id.widget_masa, "${panchang.masaLocal} | ${panchang.pakshaLocal}")
                 setTextViewText(R.id.widget_location, "📍 ${panchang.locationName}")
@@ -100,7 +112,7 @@ class PanchangWidgetProvider : AppWidgetProvider() {
                     context.sendBroadcast(intent)
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                android.util.Log.e("PanchangWidget", "Widget update broadcast failed", e)
             }
         }
     }

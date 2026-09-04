@@ -25,8 +25,8 @@ android {
     applicationId = "com.aistudio.astroveda.kpvqzm"
     minSdk = 24
     targetSdk = 36
-    versionCode = 5
-    versionName = "1.2"
+    versionCode = 6
+    versionName = "1.3"
 
     val envProperties = Properties()
     val envFile = rootProject.file(".env")
@@ -82,6 +82,16 @@ android {
     buildConfig = true
   }
   testOptions { unitTests { isIncludeAndroidResources = true } }
+
+  // MigrationTestHelper reads the exported schema JSON out of the app's assets,
+  // and the unit-test APK is built from the merged *debug* assets — a "test"
+  // sourceSet entry never reaches it, which is why the migration tests failed
+  // with FileNotFoundException. Debug-only, so the release APK does not ship the
+  // schema files.
+  sourceSets {
+    getByName("debug") { assets.srcDirs(files("$projectDir/schemas")) }
+    getByName("androidTest") { assets.srcDirs(files("$projectDir/schemas")) }
+  }
   lint {
     abortOnError = true
     warningsAsErrors = false
@@ -98,24 +108,22 @@ secrets {
 
 googleServices { missingGoogleServicesStrategy = MissingGoogleServicesStrategy.WARN }
 
-// Some unused dependencies are commented out below instead of being removed.
-// This makes it easy to add them back in the future if needed.
 // Room writes each version's schema here so migrations can be written against a
 // real diff and verified in tests, instead of guessed at.
 ksp {
   arg("room.schemaLocation", "$projectDir/schemas")
 }
 
+// Retrofit, OkHttp + logging-interceptor, Moshi (+ its KSP processor) and Coil
+// were removed: all four were left over from when GeminiAstroService called the
+// Gemini REST API directly, and had zero imports anywhere in the source. R8 was
+// stripping the code, but the Moshi processor still ran on every build and each
+// one was CVE surface carried for nothing.
 dependencies {
   implementation(platform(libs.androidx.compose.bom))
   implementation(platform(libs.firebase.bom))
-  // implementation(libs.accompanist.permissions)
   implementation("androidx.fragment:fragment-ktx:1.8.6")
   implementation(libs.androidx.activity.compose)
-  // implementation(libs.androidx.camera.camera2)
-  // implementation(libs.androidx.camera.core)
-  // implementation(libs.androidx.camera.lifecycle)
-  // implementation(libs.androidx.camera.view)
   implementation(libs.androidx.compose.material.icons.core)
   implementation(libs.androidx.compose.material.icons.extended)
   implementation(libs.androidx.compose.material3)
@@ -124,15 +132,12 @@ dependencies {
   implementation(libs.androidx.compose.ui.text.googlefonts)
   implementation(libs.androidx.compose.ui.tooling.preview)
   implementation(libs.androidx.core.ktx)
-  // implementation(libs.androidx.datastore.preferences)
   implementation(libs.androidx.lifecycle.runtime.compose)
   implementation(libs.androidx.lifecycle.runtime.ktx)
   implementation(libs.androidx.lifecycle.viewmodel.compose)
   implementation(libs.androidx.navigation.compose)
   implementation(libs.androidx.room.ktx)
   implementation(libs.androidx.room.runtime)
-  implementation(libs.coil.compose)
-  implementation(libs.converter.moshi)
   implementation(libs.firebase.ai)
   implementation(libs.firebase.crashlytics)
   implementation(libs.firebase.analytics)
@@ -150,9 +155,6 @@ dependencies {
   debugImplementation(libs.firebase.appcheck.debug)
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.coroutines.core)
-  implementation(libs.logging.interceptor)
-  implementation(libs.moshi.kotlin)
-  implementation(libs.okhttp)
   implementation(libs.play.services.location)
   implementation(libs.play.services.ads)
   // Google's consent SDK. AdMob requires a consent mechanism for EEA/UK users and
@@ -161,11 +163,11 @@ dependencies {
   implementation(libs.play.review.ktx)
   implementation(libs.billing.ktx)
   implementation(libs.androidx.work.runtime.ktx)
-  implementation(libs.retrofit)
   testImplementation(libs.androidx.compose.ui.test.junit4)
   testImplementation(libs.androidx.core)
   testImplementation(libs.androidx.junit)
   testImplementation(libs.junit)
+  testImplementation(libs.androidx.room.testing)
   testImplementation(libs.kotlinx.coroutines.test)
   testImplementation(libs.robolectric)
   testImplementation(libs.roborazzi)
@@ -179,5 +181,4 @@ dependencies {
   debugImplementation(libs.androidx.compose.ui.test.manifest)
   debugImplementation(libs.androidx.compose.ui.tooling)
   "ksp"(libs.androidx.room.compiler)
-  "ksp"(libs.moshi.kotlin.codegen)
 }

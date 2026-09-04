@@ -604,7 +604,7 @@ fun SettingsScreen(
                             )
                             val amPm = if (notificationHour >= 12) "PM" else "AM"
                             val displayHour = if (notificationHour % 12 == 0) 12 else notificationHour % 12
-                            val timeString = String.format("%02d:%02d %s", displayHour, notificationMinute, amPm)
+                            val timeString = String.format(java.util.Locale.getDefault(), "%02d:%02d %s", displayHour, notificationMinute, amPm)
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
                                     text = LanguageManager.getString("समय: $timeString", "Time: $timeString"),
@@ -1037,6 +1037,62 @@ fun SettingsScreen(
                             }
                         }
                     }
+
+                    // Ad privacy options.
+                    //
+                    // AdConsentManager has had showPrivacyOptions and
+                    // isPrivacyOptionsRequired since UMP was added, and its own doc
+                    // comment says "the Settings entry should only appear then" —
+                    // but that entry was never built, so neither function had a
+                    // single call site. Consent was gathered once on first launch
+                    // and could never be changed again. Google's UMP policy requires
+                    // an ongoing way to reopen the form wherever the requirement
+                    // status is REQUIRED, so serving the EEA/UK without this was a
+                    // policy violation as well as a GDPR withdrawal gap.
+                    //
+                    // UMP reports REQUIRED only where the user's region gives them
+                    // that ongoing right, so this row is invisible in India.
+                    val privacyActivity = remember(context) { context.findActivity() }
+                    if (privacyActivity != null &&
+                        com.example.service.AdConsentManager.isPrivacyOptionsRequired(privacyActivity)
+                    ) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(MaterialTheme.colorScheme.surfaceVariant)
+                                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
+                                .clickable {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    com.example.service.AdConsentManager.showPrivacyOptions(privacyActivity)
+                                }
+                                .padding(vertical = 10.dp, horizontal = 8.dp)
+                                .testTag("settings_ad_privacy_button"),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Default.PrivacyTip,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.secondary,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = LanguageManager.getString(
+                                        "विज्ञापन गोपनीयता विकल्प",
+                                        "Ad privacy options"
+                                    ),
+                                    style = MaterialTheme.typography.labelMedium.copy(
+                                        color = MaterialTheme.colorScheme.secondary,
+                                        fontWeight = FontWeight.Normal,
+                                        fontSize = 12.sp
+                                    )
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -1170,7 +1226,7 @@ fun SettingsScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(horoscopes) { rashi ->
+                        items(horoscopes, key = { it.rashiId }) { rashi ->
                             val isSelected = (rashi.rashiId == selectedRashiId)
                             Box(
                                 modifier = Modifier
@@ -1252,7 +1308,7 @@ fun SettingsScreen(
                     Spacer(modifier = Modifier.height(10.dp))
 
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        items(filteredCities.size) { idx ->
+                        items(filteredCities.size, key = { filteredCities[it].cityName }) { idx ->
                             val city = filteredCities[idx]
                             val isSelected = (city.cityName == selectedCity.cityName)
                             Row(
@@ -1493,4 +1549,18 @@ private fun ProBenefitRow(text: String) {
             )
         )
     }
+}
+
+/**
+ * Walks up the ContextWrapper chain to the hosting Activity.
+ *
+ * LocalContext.current inside Compose is usually a ContextWrapper rather than the
+ * Activity itself, so a plain `as? Activity` returns null on some devices and the
+ * ad privacy row would silently never appear — which is the exact bug this row
+ * exists to fix.
+ */
+private tailrec fun android.content.Context.findActivity(): android.app.Activity? = when (this) {
+    is android.app.Activity -> this
+    is android.content.ContextWrapper -> baseContext.findActivity()
+    else -> null
 }

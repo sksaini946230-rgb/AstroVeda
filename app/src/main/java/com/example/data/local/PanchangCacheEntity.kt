@@ -1,9 +1,10 @@
 package com.example.data.local
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "panchang_cache")
+@Entity(tableName = "panchang_cache", indices = [Index(value = ["cachedAtTimestamp"])])
 data class PanchangCacheEntity(
     @PrimaryKey val cacheKey: String,
     val dateString: String,
@@ -41,5 +42,16 @@ data class PanchangCacheEntity(
     val locationName: String,
     val latitude: Double,
     val longitude: Double,
+    /**
+     * The planet list, serialised.
+     *
+     * This column did not exist, so a cache hit had no planets to return and
+     * AstroCacheRepository re-ran the whole ephemeris just to fetch them — every
+     * hit cost a database read *plus* a full recompute, which made the cache
+     * slower than no cache at all. The comment there blamed
+     * fallbackToDestructiveMigration for making a column impossible; that stopped
+     * being true when real migrations landed, and nobody came back to it.
+     */
+    val planetsJson: String = "",
     val cachedAtTimestamp: Long = System.currentTimeMillis()
 )

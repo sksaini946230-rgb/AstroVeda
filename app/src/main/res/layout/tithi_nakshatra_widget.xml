@@ -51,6 +51,7 @@
         android:layout_marginBottom="8dp">
 
         <TextView
+                android:id="@+id/widget_label_tithi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="CURRENT TITHI / तिथि"
@@ -89,6 +90,7 @@
         android:layout_marginBottom="8dp">
 
         <TextView
+                android:id="@+id/widget_label_nakshatra"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="CURRENT NAKSHATRA / नक्षत्र"

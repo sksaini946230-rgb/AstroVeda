@@ -298,7 +298,7 @@ fun NumerologyScreen(viewModel: MainViewModel) {
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                items(quickQuestions) { q ->
+                items(quickQuestions, key = { it }) { q ->
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(20.dp))

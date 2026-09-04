@@ -62,7 +62,7 @@ fun RecentSearchesComponent(
             contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(recentSearches) { search ->
+            items(recentSearches, key = { it.id }) { search ->
                 val label = labelFor(search)
                 GlassCard(
                     modifier = Modifier

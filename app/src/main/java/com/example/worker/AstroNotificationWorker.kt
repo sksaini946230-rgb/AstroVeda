@@ -23,10 +23,11 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import kotlinx.coroutines.CancellationException
 import com.example.MainActivity
 import com.example.astro.PanchangCalculator
 import com.example.astro.RashifalProvider
-import com.example.data.model.CityLocation
+import com.example.data.local.CityPreferences
 import java.util.Date
 import java.util.concurrent.TimeUnit
 
@@ -48,8 +49,12 @@ class AstroNotificationWorker(
                 return
             }
 
-            val hour = sharedPrefs.getInt("notification_hour", 6) // Default to 6 AM for Panchang
-            val minute = sharedPrefs.getInt("notification_minute", 30)
+            // These defaults have to match the ones MainViewModel shows in
+            // Settings for the same two keys. They did not: Settings said 7:00
+            // and the worker scheduled 6:30, so a user who never touched the
+            // setting was woken half an hour before the time the app showed them.
+            val hour = sharedPrefs.getInt("notification_hour", 7)
+            val minute = sharedPrefs.getInt("notification_minute", 0)
 
             val calendar = java.util.Calendar.getInstance()
             val now = calendar.timeInMillis
@@ -89,14 +94,8 @@ class AstroNotificationWorker(
             
             // Get location from preferences
             val sharedPrefs = context.getSharedPreferences("astroveda_prefs", Context.MODE_PRIVATE)
-            val lat = sharedPrefs.getFloat("city_lat", 26.9124f).toDouble()
-            val lon = sharedPrefs.getFloat("city_lon", 75.7873f).toDouble()
-            val name = sharedPrefs.getString("city_name", "Jaipur") ?: "Jaipur"
-            val nameHi = sharedPrefs.getString("city_name_hi", "जयपुर") ?: "जयपुर"
-            val state = sharedPrefs.getString("city_state", "Rajasthan") ?: "Rajasthan"
-            val userCity = CityLocation(name, nameHi, state, lat, lon)
-
-            val use24Hour = sharedPrefs.getBoolean("use_24_hour_format", false)
+            val userCity = CityPreferences.read(context)
+            val use24Hour = CityPreferences.use24Hour(context)
             val panchang = PanchangCalculator.calculatePanchang(Date(), userCity, use24Hour)
             val moonPhase = PanchangCalculator.getMoonPhaseInfo(panchang.pakshaHindi, panchang.tithiHindi)
 
@@ -131,9 +130,24 @@ class AstroNotificationWorker(
             )
 
             showNotification(title, content, bigText)
+
+            // Nothing else in the app ever called deleteExpiredCache, so cache
+            // rows accumulated for the life of the install. This job already runs
+            // once a day, which is exactly the cadence the eviction wants.
+            runCatching {
+                com.example.data.local.DatabaseProvider
+                    .getAstroCacheRepository(context)
+                    .pruneExpired()
+            }
+
             Result.success()
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            Result.retry()
+            // retry() for everything meant a permanent failure — a bug in the
+            // calculator, say — retried with backoff forever. Only a genuinely
+            // transient failure earns a retry.
+            if (e is java.io.IOException) Result.retry() else Result.failure()
         }
     }
 
@@ -179,7 +193,10 @@ class AstroNotificationWorker(
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
             .setCategory(NotificationCompat.CATEGORY_REMINDER)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            // PUBLIC put the user's rashi and their horoscope reading on the lock
+            // screen, where anyone holding the phone can read it. PRIVATE keeps
+            // the notification visible but hides the content until unlock.
+            .setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
             .build()
 
         notificationManager.notify(1001, notification)

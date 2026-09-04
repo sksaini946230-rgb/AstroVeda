@@ -31,16 +31,15 @@ class AstroCacheRepository(
         if (!forceRefresh) {
             val cached = panchangCacheDao.getCachedPanchang(cacheKey)
             if (cached != null && (now - cached.cachedAtTimestamp) < SEVEN_DAYS_MS) {
-                // The cache table has no column for the planet list, so a cached
-                // read used to hand back planets = emptyList() and the whole
-                // "ग्रह स्थिति" section rendered as a blank card. Adding a column
-                // is not an option here — this database uses
-                // fallbackToDestructiveMigration(dropAllTables = true), so a
-                // version bump would take every saved birth profile with it.
-                // Recomputing is cheap and entirely on-device.
-                val planets = com.example.astro.PanchangCalculator
-                    .calculatePanchang(date, city, use24Hour).planets
-                return@withContext PanchangData(
+                // A hit used to re-run the entire ephemeris here, purely to
+                // recover the planet list, and then throw the rest of that
+                // result away — so a "cache hit" cost a database read plus a
+                // full recompute, which is strictly worse than no cache. The
+                // planets live in the row now (schema 6). A row written before
+                // that migration decodes to an empty list, so fall through and
+                // recompute once rather than render a blank ग्रह स्थिति card.
+                val planets = PlanetsCodec.decode(cached.planetsJson)
+                if (planets.isNotEmpty()) return@withContext PanchangData(
                     planets = planets,
                     dateString = cached.dateString,
                     dayOfWeek = cached.dayOfWeek,
@@ -122,6 +121,7 @@ class AstroCacheRepository(
             locationName = freshPanchang.locationName,
             latitude = freshPanchang.latitude,
             longitude = freshPanchang.longitude,
+            planetsJson = PlanetsCodec.encode(freshPanchang.planets),
             cachedAtTimestamp = now
         )
         panchangCacheDao.insertPanchangCache(entity)
@@ -224,4 +224,19 @@ class AstroCacheRepository(
     }
 
     private fun entityFieldOr(value: String?): String = value ?: ""
+
+    /**
+     * Drops cache rows past their seven days.
+     *
+     * Both DAOs have had a deleteExpiredCache query since the cache was written
+     * and nothing ever called either of them, so every distinct
+     * (date, city, clock-format) combination left a row behind for good — a daily
+     * user accumulated a few hundred dead rows a year, all of them scanned by the
+     * very DELETE that was never run. The daily notification worker calls this.
+     */
+    suspend fun pruneExpired(now: Long = System.currentTimeMillis()) = withContext(ioDispatcher) {
+        val cutoff = now - SEVEN_DAYS_MS
+        panchangCacheDao.deleteExpiredCache(cutoff)
+        horoscopeCacheDao.deleteExpiredCache(cutoff)
+    }
 }

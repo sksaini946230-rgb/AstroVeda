@@ -212,7 +212,15 @@ fun ErrorStateUI(
                 )
             }
 
-            // Optional Expandable Technical Debugger Section
+            // Expandable technical details — debug builds only.
+            //
+            // This printed a full Java stack trace to the end user in production.
+            // R8 obfuscates class names, but proguard-rules.pro keeps SourceFile
+            // and LineNumberTable for Crashlytics, so the trace showed real file
+            // names and line numbers — and error.message carried whatever Firebase
+            // put in it. Nothing a user can act on, and a free map of the app for
+            // anyone who cannot be bothered to decompile it.
+            if (app.revati.jyotish.BuildConfig.DEBUG) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -292,6 +300,7 @@ fun ErrorStateUI(
                         }
                     }
                 }
+            }
             }
         }
     }

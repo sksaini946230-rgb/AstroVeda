@@ -467,7 +467,7 @@ fun CalendarScreen(viewModel: MainViewModel) {
         }
 
         // Festivals List
-        items(filteredFestivals) { festival ->
+        items(filteredFestivals, key = { it.id }) { festival ->
             FestivalCard(
                 festival = festival,
                 onClick = { selectedFestivalDetail = festival }

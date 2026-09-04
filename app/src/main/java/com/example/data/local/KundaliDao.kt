@@ -19,6 +19,10 @@ interface KundaliDao {
     @Query("SELECT * FROM saved_kundali_profiles WHERE id = :id LIMIT 1")
     fun getProfileById(id: Long): Flow<KundaliEntity?>
 
+    /** Looks a profile up by the identity that survives a device change. */
+    @Query("SELECT * FROM saved_kundali_profiles WHERE uuid = :uuid LIMIT 1")
+    suspend fun getProfileByUuid(uuid: String): KundaliEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProfile(profile: KundaliEntity): Long
 

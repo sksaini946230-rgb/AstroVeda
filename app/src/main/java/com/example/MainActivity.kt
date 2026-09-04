@@ -128,11 +128,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Restore the user's language before anything composes, or the first frame
-        // renders in Hindi regardless of what they chose during onboarding.
-        com.example.util.LanguageManager.init(applicationContext)
-
-        com.example.service.AppCheckInitializer.install()
+        // Language and App Check are initialised in RevatiApp.onCreate, which runs
+        // for every process entry — workers and widgets included, which this did
+        // not cover.
 
         try {
             com.example.util.AstroAnalytics.init(applicationContext)

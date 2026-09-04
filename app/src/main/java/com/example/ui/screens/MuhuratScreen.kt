@@ -183,7 +183,7 @@ fun MuhuratScreen(viewModel: MainViewModel) {
         }
 
         // Muhurat List
-        items(muhurats) { item ->
+        items(muhurats, key = { it.id }) { item ->
             EventMuhuratCard(item)
         }
 

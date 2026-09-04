@@ -276,7 +276,7 @@ fun TopHeaderBar(
                     // Premium PRO Badge
                     Surface(
                         onClick = {
-                            view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                            view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
                             onPremiumClick()
                         },
                         shape = RoundedCornerShape(16.dp),

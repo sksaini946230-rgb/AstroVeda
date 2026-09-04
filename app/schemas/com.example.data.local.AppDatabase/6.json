@@ -1,0 +1,671 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 6,
+    "identityHash": "b18fd3e1f86a548494fe9503a5205a32",
+    "entities": [
+      {
+        "tableName": "saved_kundali_profiles",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `uuid` TEXT NOT NULL, `name` TEXT NOT NULL, `gender` TEXT NOT NULL, `dateOfBirth` TEXT NOT NULL, `timeOfBirth` TEXT NOT NULL, `placeOfBirth` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `notes` TEXT NOT NULL, `createdAt` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uuid",
+            "columnName": "uuid",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gender",
+            "columnName": "gender",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateOfBirth",
+            "columnName": "dateOfBirth",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timeOfBirth",
+            "columnName": "timeOfBirth",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "placeOfBirth",
+            "columnName": "placeOfBirth",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_saved_kundali_profiles_uuid",
+            "unique": true,
+            "columnNames": [
+              "uuid"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_saved_kundali_profiles_uuid` ON `${TABLE_NAME}` (`uuid`)"
+          },
+          {
+            "name": "index_saved_kundali_profiles_createdAt",
+            "unique": false,
+            "columnNames": [
+              "createdAt"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_saved_kundali_profiles_createdAt` ON `${TABLE_NAME}` (`createdAt`)"
+          }
+        ]
+      },
+      {
+        "tableName": "panchang_cache",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`cacheKey` TEXT NOT NULL, `dateString` TEXT NOT NULL, `dayOfWeek` TEXT NOT NULL, `dayOfWeekHindi` TEXT NOT NULL, `vikramSamvat` INTEGER NOT NULL, `sakaSamvat` INTEGER NOT NULL, `masaName` TEXT NOT NULL, `masaNameHindi` TEXT NOT NULL, `paksha` TEXT NOT NULL, `pakshaHindi` TEXT NOT NULL, `tithi` TEXT NOT NULL, `tithiHindi` TEXT NOT NULL, `tithiEndTime` TEXT NOT NULL, `tithiProgressPercent` REAL NOT NULL, `nakshatra` TEXT NOT NULL, `nakshatraHindi` TEXT NOT NULL, `nakshatraEndTime` TEXT NOT NULL, `nakshatraPada` INTEGER NOT NULL, `yoga` TEXT NOT NULL, `yogaHindi` TEXT NOT NULL, `karan` TEXT NOT NULL, `karanHindi` TEXT NOT NULL, `sunrise` TEXT NOT NULL, `sunset` TEXT NOT NULL, `moonrise` TEXT NOT NULL, `moonset` TEXT NOT NULL, `rahuKaal` TEXT NOT NULL, `gulikaKaal` TEXT NOT NULL, `yamaganda` TEXT NOT NULL, `abhijitMuhurat` TEXT NOT NULL, `brahmaMuhurat` TEXT NOT NULL, `sunSign` TEXT NOT NULL, `moonSign` TEXT NOT NULL, `locationName` TEXT NOT NULL, `latitude` REAL NOT NULL, `longitude` REAL NOT NULL, `planetsJson` TEXT NOT NULL, `cachedAtTimestamp` INTEGER NOT NULL, PRIMARY KEY(`cacheKey`))",
+        "fields": [
+          {
+            "fieldPath": "cacheKey",
+            "columnName": "cacheKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateString",
+            "columnName": "dateString",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dayOfWeek",
+            "columnName": "dayOfWeek",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dayOfWeekHindi",
+            "columnName": "dayOfWeekHindi",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "vikramSamvat",
+            "columnName": "vikramSamvat",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sakaSamvat",
+            "columnName": "sakaSamvat",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "masaName",
+            "columnName": "masaName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "masaNameHindi",
+            "columnName": "masaNameHindi",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "paksha",
+            "columnName": "paksha",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pakshaHindi",
+            "columnName": "pakshaHindi",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tithi",
+            "columnName": "tithi",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tithiHindi",
+            "columnName": "tithiHindi",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tithiEndTime",
+            "columnName": "tithiEndTime",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tithiProgressPercent",
+            "columnName": "tithiProgressPercent",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nakshatra",
+            "columnName": "nakshatra",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nakshatraHindi",
+            "columnName": "nakshatraHindi",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nakshatraEndTime",
+            "columnName": "nakshatraEndTime",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nakshatraPada",
+            "columnName": "nakshatraPada",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "yoga",
+            "columnName": "yoga",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "yogaHindi",
+            "columnName": "yogaHindi",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "karan",
+            "columnName": "karan",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "karanHindi",
+            "columnName": "karanHindi",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sunrise",
+            "columnName": "sunrise",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sunset",
+            "columnName": "sunset",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "moonrise",
+            "columnName": "moonrise",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "moonset",
+            "columnName": "moonset",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rahuKaal",
+            "columnName": "rahuKaal",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gulikaKaal",
+            "columnName": "gulikaKaal",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "yamaganda",
+            "columnName": "yamaganda",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "abhijitMuhurat",
+            "columnName": "abhijitMuhurat",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "brahmaMuhurat",
+            "columnName": "brahmaMuhurat",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sunSign",
+            "columnName": "sunSign",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "moonSign",
+            "columnName": "moonSign",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "locationName",
+            "columnName": "locationName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "latitude",
+            "columnName": "latitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "longitude",
+            "columnName": "longitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "planetsJson",
+            "columnName": "planetsJson",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cachedAtTimestamp",
+            "columnName": "cachedAtTimestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "cacheKey"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_panchang_cache_cachedAtTimestamp",
+            "unique": false,
+            "columnNames": [
+              "cachedAtTimestamp"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_panchang_cache_cachedAtTimestamp` ON `${TABLE_NAME}` (`cachedAtTimestamp`)"
+          }
+        ]
+      },
+      {
+        "tableName": "horoscope_cache",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`cacheKey` TEXT NOT NULL, `rashiId` INTEGER NOT NULL, `rashiNameEn` TEXT NOT NULL, `rashiNameHi` TEXT NOT NULL, `symbol` TEXT NOT NULL, `elementHi` TEXT NOT NULL, `rulerHi` TEXT NOT NULL, `ratingStars` INTEGER NOT NULL, `luckyNumber` INTEGER NOT NULL, `luckyColorEn` TEXT NOT NULL, `luckyColorHi` TEXT NOT NULL, `luckyStoneHi` TEXT NOT NULL, `luckyTimeHi` TEXT NOT NULL, `luckyTimeEn` TEXT NOT NULL, `generalReadingHi` TEXT NOT NULL, `generalReadingEn` TEXT NOT NULL, `careerReadingHi` TEXT NOT NULL, `careerReadingEn` TEXT NOT NULL, `healthReadingHi` TEXT NOT NULL, `healthReadingEn` TEXT NOT NULL, `loveReadingHi` TEXT NOT NULL, `loveReadingEn` TEXT NOT NULL, `financeReadingHi` TEXT NOT NULL, `financeReadingEn` TEXT NOT NULL, `period` TEXT NOT NULL, `cachedAtTimestamp` INTEGER NOT NULL, PRIMARY KEY(`cacheKey`))",
+        "fields": [
+          {
+            "fieldPath": "cacheKey",
+            "columnName": "cacheKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rashiId",
+            "columnName": "rashiId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rashiNameEn",
+            "columnName": "rashiNameEn",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rashiNameHi",
+            "columnName": "rashiNameHi",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "symbol",
+            "columnName": "symbol",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "elementHi",
+            "columnName": "elementHi",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rulerHi",
+            "columnName": "rulerHi",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ratingStars",
+            "columnName": "ratingStars",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "luckyNumber",
+            "columnName": "luckyNumber",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "luckyColorEn",
+            "columnName": "luckyColorEn",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "luckyColorHi",
+            "columnName": "luckyColorHi",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "luckyStoneHi",
+            "columnName": "luckyStoneHi",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "luckyTimeHi",
+            "columnName": "luckyTimeHi",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "luckyTimeEn",
+            "columnName": "luckyTimeEn",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "generalReadingHi",
+            "columnName": "generalReadingHi",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "generalReadingEn",
+            "columnName": "generalReadingEn",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "careerReadingHi",
+            "columnName": "careerReadingHi",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "careerReadingEn",
+            "columnName": "careerReadingEn",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "healthReadingHi",
+            "columnName": "healthReadingHi",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "healthReadingEn",
+            "columnName": "healthReadingEn",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "loveReadingHi",
+            "columnName": "loveReadingHi",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "loveReadingEn",
+            "columnName": "loveReadingEn",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "financeReadingHi",
+            "columnName": "financeReadingHi",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "financeReadingEn",
+            "columnName": "financeReadingEn",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "period",
+            "columnName": "period",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cachedAtTimestamp",
+            "columnName": "cachedAtTimestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "cacheKey"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_horoscope_cache_period",
+            "unique": false,
+            "columnNames": [
+              "period"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_horoscope_cache_period` ON `${TABLE_NAME}` (`period`)"
+          },
+          {
+            "name": "index_horoscope_cache_cachedAtTimestamp",
+            "unique": false,
+            "columnNames": [
+              "cachedAtTimestamp"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_horoscope_cache_cachedAtTimestamp` ON `${TABLE_NAME}` (`cachedAtTimestamp`)"
+          }
+        ]
+      },
+      {
+        "tableName": "saved_astrology_reports",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `reportType` TEXT NOT NULL, `profileName` TEXT NOT NULL, `summaryText` TEXT NOT NULL, `detailedJsonData` TEXT NOT NULL, `createdAt` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reportType",
+            "columnName": "reportType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "profileName",
+            "columnName": "profileName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "summaryText",
+            "columnName": "summaryText",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "detailedJsonData",
+            "columnName": "detailedJsonData",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_saved_astrology_reports_reportType",
+            "unique": false,
+            "columnNames": [
+              "reportType"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_saved_astrology_reports_reportType` ON `${TABLE_NAME}` (`reportType`)"
+          },
+          {
+            "name": "index_saved_astrology_reports_createdAt",
+            "unique": false,
+            "columnNames": [
+              "createdAt"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_saved_astrology_reports_createdAt` ON `${TABLE_NAME}` (`createdAt`)"
+          }
+        ]
+      },
+      {
+        "tableName": "recent_searches",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `data` TEXT NOT NULL, `createdAt` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "data",
+            "columnName": "data",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_recent_searches_createdAt",
+            "unique": false,
+            "columnNames": [
+              "createdAt"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_recent_searches_createdAt` ON `${TABLE_NAME}` (`createdAt`)"
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b18fd3e1f86a548494fe9503a5205a32')"
+    ]
+  }
+}
