@@ -246,6 +246,30 @@ sideways the sub-tab header and bottom nav leave roughly 250dp of content, the
 banner lands mid-screen, and some screens cannot be scrolled to their end. It is
 usable but not good, and it has never been a design pass of its own.
 
+**The Dependabot count is about the build, not the app.** GitHub reports 50
+vulnerabilities on the default branch and the number is alarming until you look
+at where they are. Checking every dependency by name against OSV:
+
+    277 libraries that ship inside the APK   ->  0 vulnerable
+    147 build-time libraries (Gradle plugins) ->  6 vulnerable, 7 advisories
+
+The six are bcprov-jdk18on, bcpkix-jdk18on, commons-lang3, jose4j, jdom2 and the
+Kotlin Gradle plugin — all of them pulled in by Gradle plugins, all of them
+running on the build machine and on the CI runner, none of them present in the
+APK. The threat they describe is someone compromising a build, not a user's
+phone.
+
+The count does not reconcile: this scan finds 7 advisories where GitHub counts
+50. The likely reason is that Automatic dependency submission reports a graph
+per build variant, so one advisory is counted several times — but that is a
+guess and has not been confirmed against GitHub's own list. What *is* confirmed
+is the half that matters: nothing that reaches a user is vulnerable.
+
+Keeping AGP, Kotlin and KSP current pulls newer versions of all six in time.
+Reproduce with `./gradlew :app:dependencies --configuration releaseRuntimeClasspath`
+and `./gradlew buildEnvironment`, then post the resolved coordinates to
+`https://api.osv.dev/v1/querybatch`.
+
 **minSdk is 24 and there is no core library desugaring.** `java.time` is off
 limits in `app/`. Lint catches it; it once got as far as a crash-on-Android-7
 before that. Use `java.util.Calendar` or parse strings.
