@@ -292,12 +292,43 @@ All six fingerprints are registered on `com.aistudio.astroveda.kpvqzm` now:
 
 | Key | SHA-1 |
 |---|---|
-| Play app signing (what users present) | `B7:D1:DE:10:DD:F3:5E:FD:56:27:99:FA:F6:C4:D1:D0:38:B4:5C:C5` |
+| Play app signing (what users present) | see below — **the value that used to be here is stale** |
 | Upload key | `77:D9:C2:35:B4:EB:2D:47:8E:89:DB:27:41:A8:D7:E2:06:9A:40:81` |
 | Debug | `D3:46:B8:A4:61:5B:85:6A:4F:AF:5B:F2:64:D2:01:47:2B:F2:31:E1` |
 
-Play app signing SHA-256 (App Check / Play Integrity):
-`0A:5D:A6:36:17:4B:F6:4A:88:0D:64:1A:89:2C:C6:0C:B6:B9:8F:BF:51:4A:CD:41:82:32:06:E8:D5:D8:4B:6A`
+The upload and debug values above were re-derived from the keystores
+themselves (`keytool -list -v`) and are correct.
+
+**The Play app signing key was upgraded on 25 Aug 2026**, and this file went on
+recording the old one. Play Console → App signing now shows a *Classical key*, a
+*Post-quantum cryptography key*, and a **Previous app signing keys** section
+first used 25 Aug 2026 — which is what the old
+`B7:D1:DE:10:DD:F3:5E:FD:56:27:99:FA:F6:C4:D1:D0:38:B4:5C:C5` was. Pulling the
+APK Play actually serves and reading its certificate gave
+
+    SHA-1    FB:3F:D2:6B:05:B8:71:4E:8B:2D:DB:E5:DB:67:AF:FE:B5:96:52:2F
+    SHA-256  9A:42:6C:10:AD:96:C7:69:0E:A3:FC:4B:62:DC:99:34:BE:E5:DF:C6:D0:95:8D:93:B4:55:E7:EF:7D:9F:49:B9
+
+and the SHA-256 there matches what the console shows. Before registering these
+anywhere, copy them from Play Console → App signing rather than from here: there
+are now several certificates (classical, post-quantum, previous) and a user's
+install may present any of them.
+
+**The Firebase API key has no application restriction.** GitHub secret scanning
+flags `app/google-services.json`, and the honest reading is that the key in it
+is not a password — it ships inside every APK and anyone can read it out of a
+Play download. What matters is what the key is allowed to do, and Google Cloud
+Console → Credentials → *Android key (auto created by Firebase)* currently says
+
+    Action recommended: This key can currently be used with any application.
+    Application restrictions: None
+
+with API restrictions set to 25 APIs, among them Firebase AI Logic and Identity
+Toolkit. So anyone holding the key can call those from anywhere, billed here.
+The fix is Application restrictions → Android apps with the package name and
+**every** SHA-1 above, and it wants a device in hand: get the list wrong and the
+app's AI and Google Sign-In both stop working. Reverting to None is instant if
+they do.
 
 Find these under Play Console → Test and release → **App signing**. Adding a
 fingerprint takes effect server-side — no new release needed.
