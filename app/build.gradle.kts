@@ -11,6 +11,40 @@ plugins {
   alias(libs.plugins.google.firebase.crashlytics)
 }
 
+// Signing credentials are read here, but nothing is *required* here.
+//
+// These used to be `?: error(...)`, which runs at configuration time — so a
+// missing STORE_PASSWORD failed every Gradle invocation, including
+// `testDebugUnitTest`, on any machine without the real .env. That is CI (where
+// .env is the example file by design, and must never hold a signing password)
+// and it is anyone else who clones the repo. A release-only requirement was
+// being enforced on every task. Missing credentials now leave the release
+// signing config unconfigured, and the check moves to the release build itself,
+// below, where it can actually be about a release.
+val signingEnv = Properties().apply {
+  val f = rootProject.file(".env")
+  if (f.exists()) f.inputStream().use { load(it) }
+}
+fun signingValue(name: String): String? =
+  System.getenv(name) ?: signingEnv.getProperty(name)?.takeIf { it.isNotBlank() }
+
+// KEYSTORE_PATH used to be read from the environment only, and fell back to
+// astroveda-upload-key.jks — the key Play stopped accepting. .env pointed at
+// the live keystore and was ignored, so a release build signed itself with a
+// dead key. The fallback is now the keystore Play actually accepts.
+val releaseKeystore = file(signingValue("KEYSTORE_PATH") ?: "${rootDir}/upload-keystore.jks")
+val releaseStorePassword = signingValue("STORE_PASSWORD")
+val releaseKeyAlias = signingValue("KEY_ALIAS")
+val releaseKeyPassword = signingValue("KEY_PASSWORD")
+val canSignRelease = releaseKeystore.exists() &&
+  releaseStorePassword != null && releaseKeyAlias != null && releaseKeyPassword != null
+
+// The debug keystore is gitignored, so it is absent on CI and on a fresh
+// clone. Falling back to the one AGP generates keeps those builds working;
+// the checked-in keystore is only interesting locally, because its SHA-1 is
+// the one registered in Firebase for Google Sign-In from debug builds.
+val debugKeystore = file("${rootDir}/debug.keystore")
+
 android {
   // The Kotlin sources still live under com.example; this is the applicationId
   // namespace, which is what R and BuildConfig are generated into.
@@ -39,27 +73,23 @@ android {
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 
+
   signingConfigs {
     create("release") {
-      val envProps = Properties().apply { val f = rootProject.file(".env"); if (f.exists()) f.inputStream().use { load(it) } }
-      // KEYSTORE_PATH used to be read from the environment only, and fell back to
-      // astroveda-upload-key.jks — the key Play stopped accepting. .env pointed at
-      // the live keystore and was ignored, so a release build signed itself with a
-      // dead key (or, as it happened, failed on the wrong key's password). The
-      // fallback is now the keystore Play actually accepts.
-      val keystorePath = System.getenv("KEYSTORE_PATH")
-        ?: envProps.getProperty("KEYSTORE_PATH")
-        ?: "${rootDir}/upload-keystore.jks"
-      storeFile = file(keystorePath)
-      storePassword = System.getenv("STORE_PASSWORD") ?: envProps.getProperty("STORE_PASSWORD") ?: error("STORE_PASSWORD is required (.env or environment variable) for release build")
-      keyAlias = System.getenv("KEY_ALIAS") ?: envProps.getProperty("KEY_ALIAS") ?: error("KEY_ALIAS is required (.env or environment variable) for release build")
-      keyPassword = System.getenv("KEY_PASSWORD") ?: envProps.getProperty("KEY_PASSWORD") ?: error("KEY_PASSWORD is required (.env or environment variable) for release build")
+      if (canSignRelease) {
+        storeFile = releaseKeystore
+        storePassword = releaseStorePassword
+        keyAlias = releaseKeyAlias
+        keyPassword = releaseKeyPassword
+      }
     }
-    create("debugConfig") {
-      storeFile = file("${rootDir}/debug.keystore")
-      storePassword = "android"
-      keyAlias = "androiddebugkey"
-      keyPassword = "android"
+    if (debugKeystore.exists()) {
+      create("debugConfig") {
+        storeFile = debugKeystore
+        storePassword = "android"
+        keyAlias = "androiddebugkey"
+        keyPassword = "android"
+      }
     }
   }
 
@@ -69,7 +99,9 @@ android {
       isMinifyEnabled = true
       isShrinkResources = true
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-      signingConfig = signingConfigs.getByName("release")
+      // Unsigned rather than half-signed when credentials are absent; the check
+      // below turns that into a clear failure if a release is actually asked for.
+      if (canSignRelease) signingConfig = signingConfigs.getByName("release")
       // Play warns on upload: "This App Bundle contains native code, and you've
       // not uploaded debug symbols."
       //
@@ -89,7 +121,9 @@ android {
       // warning itself is advisory and does not block a release.
       ndk { debugSymbolLevel = "SYMBOL_TABLE" }
     }
-    debug { signingConfig = signingConfigs.getByName("debugConfig") }
+    debug {
+      if (debugKeystore.exists()) signingConfig = signingConfigs.getByName("debugConfig")
+    }
   }
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_11
@@ -199,4 +233,26 @@ dependencies {
   debugImplementation(libs.androidx.compose.ui.test.manifest)
   debugImplementation(libs.androidx.compose.ui.tooling)
   "ksp"(libs.androidx.room.compiler)
+}
+
+// A release asked for without signing credentials would otherwise produce an
+// unsigned bundle, which Play rejects after the upload rather than before it.
+// The configuration-time `error(...)` that used to guard this broke every other
+// task instead; this fires only when a release is actually in the task graph.
+gradle.taskGraph.whenReady {
+  val wantsRelease = allTasks.any { t ->
+    t.name.contains("Release") &&
+      (t.name.startsWith("assemble") || t.name.startsWith("bundle") || t.name.startsWith("publish"))
+  }
+  if (wantsRelease && !canSignRelease) {
+    throw GradleException(
+      "This is a release build and it cannot be signed.\n" +
+        "  keystore: ${releaseKeystore.path} (exists: ${releaseKeystore.exists()})\n" +
+        "  STORE_PASSWORD set: ${releaseStorePassword != null}\n" +
+        "  KEY_ALIAS set: ${releaseKeyAlias != null}\n" +
+        "  KEY_PASSWORD set: ${releaseKeyPassword != null}\n" +
+        "Set these in .env or the environment. Debug builds and unit tests do " +
+        "not need them and will run without."
+    )
+  }
 }
