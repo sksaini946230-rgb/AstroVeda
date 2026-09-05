@@ -444,6 +444,28 @@ Google + email sign-in, AdMob with UMP consent, App Check via Play Integrity.
 
 Not working / not finished:
 
+- **The Firebase API key has no application restriction — do this with a device
+  in hand.** Google Cloud Console → Credentials → *Android key (auto created by
+  Firebase)* says "This key can currently be used with any application", while
+  its 25 permitted APIs include Firebase AI Logic and Identity Toolkit. Anyone
+  holding the key — and it is inside every APK — can call those from anywhere,
+  billed here. The steps, in order:
+
+  1. Play Console → **App signing**: copy *every* SHA-1 — classical,
+     post-quantum, and the previous key under "Previous app signing keys".
+     Installs from before the 25 Aug 2026 key upgrade still present the old one.
+  2. Cloud Console → Android key → **Application restrictions → Android apps**.
+  3. Add package `com.aistudio.astroveda.kpvqzm` with each SHA-1, and the debug
+     SHA-1 too if debug builds should keep working.
+  4. Wait five minutes, then on a device check **the AI answer and Google
+     Sign-In**. Those are the two that break first.
+  5. Anything broken: set Application restrictions back to **None**. It takes
+     effect in minutes.
+
+  Deliberately not done in the same pass that found it: an incomplete SHA-1 list
+  takes down AI and sign-in, and the failure does not say why.
+
+
 - **PRO subscription cannot exist yet.** Play Console refuses the Subscriptions
   page until a Google Payments merchant account is set up. Until then the PRO
   button leads nowhere. Product id the app queries:
