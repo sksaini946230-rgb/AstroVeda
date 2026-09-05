@@ -187,12 +187,29 @@ quota one user can exhaust for everyone.
 
 **Analytics were almost entirely unwired.** `AstroAnalytics` has eighteen logging
 methods; `init` and `logAppOpen` were the only two ever called, so the live app
-recorded app opens and nothing else — no screen views, no feature use, no login
-or purchase outcomes. Screen views, onboarding completion, horoscope views,
-kundali generation, guna matching, numerology and AI queries are wired now.
-Still unwired, and worth doing: `logLogin`, the three purchase events,
-`logShareEvent`, and `recordNonFatal`. `AstroFeatureFlags` has zero call sites
-and is the same pattern.
+recorded app opens and nothing else. All of them are wired now — screen views,
+onboarding, horoscope views, kundali, matching, numerology, AI queries, login on
+all four paths, the three purchase outcomes, and sharing.
+
+`recordNonFatal` in particular now sits on every data path that can lose or fail
+to save a profile: background backup, cloud backup, sync, local wipe, export,
+import, account deletion. They were calling `Log.e` and stopping, which means
+nobody ever learned it happened — the test device records nothing below `E`, and
+no one reads a stranger's logcat.
+
+`AstroFeatureFlags` was the same dead pattern and is **deleted**. Its own doc
+called it a "Remote Kill-Switch & Soft Launch Feature Flag Engine"; it had zero
+call sites, no remote source at all (every flag a hardcoded default), and a
+support address, `support@astroveda.app`, that is not the one the app or the Play
+listing uses. A real kill switch needs a real remote source and is its own piece
+of work.
+
+Not every silent `catch` is a bug, and the count is misleading. The ones in
+`AstroAnalytics` are correct — analytics must never crash the app, and an
+analytics failure cannot be reported through analytics. The ones in `onCleared`,
+in ads/consent init, and around an external browser that may not exist are
+correct too. The user-facing data paths already reported failures in both
+languages before this pass; what they lacked was telling *the developer*.
 
 **minSdk is 24 and there is no core library desugaring.** `java.time` is off
 limits in `app/`. Lint catches it; it once got as far as a crash-on-Android-7
