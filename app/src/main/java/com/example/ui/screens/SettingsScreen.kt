@@ -927,7 +927,13 @@ fun SettingsScreen(
                                 )
                             )
                             Text(
-                                text = LanguageManager.getString("संस्करण 2026.1.0 • Meeus/ELP2000 खगोलीय गणना", "Version 2026.1.0 • Meeus/ELP2000 astronomical engine"),
+                                // Read from the build, not typed in. This said "2026.1.0" while the
+                                // app shipped as 1.4, so every user saw a version that matched no
+                                // release and support could not tell which build they were on.
+                                text = LanguageManager.getString(
+                                    "संस्करण ${app.revati.jyotish.BuildConfig.VERSION_NAME} (${app.revati.jyotish.BuildConfig.VERSION_CODE}) • Meeus/ELP2000 खगोलीय गणना",
+                                    "Version ${app.revati.jyotish.BuildConfig.VERSION_NAME} (${app.revati.jyotish.BuildConfig.VERSION_CODE}) • Meeus/ELP2000 astronomical engine"
+                                ),
                                 style = MaterialTheme.typography.bodySmall.copy(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     fontSize = 11.sp
@@ -960,7 +966,10 @@ fun SettingsScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = LanguageManager.getString("प्ले स्टोर पर 5★ रेटिंग दें", "Rate us 5★ on the Play Store"),
+                                // Not "5★". Asking for a particular rating is the kind of
+                                // manipulation Google Play's ratings policy prohibits, and this
+                                // app has already had two policy violations.
+                                text = LanguageManager.getString("प्ले स्टोर पर रेटिंग दें", "Rate this app on the Play Store"),
                                 style = MaterialTheme.typography.labelMedium.copy(
                                     color = MaterialTheme.colorScheme.primary,
                                     fontWeight = FontWeight.Normal,

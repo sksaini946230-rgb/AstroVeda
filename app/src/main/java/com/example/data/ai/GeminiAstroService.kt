@@ -144,29 +144,75 @@ object GeminiAstroService {
         null
     }
 
+    /**
+     * The answer when the model cannot be reached.
+     *
+     * It picks by keyword, and the keyword list used to be so narrow that the
+     * app's own suggested questions missed it. "When will I get a promotion at
+     * work?" — a chip the app puts in front of the user — carried neither
+     * "career" nor "job", so it fell through to the generic paragraph; so did
+     * the money chip, because there was no money branch at all. Three of the
+     * four suggestions returned one identical answer, which is how an offline
+     * user concluded the app says the same thing to everyone.
+     *
+     * Both languages have to be covered for each topic. The Hindi chip matched
+     * on नौकरी while its English twin matched nothing, so the same tap gave
+     * different-quality answers depending on the reader's language.
+     */
     fun getOfflineVedicResponse(question: String): String {
-        val qLower = question.lowercase()
+        val q = question.lowercase()
+        fun hits(vararg words: String) = words.any { q.contains(it) }
+
         return when {
-            qLower.contains("career") || qLower.contains("नौकरी") || qLower.contains("व्यापार") || qLower.contains("job") ->
-                LanguageManager.getString(
-                    "वैदिक ज्योतिष शास्त्र के अनुसार दशम भाव एवं कर्मेश ग्रह का अध्ययन आवश्यक है। सूर्य एवं गुरु ग्रह की स्थिति अनुकूल होने पर नौकरी में शीघ्र पदोन्नति एवं व्यापार में लाभ होता है। प्रतिदिन प्रातःकाल सूर्य देव को तांबे के पात्र से जल अर्पित करें (ॐ घृणिः सूर्याय नमः)।",
-                    "The 10th house and its lord are what to read here. A well-placed Sun and Jupiter bring promotion at work and gain in business. Offer water to the Sun each morning from a copper vessel, with the mantra Om Ghrini Suryaya Namah."
-                )
-            qLower.contains("marriage") || qLower.contains("विवाह") || qLower.contains("शादी") || qLower.contains("love") ->
-                LanguageManager.getString(
-                    "सप्तम भाव एवं शुक्र/गुरु ग्रह की शुभ दृष्टि वैवाहिक सुख का आधार है। यदि विवाह में विलम्ब हो रहा हो तो प्रत्येक गुरुवार को बेसन के लड्डू अथवा पीली वस्तु का दान करें तथा शिव-पार्वती जी का पूजन करें।",
-                    "The 7th house, with a benefic aspect from Venus or Jupiter, is the ground of a happy marriage. Where marriage is delayed, donate besan laddus or something yellow each Thursday and worship Shiva and Parvati."
-                )
-            qLower.contains("health") || qLower.contains("स्वास्थ्य") || qLower.contains("रोग") ->
-                LanguageManager.getString(
-                    "प्रथम भाव एवं लग्नेश ग्रह का बलवान होना निरोगी काया हेतु अनिवार्य है। महामृत्युंजय मन्त्र अथवा आदित्य हृदय स्तोत्र का पाठ करने से शारीरिक एवं मानसिक ऊर्जा में वृद्धि होती है।",
-                    "A strong 1st house and a strong lagna lord are what keep the body well. Reciting the Mahamrityunjaya mantra or the Aditya Hridaya Stotra lifts both physical and mental energy."
-                )
-            else ->
-                LanguageManager.getString(
-                    "ज्योतिष शास्त्र जीवन का मार्गदर्शन करता है। नवग्रह शांति हेतु प्रतिदिन प्रातः स्नानोपरांत 'ॐ नमो भगवते वासुदेवाय' मन्त्र का जप करें तथा अपने कुलदेवता व माता-पिता का आशीर्वाद प्राप्त करें।",
-                    "Jyotish points the way rather than fixing it. To settle the nine grahas, chant 'Om Namo Bhagavate Vasudevaya' each morning after bathing, and seek the blessing of your kuladevata and your parents."
-                )
+            hits(
+                "career", "job", "work", "promotion", "business", "salary",
+                "office", "employment", "profession",
+                "नौकरी", "व्यापार", "काम", "पदोन्नति", "वेतन", "कारोबार",
+                "रोजगार", "व्यवसाय"
+            ) -> LanguageManager.getString(
+                "वैदिक ज्योतिष शास्त्र के अनुसार दशम भाव एवं कर्मेश ग्रह का अध्ययन आवश्यक है। सूर्य एवं गुरु ग्रह की स्थिति अनुकूल होने पर नौकरी में शीघ्र पदोन्नति एवं व्यापार में लाभ होता है। प्रतिदिन प्रातःकाल सूर्य देव को तांबे के पात्र से जल अर्पित करें (ॐ घृणिः सूर्याय नमः)।",
+                "The 10th house and its lord are what to read here. A well-placed Sun and Jupiter bring promotion at work and gain in business. Offer water to the Sun each morning from a copper vessel, with the mantra Om Ghrini Suryaya Namah."
+            )
+
+            hits(
+                "marriage", "wedding", "love", "partner", "relationship",
+                "spouse", "romance",
+                "विवाह", "शादी", "प्रेम", "जीवनसाथी", "रिश्ता", "प्यार", "सगाई"
+            ) -> LanguageManager.getString(
+                "सप्तम भाव एवं शुक्र/गुरु ग्रह की शुभ दृष्टि वैवाहिक सुख का आधार है। यदि विवाह में विलम्ब हो रहा हो तो प्रत्येक गुरुवार को बेसन के लड्डू अथवा पीली वस्तु का दान करें तथा शिव-पार्वती जी का पूजन करें।",
+                "The 7th house, with a benefic aspect from Venus or Jupiter, is the ground of a happy marriage. Where marriage is delayed, donate besan laddus or something yellow each Thursday and worship Shiva and Parvati."
+            )
+
+            hits(
+                "health", "illness", "disease", "sick", "medical", "body",
+                "स्वास्थ्य", "रोग", "बीमारी", "तबीयत", "सेहत"
+            ) -> LanguageManager.getString(
+                "प्रथम भाव एवं लग्नेश ग्रह का बलवान होना निरोगी काया हेतु अनिवार्य है। महामृत्युंजय मन्त्र अथवा आदित्य हृदय स्तोत्र का पाठ करने से शारीरिक एवं मानसिक ऊर्जा में वृद्धि होती है। किसी भी शारीरिक कष्ट में चिकित्सक से परामर्श अवश्य लें — उपाय उसके साथ चलते हैं, उसकी जगह नहीं।",
+                "A strong 1st house and a strong lagna lord are what keep the body well. Reciting the Mahamrityunjaya mantra or the Aditya Hridaya Stotra lifts both physical and mental energy. For anything troubling the body, see a doctor — an upaya goes alongside treatment, never in place of it."
+            )
+
+            hits(
+                "money", "wealth", "finance", "financial", "debt", "loan",
+                "property", "income", "savings", "rich",
+                "धन", "पैसा", "पैसे", "कर्ज", "ऋण", "संपत्ति", "आय", "लाभ", "दौलत"
+            ) -> LanguageManager.getString(
+                "धन का विचार द्वितीय भाव (संचित धन) एवं एकादश भाव (आय) से किया जाता है, तथा गुरु एवं शुक्र इनके कारक हैं। शुक्रवार को श्वेत वस्तु का दान तथा प्रतिदिन 'ॐ श्रीं ह्रीं श्रीं महालक्ष्म्यै नमः' का जप धन-प्रवाह हेतु शुभ माना गया है। अनावश्यक ऋण से बचें जब तक गुरु की दशा अनुकूल न हो।",
+                "Wealth is read from the 2nd house, which holds what is saved, and the 11th, which brings what comes in; Jupiter and Venus are their karakas. Donating something white on Friday and chanting 'Om Shreem Hreem Shreem Mahalakshmyai Namah' daily are the traditional measures for the flow of money. Avoid taking on debt while Jupiter's period is unfavourable."
+            )
+
+            hits(
+                "dasha", "rahu", "ketu", "shani", "saturn", "sade sati",
+                "remedy", "upay", "dosha", "mangal",
+                "दशा", "राहु", "केतु", "शनि", "साढ़े साती", "उपाय", "दोष", "मंगल"
+            ) -> LanguageManager.getString(
+                "ग्रह दशा का फल उस ग्रह की कुण्डली में स्थिति पर निर्भर करता है — दशा स्वयं शुभ या अशुभ नहीं होती। राहु हेतु शनिवार को नारियल अथवा काली उड़द का दान, शनि हेतु सरसों तेल का दीपक तथा हनुमान चालीसा का पाठ, और मंगल दोष हेतु मंगलवार व्रत परम्परा में बताए गए हैं। शांति उपाय नियम से करें, भय से नहीं।",
+                "What a dasha brings depends on where that graha sits in the chart — the period is not auspicious or inauspicious by itself. Tradition gives, for Rahu, a donation of coconut or black urad on Saturday; for Shani, a mustard-oil lamp and the Hanuman Chalisa; for Mangal dosha, the Tuesday vrat. Keep such remedies as a steady practice, not out of fear."
+            )
+
+            else -> LanguageManager.getString(
+                "ज्योतिष शास्त्र जीवन का मार्गदर्शन करता है। नवग्रह शांति हेतु प्रतिदिन प्रातः स्नानोपरांत 'ॐ नमो भगवते वासुदेवाय' मन्त्र का जप करें तथा अपने कुलदेवता व माता-पिता का आशीर्वाद प्राप्त करें।",
+                "Jyotish points the way rather than fixing it. To settle the nine grahas, chant 'Om Namo Bhagavate Vasudevaya' each morning after bathing, and seek the blessing of your kuladevata and your parents."
+            )
         }
     }
 

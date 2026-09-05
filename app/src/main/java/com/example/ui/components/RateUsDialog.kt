@@ -149,7 +149,8 @@ fun RateUsDialog(
 
                 // Low rating logic (1 to 3 stars) -> feedback form
                 AnimatedVisibility(
-                    visible = selectedStars in 1..3,
+                    // Offered at every rating too, for the same reason.
+                    visible = selectedStars >= 1,
                     enter = fadeIn() + expandVertically(),
                     exit = fadeOut() + shrinkVertically()
                 ) {
@@ -235,9 +236,18 @@ fun RateUsDialog(
                     }
                 }
 
-                // High rating logic (4 or 5 stars) -> store prompt
+                // The Play Store route is offered to everyone who rates, not
+                // only to those who rated well.
+                //
+                // It used to appear at 4 stars and above, while 1 to 3 got the
+                // feedback form instead. That is review gating: it routes happy
+                // users to the public rating and quiet ones away from it, which
+                // is exactly the manipulation Google Play's ratings policy
+                // forbids — and this app has already collected two policy
+                // violations. Whoever wants to leave a public review can, at any
+                // rating; the feedback form is offered alongside, not instead.
                 AnimatedVisibility(
-                    visible = selectedStars >= 4,
+                    visible = selectedStars >= 1,
                     enter = fadeIn() + expandVertically(),
                     exit = fadeOut() + shrinkVertically()
                 ) {
@@ -247,8 +257,8 @@ fun RateUsDialog(
                     ) {
                         Text(
                             text = com.example.util.LanguageManager.getString(
-                                "आपको Revati पसंद आया, यह जानकर खुशी हुई! 🌟 हमारे काम को सहयोग देने के लिए Play Store पर रेटिंग दें।",
-                                "We're thrilled that you are enjoying Revati! 🌟 Please rate us on the Play Store to support our work."
+                                "आपकी राय के लिए धन्यवाद। यदि आप चाहें तो Play Store पर भी अपनी समीक्षा लिख सकते हैं।",
+                                "Thank you for the rating. If you would like to, you can also leave your review on the Play Store."
                             ),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface,
