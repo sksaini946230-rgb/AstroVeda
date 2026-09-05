@@ -211,6 +211,41 @@ in ads/consent init, and around an external browser that may not exist are
 correct too. The user-facing data paths already reported failures in both
 languages before this pass; what they lacked was telling *the developer*.
 
+**R8 was keeping three quarters of the app.** `proguard-rules.pro` carried
+blanket rules — `-keep class com.google.firebase.** { *; }` and
+`-keep class com.google.android.gms.** { *; }` chief among them — which held the
+two largest dependency trees completely immune to the optimiser. Play measured
+it and said so on the release dashboard for versionCode 7: **optimization 27%,
+obfuscation 28%, shrinking 28%**. Firebase and Play Services ship their own
+consumer ProGuard rules inside their AARs and R8 applies those automatically; a
+blanket keep on top only defeats it. Removing them took the APK from 10.4 MB to
+8.8 MB and obfuscated all 15,482 classes instead of a quarter of them.
+
+What must stay is this app's own classes that are reached by reflection —
+`com.example.data.model.**`, `com.example.data.local.**`, `com.example.worker.**`,
+the Room `@Entity` keep and the Firestore `PropertyName` members — plus the
+Firebase AI serializer rules. Those are kept by name.
+
+`com.android.billingclient.api.**` also keeps its blanket rule, deliberately and
+alone: PRO is not purchasable until the merchant account exists, so a purchase
+cannot be walked through a minified build to see it work. The library is small,
+and a purchase that silently fails in production is not worth the bytes.
+Revisit when a real purchase can be tested.
+
+Verified on a device against the minified build: no crash on any screen, Google
+Sign-In's account picker opens (that is `androidx.credentials` and
+`com.google.android.libraries.identity`, both of which lost their blanket keeps),
+and real banner and interstitial ads serve. The Firebase AI call was not
+re-exercised live — the device was stuck in landscape, where the content area is
+too short to reach the question box — but its serializer keeps were left intact
+and 710 Firebase AI classes with 124 `serializer()` methods survive in the
+mapping.
+
+**Landscape is cramped and nobody has designed it.** On a 720x1600 phone held
+sideways the sub-tab header and bottom nav leave roughly 250dp of content, the
+banner lands mid-screen, and some screens cannot be scrolled to their end. It is
+usable but not good, and it has never been a design pass of its own.
+
 **minSdk is 24 and there is no core library desugaring.** `java.time` is off
 limits in `app/`. Lint catches it; it once got as far as a crash-on-Android-7
 before that. Use `java.util.Calendar` or parse strings.

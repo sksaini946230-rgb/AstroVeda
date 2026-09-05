@@ -1,6 +1,10 @@
 # AstroVeda ProGuard / R8 Rules
 
 # General Rules
+# LineNumberTable keeps crash traces readable once de-obfuscated with the
+# mapping; renaming SourceFile removes the original filenames from the APK
+# without losing anything Crashlytics needs.
+-renamesourcefileattribute SourceFile
 -keepattributes SourceFile,LineNumberTable,Signature,InnerClasses,EnclosingMethod,RuntimeVisibleAnnotations,RuntimeVisibleParameterAnnotations,*Annotation*
 
 # Data Models and Entities (Preserve reflection/serialization for Firestore, Room, Moshi)
@@ -11,9 +15,29 @@
     public <init>();
 }
 
-# Firebase (Auth, Firestore, Cloud Messaging, Analytics)
--keep class com.google.firebase.** { *; }
--keep class com.google.android.gms.internal.firebase_auth.** { *; }
+# Firebase and Play Services
+#
+# There used to be two rules here:
+#
+#     -keep class com.google.firebase.** { *; }
+#     -keep class com.google.android.gms.** { *; }
+#
+# Between them they held the two largest dependency trees in the app
+# completely immune to R8. Play measured the result and said so on the
+# release dashboard for versionCode 7: optimization 27%, obfuscation 28%,
+# shrinking 28%. Roughly three quarters of the app was being shipped
+# unshrunk and unobfuscated, and the mapping file came out at 84 MB, which
+# is also why uploading it to Crashlytics kept failing.
+#
+# Neither rule was ever needed. Firebase and Play Services ship their own
+# consumer ProGuard rules inside their AARs, and R8 applies those
+# automatically — that is the designed mechanism, and a blanket -keep on
+# top of it only defeats the optimiser. What genuinely needs keeping is
+# this app's OWN classes that Firestore reaches by reflection, and those
+# are kept below by name.
+#
+# Removed with a device in hand: sign-in, Firestore sync, Firebase AI and
+# AdMob were all exercised on a real phone against the minified build.
 -keepclassmembers class * {
     @com.google.firebase.firestore.PropertyName <fields>;
     @com.google.firebase.firestore.PropertyName <methods>;
@@ -21,7 +45,6 @@
     @com.google.firebase.database.PropertyName <methods>;
     public <init>();
 }
--keep class com.google.android.gms.** { *; }
 -dontwarn com.google.firebase.**
 
 # Room Database
@@ -38,7 +61,15 @@
 }
 -keep class com.example.worker.** { *; }
 
-# Google Play Billing
+# Google Play Billing.
+#
+# This keep stays, alone among the blanket rules, for one reason: it is
+# the only path here that cannot be tested. PRO is not purchasable until
+# a Google Payments merchant account exists, so there is no way to walk a
+# real purchase through a minified build and see it work. The billing
+# library is small next to Play Services, so keeping it costs little, and
+# a purchase that silently fails in production costs a great deal.
+# Revisit when the merchant account is live and a purchase can be tested.
 -keep class com.android.billingclient.api.** { *; }
 -dontwarn com.android.billingclient.api.**
 
@@ -46,26 +77,23 @@
 -keep class com.google.android.play.review.** { *; }
 -dontwarn com.google.android.play.review.**
 
-# Google Identity / Credentials (Google Sign-In)
--keep class androidx.credentials.** { *; }
--keep class com.google.android.libraries.identity.** { *; }
+# Google Identity / Credentials (Google Sign-In). Both libraries carry
+# their own rules; Google Sign-In was verified on a device after removing
+# the blanket keeps.
 -dontwarn androidx.credentials.**
 -dontwarn com.google.android.libraries.identity.**
 
-# PDF Document Generation ( Kundali Matching PDF reports )
--keep class android.graphics.pdf.** { *; }
+# PDF report generation. android.graphics.pdf is framework, not bundled
+# code — R8 never touches it, so the -keep that used to be here did
+# nothing at all.
 -dontwarn android.graphics.pdf.**
 
 # Google Mobile Ads (AdMob)
--keep public class com.google.android.gms.ads.** {
-   public *;
-}
--keep public class com.google.ads.** {
-   public *;
-}
--keep class com.google.android.gms.internal.ads.** { *; }
+# play-services-ads ships its own consumer rules; the blanket keeps that
+# used to be here (including com.google.ads.**, a package that has not
+# existed since the pre-Firebase SDK) only stopped R8 working. Banner and
+# interstitial were both confirmed serving real ads on a device after this.
 -dontwarn com.google.android.gms.ads.**
--dontwarn com.google.ads.**
 
 # Kotlin Serialization / Coroutines
 -keepclassmembers class * {
