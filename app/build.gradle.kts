@@ -59,8 +59,8 @@ android {
     applicationId = "com.aistudio.astroveda.kpvqzm"
     minSdk = 24
     targetSdk = 36
-    versionCode = 9
-    versionName = "1.4"
+    versionCode = 10
+    versionName = "2.0"
 
     val envProperties = Properties()
     val envFile = rootProject.file(".env")

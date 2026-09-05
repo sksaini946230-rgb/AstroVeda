@@ -1,7 +1,25 @@
 package com.example
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -90,4 +108,100 @@ class ScreenSizeScreenshotTest {
 
     @Test fun settings_320() = shoot("settings_320", 320) { SettingsScreen(viewModel = it) }
     @Test fun settings_360() = shoot("settings_360", 360) { SettingsScreen(viewModel = it) }
+
+    /**
+     * The kundali date and time fields **with a value in them**.
+     *
+     * The kundali_320 and kundali_360 shots above render the form empty, which
+     * is why they never showed this: the fields clip only once they hold
+     * something. Filling the form on a real phone showed "1994-08-2" — the date
+     * just entered, missing its last digit, with nothing to say whether the app
+     * had read it correctly. Two fields share the row, so each has about 159dp
+     * on a 360dp phone, and the default content padding and trailing icon take
+     * roughly 80 of it.
+     *
+     * This mirrors the production configuration rather than driving the real
+     * screen, because the field is readOnly and its value lives in local
+     * remember state a test cannot reach. So it checks the arithmetic, not the
+     * screen: change the font size, the icon size or the row in KundaliScreen
+     * and this has to change with them, or it is showing a picture of something
+     * the app no longer does.
+     */
+    @Test fun kundali_datetime_filled_360() = shoot("kundali_datetime_filled_360", 360) {
+        FilledDateTimeRow()
+    }
+
+    @Test fun kundali_datetime_filled_320() = shoot("kundali_datetime_filled_320", 320) {
+        FilledDateTimeRow()
+    }
+
+    @Test fun kundali_datetime_filled_320_large_text() =
+        shoot("kundali_datetime_filled_320_large_text", 320, fontScale = 1.3f) {
+            FilledDateTimeRow()
+        }
+
+    /** The pair as KundaliScreen builds it, with values in. Keep in step with it. */
+    @Composable
+    private fun FilledDateTimeRow() {
+        Column(Modifier.fillMaxWidth().padding(16.dp)) {
+            BoxWithConstraints(Modifier.fillMaxWidth()) {
+                val measurer = androidx.compose.ui.text.rememberTextMeasurer()
+                val valueStyle = LocalTextStyle.current.copy(fontSize = 13.sp)
+                val widestValue = measurer.measure(
+                    androidx.compose.ui.text.AnnotatedString("0000-00-00"), valueStyle
+                ).size.width
+                val roomPerField = with(androidx.compose.ui.platform.LocalDensity.current) {
+                    (((maxWidth - 10.dp) / 2) - 66.dp).toPx()
+                }
+                val stack = widestValue > roomPerField
+                @Composable fun fields(mod: Modifier) {
+                OutlinedTextField(
+                    value = "1994-08-25",
+                    onValueChange = {},
+                    readOnly = true,
+                    singleLine = true,
+                    label = { Text("तिथि *", maxLines = 1, softWrap = false) },
+                    textStyle = LocalTextStyle.current.copy(fontSize = 13.sp),
+                    trailingIcon = {
+                        Icon(
+                            Icons.Default.CalendarMonth,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    },
+                    shape = RoundedCornerShape(14.dp),
+                    modifier = mod
+                )
+                OutlinedTextField(
+                    value = "14:15",
+                    onValueChange = {},
+                    readOnly = true,
+                    singleLine = true,
+                    label = { Text("समय *", maxLines = 1, softWrap = false) },
+                    textStyle = LocalTextStyle.current.copy(fontSize = 13.sp),
+                    trailingIcon = {
+                        Icon(
+                            Icons.Default.Schedule,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    },
+                    shape = RoundedCornerShape(14.dp),
+                    modifier = mod
+                )
+                }
+                if (stack) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) { fields(Modifier.fillMaxWidth()) }
+                } else {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) { fields(Modifier.weight(1f)) }
+                }
+            }
+        }
+    }
 }

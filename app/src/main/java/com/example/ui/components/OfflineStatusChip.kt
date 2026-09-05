@@ -23,7 +23,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun OfflineStatusChip(text: String = "Offline Mode: Showing Cached Content") {
+// No default text. There used to be one — "Offline Mode: Showing Cached
+// Content" — and a caller that took it, or passed its own English string, put
+// an untranslated sentence in front of a Hindi user. Making the caller say it
+// out loud in both languages is the only way this stays honest.
+fun OfflineStatusChip(text: String) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(16.dp))
@@ -35,7 +39,7 @@ fun OfflineStatusChip(text: String = "Offline Mode: Showing Cached Content") {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 imageVector = Icons.Default.CloudOff,
-                contentDescription = "Offline",
+                contentDescription = com.example.util.LanguageManager.getString("ऑफलाइन", "Offline"),
                 tint = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.size(11.dp)
             )

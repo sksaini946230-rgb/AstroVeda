@@ -16,6 +16,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -84,6 +85,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.sp
 import com.example.data.local.KundaliEntity
 import com.example.ui.MainViewModel
@@ -545,78 +550,221 @@ fun KundaliScreen(
                                             // label — the longer Hindi clipped to "जन्म ति".
                                             // The card is already headed जन्म कुण्डली, so the
                                             // shorter labels lose nothing.
-                                            Row(
-                                                modifier = Modifier.fillMaxWidth(),
-                                                horizontalArrangement = Arrangement.spacedBy(10.dp)
-                                            ) {
-                                                // Date of Birth Field
-                                                Box(modifier = Modifier.weight(1f)) {
-                                                    OutlinedTextField(
-                                                        value = dobInput,
-                                                        onValueChange = {
-                                                            dobInput = it
-                                                            formValidationError = null
-                                                        },
-                                                        readOnly = true,
-                                                        label = { Text(LanguageManager.getString("तिथि *", "Date *"), maxLines = 1, softWrap = false) },
-                                                        placeholder = { Text("YYYY-MM-DD") },
-                                                        trailingIcon = {
-                                                            Icon(
-                                                                imageVector = Icons.Default.CalendarMonth,
-                                                                contentDescription = "Select DOB",
-                                                                tint = MaterialTheme.colorScheme.primary
-                                                            )
-                                                        },
-                                                        shape = RoundedCornerShape(14.dp),
-                                                        colors = tfColors,
-                                                        singleLine = true,
-                                                        modifier = Modifier
-                                                            .fillMaxWidth()
-                                                            .testTag("input_kundali_dob")
-                                                    )
-                                                    Box(
-                                                        modifier = Modifier
-                                                            .matchParentSize()
-                                                            .clickable {
-                                                                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                                                                showDatePicker = true
-                                                            }
-                                                    )
+                                            // Side by side only when there is room for it.
+                                            //
+                                            // Each of these is half a row with a trailing
+                                            // icon, and the icon plus the field's own padding
+                                            // take about 80dp. On a 360dp phone that leaves
+                                            // just enough for "1994-08-25"; at 320dp, or at
+                                            // 320dp with the larger text setting, it does not,
+                                            // and the user was shown "1994-08-" — the date
+                                            // they had just picked, missing its end, with
+                                            // nothing to say whether the app had it right.
+                                            //
+                                            // Shrinking the glyphs bought 360dp and no more.
+                                            // Below the threshold the two stack instead, which
+                                            // gives each the full width and keeps the picker
+                                            // icon that tells you the field opens something.
+                                            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+                                                // Measured, not guessed at. A dp threshold cannot
+                                                // see the font scale, and 320dp at 1.3x text is a
+                                                // real combination — so ask how wide the widest
+                                                // value this field ever holds actually renders,
+                                                // and compare it with the room a half-row leaves
+                                                // after the gap, the field's padding and the icon.
+                                                val measurer = rememberTextMeasurer()
+                                                val valueStyle = LocalTextStyle.current.copy(fontSize = 13.sp)
+                                                val widestValue = measurer.measure(
+                                                    AnnotatedString("0000-00-00"), valueStyle
+                                                ).size.width
+                                                val roomPerField = with(LocalDensity.current) {
+                                                    (((maxWidth - 10.dp) / 2) - 66.dp).toPx()
                                                 }
-
-                                                // Time of Birth Field
-                                                Box(modifier = Modifier.weight(1f)) {
-                                                    OutlinedTextField(
-                                                        value = tobInput,
-                                                        onValueChange = {
-                                                            tobInput = it
-                                                            formValidationError = null
-                                                        },
-                                                        readOnly = true,
-                                                        label = { Text(LanguageManager.getString("समय *", "Time *"), maxLines = 1, softWrap = false) },
-                                                        placeholder = { Text("HH:MM") },
-                                                        trailingIcon = {
-                                                            Icon(
-                                                                imageVector = Icons.Default.Schedule,
-                                                                contentDescription = "Select TOB",
-                                                                tint = MaterialTheme.colorScheme.primary
+                                                val stack = widestValue > roomPerField
+                                                if (stack) {
+                                                    Column(
+                                                        modifier = Modifier.fillMaxWidth(),
+                                                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                                                    ) {
+        // Date of Birth Field
+                                                        Box(modifier = Modifier.fillMaxWidth()) {
+                                                            OutlinedTextField(
+                                                                value = dobInput,
+                                                                onValueChange = {
+                                                                    dobInput = it
+                                                                    formValidationError = null
+                                                                },
+                                                                readOnly = true,
+                                                                label = { Text(LanguageManager.getString("तिथि *", "Date *"), maxLines = 1, softWrap = false) },
+                                                                placeholder = { Text("YYYY-MM-DD") },
+                                                                // The value itself used to clip. Two of these sit side by
+                                                                // side, so on a 360dp phone each field is about 159dp; the
+                                                                // default trailing icon and content padding take roughly 80
+                                                                // of that, and "1994-08-25" needs about 95. What the user
+                                                                // saw was "1994-08-2" — the date they had just entered,
+                                                                // missing its last digit, with no way to tell whether the
+                                                                // app had it right. Shrinking the glyphs and the icon buys
+                                                                // back enough room to show all ten characters.
+                                                                textStyle = LocalTextStyle.current.copy(fontSize = 13.sp),
+                                                                trailingIcon = {
+                                                                    Icon(
+                                                                        imageVector = Icons.Default.CalendarMonth,
+                                                                        contentDescription = LanguageManager.getString(
+                                                                            "जन्म तिथि चुनें", "Select date of birth"
+                                                                        ),
+                                                                        tint = MaterialTheme.colorScheme.primary,
+                                                                        modifier = Modifier.size(18.dp)
+                                                                    )
+                                                                },
+                                                                shape = RoundedCornerShape(14.dp),
+                                                                colors = tfColors,
+                                                                singleLine = true,
+                                                                modifier = Modifier
+                                                                    .fillMaxWidth()
+                                                                    .testTag("input_kundali_dob")
                                                             )
-                                                        },
-                                                        shape = RoundedCornerShape(14.dp),
-                                                        colors = tfColors,
-                                                        singleLine = true,
-                                                        modifier = Modifier
-                                                            .fillMaxWidth()
-                                                            .testTag("input_kundali_tob")
-                                                    )
-                                                    Box(
-                                                        modifier = Modifier
-                                                            .matchParentSize()
-                                                            .clickable {
-                                                                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                                                                showTimePicker = true
-                                                            }
-                                                    )
+                                                            Box(
+                                                                modifier = Modifier
+                                                                    .matchParentSize()
+                                                                    .clickable {
+                                                                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                                                        showDatePicker = true
+                                                                    }
+                                                            )
+                                                        }
+        // Time of Birth Field
+                                                        Box(modifier = Modifier.fillMaxWidth()) {
+                                                            OutlinedTextField(
+                                                                value = tobInput,
+                                                                onValueChange = {
+                                                                    tobInput = it
+                                                                    formValidationError = null
+                                                                },
+                                                                readOnly = true,
+                                                                label = { Text(LanguageManager.getString("समय *", "Time *"), maxLines = 1, softWrap = false) },
+                                                                placeholder = { Text("HH:MM") },
+                                                                // Matched to the date field beside it — same width, same
+                                                                // treatment, so the pair stays visually even.
+                                                                textStyle = LocalTextStyle.current.copy(fontSize = 13.sp),
+                                                                trailingIcon = {
+                                                                    Icon(
+                                                                        imageVector = Icons.Default.Schedule,
+                                                                        contentDescription = LanguageManager.getString(
+                                                                            "जन्म समय चुनें", "Select time of birth"
+                                                                        ),
+                                                                        tint = MaterialTheme.colorScheme.primary,
+                                                                        modifier = Modifier.size(18.dp)
+                                                                    )
+                                                                },
+                                                                shape = RoundedCornerShape(14.dp),
+                                                                colors = tfColors,
+                                                                singleLine = true,
+                                                                modifier = Modifier
+                                                                    .fillMaxWidth()
+                                                                    .testTag("input_kundali_tob")
+                                                            )
+                                                            Box(
+                                                                modifier = Modifier
+                                                                    .matchParentSize()
+                                                                    .clickable {
+                                                                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                                                        showTimePicker = true
+                                                                    }
+                                                            )
+                                                        }
+                                                    }
+                                                } else {
+                                                    Row(
+                                                        modifier = Modifier.fillMaxWidth(),
+                                                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                                    ) {
+        // Date of Birth Field
+                                                        Box(modifier = Modifier.weight(1f)) {
+                                                            OutlinedTextField(
+                                                                value = dobInput,
+                                                                onValueChange = {
+                                                                    dobInput = it
+                                                                    formValidationError = null
+                                                                },
+                                                                readOnly = true,
+                                                                label = { Text(LanguageManager.getString("तिथि *", "Date *"), maxLines = 1, softWrap = false) },
+                                                                placeholder = { Text("YYYY-MM-DD") },
+                                                                // The value itself used to clip. Two of these sit side by
+                                                                // side, so on a 360dp phone each field is about 159dp; the
+                                                                // default trailing icon and content padding take roughly 80
+                                                                // of that, and "1994-08-25" needs about 95. What the user
+                                                                // saw was "1994-08-2" — the date they had just entered,
+                                                                // missing its last digit, with no way to tell whether the
+                                                                // app had it right. Shrinking the glyphs and the icon buys
+                                                                // back enough room to show all ten characters.
+                                                                textStyle = LocalTextStyle.current.copy(fontSize = 13.sp),
+                                                                trailingIcon = {
+                                                                    Icon(
+                                                                        imageVector = Icons.Default.CalendarMonth,
+                                                                        contentDescription = LanguageManager.getString(
+                                                                            "जन्म तिथि चुनें", "Select date of birth"
+                                                                        ),
+                                                                        tint = MaterialTheme.colorScheme.primary,
+                                                                        modifier = Modifier.size(18.dp)
+                                                                    )
+                                                                },
+                                                                shape = RoundedCornerShape(14.dp),
+                                                                colors = tfColors,
+                                                                singleLine = true,
+                                                                modifier = Modifier
+                                                                    .fillMaxWidth()
+                                                                    .testTag("input_kundali_dob")
+                                                            )
+                                                            Box(
+                                                                modifier = Modifier
+                                                                    .matchParentSize()
+                                                                    .clickable {
+                                                                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                                                        showDatePicker = true
+                                                                    }
+                                                            )
+                                                        }
+        // Time of Birth Field
+                                                        Box(modifier = Modifier.weight(1f)) {
+                                                            OutlinedTextField(
+                                                                value = tobInput,
+                                                                onValueChange = {
+                                                                    tobInput = it
+                                                                    formValidationError = null
+                                                                },
+                                                                readOnly = true,
+                                                                label = { Text(LanguageManager.getString("समय *", "Time *"), maxLines = 1, softWrap = false) },
+                                                                placeholder = { Text("HH:MM") },
+                                                                // Matched to the date field beside it — same width, same
+                                                                // treatment, so the pair stays visually even.
+                                                                textStyle = LocalTextStyle.current.copy(fontSize = 13.sp),
+                                                                trailingIcon = {
+                                                                    Icon(
+                                                                        imageVector = Icons.Default.Schedule,
+                                                                        contentDescription = LanguageManager.getString(
+                                                                            "जन्म समय चुनें", "Select time of birth"
+                                                                        ),
+                                                                        tint = MaterialTheme.colorScheme.primary,
+                                                                        modifier = Modifier.size(18.dp)
+                                                                    )
+                                                                },
+                                                                shape = RoundedCornerShape(14.dp),
+                                                                colors = tfColors,
+                                                                singleLine = true,
+                                                                modifier = Modifier
+                                                                    .fillMaxWidth()
+                                                                    .testTag("input_kundali_tob")
+                                                            )
+                                                            Box(
+                                                                modifier = Modifier
+                                                                    .matchParentSize()
+                                                                    .clickable {
+                                                                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                                                                        showTimePicker = true
+                                                                    }
+                                                            )
+                                                        }
+                                                    }
                                                 }
                                             }
 

@@ -113,7 +113,12 @@ fun NumerologyScreen(viewModel: MainViewModel) {
         if (isAiOffline) {
             item {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                    OfflineStatusChip("Offline Mode: AI offline, showing cached/classical content")
+                    OfflineStatusChip(
+                        LanguageManager.getString(
+                            "AI उपलब्ध नहीं — शास्त्रीय उत्तर दिखाया जा रहा है",
+                            "AI unavailable — showing classical guidance"
+                        )
+                    )
                 }
             }
         }
@@ -386,8 +391,27 @@ fun NumerologyScreen(viewModel: MainViewModel) {
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(text = LanguageManager.getString("ज्योतिषाचार्य का उत्तर:", "The answer:"), style = MaterialTheme.typography.labelMedium.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Normal, fontSize = 14.sp))
                                 }
+                                // This used to be an empty 4dp spacer. The flag was
+                                // computed in the ViewModel, collected here, and
+                                // checked — and then produced four pixels of nothing,
+                                // so a canned classical answer appeared under "the
+                                // answer" with no sign the model had never been
+                                // reached. The chip at the top of the list does say
+                                // so, but a user reading the answer is scrolled far
+                                // past it.
                                 if (isAiOffline) {
-                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                    Text(
+                                        text = LanguageManager.getString(
+                                            "AI तक पहुंच नहीं हो सकी — यह शास्त्रीय मार्गदर्शन है, आपके प्रश्न का व्यक्तिगत उत्तर नहीं।",
+                                            "The AI could not be reached — this is classical guidance, not a personal answer to your question."
+                                        ),
+                                        style = MaterialTheme.typography.labelSmall.copy(
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            fontSize = 12.sp,
+                                            lineHeight = 17.sp
+                                        )
+                                    )
                                 }
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
