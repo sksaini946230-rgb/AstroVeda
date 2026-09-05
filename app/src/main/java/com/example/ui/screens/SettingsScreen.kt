@@ -1020,8 +1020,19 @@ fun SettingsScreen(
                                     " (" + app.revati.jyotish.BuildConfig.VERSION_CODE + ")" +
                                     "\nAndroid: " + android.os.Build.VERSION.RELEASE +
                                     "\nDevice: " + android.os.Build.MANUFACTURER + " " + android.os.Build.MODEL
+                                // Subject and body go in the mailto URI, not only
+                                // in the extras. Tested on a real device: Gmail
+                                // opened from ACTION_SENDTO takes the recipient
+                                // from the URI and silently drops EXTRA_SUBJECT
+                                // and EXTRA_TEXT, so the version and device lines
+                                // never arrived — which was the whole point of
+                                // putting them there. The extras stay as well for
+                                // clients that prefer them.
+                                val mailto = "mailto:" + SUPPORT_EMAIL +
+                                    "?subject=" + android.net.Uri.encode(subject) +
+                                    "&body=" + android.net.Uri.encode(body)
                                 val intent = android.content.Intent(android.content.Intent.ACTION_SENDTO).apply {
-                                    data = android.net.Uri.parse("mailto:" + SUPPORT_EMAIL)
+                                    data = android.net.Uri.parse(mailto)
                                     putExtra(android.content.Intent.EXTRA_SUBJECT, subject)
                                     putExtra(android.content.Intent.EXTRA_TEXT, body)
                                 }
