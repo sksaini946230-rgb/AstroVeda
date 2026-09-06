@@ -151,6 +151,29 @@ android {
   }
 }
 
+// Build on JDK 17, whichever JDK happened to launch Gradle.
+//
+// Nothing declared a toolchain, so Gradle used its own JVM — and when Homebrew
+// moved the default to JDK 26, every build broke on AGP's jdkImage step:
+//
+//     Execution failed for JdkImageTransform:
+//       .../android-36.1/core-for-system-modules.jar
+//     Error while executing process .../openjdk/26.0.1/.../bin/jlink
+//
+// JDK 26's jlink will not process Android's system-modules jar. Pinning
+// org.gradle.java.home would fix it here and break it everywhere else, which is
+// exactly why that line was removed from gradle.properties in the first place.
+// A toolchain says which JDK the build needs and lets Gradle find it — the
+// foojay resolver in settings.gradle.kts provisions one if the machine has
+// none. Portable, and CI already asks setup-java for 17.
+kotlin {
+  jvmToolchain(17)
+}
+
+java {
+  toolchain { languageVersion = JavaLanguageVersion.of(17) }
+}
+
 // Configure the Secrets Gradle Plugin to use .env and .env.example files
 // to match the convention used in Web projects.
 secrets {
