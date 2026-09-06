@@ -446,7 +446,7 @@ fun SettingsScreen(
                                     )
                                 )
                                 Text(
-                                    text = "${selectedCity.cityNameHindi} (${selectedCity.state})",
+                                    text = "${selectedCity.nameLocal} (${selectedCity.state})",
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         fontSize = 11.sp

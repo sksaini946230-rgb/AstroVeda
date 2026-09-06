@@ -1,5 +1,6 @@
 package com.example.data.model
 
+import com.example.util.LanguageManager
 data class PanchangData(
     val dateString: String,
     val dayOfWeek: String, // Var
@@ -45,4 +46,19 @@ data class CityLocation(
     val state: String,
     val latitude: Double,
     val longitude: Double
-)
+) {
+    /**
+     * The name in whichever language the app is showing.
+     *
+     * Both names are carried, and two screens still reached for the Hindi one
+     * directly — so an English user was told "Current City: जयपुर" in
+     * onboarding and saw "जयपुर (Rajasthan)" in Settings. Reading the field by
+     * name is what makes that easy to do by accident; this is the same shape as
+     * ChoghadiyaType.nameLocal, and the thing to use.
+     *
+     * A city resolved from GPS has no Hindi name — the geocoder does not give
+     * one — so both fields hold the same string there and this returns it
+     * either way.
+     */
+    val nameLocal: String get() = LanguageManager.getString(cityNameHindi, cityName)
+}

@@ -140,7 +140,7 @@ fun OnboardingScreen(
                 0 -> LanguageSelectOnboardingPage(viewModel)
                 1 -> RashiSelectOnboardingPage(viewModel)
                 2 -> LocationNotificationOnboardingPage(
-                    selectedCityName = selectedCity.cityNameHindi,
+                    selectedCityName = selectedCity.nameLocal,
                     locationGranted = locationPermissionGranted,
                     notificationGranted = notificationPermissionGranted,
                     onToggleLocation = { locationPermissionGranted = !locationPermissionGranted },
