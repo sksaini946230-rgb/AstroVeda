@@ -350,7 +350,13 @@ fun NumerologyScreen(viewModel: MainViewModel) {
 
                     OutlinedTextField(
                         value = userQuestion,
-                        onValueChange = { userQuestion = it },
+                        // Stops at the cap rather than letting someone type past it
+                        // and have the tail silently dropped on the way out.
+                        onValueChange = {
+                            if (it.length <= com.example.util.AiRateLimiter.MAX_QUESTION_CHARS) {
+                                userQuestion = it
+                            }
+                        },
                         label = { Text(LanguageManager.getString("अपना प्रश्न पूछें", "Ask your question")) },
                         colors = tfColors,
                         modifier = Modifier.fillMaxWidth().testTag("ai_chat_input"),

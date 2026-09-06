@@ -83,6 +83,20 @@ class AiRateLimiterTest {
     }
 
     @Test
+    fun `the question cap is short enough to matter and long enough to use`() {
+        // Long enough for a real question, short enough that twenty an hour is
+        // not a bill. "मेरी नौकरी में पदोन्नति कब होगी?" is 30 characters.
+        assertTrue(
+            "cap should leave room for a real question",
+            AiRateLimiter.MAX_QUESTION_CHARS >= 200
+        )
+        assertTrue(
+            "cap should stop someone pasting pages into a metered API",
+            AiRateLimiter.MAX_QUESTION_CHARS <= 1000
+        )
+    }
+
+    @Test
     fun `a wait is reported in whole minutes and never as zero`() {
         val l = limiter()
         assertEquals(1, l.minutesFrom(1))

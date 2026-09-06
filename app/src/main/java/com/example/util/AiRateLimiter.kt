@@ -34,6 +34,24 @@ class AiRateLimiter(
         /** A real session of questions fits well inside this. */
         const val DEFAULT_MAX_PER_HOUR = 20
 
+        /**
+         * The longest question that will be sent to the model.
+         *
+         * The limiter above bounds how *often* someone can ask; nothing bounded
+         * how *much* they could send. The question box accepted any length and
+         * handed it straight to Firebase AI, which bills by token — so twenty
+         * pasted pages an hour was within the rules as written, and the bill
+         * lands here with no server in between.
+         *
+         * Length is also the room a prompt injection needs. GeminiAstroService's
+         * system prompt states its boundaries, and a shorter question is less
+         * space in which to argue with them.
+         *
+         * A real question — "मेरी नौकरी में पदोन्नति कब होगी?" — is well under
+         * a hundred characters. Five hundred is generous.
+         */
+        const val MAX_QUESTION_CHARS = 500
+
         const val ONE_HOUR_MS = 60L * 60L * 1000L
     }
 

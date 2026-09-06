@@ -959,8 +959,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun askAiAstrologer(question: String) {
+    fun askAiAstrologer(rawQuestion: String) {
         if (_isAiLoading.value) return
+
+        // Bounded here rather than only at the text field, so the sample-question
+        // chips and anything added later are covered too. See MAX_QUESTION_CHARS.
+        val question = rawQuestion.trim().take(com.example.util.AiRateLimiter.MAX_QUESTION_CHARS)
+        if (question.isBlank()) return
         aiRefusalMessage()?.let { refusal ->
             // Said plainly in the answer area, where the user is already looking.
             _aiResponse.value = refusal
