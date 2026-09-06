@@ -293,6 +293,54 @@ a real convention, or it may be the same class of slip as Sunday's. It was left
 alone because, unlike Sunday, nothing about it is internally inconsistent —
 deciding it needs someone who knows the shastra, not someone reading the table.
 
+**What the security review found, and what it did not.** Checked before the
+public launch, all of it against the release build rather than the source alone:
+
+    manifest        not debuggable; no app component exported without a
+                    launcher intent, a widget, or a permission behind it
+    backup          Room database and both preference files excluded from
+                    cloud backup and device transfer, on both API levels
+    network         cleartext blocked, system trust anchors only
+    WebView         JavaScript off, DOM storage off, file-URL access off, and
+                    only the two bundled legal pages load in it
+    APK strings     nothing extractable that is not public by design — the
+                    AdMob unit ids and the Firebase key, both of which ship
+                    in every APK on Play
+    input           sanitised at all four entry points: both profile-save
+                    paths, BirthData.parse, and the profile import
+    Firestore       users/{uid}/** behind request.auth.uid == userId
+    code            no world-readable modes, no addJavascriptInterface, no
+                    custom TrustManager or hostname verifier, no Runtime.exec,
+                    no PII in any log
+
+**App Check is the control that matters, and it is provably working.** Play
+Integrity is installed in `RevatiApp.onCreate`, so worker and widget processes
+are attested too, and the debug provider lives in a variant source set that
+never reaches release. A release APK signed with the upload key and side-loaded
+was refused by the server:
+
+    Firebase AI Logic call failed: Firebase App Check token is invalid
+
+So extracting the API key from the APK does not buy an attacker Firebase AI —
+which is the thing that costs money. The API key restriction in Cloud Console
+is still worth adding as defence in depth; it is not the only thing standing
+there.
+
+**PRO cannot be defended against a patched APK, and does not need to be yet.**
+Entitlement is a boolean in SharedPreferences, so anyone with root can set it.
+What stops that mattering is `queryPurchases()`: Play is asked on every launch
+and an absent subscription revokes Pro, so a hand-set flag survives until the
+next start. A patched binary that skips the revocation cannot be stopped
+without a server, and there is no server. The financial exposure today is zero
+because PRO is not purchasable.
+
+Left as they are, with reasons: `USE_BIOMETRIC` and `USE_FINGERPRINT` arrive
+from `androidx.credentials`, which Google Sign-In needs. Nothing in this app
+uses biometrics, but both are normal-level permissions with no prompt and no
+Play declaration, and removing a permission a sign-in library asks for is not
+a change to make the day before a launch — Google Sign-In has broken in
+production here once already.
+
 **minSdk is 24 and there is no core library desugaring.** `java.time` is off
 limits in `app/`. Lint catches it; it once got as far as a crash-on-Android-7
 before that. Use `java.util.Calendar` or parse strings.
