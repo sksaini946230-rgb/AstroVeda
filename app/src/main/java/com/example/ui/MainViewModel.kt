@@ -553,7 +553,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
     
-    private val _notificationHour = MutableStateFlow(sharedPrefs.getInt("notification_hour", 7))
+    private val _notificationHour = MutableStateFlow(sharedPrefs.getInt("notification_hour", com.example.util.NotificationDefaults.DAILY_HOUR))
     val notificationHour: StateFlow<Int> = _notificationHour.asStateFlow()
     
     private val _notificationMinute = MutableStateFlow(sharedPrefs.getInt("notification_minute", 0))

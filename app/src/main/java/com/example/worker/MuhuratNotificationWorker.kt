@@ -45,7 +45,7 @@ class MuhuratNotificationWorker(
             }
 
             // Schedule for 7:00 AM daily (optimal morning time for daily auspicious timings)
-            val hour = sharedPrefs.getInt("muhurat_notification_hour", 7)
+            val hour = sharedPrefs.getInt("muhurat_notification_hour", com.example.util.NotificationDefaults.MUHURAT_HOUR)
             val minute = sharedPrefs.getInt("muhurat_notification_minute", 0)
 
             val calendar = Calendar.getInstance()

@@ -53,7 +53,7 @@ class AstroNotificationWorker(
             // Settings for the same two keys. They did not: Settings said 7:00
             // and the worker scheduled 6:30, so a user who never touched the
             // setting was woken half an hour before the time the app showed them.
-            val hour = sharedPrefs.getInt("notification_hour", 7)
+            val hour = sharedPrefs.getInt("notification_hour", com.example.util.NotificationDefaults.DAILY_HOUR)
             val minute = sharedPrefs.getInt("notification_minute", 0)
 
             val calendar = java.util.Calendar.getInstance()

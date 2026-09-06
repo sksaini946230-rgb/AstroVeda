@@ -529,7 +529,13 @@ fun LocationNotificationOnboardingPage(
                             style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                         )
                         Text(
-                            text = LanguageManager.getString("प्रातः 06:00 बजे शुभ मुहूर्त व चौघड़िया सूचनाएं", "Morning 6:00 AM auspicious timings & festival alerts"),
+                            // Said 06:00 while every default in the code said 07:00,
+                            // so onboarding promised one time and the notification
+                            // arrived at another. Read from the constant instead.
+                            text = LanguageManager.getString(
+                                "प्रातः ${com.example.util.NotificationDefaults.formatHour(com.example.util.NotificationDefaults.DAILY_HOUR)} बजे शुभ मुहूर्त व चौघड़िया सूचनाएं",
+                                "Morning ${com.example.util.NotificationDefaults.formatHour(com.example.util.NotificationDefaults.DAILY_HOUR)} auspicious timings & festival alerts"
+                            ),
                             style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 11.5.sp)
                         )
                     }
