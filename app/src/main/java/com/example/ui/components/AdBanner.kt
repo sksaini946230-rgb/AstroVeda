@@ -104,7 +104,24 @@ fun AdBanner(
             .testTag("ad_banner_container"),
         factory = { context ->
             AdView(context).apply {
-                setAdSize(AdSize.BANNER)
+                // Anchored adaptive, not the fixed 320x50 this used to ask for.
+                //
+                // AdSize.BANNER is the legacy size: 320dp wide whatever the
+                // phone is, so on a 360dp screen it left 40dp of the width
+                // unsold and sat visibly narrower than everything around it.
+                // Adaptive takes the full width and picks a height to match,
+                // and Google's own guidance is to prefer it — advertisers bid
+                // on it, the fixed size is what is left over.
+                //
+                // Same ad unit, same placement, no policy difference; it is the
+                // size that changes.
+                val widthDp = run {
+                    val m = context.resources.displayMetrics
+                    (m.widthPixels / m.density).toInt().coerceAtLeast(320)
+                }
+                setAdSize(
+                    AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, widthDp)
+                )
                 adUnitId = bannerId
                 adListener = object : AdListener() {
                     override fun onAdFailedToLoad(error: LoadAdError) {

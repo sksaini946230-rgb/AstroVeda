@@ -445,11 +445,23 @@ class MainActivity : ComponentActivity() {
     private fun showInterstitialAd() {
         val currentTime = System.currentTimeMillis()
 
-        // A minute's gap between full-screen ads meant that simply looking
-        // around the five tabs produced one every minute, and the very first
-        // one could land seconds after launch — on a Panchang app people open
-        // for ten seconds to read a tithi. Three minutes between them, and
-        // none at all until the session is 90 seconds old.
+        // Three gates, and the numbers behind them have moved twice.
+        //
+        // They began at a one-minute gap with no startup delay, which meant
+        // looking around the five tabs produced a full-screen ad every minute
+        // and the first could land seconds after launch — on an app people open
+        // for ten seconds to read a tithi. That was pulled back hard: 90 seconds
+        // before the first, three minutes between, three a session.
+        //
+        // The owner has since asked for more inventory, so they sit between the
+        // two: 45 seconds before the first, two minutes between, five a session.
+        // Two minutes is a common setting and a tab change is a natural break,
+        // which is what Play's disruptive-ads policy asks for — an ad must not
+        // arrive unannounced or interrupt something. What would cross the line
+        // is showing one on launch or between a tap and its result, and neither
+        // happens here.
+        //
+        // If retention or reviews turn, these three numbers are the dial.
         if (currentTime - sessionStartTime < FIRST_INTERSTITIAL_DELAY_MS) return
         if (currentTime - lastInterstitialShowTime < INTERSTITIAL_MIN_GAP_MS) return
         if (interstitialsShownThisSession >= MAX_INTERSTITIALS_PER_SESSION) return
@@ -474,9 +486,9 @@ class MainActivity : ComponentActivity() {
     }
 
     private companion object {
-        const val FIRST_INTERSTITIAL_DELAY_MS = 90_000L
-        const val INTERSTITIAL_MIN_GAP_MS = 180_000L
-        const val MAX_INTERSTITIALS_PER_SESSION = 3
+        const val FIRST_INTERSTITIAL_DELAY_MS = 45_000L
+        const val INTERSTITIAL_MIN_GAP_MS = 120_000L
+        const val MAX_INTERSTITIALS_PER_SESSION = 5
     }
 }
 
