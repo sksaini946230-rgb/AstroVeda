@@ -7,10 +7,28 @@ import java.util.Date
 
 object ChoghadiyaCalculator {
 
-    // Day Choghadiya sequence by day of week (starting from Sunrise)
-    // 1: Sun, 2: Mon, 3: Tue, 4: Wed, 5: Thu, 6: Fri, 7: Sat
+    // Day Choghadiya by weekday, from sunrise.
+    //
+    // Every row is the same seven-Choghadiya cycle, rotated to begin with the
+    // one ruled by that weekday's lord. The cycle is the Chaldean order of the
+    // grahas — Sun, Venus, Mercury, Moon, Saturn, Jupiter, Mars — which in
+    // Choghadiya names reads
+    //
+    //     Udveg, Char, Labh, Amrit, Kaal, Shubh, Rog
+    //
+    // **Sunday's row did not follow it.** Six of the seven were clean rotations
+    // of that cycle and Sunday alone stepped through it three at a time, which
+    // is what a copying slip looks like. The effect was not cosmetic: on a
+    // Sunday the app called 07:34-09:09 Amrit, the most auspicious slot there
+    // is, when the cycle makes it Char, merely neutral — and called 09:09-10:43
+    // Rog, inauspicious, when it is Labh. People read this screen to choose when
+    // to begin something.
+    //
+    // It survived because the only test on Choghadiya counted the slots. Eight
+    // came back, so it passed, for one day in seven that was wrong.
+    // ChoghadiyaSequenceTest now checks the sequence itself.
     private val DAY_SEQUENCES = mapOf(
-        Calendar.SUNDAY to listOf(ChoghadiyaType.UDVEG, ChoghadiyaType.AMRIT, ChoghadiyaType.ROG, ChoghadiyaType.LABH, ChoghadiyaType.SHUBH, ChoghadiyaType.CHAR, ChoghadiyaType.KAAL, ChoghadiyaType.UDVEG),
+        Calendar.SUNDAY to listOf(ChoghadiyaType.UDVEG, ChoghadiyaType.CHAR, ChoghadiyaType.LABH, ChoghadiyaType.AMRIT, ChoghadiyaType.KAAL, ChoghadiyaType.SHUBH, ChoghadiyaType.ROG, ChoghadiyaType.UDVEG),
         Calendar.MONDAY to listOf(ChoghadiyaType.AMRIT, ChoghadiyaType.KAAL, ChoghadiyaType.SHUBH, ChoghadiyaType.ROG, ChoghadiyaType.UDVEG, ChoghadiyaType.CHAR, ChoghadiyaType.LABH, ChoghadiyaType.AMRIT),
         Calendar.TUESDAY to listOf(ChoghadiyaType.ROG, ChoghadiyaType.UDVEG, ChoghadiyaType.CHAR, ChoghadiyaType.LABH, ChoghadiyaType.AMRIT, ChoghadiyaType.KAAL, ChoghadiyaType.SHUBH, ChoghadiyaType.ROG),
         Calendar.WEDNESDAY to listOf(ChoghadiyaType.LABH, ChoghadiyaType.AMRIT, ChoghadiyaType.KAAL, ChoghadiyaType.SHUBH, ChoghadiyaType.ROG, ChoghadiyaType.UDVEG, ChoghadiyaType.CHAR, ChoghadiyaType.LABH),

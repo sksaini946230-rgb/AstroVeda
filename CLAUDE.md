@@ -270,6 +270,29 @@ Reproduce with `./gradlew :app:dependencies --configuration releaseRuntimeClassp
 and `./gradlew buildEnvironment`, then post the resolved coordinates to
 `https://api.osv.dev/v1/querybatch`.
 
+**Sunday's Choghadiya was wrong, and a test that counted slots let it
+through.** Each Choghadiya belongs to a graha — Udveg/Sun, Char/Venus,
+Labh/Mercury, Amrit/Moon, Kaal/Saturn, Shubh/Jupiter, Rog/Mars — and the daytime
+sequence for a weekday is that Chaldean cycle rotated to begin with the
+weekday lord's own Choghadiya. Six of the seven rows in `ChoghadiyaCalculator`
+obeyed that. Sunday stepped through the cycle three at a time, so on a Sunday
+07:34-09:09 was labelled **Amrit**, the most auspicious slot there is, when it
+is Char and merely neutral; and 09:09-10:43 was labelled **Rog** when it is
+**Labh**. That is the screen people read to choose when to begin something.
+
+The only test touching Choghadiya asserted that eight slots came back. Eight
+always came back. `ChoghadiyaSequenceTest` checks the sequence itself now, and
+was confirmed to fail against the old table before the fix went in.
+
+**Open question, deliberately not changed: the night table uses a different
+progression from the day table.** All seven night rows are consistent rotations
+of one list, and every one starts on the lord of the fifth weekday, which is the
+classical rule and is now covered by a test. But that list steps the Chaldean
+order five at a time where the daytime list steps it one at a time. That may be
+a real convention, or it may be the same class of slip as Sunday's. It was left
+alone because, unlike Sunday, nothing about it is internally inconsistent —
+deciding it needs someone who knows the shastra, not someone reading the table.
+
 **minSdk is 24 and there is no core library desugaring.** `java.time` is off
 limits in `app/`. Lint catches it; it once got as far as a crash-on-Android-7
 before that. Use `java.util.Calendar` or parse strings.
