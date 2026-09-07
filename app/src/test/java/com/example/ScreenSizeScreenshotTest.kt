@@ -150,8 +150,40 @@ class ScreenSizeScreenshotTest {
 
     @Test fun navbar_320() = shoot("navbar_320", 320) { NavBarOnly() }
 
+    @Test fun navbar_412() = shoot("navbar_412", 412) { NavBarOnly() }
+
     @Test fun navbar_320_large_text() =
         shoot("navbar_320_large_text", 320, fontScale = 1.3f) { NavBarOnly() }
+
+    // The two hardest cases the bar has to survive: the narrowest phone at the
+    // largest text, and the same with English labels, which are longer words
+    // than the Hindi ones even though they are narrower per character.
+    @Test fun navbar_320_largest_text() =
+        shoot("navbar_320_largest_text", 320, fontScale = 1.6f) { NavBarOnly() }
+
+    @Test fun navbar_360_large_text() =
+        shoot("navbar_360_large_text", 360, fontScale = 1.3f) { NavBarOnly() }
+
+    // English, which is where the bar is actually tightest: "Horoscope" is
+    // nearly twice the width of "राशिफल". The narrow-and-large case is the one
+    // that decides whether a label can be shown at all.
+    @Test fun navbar_en_360() = shootEnglish("navbar_en_360", 360, 1f)
+
+    @Test fun navbar_en_320() = shootEnglish("navbar_en_320", 320, 1f)
+
+    @Test fun navbar_en_320_large_text() = shootEnglish("navbar_en_320_large_text", 320, 1.3f)
+
+    @Test fun navbar_en_320_largest_text() = shootEnglish("navbar_en_320_largest_text", 320, 1.6f)
+
+    private fun shootEnglish(name: String, widthDp: Int, fontScale: Float) {
+        val previous = com.example.util.LanguageManager.currentLanguage
+        com.example.util.LanguageManager.setLanguage(com.example.util.AppLanguage.ENGLISH)
+        try {
+            shoot(name, widthDp, fontScale = fontScale) { NavBarOnly() }
+        } finally {
+            com.example.util.LanguageManager.setLanguage(previous)
+        }
+    }
 
     @Composable
     private fun NavBarOnly() {
