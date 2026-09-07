@@ -137,6 +137,30 @@ class ScreenSizeScreenshotTest {
     // device this app is tested on. Both are here because the point of the
     // measured threshold is that the row splits on the wide one and stacks on
     // the narrow one — a single width cannot show that it does either.
+    // The bottom navigation bar on its own, both themes and both languages.
+    //
+    // It is drawn at the foot of every screen and was never rendered by itself,
+    // so the only way to look at it was to find it under whatever else was on
+    // the page. These four shots are the whole bar and nothing else — selected
+    // pill, filled-vs-outlined icons, and the Hindi labels, which are the ones
+    // that run out of room first.
+    @Test fun navbar_360() = shoot("navbar_360", 360) { NavBarOnly() }
+
+    @Test fun navbar_360_dark() = shoot("navbar_360_dark", 360, dark = true) { NavBarOnly() }
+
+    @Test fun navbar_320() = shoot("navbar_320", 320) { NavBarOnly() }
+
+    @Test fun navbar_320_large_text() =
+        shoot("navbar_320_large_text", 320, fontScale = 1.3f) { NavBarOnly() }
+
+    @Composable
+    private fun NavBarOnly() {
+        com.example.ui.components.BottomNavBar(
+            selectedTab = com.example.ui.AppTab.KUNDALI,
+            onTabSelected = {}
+        )
+    }
+
     @Test fun matching_filled_412() =
         shoot("matching_filled_412", 412, prepare = ::filledMatch) { MatchingScreen(viewModel = it) }
 

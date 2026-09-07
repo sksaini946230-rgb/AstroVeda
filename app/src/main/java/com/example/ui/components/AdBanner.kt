@@ -2,6 +2,7 @@ package com.example.ui.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -118,10 +119,23 @@ fun AdBanner(
         return
     }
 
+    // No ad, no space.
+    //
+    // An AdView that has been given an adaptive size reserves that height as
+    // soon as it exists, ad or no ad — about 50dp, plus this padding. That used
+    // to disappear on its own: after three failures the banner gave up and
+    // rendered nothing. Now that it keeps retrying, the empty strip stayed, and
+    // on a phone getting no fill it sat above the tab bar for the whole session
+    // looking like a rendering fault. It is exactly the sort of thing the retry
+    // fix was not supposed to introduce.
+    //
+    // The view stays in the tree so it can keep requesting; it simply takes no
+    // room until an ad has actually arrived. Nothing is hidden from the user or
+    // from AdMob — there is no impression to count while there is no ad.
     AndroidView(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp)
+            .then(if (loaded) Modifier.padding(vertical = 4.dp) else Modifier.height(0.dp))
             .testTag("ad_banner_container"),
         factory = { context ->
             AdView(context).apply {
