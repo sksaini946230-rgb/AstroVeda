@@ -287,11 +287,74 @@ was confirmed to fail against the old table before the fix went in.
 **Open question, deliberately not changed: the night table uses a different
 progression from the day table.** All seven night rows are consistent rotations
 of one list, and every one starts on the lord of the fifth weekday, which is the
-classical rule and is now covered by a test. But that list steps the Chaldean
+classical rule and is now covered by a test — and, since the toggle was fixed,
+is finally visible on the device (Monday opens on Char, Shukra's Choghadiya, and
+Friday is the fifth weekday from Monday). But that list steps the Chaldean
 order five at a time where the daytime list steps it one at a time. That may be
 a real convention, or it may be the same class of slip as Sunday's. It was left
 alone because, unlike Sunday, nothing about it is internally inconsistent —
 deciding it needs someone who knows the shastra, not someone reading the table.
+
+**The night Choghadiya could not be reached at all, and that hid the open
+question above.** Tapping "रात का चौघड़िया" moved the pill and changed nothing
+else — all eight tiles kept the daytime sequence and the daytime hours under a
+control that said night. `choghadiyaSlots` was a plain `get()` reading four
+MutableStateFlows through `.value`, which is not a snapshot read, so Compose
+never learned the list depended on them; the only scope invalidated was the one
+drawing the pill. The same silence covered the city, the date and the 12/24-hour
+setting. It is a `combine` of all four now. Half a screen had never worked, and
+nobody had noticed because the screen looked like it responded.
+
+**Bhakoot had two of the three doshas.** The classical set is 2/12
+Dwirdwadasha, 5/9 Nav-Pancham and 6/8 Shadashtaka; `calculateBhakoot` listed 5/9
+among the *scoring* distances instead, so one couple in six was handed the full
+seven points and told "भकूट दोष नहीं है" underneath. Seven of thirty-six is
+enough to carry a match across the 18-point line the conclusion text treats as
+the verdict. The dosha label had no branch for Nav-Pancham either, so a fix to
+the score alone would have called it Shadashtaka. The three distances now live
+in one named list so the score and the label cannot disagree again, and
+`BhakootDoshaTest` asserts all 144 rashi pairs against the rule rather than
+restating the table.
+
+**Guna Milan never asked for a birth time.** The calculator has always taken
+one and `MainViewModel` has always held the field, defaulted to "12:00" — but
+nothing on screen set it, so every match was computed for noon. The Moon changes
+nakshatra about once a day and Tara, Yoni, Gana and Nadi are all read from the
+nakshatra: 21 of the 36 points. The field is there now, still optional, and the
+card under the form says what leaving it blank costs.
+
+**The lucky time reached three of its six values.** `(rashiIdx * 5 + house +
+dayOfMonth) % 6`, and six divides twelve, so the modulo inside `house` survived
+the outer one and the expression reduced to `4 * rashiIdx` plus terms every
+rashi shares — and 4 is not coprime with 6. Half the list was unreachable on any
+given day and four rashis shared each of the rest. The fix is a shape that
+cannot cancel rather than a better multiplier: the lucky time no longer involves
+the transit house at all. This is the fifth separate cause in the "everyone sees
+the same data" family, and the first one found by *counting a field nobody had
+counted* — `RashifalVariesByRashiTest` covered the rating, the colour, the stone
+and the six readings, and this was not among them.
+
+**The recent-search chip on Guna Milan had never worked.** It assigned the four
+local `remember` variables, which is what the fields render, while
+`calculateGunaMatching()` reads the ViewModel — so the form filled in and the
+calculation then refused it with "कृपया नाम दर्ज करें" over a form that plainly
+had a name in it. No test could have caught it: the calculator was right, the
+screen was right, only the wiring between them was wrong.
+
+**Generated text does not follow a language switch on its own.**
+`onLanguageChanged` recomputes the Panchang and the horoscopes for exactly this
+reason, and the astro news was missed: switching to English left the Hindi
+bulletins on the More tab verbatim. It was the only Devanagari string a sweep of
+the whole app in English still found. The offline copy is bilingual so re-reading
+it is free; model-fetched news costs one call. The AI answer and the per-rashi
+insights are cleared rather than re-asked — re-asking spends a call to say the
+same thing, and leaving them puts a Hindi paragraph under an English heading.
+
+**A clipped word at the top of a scrolling list is not a font bug.** Devanagari
+loses its matras first, so a half-scrolled heading reads "भकूट दाष ावचार" and
+looks like broken shaping. It is the scroll viewport. The tell is that the
+warning icon beside it is clipped at exactly the same y — a font problem cannot
+crop a vector. Check that before reaching for `includeFontPadding`.
 
 **What the security review found, and what it did not.** Checked before the
 public launch, all of it against the release build rather than the source alone:

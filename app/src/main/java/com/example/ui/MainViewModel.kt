@@ -419,6 +419,29 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun onLanguageChanged() {
         recalculatePanchang(forceRefresh = true)
         loadHoroscopesWithCache(forceRefresh = true)
+
+        // Same reason, three more places the old language was left sitting.
+        //
+        // The astro news is generated text held in a StateFlow. Switching to
+        // English left the Hindi bulletins on the More tab verbatim — the one
+        // Devanagari string a sweep of the whole app in English still found.
+        // When the bulletins are the bundled offline copy this is free, because
+        // that copy is bilingual and only needs re-reading; when they came from
+        // the model it costs one call, and only on a language change.
+        if (_astroNews.value.isNotBlank()) {
+            if (_isNewsOffline.value) {
+                _astroNews.value = com.example.data.ai.GeminiAstroService.getOfflineAstroNews()
+            } else {
+                fetchAstroNews()
+            }
+        }
+
+        // An answer and a set of insights are not re-asked — the user's question
+        // has already been answered and asking again would spend a model call to
+        // say the same thing in the other language. Dropping them is honest;
+        // leaving them is a Hindi paragraph under an English heading.
+        _aiResponse.value = ""
+        _aiRashifalInsights.value = emptyMap()
     }
 
     // Selected City Location for Panchang

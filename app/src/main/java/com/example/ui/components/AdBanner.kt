@@ -71,28 +71,49 @@ fun AdBanner(
     var attempt by remember { mutableIntStateOf(0) }
     var failures by remember { mutableIntStateOf(0) }
     var loaded by remember { mutableStateOf(false) }
-    var givenUp by remember { mutableStateOf(false) }
 
+    // No fill is a fact about this minute, not about this session.
+    //
+    // This used to stop after three retries and render nothing for the rest of
+    // the session. On the test device that is exactly what happens: four
+    // requests in a row came back `code=3 No fill` inside the first minute, the
+    // banner gave up, and the next twenty minutes of use carried no ad at all —
+    // while the same build had filled a minute earlier in landscape. Demand for
+    // a new app is thin and intermittent, and a policy of "gave up at 09:05"
+    // turns a thin minute into an empty session.
+    //
+    // So the fast attempts stay for the cold-start case and then it settles to
+    // one request a minute instead of stopping. One a minute is also what a
+    // filled banner does — see the refresh below — so a failing banner costs no
+    // more requests than a working one.
     LaunchedEffect(failures) {
         if (failures == 0) return@LaunchedEffect
-        if (failures > MAX_RETRIES) {
-            givenUp = true
-            return@LaunchedEffect
-        }
-        // 4s, 12s, 36s — long enough for a network or the SDK to come back,
-        // short enough that someone who opened the app on a bad signal still
-        // ends up with a banner.
-        delay(RETRY_BASE_MS * BACKOFF[failures - 1])
+        // 4s, 12s, 36s while it might be the SDK or the network coming up,
+        // then a steady minute.
+        val wait = if (failures <= BACKOFF.size) RETRY_BASE_MS * BACKOFF[failures - 1] else REFRESH_MS
+        delay(wait)
+        attempt++
+    }
+
+    // A banner that loaded once and then sits there is one impression for the
+    // whole session. Sixty seconds is the interval Google's own guidance uses
+    // for banner refresh and the floor below which it becomes a policy problem,
+    // so this asks for a new ad every minute for as long as the banner is on
+    // screen — and stops the moment it leaves, because the effect is cancelled
+    // with the composable.
+    LaunchedEffect(loaded, attempt) {
+        if (!loaded) return@LaunchedEffect
+        delay(REFRESH_MS)
         attempt++
     }
 
     // The SDK finishing initialisation is the most likely reason an early
     // request failed, so it is worth one attempt of its own.
     LaunchedEffect(adsReady) {
-        if (adsReady && !loaded && !givenUp) attempt++
+        if (adsReady && !loaded) attempt++
     }
 
-    if (bannerId.isBlank() || givenUp) {
+    if (bannerId.isBlank()) {
         Box(modifier = Modifier.size(0.dp))
         return
     }
@@ -127,7 +148,14 @@ fun AdBanner(
                     override fun onAdFailedToLoad(error: LoadAdError) {
                         // Worth keeping: a banner that silently declines to
                         // appear is exactly the bug that took a day to find.
-                        android.util.Log.w(
+                        //
+                        // At error level on purpose. This was Log.w, and the
+                        // device this app is tested on keeps nothing below E —
+                        // a logcat dump from it holds thousands of E lines and
+                        // not one W. So the message the comment above calls
+                        // worth keeping was invisible in the only place anyone
+                        // reads it. Same reason PurchaseVerifier logs at error.
+                        android.util.Log.e(
                             "AdBanner",
                             "load failed: code=${error.code} domain=${error.domain} " +
                                 "msg=${error.message} cause=${error.cause}"
@@ -136,7 +164,11 @@ fun AdBanner(
                     }
 
                     override fun onAdLoaded() {
-                        android.util.Log.i("AdBanner", "loaded")
+                        // Also at error level, and only because "did the banner
+                        // fill?" cannot be answered from this device otherwise:
+                        // an absent failure line and an absent success line look
+                        // identical when the buffer drops both.
+                        android.util.Log.e("AdBanner", "loaded")
                         loaded = true
                         failures = 0
                     }
@@ -156,7 +188,16 @@ fun AdBanner(
 }
 
 private const val TEST_BANNER_ID = "ca-app-pub-3940256099942544/6300978111"
-private const val MAX_RETRIES = 3
 private const val RETRY_BASE_MS = 4_000L
 private val BACKOFF = longArrayOf(1, 3, 9)
+
+/**
+ * One request a minute, for a refresh and for a retry alike.
+ *
+ * Sixty seconds is what Google's banner-refresh guidance uses and is the floor
+ * below which frequent reloading reads as invalid traffic. Using the same
+ * number for both means a banner that cannot fill never asks more often than
+ * one that can.
+ */
+private const val REFRESH_MS = 60_000L
 private val ATTEMPT_TAG = "revati_ad_attempt".hashCode()

@@ -62,6 +62,48 @@ Thank you for using Revati.
 
 ## Said so far
 
+### versionCode 10 / 2.0
+
+The one that goes to production. Everything in the 1.4 list below, which was
+never uploaded, plus what a full pass on a real phone found: Guna Milan was
+missing one of the three Bhakoot doshas and never asked for a birth time, the
+night Choghadiya could not be opened at all, and the lucky time was the same for
+four rashis at once.
+
+Bhakoot leads because it changes an answer people act on. The night Choghadiya
+is second because it is a whole half of a screen that has never worked.
+
+```
+<en-US>
+Namaste 🙏
+
+Kundli Milan and Choghadiya are both more accurate this time:
+
+• Guna Milan now catches all three Bhakoot doshas — 5/9 Nav-Pancham was being scored as a full match
+• Guna Milan accepts a birth time, which decides 21 of the 36 gunas
+• Night Choghadiya opens properly — the tab used to show daytime hours
+• Daily horoscope: lucky time now really differs by rashi
+• Recent searches on Kundli Milan work again
+• Steadier layout on compact screens
+
+Thank you for using Revati.
+</en-US>
+<hi-IN>
+नमस्ते 🙏
+
+इस बार कुण्डली मिलान और चौघड़िया दोनों अधिक सटीक:
+
+• गुण मिलान में तीनों भकूट दोष — 5/9 नवपंचम अब तक पूरे गुण दे रहा था
+• गुण मिलान में जन्म समय भी — 36 में से 21 गुण इसी पर आधारित
+• रात का चौघड़िया अब सही खुलता है — पहले दिन के ही समय दिखते थे
+• दैनिक राशिफल: शुभ समय अब वाकई हर राशि के लिए अलग
+• कुण्डली मिलान में हाल की खोजें फिर से काम करती हैं
+• छोटी स्क्रीन पर बेहतर लेआउट
+
+रेवती चुनने के लिए धन्यवाद।
+</hi-IN>
+```
+
 ### versionCode 9 / 1.4
 
 Everything since the 1.2 that production is on: the per-rashi horoscope fix,
