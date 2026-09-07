@@ -88,6 +88,34 @@ class RashifalVariesByRashiTest {
     }
 
     @Test
+    fun `the lucky number and lucky time both reach their whole range`() {
+        periods.forEach { period ->
+            val all = RashifalProvider.getHoroscope(period)
+
+            // Nine numbers, twelve rashis: every one of 1..9 must appear.
+            assertEquals(
+                "$period: lucky number should cover 1..9",
+                (1..9).toList(), all.map { it.luckyNumber }.distinct().sorted()
+            )
+
+            // Six slots, twelve rashis, so six distinct times with two rashis
+            // sharing each. This was three, because the expression mixed the
+            // rashi with the transit house and the rashi partly cancelled:
+            // half the list was unreachable on any given day. Counting the
+            // whole zodiac is the only way that shows — each sign on its own
+            // looked like it had been given a time.
+            assertEquals(
+                "$period: lucky time should reach all six slots",
+                6, all.map { it.luckyTimeHi }.distinct().size
+            )
+            assertEquals(
+                "$period: the English lucky time must vary with the Hindi one",
+                6, all.map { it.luckyTimeEn }.distinct().size
+            )
+        }
+    }
+
+    @Test
     fun `the gochar rating follows the classical shubha houses`() {
         // Chandra gochar is read as favourable from the 1st, 3rd, 6th, 7th,
         // 10th and 11th; Surya gochar from the 3rd, 6th, 10th and 11th.

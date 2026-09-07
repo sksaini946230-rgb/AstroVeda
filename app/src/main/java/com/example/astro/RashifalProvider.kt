@@ -967,7 +967,22 @@ object RashifalProvider {
         val rulerEnName = enPart(ruler)
         val rating = gocharRating(driverPlanet, house)
         val luckyNum = 1 + ((rashiIdx * 7 + house * 3) % 9)
-        val timeIdx = (rashiIdx * 5 + house + cal.get(Calendar.DAY_OF_MONTH)) % luckyTimesHi.size
+
+        // The lucky time deliberately does not involve `house`.
+        //
+        // It used to: `(rashiIdx * 5 + house + dayOfMonth) % 6`. But
+        // house = ((planetRashiIdx - rashiIdx + 12) % 12) + 1, and because 6
+        // divides 12 that inner modulo survives the outer one — the expression
+        // reduces to 4*rashiIdx plus terms the whole zodiac shares, and 4 is not
+        // coprime with 6. So it took three of its six values, never the other
+        // three, and four rashis shared each one. The same partial cancellation
+        // that once gave every sign five stars, just further along.
+        //
+        // Anything derived from the rashi and the transit house together is at
+        // risk of this, so the safe shape is to not mix them: the rashi and the
+        // day of the month are independent of each other, six values appear,
+        // and two rashis share each. `RashifalVariesByRashiTest` counts them.
+        val timeIdx = (rashiIdx + cal.get(Calendar.DAY_OF_MONTH)) % luckyTimesHi.size
 
         return RashifalData(
             rashiId = id,
