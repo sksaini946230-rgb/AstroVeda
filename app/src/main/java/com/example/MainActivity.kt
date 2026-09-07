@@ -76,6 +76,12 @@ class MainActivity : ComponentActivity() {
     private val mainViewModel: MainViewModel by viewModels()
 
     private var mInterstitialAd: InterstitialAd? = null
+
+    /** How many times the interstitial has failed to load since the last success. */
+    private var interstitialLoadFailures = 0
+
+    /** True while a load is in flight, so a retry and a tab change cannot double-request. */
+    private var interstitialLoading = false
     private var lastInterstitialShowTime = 0L
 
     /** When this process started showing UI — the first ad waits for it. */
@@ -426,20 +432,62 @@ class MainActivity : ComponentActivity() {
 
         if (interstitialId.isBlank()) return
 
+        if (interstitialLoading || mInterstitialAd != null) return
+
         val adRequest = AdRequest.Builder().build()
         try {
+            interstitialLoading = true
             InterstitialAd.load(this, interstitialId, adRequest, object : InterstitialAdLoadCallback() {
                 override fun onAdFailedToLoad(adError: LoadAdError) {
+                    interstitialLoading = false
                     mInterstitialAd = null
+
+                    // At error level, like the banner's, and for the same
+                    // reason: this device keeps nothing below E, so a load that
+                    // said nothing left "why is no interstitial showing?"
+                    // unanswerable. It used to say nothing at all.
+                    android.util.Log.e(
+                        "InterstitialAd",
+                        "load failed: code=${adError.code} msg=${adError.message}"
+                    )
+
+                    // And retry, because nothing did. A failed load was only
+                    // re-attempted when a tab change happened to get past all
+                    // three gates — and the gates return before reaching the
+                    // reload, so during the first 45 seconds no tab change
+                    // retried anything at all. One no-fill at launch meant no
+                    // interstitial for the session, which is the same fault the
+                    // banner had.
+                    interstitialLoadFailures++
+                    if (interstitialLoadFailures <= MAX_INTERSTITIAL_LOAD_RETRIES) {
+                        adHandler.postDelayed(
+                            { loadInterstitialAd() },
+                            INTERSTITIAL_RETRY_MS * interstitialLoadFailures
+                        )
+                    }
                 }
 
                 override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                    interstitialLoading = false
+                    interstitialLoadFailures = 0
                     mInterstitialAd = interstitialAd
+                    android.util.Log.e("InterstitialAd", "loaded")
                 }
             })
         } catch (e: Throwable) {
-            // fail gracefully
+            interstitialLoading = false
         }
+    }
+
+    /** Posts the interstitial retries. Cleared in onDestroy so none outlives the Activity. */
+    private val adHandler = android.os.Handler(android.os.Looper.getMainLooper())
+
+    override fun onDestroy() {
+        // A retry posted here holds a reference to this Activity. On a rotation
+        // that is a leaked Activity per pending callback, and the ad it loads
+        // belongs to an instance nobody is looking at.
+        adHandler.removeCallbacksAndMessages(null)
+        super.onDestroy()
     }
 
     private fun showInterstitialAd() {
@@ -489,6 +537,11 @@ class MainActivity : ComponentActivity() {
         const val FIRST_INTERSTITIAL_DELAY_MS = 45_000L
         const val INTERSTITIAL_MIN_GAP_MS = 120_000L
         const val MAX_INTERSTITIALS_PER_SESSION = 5
+
+        /** 30s, 60s, 90s, 120s. Bounded, because an interstitial nobody can be
+         *  shown yet is not worth requesting forever. */
+        const val INTERSTITIAL_RETRY_MS = 30_000L
+        const val MAX_INTERSTITIAL_LOAD_RETRIES = 4
     }
 }
 
