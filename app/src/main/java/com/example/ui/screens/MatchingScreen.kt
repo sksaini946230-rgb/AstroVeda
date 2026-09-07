@@ -29,6 +29,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Female
 import androidx.compose.material.icons.filled.Info
@@ -70,6 +71,7 @@ import com.example.ui.components.GlassBadge
 import com.example.ui.components.GlassCard
 import com.example.ui.components.GoldGlowButton
 import com.example.ui.components.M3DatePickerDialog
+import com.example.ui.components.M3TimePickerDialog
 import com.example.ui.components.RecentSearchesComponent
 import com.example.ui.components.SectionHeader
 import com.example.ui.theme.RahuKaalDangerColor
@@ -85,11 +87,38 @@ fun MatchingScreen(viewModel: MainViewModel) {
     var boyName by remember { mutableStateOf(viewModel.matchBoyName.value) }
     var boyDob by remember { mutableStateOf(viewModel.matchBoyDob.value) }
 
+    var boyTob by remember { mutableStateOf(viewModel.matchBoyTob.value) }
+
     var girlName by remember { mutableStateOf(viewModel.matchGirlName.value) }
     var girlDob by remember { mutableStateOf(viewModel.matchGirlDob.value) }
+    var girlTob by remember { mutableStateOf(viewModel.matchGirlTob.value) }
 
     var showBoyDatePicker by remember { mutableStateOf(false) }
     var showGirlDatePicker by remember { mutableStateOf(false) }
+    var showBoyTimePicker by remember { mutableStateOf(false) }
+    var showGirlTimePicker by remember { mutableStateOf(false) }
+
+    if (showBoyTimePicker) {
+        M3TimePickerDialog(
+            initialTimeString = boyTob.ifBlank { "12:00" },
+            onTimeSelected = { selected ->
+                boyTob = selected
+                viewModel.matchBoyTob.value = selected
+            },
+            onDismiss = { showBoyTimePicker = false }
+        )
+    }
+
+    if (showGirlTimePicker) {
+        M3TimePickerDialog(
+            initialTimeString = girlTob.ifBlank { "12:00" },
+            onTimeSelected = { selected ->
+                girlTob = selected
+                viewModel.matchGirlTob.value = selected
+            },
+            onDismiss = { showGirlTimePicker = false }
+        )
+    }
 
     if (showBoyDatePicker) {
         M3DatePickerDialog(
@@ -198,7 +227,16 @@ fun MatchingScreen(viewModel: MainViewModel) {
                             },
                             colors = tfColors,
                             nameTestTag = "input_boy_name",
-                            dobTestTag = "input_boy_dob"
+                            dobTestTag = "input_boy_dob",
+                            tob = boyTob,
+                            tobContentDescription = LanguageManager.getString(
+                                "वर का जन्म समय चुनें", "Select boy's time of birth"
+                            ),
+                            onTobClick = {
+                                view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                                showBoyTimePicker = true
+                            },
+                            tobTestTag = "input_boy_tob"
                         )
 
                         // Girl Details
@@ -233,7 +271,16 @@ fun MatchingScreen(viewModel: MainViewModel) {
                             },
                             colors = tfColors,
                             nameTestTag = "input_girl_name",
-                            dobTestTag = "input_girl_dob"
+                            dobTestTag = "input_girl_dob",
+                            tob = girlTob,
+                            tobContentDescription = LanguageManager.getString(
+                                "कन्या का जन्म समय चुनें", "Select girl's time of birth"
+                            ),
+                            onTobClick = {
+                                view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                                showGirlTimePicker = true
+                            },
+                            tobTestTag = "input_girl_tob"
                         )
 
                         val isCalculating by viewModel.isCalculating.collectAsState()
@@ -291,8 +338,8 @@ fun MatchingScreen(viewModel: MainViewModel) {
                             )
                             Text(
                                 text = LanguageManager.getString(
-                                    "वर एवं कन्या का नाम और जन्म तिथि दर्ज करके 'गुण मिलान करें' पर टैप करें। 8 कूट (वर्ण, वश्य, तारा, योनि, ग्रह मैत्री, गण, भकूट, नाड़ी) एवं नाड़ी व भकूट दोष का सम्पूर्ण विश्लेषण प्राप्त होगा।",
-                                    "Enter Boy & Girl birth details and tap 'Calculate 36 Guna' to get complete Ashtakoot compatibility, Nadi Dosha, Bhakoot Dosha, and Manglik analysis."
+                                    "वर एवं कन्या का नाम, जन्म तिथि एवं जन्म समय दर्ज करके 'गुण मिलान करें' पर टैप करें। 8 कूट (वर्ण, वश्य, तारा, योनि, ग्रह मैत्री, गण, भकूट, नाड़ी) एवं नाड़ी व भकूट दोष का सम्पूर्ण विश्लेषण प्राप्त होगा।\n\nजन्म समय न देने पर दोपहर 12:00 माना जाता है। चन्द्रमा लगभग एक दिन में नक्षत्र बदलता है और 36 में से 21 गुण नक्षत्र पर ही आधारित हैं — इसलिए सही समय देने पर मिलान अधिक सटीक होता है।",
+                                    "Enter both names, dates of birth and times of birth, then tap 'Calculate 36 Guna' for the full Ashtakoot reading with Nadi Dosha, Bhakoot Dosha and Manglik analysis.\n\nWith no time given, noon is assumed. The Moon changes nakshatra roughly once a day and 21 of the 36 gunas are read from the nakshatra, so an accurate birth time makes a real difference to the result."
                                 ),
                                 style = MaterialTheme.typography.bodyMedium.copy(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -680,7 +727,11 @@ private fun NameAndDobFields(
     onDobClick: () -> Unit,
     colors: TextFieldColors,
     nameTestTag: String,
-    dobTestTag: String
+    dobTestTag: String,
+    tob: String,
+    tobContentDescription: String,
+    onTobClick: () -> Unit,
+    tobTestTag: String
 ) {
     BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
         val measurer = rememberTextMeasurer()
@@ -691,6 +742,14 @@ private fun NameAndDobFields(
         // KundaliScreen's date/time pair, deliberately: the two screens hold
         // the same ten-character date in the same kind of field, so they should
         // reach the same answer about whether it fits.
+        //
+        // 66dp is deliberately generous. Measured, the value needs 90dp at the
+        // default text size and 112dp at 1.3x, and the true padding-plus-icon
+        // overhead is somewhere between those two brackets — a tighter number
+        // would let 360dp phones keep the pair side by side, but if it were too
+        // tight by even a few dp the result is a clipped birth date, which is
+        // the bug this exists to prevent. One extra row on a scrolling form is
+        // the cheaper way to be wrong.
         val roomForDate = with(LocalDensity.current) {
             (((maxWidth - 8.dp) / 2) - 66.dp).toPx()
         }
@@ -745,18 +804,60 @@ private fun NameAndDobFields(
             }
         }
 
-        if (stack) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                nameField(Modifier.fillMaxWidth())
-                dobField(Modifier.fillMaxWidth())
+        val tobField = @Composable { modifier: Modifier ->
+            Box(modifier = modifier) {
+                OutlinedTextField(
+                    value = tob,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = {
+                        Text(
+                            LanguageManager.getString("समय", "Time"),
+                            maxLines = 1,
+                            softWrap = false
+                        )
+                    },
+                    placeholder = { Text("12:00", maxLines = 1, softWrap = false) },
+                    textStyle = LocalTextStyle.current.copy(fontSize = 13.sp),
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Schedule,
+                            contentDescription = tobContentDescription,
+                            tint = iconTint,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    },
+                    colors = colors,
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth().testTag(tobTestTag)
+                )
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .clickable(onClick = onTobClick)
+                )
             }
-        } else {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                nameField(Modifier.weight(1f))
-                dobField(Modifier.weight(1f))
+        }
+
+        // The name always gets the full width — it is the field most likely to
+        // hold something long. The date and time share a row only when the date
+        // measurably fits half of one; below that everything stacks. Both
+        // branches were tried the other way round first and 320dp at 1.3x text
+        // clipped "1995-06-15" to "1995-0", which is the same fault this
+        // composable exists to fix.
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            nameField(Modifier.fillMaxWidth())
+            if (stack) {
+                dobField(Modifier.fillMaxWidth())
+                tobField(Modifier.fillMaxWidth())
+            } else {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    dobField(Modifier.weight(1f))
+                    tobField(Modifier.weight(1f))
+                }
             }
         }
     }
