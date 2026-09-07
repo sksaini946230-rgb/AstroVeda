@@ -685,6 +685,17 @@ the owner's instruction after he created the units.
     app open      return to the foreground, never on a cold start
     rewarded      opt-in, in front of the Guna Milan PDF
 
+All four were confirmed serving on a real device on 7 Sep 2026: the banner
+filled in landscape and refreshed on the minute, the interstitial appeared on a
+tab change, the app-open ad appeared on a return to the foreground and *not* on
+a cold start, and the rewarded ad played on the PDF button and produced the
+report — as did the "just make it" button beside it.
+
+Both new units answered `code=0 Internal error` for the first couple of hours
+after being created and then began serving. That is propagation, not wiring: the
+other formats were loading from the same app id throughout. Do not go looking
+for a bug in the first hours of a new ad unit.
+
 `FullScreenAdGate` is what stops the interstitial and the app-open ad arriving
 together — they fire on unrelated events (a tab change, a return to the
 foreground), so "come back to the app and change tab" was two full-screen ads
