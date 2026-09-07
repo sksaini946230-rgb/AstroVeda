@@ -71,6 +71,12 @@ import com.example.ui.AppTab
 
 import com.example.ui.components.OfflineStatusChip
 
+/** A long name is still a name; a thousand characters is a paste accident. */
+private const val MAX_NAME_CHARS = 60
+
+/** "YYYY-MM-DD" is ten. Ten more is room to correct a typo, not to paste an essay. */
+private const val MAX_DOB_CHARS = 20
+
 @Composable
 fun NumerologyScreen(viewModel: MainViewModel) {
     val numData by viewModel.numerologyData.collectAsState()
@@ -149,15 +155,24 @@ fun NumerologyScreen(viewModel: MainViewModel) {
                         OutlinedTextField(
                             value = nameInput,
                             onValueChange = {
-                                nameInput = it
-                                viewModel.numName.value = it
-                                if (nameError != null) {
-                                    nameError = NumerologyValidator.validateName(it)
+                                // Bounded and single line. Neither field had a
+                                // limit, so text pasted into one simply grew it:
+                                // 700 characters in the date box made it 800px
+                                // tall, pushed the Calculate button off the
+                                // screen and left the form looking broken. A
+                                // name and an ISO date both have a known size.
+                                if (it.length <= MAX_NAME_CHARS) {
+                                    nameInput = it
+                                    viewModel.numName.value = it
+                                    if (nameError != null) {
+                                        nameError = NumerologyValidator.validateName(it)
+                                    }
                                 }
                             },
                             label = { Text(LanguageManager.getString("नाम", "Name")) },
                             isError = (nameError != null),
                             colors = tfColors,
+                            singleLine = true,
                             modifier = Modifier.fillMaxWidth().testTag("input_num_name")
                         )
                         if (nameError != null) {
@@ -176,15 +191,18 @@ fun NumerologyScreen(viewModel: MainViewModel) {
                         OutlinedTextField(
                             value = dobInput,
                             onValueChange = {
-                                dobInput = it
-                                viewModel.numDob.value = it
-                                if (dobError != null) {
-                                    dobError = NumerologyValidator.validateDob(it)
+                                if (it.length <= MAX_DOB_CHARS) {
+                                    dobInput = it
+                                    viewModel.numDob.value = it
+                                    if (dobError != null) {
+                                        dobError = NumerologyValidator.validateDob(it)
+                                    }
                                 }
                             },
                             label = { Text(LanguageManager.getString("जन्म तिथि (YYYY-MM-DD)", "Date of birth (YYYY-MM-DD)")) },
                             isError = (dobError != null),
                             colors = tfColors,
+                            singleLine = true,
                             modifier = Modifier.fillMaxWidth().testTag("input_num_dob")
                         )
                         if (dobError != null) {
@@ -207,6 +225,11 @@ fun NumerologyScreen(viewModel: MainViewModel) {
                             dobError = valResult.dobError
                             if (valResult.isValid) {
                                 viewModel.calculateNumerology()
+                            } else {
+                                // A reading left over from the last valid date
+                                // would otherwise sit under the error message,
+                                // reading as the answer to what was just typed.
+                                viewModel.clearNumerology()
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
@@ -359,6 +382,11 @@ fun NumerologyScreen(viewModel: MainViewModel) {
                         },
                         label = { Text(LanguageManager.getString("अपना प्रश्न पूछें", "Ask your question")) },
                         colors = tfColors,
+                        // The 500-character cap above bounds what is sent; this
+                        // bounds what it does to the screen. Without it a long
+                        // question grows the field until the send button is
+                        // pushed out of view.
+                        maxLines = 5,
                         modifier = Modifier.fillMaxWidth().testTag("ai_chat_input"),
                         trailingIcon = {
                             if (isAiLoading) {

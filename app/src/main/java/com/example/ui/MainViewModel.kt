@@ -851,6 +851,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _numerologyData = MutableStateFlow<NumerologyData?>(null)
     val numerologyData: StateFlow<NumerologyData?> = _numerologyData.asStateFlow()
 
+    /**
+     * Drops a result that no longer belongs to what is in the form.
+     *
+     * Typing "25-08-1994" — the order most Indian users reach for first —
+     * fails validation, and the error appeared *above a full reading computed
+     * from the previous date*. Nothing said the numbers below were stale, so
+     * the screen showed one date and answered a different one.
+     */
+    fun clearNumerology() {
+        _numerologyData.value = null
+    }
+
     fun calculateNumerology() {
         try {
             val result = NumerologyCalculator.calculateNumerology(numName.value, numDob.value)
