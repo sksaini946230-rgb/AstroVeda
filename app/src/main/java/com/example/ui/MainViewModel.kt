@@ -798,7 +798,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val gTob = matchGirlTob.value.trim().ifBlank { "12:00" }
 
         if (bName.isNotBlank() && bDob.isNotBlank() && gName.isNotBlank() && gDob.isNotBlank()) {
-            addRecentSearch("MATCHING", bName, bDob, gName, gDob)
+            addRecentMatch(bName, bDob, bTob, gName, gDob, gTob)
         }
 
         _matchingInputError.value = null
@@ -1071,6 +1071,33 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
         viewModelScope.launch {
             recentSearchRepository.insertSearch(RecentSearchEntity(type = type, data = data))
+        }
+    }
+
+    /**
+     * A Guna Milan search, in its own shape.
+     *
+     * This used to go through [addRecentSearch], whose four fields are named
+     * for a kundali — so a match was stored with the girl's name in `tob` and
+     * her date in `place`. It read back correctly by accident, and then the
+     * birth times were added to the matching form and there was nowhere to put
+     * them: restoring a recent match would have quietly dropped both times back
+     * to noon and produced a different answer than the one that was saved.
+     *
+     * Six fields, in the order the form asks for them. Rows written before this
+     * have four; [MatchingScreen] accepts both.
+     */
+    fun addRecentMatch(
+        boyName: String,
+        boyDob: String,
+        boyTob: String,
+        girlName: String,
+        girlDob: String,
+        girlTob: String
+    ) {
+        val data = "$boyName|$boyDob|$girlName|$girlDob|$boyTob|$girlTob"
+        viewModelScope.launch {
+            recentSearchRepository.insertSearch(RecentSearchEntity(type = "MATCHING", data = data))
         }
     }
 

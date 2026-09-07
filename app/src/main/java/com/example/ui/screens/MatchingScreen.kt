@@ -171,11 +171,33 @@ fun MatchingScreen(viewModel: MainViewModel) {
                     recentSearches = recentSearches.filter { it.type == "MATCHING" },
                     onSearchSelected = { search ->
                         val parts = search.data.split("|")
-                        if (parts.size == 4) {
+                        // Six fields since the birth times were added, four in
+                        // rows written before that; an older row simply has no
+                        // times and keeps the noon default.
+                        if (parts.size >= 4) {
+                            // Both halves, and that is the point: these four
+                            // assignments used to set only the local state, and
+                            // calculateGunaMatching() reads the ViewModel. So
+                            // tapping a recent search filled the form in front
+                            // of the user and then refused it with "कृपया नाम
+                            // दर्ज करें" — a name was plainly in the box. The
+                            // feature had never worked from this screen.
+                            //
+                            // KundaliScreen does not have this because it hands
+                            // the values to generateKundaliChart as arguments
+                            // rather than through the ViewModel's fields.
                             boyName = parts[0]
                             boyDob = parts[1]
                             girlName = parts[2]
                             girlDob = parts[3]
+                            viewModel.matchBoyName.value = parts[0]
+                            viewModel.matchBoyDob.value = parts[1]
+                            viewModel.matchGirlName.value = parts[2]
+                            viewModel.matchGirlDob.value = parts[3]
+                            boyTob = parts.getOrNull(4)?.takeIf { it.isNotBlank() } ?: "12:00"
+                            girlTob = parts.getOrNull(5)?.takeIf { it.isNotBlank() } ?: "12:00"
+                            viewModel.matchBoyTob.value = boyTob
+                            viewModel.matchGirlTob.value = girlTob
                             viewModel.calculateGunaMatching()
                         }
                     }
