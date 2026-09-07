@@ -416,6 +416,30 @@ None)` and 1.35× line heights. Leave it alone.
 **Themes come from `LocalAstroColors`.** Light and dark both real, following the
 system. Never hardcode a colour that only works in one.
 
+**The bottom navigation bar is a floating capsule, and only the selected tab
+carries a label.** That is not decoration, it is what makes it fit. Five labels
+cannot share a 320dp screen: measured, "Horoscope" needs 60px at 8.5sp once the
+font scale is 1.3x, and five items on that screen have 50px each. An earlier
+version shrank the type until it "fitted" and the words still ran together at
+large font scales, with the selected pill narrower than its own label. One label
+at a time gives it about a third of the bar instead of a fifth.
+
+The label size is measured, not chosen — `rememberTextMeasurer` against the real
+per-item width, stepping 12sp down to 8.5sp, and dropping the label entirely if
+none fits (320dp English at 1.6x). Two mistakes to not repeat: **the widest
+label is not the longest one** — "कुण्डली" has more characters than "राशिफल"
+and is 5px narrower, so picking by `length` measures the wrong string — and
+**the English labels are the long ones**, so a bar checked only in Hindi proves
+nothing. The bar's height comes from the icon and its padding, never the label,
+so it stays 62dp at every font scale and the capsule stays a capsule.
+`navbar_*` and `navbar_en_*` screenshots cover 320/360/412, dark, 1.3x and 1.6x.
+
+**An AdView reserves its height whether or not it has an ad.** Roughly 50dp of
+empty strip, and it used to hide itself by accident: the banner gave up after
+three failures and rendered nothing. Making it retry indefinitely left that
+strip sitting above the tab bar for the whole session on a phone getting no
+fill, which reads as a rendering fault. It is `height(0.dp)` until `loaded`.
+
 **Compact facts use `BentoTile`** (`ui/components/BentoPanchangGrid.kt`). Rows of
 tiles need `Modifier.height(IntrinsicSize.Min)` on the Row and `.fillMaxHeight()`
 on each tile, or a two-line neighbour leaves the other short. Saved Profiles is
@@ -757,6 +781,18 @@ schedule now. On 7 Sep 2026 the banner took `No fill` for twenty minutes
 straight in portrait while the interstitial filled immediately and the banner
 itself had filled in landscape — demand is thin and uneven for a new app, which
 is exactly why giving up is the wrong response.
+
+**A failed `uploadCrashlyticsMappingFileRelease` does not mean a failed build.**
+That task runs *after* `packageRelease` and `bundleRelease`, so the APK and the
+AAB are already on disk when it fails. It failed repeatedly on 7 Sep 2026 with
+`SocketException: Connection reset by peer` and `Broken pipe` while the machine
+was on a tethered connection — the host answers, the upload does not complete.
+The consequence is limited and worth knowing: Play deobfuscates its own crash
+reports from the mapping inside the bundle
+(`BUNDLE-METADATA/com.android.tools.build.obfuscation/proguard.map`), so
+Play Console is unaffected; only **Firebase Crashlytics** lacks the mapping for
+that build until the task is re-run on a working network. Check the artifact's
+timestamp before treating a red build as a broken one.
 
 **Ads cannot be tested on the iPhone hotspot.** It resolves
 `googleads.g.doubleclick.net` and `pagead2.googlesyndication.com` to 127.0.0.1,
