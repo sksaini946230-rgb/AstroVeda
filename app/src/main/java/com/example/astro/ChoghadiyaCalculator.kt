@@ -66,7 +66,6 @@ object ChoghadiyaCalculator {
     ): List<ChoghadiyaSlot> {
         val cal = Calendar.getInstance().apply { time = date }
         val dayOfWeek = cal.get(Calendar.DAY_OF_WEEK)
-        val dayOfYear = cal.get(Calendar.DAY_OF_YEAR)
 
         val sequence = if (isDaytime) {
             DAY_SEQUENCES[dayOfWeek] ?: DAY_SEQUENCES[Calendar.SUNDAY]!!
@@ -74,21 +73,31 @@ object ChoghadiyaCalculator {
             NIGHT_SEQUENCES[dayOfWeek] ?: NIGHT_SEQUENCES[Calendar.SUNDAY]!!
         }
 
-        // Solar calculations
-        val latRad = Math.toRadians(lat)
-        val N = dayOfYear.toDouble()
-        val radM = Math.toRadians((357.528 + 0.9856003 * N) % 360.0)
-        val radL = Math.toRadians((280.460 + 0.9856474 * N) % 360.0)
-        val trueSunLonRad = radL + Math.toRadians(1.915 * Math.sin(radM) + 0.020 * Math.sin(2 * radM))
-        val sinDec = Math.sin(Math.toRadians(23.439)) * Math.sin(trueSunLonRad)
-        val decRad = Math.asin(sinDec)
-        val cosH = (Math.sin(Math.toRadians(-0.8333)) - Math.sin(latRad) * Math.sin(decRad)) / (Math.cos(latRad) * Math.cos(decRad))
-        val hDeg = Math.toDegrees(Math.acos(cosH.coerceIn(-1.0, 1.0)))
-        val eotMins = 4.0 * Math.toDegrees(trueSunLonRad - radL)
-        val solarNoonMin = 720.0 - eotMins + (82.5 - lon) * 4.0
+        // Sunrise and sunset from the app's own ephemeris, not a second one.
+        //
+        // This used to carry its own inline solar formula — day-of-year, a
+        // first-order equation of time, a fixed 82.5°E meridian — and it
+        // disagreed with the Panchang by about nine minutes. On 7 Sep 2026 at
+        // Rampur the widget and the Panchang said sunrise 05:54 AM while the
+        // Choghadiya's first slot opened at 06:03. Every boundary on the screen
+        // was shifted by that much, and both numbers were visible at once.
+        //
+        // Choghadiya slots are one eighth of the day from sunrise to sunset, so
+        // they are only as good as those two moments. RiseSetCalculator is what
+        // the rest of the app uses and is the tested one; there is no reason for
+        // this file to have a second opinion about when the Sun comes up.
+        val zone = AstroTime.IST
+        val gcal = java.util.GregorianCalendar(zone).apply { time = date }
+        val midnightJd = AstroTime.julianDayFromLocal(
+            gcal.get(Calendar.YEAR), gcal.get(Calendar.MONTH) + 1, gcal.get(Calendar.DAY_OF_MONTH),
+            0, 0, zone
+        )
+        val sunTimes = RiseSetCalculator.sunRiseSet(midnightJd, lat, lon)
 
-        val sunriseMin = (solarNoonMin - hDeg * 4.0).toInt()
-        val sunsetMin = (solarNoonMin + hDeg * 4.0).toInt()
+        // Only reached where the Sun genuinely does not rise or set, which is
+        // outside anywhere this app is used — the same fallback the Panchang has.
+        val sunriseMin = sunTimes.riseJd?.let { minutesFromMidnight(it, midnightJd) } ?: 360
+        val sunsetMin = sunTimes.setJd?.let { minutesFromMidnight(it, midnightJd) } ?: 1080
 
         val baseStartMin = if (isDaytime) sunriseMin else sunsetMin
         val totalDurationMin = if (isDaytime) (sunsetMin - sunriseMin) else (1440 - (sunsetMin - sunriseMin))
@@ -111,6 +120,10 @@ object ChoghadiyaCalculator {
             )
         }
     }
+
+    /** Local minutes past midnight for a UT Julian Day, rounded to the minute. */
+    private fun minutesFromMidnight(jd: Double, midnightJd: Double): Int =
+        Math.round((jd - midnightJd) * 1440.0).toInt().coerceIn(0, 1439)
 
     private fun formatMins(mins: Int, use24Hour: Boolean = false): String {
         val hrs = mins / 60
