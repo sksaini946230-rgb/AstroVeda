@@ -670,14 +670,38 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _choghadiyaDaytime = MutableStateFlow(true)
     val choghadiyaDaytime: StateFlow<Boolean> = _choghadiyaDaytime.asStateFlow()
 
-    val choghadiyaSlots: List<ChoghadiyaSlot>
-        get() = ChoghadiyaCalculator.getChoghadiyaSlots(
+    /**
+     * The eight Choghadiya slots, as observable state.
+     *
+     * This was a plain `get()`. It read four MutableStateFlows through `.value`,
+     * which is not a snapshot read, so Compose never learned that the list
+     * depended on them. The screen collected `choghadiyaDaytime` for the
+     * toggle's highlight and read this getter once: tapping "रात का चौघड़िया"
+     * lit the night pill and left all eight tiles showing the daytime sequence
+     * and daytime hours. The night Choghadiya could not be reached at all.
+     *
+     * The same silence applied to the other three inputs — changing the city,
+     * the date, or the 12/24-hour setting left this list stale until something
+     * unrelated happened to recompose the screen.
+     *
+     * Combining them makes every input an actual dependency, so the list cannot
+     * disagree with the controls that produce it.
+     */
+    val choghadiyaSlots: StateFlow<List<ChoghadiyaSlot>> = kotlinx.coroutines.flow.combine(
+        _selectedDate, _choghadiyaDaytime, _selectedCity, _use24HourFormat
+    ) { date, isDay, city, use24 ->
+        ChoghadiyaCalculator.getChoghadiyaSlots(date, isDay, city.latitude, city.longitude, use24)
+    }.stateIn(
+        viewModelScope,
+        kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5000),
+        ChoghadiyaCalculator.getChoghadiyaSlots(
             _selectedDate.value,
             _choghadiyaDaytime.value,
             _selectedCity.value.latitude,
             _selectedCity.value.longitude,
             _use24HourFormat.value
         )
+    )
 
     fun toggleChoghadiyaDayNight(isDay: Boolean) {
         _choghadiyaDaytime.value = isDay

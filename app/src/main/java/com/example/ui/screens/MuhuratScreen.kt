@@ -58,7 +58,7 @@ import com.example.ui.theme.ShubhSuccessColor
 fun MuhuratScreen(viewModel: MainViewModel) {
     val view = LocalView.current
     val isDaytime by viewModel.choghadiyaDaytime.collectAsState()
-    val slots = viewModel.choghadiyaSlots
+    val slots by viewModel.choghadiyaSlots.collectAsState()
     val muhurats = viewModel.upcomingMuhurats
 
     Scaffold(

@@ -123,7 +123,7 @@ fun PanchangScreen(
     val panchang by viewModel.panchangState.collectAsState()
     val selectedCity by viewModel.selectedCity.collectAsState()
     val isChoghadiyaDaytime by viewModel.choghadiyaDaytime.collectAsState()
-    val choghadiyaSlots = viewModel.choghadiyaSlots
+    val choghadiyaSlots by viewModel.choghadiyaSlots.collectAsState()
     val currentSubTab by viewModel.panchangSubTab.collectAsState()
 
     val currentUser by viewModel.currentUser.collectAsState()
