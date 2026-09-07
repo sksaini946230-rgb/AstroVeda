@@ -173,6 +173,7 @@ class MainActivity : ComponentActivity() {
                         com.example.service.AdsInitState.markReady()
                     }
                     loadInterstitialAd()
+                    onAdsInitialised()
                 } catch (e: Throwable) {
                     // fail gracefully
                 }
@@ -184,6 +185,7 @@ class MainActivity : ComponentActivity() {
                     com.example.service.AdsInitState.markReady()
                 }
                 loadInterstitialAd()
+                onAdsInitialised()
             } catch (_: Throwable) {
             }
         }
@@ -420,6 +422,27 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * The two formats that are not requested from a composable.
+     *
+     * The app-open ad is registered in RevatiApp because it watches the whole
+     * process, but it cannot ask for anything until consent has been gathered
+     * and the SDK is up — which happens here. The rewarded ad is preloaded so
+     * the PDF button can offer to play one instead of making the user wait for
+     * a request after they have already tapped.
+     */
+    private fun onAdsInitialised() {
+        try {
+            com.example.service.AppOpenAdManager.isProUser = { mainViewModel.isProUser.value }
+            com.example.service.AppOpenAdManager.load()
+            if (!mainViewModel.isProUser.value) {
+                com.example.service.RewardedAdManager.load(this)
+            }
+        } catch (e: Throwable) {
+            // Ads must never take the app down with them.
+        }
+    }
+
     private fun loadInterstitialAd() {
         val interstitialId = try {
             val id = app.revati.jyotish.BuildConfig.ADMOB_INTERSTITIAL_ID
@@ -518,8 +541,27 @@ class MainActivity : ComponentActivity() {
             return
         }
 
+        // The app-open ad is the other thing that can cover the screen, and the
+        // two are driven by unrelated events — a tab change and a return to the
+        // foreground. Without this, doing both at once hands the user two
+        // full-screen ads back to back.
+        if (!com.example.service.FullScreenAdGate.canShow(currentTime)) return
+
         try {
             mInterstitialAd?.let { ad ->
+                ad.fullScreenContentCallback = object : com.google.android.gms.ads.FullScreenContentCallback() {
+                    override fun onAdShowedFullScreenContent() {
+                        com.example.service.FullScreenAdGate.onShown()
+                    }
+
+                    override fun onAdDismissedFullScreenContent() {
+                        com.example.service.FullScreenAdGate.onDismissed()
+                    }
+
+                    override fun onAdFailedToShowFullScreenContent(e: com.google.android.gms.ads.AdError) {
+                        com.example.service.FullScreenAdGate.onDismissed()
+                    }
+                }
                 ad.show(this)
                 mInterstitialAd = null
                 lastInterstitialShowTime = currentTime

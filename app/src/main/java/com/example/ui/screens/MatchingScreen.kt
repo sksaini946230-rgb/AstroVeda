@@ -37,6 +37,7 @@ import androidx.compose.material.icons.filled.Male
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -44,9 +45,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -97,6 +100,82 @@ fun MatchingScreen(viewModel: MainViewModel) {
     var showGirlDatePicker by remember { mutableStateOf(false) }
     var showBoyTimePicker by remember { mutableStateOf(false) }
     var showGirlTimePicker by remember { mutableStateOf(false) }
+    var showPdfRewardPrompt by remember { mutableStateOf(false) }
+
+    if (showPdfRewardPrompt) {
+        val ctx = LocalContext.current
+        val gunaResultNow = gunaResult
+        val isPro by viewModel.isProUser.collectAsState()
+
+        // What this offers, and what it never does.
+        //
+        // The PDF is the output of a calculation the user has already run, and
+        // it has always been free. So this asks — it does not charge. Watching
+        // is one tap and skipping is the other, and skipping still produces the
+        // report. RewardedAdManager also reports success when it has no ad to
+        // show, so a no-fill is invisible here: nobody loses a report because
+        // AdMob had nothing to serve.
+        //
+        // PRO users never see this at all.
+        fun makeReport() {
+            showPdfRewardPrompt = false
+            val r = gunaResultNow ?: return
+            val pdfFile = MatchingPdfReportService.generatePdfReport(ctx, r)
+            if (pdfFile != null) MatchingPdfReportService.sharePdfReport(ctx, pdfFile)
+        }
+
+        if (isPro || !com.example.service.RewardedAdManager.isReady) {
+            // Nothing to offer. Do not put a dialog in the way of a button that
+            // used to just work.
+            LaunchedEffect(Unit) { makeReport() }
+        } else {
+            AlertDialog(
+                onDismissRequest = { showPdfRewardPrompt = false },
+                title = {
+                    Text(
+                        LanguageManager.getString(
+                            "PDF रिपोर्ट",
+                            "PDF report"
+                        )
+                    )
+                },
+                text = {
+                    Text(
+                        LanguageManager.getString(
+                            "एक छोटा विज्ञापन देखकर रिपोर्ट प्राप्त करें, या सीधे रिपोर्ट बनाएं — दोनों में रिपोर्ट पूरी मिलेगी।",
+                            "Watch a short ad to support the app, or just make the report — either way you get the full report."
+                        )
+                    )
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        val activity = ctx as? android.app.Activity
+                        if (activity == null) {
+                            makeReport()
+                        } else {
+                            showPdfRewardPrompt = false
+                            com.example.service.RewardedAdManager.showForReward(activity) { granted ->
+                                if (granted) {
+                                    val r = gunaResultNow
+                                    if (r != null) {
+                                        val f = MatchingPdfReportService.generatePdfReport(ctx, r)
+                                        if (f != null) MatchingPdfReportService.sharePdfReport(ctx, f)
+                                    }
+                                }
+                            }
+                        }
+                    }) {
+                        Text(LanguageManager.getString("विज्ञापन देखें", "Watch ad"))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { makeReport() }) {
+                        Text(LanguageManager.getString("सीधे बनाएं", "Just make it"))
+                    }
+                }
+            )
+        }
+    }
 
     if (showBoyTimePicker) {
         M3TimePickerDialog(
@@ -441,10 +520,7 @@ fun MatchingScreen(viewModel: MainViewModel) {
                                     .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
                                     .clickable {
                                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                        val pdfFile = MatchingPdfReportService.generatePdfReport(context, result)
-                                        if (pdfFile != null) {
-                                            MatchingPdfReportService.sharePdfReport(context, pdfFile)
-                                        }
+                                        showPdfRewardPrompt = true
                                     }
                                     .padding(vertical = 12.dp)
                                     .testTag("share_pdf_report_button"),

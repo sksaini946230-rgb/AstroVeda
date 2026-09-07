@@ -430,8 +430,14 @@ plugin. **The plugin cannot emit an empty string** — an unset value must be a
 sentinel, which is why `PLAY_LICENSE_KEY=NOT_CONFIGURED` rather than blank.
 
 Keys: `ADMOB_APP_ID_ANDROID`, `ADMOB_BANNER_ID`, `ADMOB_INTERSTITIAL_ID`,
-`GOOGLE_WEB_CLIENT_ID`, `PLAY_LICENSE_KEY`, `KEYSTORE_PATH`, `STORE_PASSWORD`,
-`KEY_ALIAS`, `KEY_PASSWORD`.
+`ADMOB_APP_OPEN_ID`, `ADMOB_REWARDED_ID`, `GOOGLE_WEB_CLIENT_ID`,
+`PLAY_LICENSE_KEY`, `KEYSTORE_PATH`, `STORE_PASSWORD`, `KEY_ALIAS`,
+`KEY_PASSWORD`.
+
+`ADMOB_APP_OPEN_ID` and `ADMOB_REWARDED_ID` are still `NOT_CONFIGURED`. The
+units exist in AdMob; the ids have not been pasted in. Until they are, those two
+placements are absent — no crash, no test ad, nothing on screen. See
+`AdIds.resolve`.
 
 Release signing uses `upload-keystore.jks` (alias `upload`). The older
 `astroveda-upload-key.jks` is dead — Play no longer accepts it.
@@ -669,6 +675,68 @@ Two code faults were found afterwards and fixed, both the same mistake:
   it arrives whether startup succeeded or not.
 - Startup *finishing* and startup *working* are different facts. Nothing should
   gate on the second one.
+
+**Four ad formats now, and one gate between the two that cover the screen.**
+Banner and interstitial were the only ones; App Open and Rewarded were added on
+the owner's instruction after he created the units.
+
+    banner        anchored adaptive, refreshes every 60s while on screen
+    interstitial  tab change, 45s / 120s / 5 per session
+    app open      return to the foreground, never on a cold start
+    rewarded      opt-in, in front of the Guna Milan PDF
+
+`FullScreenAdGate` is what stops the interstitial and the app-open ad arriving
+together — they fire on unrelated events (a tab change, a return to the
+foreground), so "come back to the app and change tab" was two full-screen ads
+back to back. One at a time, and a 60s floor between any two of them.
+
+`AdIds.resolve` decides what may be asked for. Debug always uses Google's test
+units — development traffic on a live unit is what invalid-traffic enforcement
+looks for, and the account is what is at risk. Release refuses a test unit, the
+`NOT_CONFIGURED` sentinel, and anything not shaped like `ca-app-pub-…/…`,
+because `.env.example` holds test ids and the secrets plugin falls back to it
+for any key `.env` does not define — so a release built without `.env` would
+otherwise serve test ads to real users, earn nothing, and look like it worked.
+An unresolvable id means the placement is simply absent. `AdIdsTest` pins it.
+
+**The rewarded ad must never cost the user the report.** The PDF has always been
+free and is the output of a calculation they already ran. `RewardedAdManager`
+reports the reward as earned whenever there is no ad to show, so a no-fill is
+invisible: only an ad that actually played and was actually abandoned counts as
+a refusal. The dialog offers "Watch ad" and "Just make it", and both produce the
+report; PRO users never see it.
+
+**The app-open ad never shows on a cold start.** Google's guidance is that it
+belongs over a loading screen someone is already waiting through, not in front
+of an app they just launched — that is how these get reported as disruptive. It
+also needs the process's foreground state, which an Activity cannot see, so it
+is registered from `RevatiApp` and counts started Activities rather than using
+ProcessLifecycleOwner: a rotation never drops the count to zero, so returning
+from a rotation cannot be mistaken for returning from the launcher. Four-hour
+expiry, because that is Google's documented validity window for the response.
+
+**Every ad callback logs at error level, and that is deliberate.** The test
+device keeps nothing below E — a dump of its buffer holds thousands of E lines
+and not one W. `AdBanner` logged its failure at warning, so the message its own
+comment called worth keeping was invisible in the only place anyone reads it;
+the interstitial logged nothing at all. Both say `loaded` or `load failed:
+code=… msg=…` now, and that is how `code=3 No fill` was identified in one run
+instead of being guessed at.
+
+**No fill is a fact about the minute, not the session.** The banner used to give
+up after three retries and render nothing until the app restarted; the
+interstitial retried only when a tab change happened to pass all three gates,
+which during the first 45 seconds never happens. Both retry on a bounded
+schedule now. On 7 Sep 2026 the banner took `No fill` for twenty minutes
+straight in portrait while the interstitial filled immediately and the banner
+itself had filled in landscape — demand is thin and uneven for a new app, which
+is exactly why giving up is the wrong response.
+
+**Ads cannot be tested on the iPhone hotspot.** It resolves
+`googleads.g.doubleclick.net` and `pagead2.googlesyndication.com` to 127.0.0.1,
+so every request fails and it looks like the integration is broken. `adb shell
+ping pagead2.googlesyndication.com` answers in 0.1ms when this is happening.
+Switch the phone to normal WiFi before concluding anything about ads.
 
 **Interstitials are wired to tab switches and are meant to be sparse.**
 `onBottomNavTabSelected` triggers one on every real tab change, but

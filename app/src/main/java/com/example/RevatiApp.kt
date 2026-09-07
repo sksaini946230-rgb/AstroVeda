@@ -26,5 +26,10 @@ class RevatiApp : Application() {
         super.onCreate()
         com.example.util.LanguageManager.init(this)
         com.example.service.AppCheckInitializer.install()
+
+        // The app-open ad watches the process's foreground state, so it has to
+        // be registered from here rather than from an Activity — an Activity
+        // cannot see the app being backgrounded and brought back.
+        com.example.service.AppOpenAdManager.register(this)
     }
 }
