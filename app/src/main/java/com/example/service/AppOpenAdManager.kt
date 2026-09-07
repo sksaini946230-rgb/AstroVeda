@@ -61,6 +61,23 @@ object AppOpenAdManager {
     private var backgroundedAt = 0L
     private var hadFirstForeground = false
 
+    /** Set when a foreground transition is seen, acted on once the Activity resumes. */
+    private var showOnNextResume = false
+
+    private val handler = android.os.Handler(android.os.Looper.getMainLooper())
+
+    /**
+     * How long after onResume to attempt the show.
+     *
+     * Long enough for the process to actually become foreground, short enough
+     * that the ad still reads as part of opening the app rather than as an
+     * interruption of something the user has started doing.
+     */
+    private const val SHOW_DELAY_MS = 600L
+
+    /** One more attempt, for the case where 600ms was not enough. */
+    private const val RETRY_SHOW_DELAY_MS = 1_200L
+
     /** Set by the app; this file does not depend on the billing layer. */
     @Volatile
     var isProUser: () -> Boolean = { false }
@@ -106,12 +123,20 @@ object AppOpenAdManager {
                 if (System.currentTimeMillis() - backgroundedAt < MIN_BACKGROUND_MS) {
                     return
                 }
-                showIfAvailable(a)
+
+                // Decided here, shown in onActivityResumed. onStart is where the
+                // foreground *transition* can be detected, but the Activity is
+                // not actually foreground yet — showing from here gets
+                // "The ad can not be shown when app is not in foreground" from
+                // the SDK and burns the loaded ad. Found on the device; the log
+                // line is the only reason it was visible at all.
+                showOnNextResume = true
             }
 
             override fun onActivityStopped(a: Activity) {
                 startedActivities = (startedActivities - 1).coerceAtLeast(0)
                 if (startedActivities == 0) {
+                    showOnNextResume = false
                     backgroundedAt = System.currentTimeMillis()
                     // Have one ready for the return rather than starting the
                     // request at the moment it is needed.
@@ -119,7 +144,20 @@ object AppOpenAdManager {
                 }
             }
 
-            override fun onActivityResumed(a: Activity) { currentActivity = a }
+            override fun onActivityResumed(a: Activity) {
+                currentActivity = a
+                if (!showOnNextResume) return
+                showOnNextResume = false
+                // Posted, not called straight through. onResume runs before the
+                // process reaches foreground importance, and the SDK checks
+                // that: showing from here directly gets "The ad can not be
+                // shown when app is not in foreground". Verified on the device
+                // from both onStart and onResume before this was added.
+                handler.postDelayed({
+                    val act = currentActivity
+                    if (act != null && !act.isFinishing) showIfAvailable(act, retryOnNotForeground = true)
+                }, SHOW_DELAY_MS)
+            }
             override fun onActivityPaused(a: Activity) {}
             override fun onActivitySaveInstanceState(a: Activity, b: Bundle) {}
         })
@@ -160,7 +198,7 @@ object AppOpenAdManager {
         )
     }
 
-    private fun showIfAvailable(activity: Activity) {
+    private fun showIfAvailable(activity: Activity, retryOnNotForeground: Boolean = false) {
         if (isProUser()) return
         if (!FullScreenAdGate.canShow()) return
 
@@ -184,9 +222,23 @@ object AppOpenAdManager {
 
             override fun onAdFailedToShowFullScreenContent(error: AdError) {
                 FullScreenAdGate.onDismissed()
-                appOpenAd = null
                 Log.e(TAG, "show failed: ${error.message}")
-                load()
+
+                // Keep the ad. A failure to show is almost always the
+                // foreground race above, not a bad ad — and the response is
+                // valid for four hours, so throwing it away meant paying for a
+                // load and then discarding it. It used to be nulled here.
+                if (isExpired()) {
+                    appOpenAd = null
+                    load()
+                    return
+                }
+                if (retryOnNotForeground) {
+                    handler.postDelayed({
+                        val act = currentActivity
+                        if (act != null && !act.isFinishing) showIfAvailable(act)
+                    }, RETRY_SHOW_DELAY_MS)
+                }
             }
         }
 

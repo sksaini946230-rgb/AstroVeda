@@ -706,6 +706,21 @@ invisible: only an ad that actually played and was actually abandoned counts as
 a refusal. The dialog offers "Watch ad" and "Just make it", and both produce the
 report; PRO users never see it.
 
+**An app-open ad cannot be shown from `onStart`, and barely from `onResume`.**
+The SDK refuses with *"The ad can not be shown when app is not in foreground"*
+and, as first written, that refusal also threw the loaded ad away. `onStart` is
+where the background-to-foreground transition can be *detected*, but the process
+has not reached foreground importance yet; `onResume` is closer and still too
+early. It is posted 600ms after resume now, with one retry at 1.2s, and a show
+failure keeps the ad — the response is valid for four hours, so discarding it
+meant paying for a load and binning it.
+
+Two false alarms are worth recording alongside that, because both looked like
+the same bug. Bringing the app back with `adb shell am start` while the screen
+is **asleep** produces exactly that message and is correct behaviour: check
+`dumpsys power | grep mWakefulness` before believing it. And the message only
+became visible at all because these callbacks log at error level.
+
 **The app-open ad never shows on a cold start.** Google's guidance is that it
 belongs over a loading screen someone is already waiting through, not in front
 of an app they just launched — that is how these get reported as disruptive. It
