@@ -47,6 +47,17 @@ object KundaliMatchingCalculator {
     private val NADI_NAMES_HI = listOf("आद्य (Adi / Vata)", "मध्य (Madhya / Pitta)", "अन्त्य (Antya / Kapha)")
     private val NADI_NAMES_EN = listOf("Adi (Vata)", "Madhya (Pitta)", "Antya (Kapha)")
 
+    /**
+     * The three Bhakoot doshas, as one-way rashi distances.
+     *
+     * 2/12 Dwirdwadasha, 5/9 Nav-Pancham, 6/8 Shadashtaka. Both ends of each
+     * pair appear because [calculateBhakoot] measures the distance in one
+     * direction only. Named here rather than inlined so the dosha label below
+     * and the score cannot disagree about which distances are a dosha —
+     * they did, and the label had no branch for Nav-Pancham at all.
+     */
+    private val BHAKOOT_DOSHA_DISTANCES = listOf(2, 12, 5, 9, 6, 8)
+
     private val RASHI_NAMES_HI = listOf(
         "मेष (Aries)", "वृषभ (Taurus)", "मिथुन (Gemini)", "कर्क (Cancer)",
         "सिंह (Leo)", "कन्या (Virgo)", "तुला (Libra)", "वृश्चिक (Scorpio)",
@@ -179,7 +190,11 @@ object KundaliMatchingCalculator {
 
         val bhakootDoshaStatusHi = if (hasBhakootDosha) {
             val rashiDist = ((girlMoonRashiIdx - boyMoonRashiIdx + 12) % 12) + 1
-            val combo = if (rashiDist == 2 || rashiDist == 12) "द्विर्द्वादश (2/12 - आर्थिक/व्यय दोष)" else "षडाष्टक (6/8 - स्वास्थ्य/कलह दोष)"
+            val combo = when (rashiDist) {
+                2, 12 -> "द्विर्द्वादश (2/12 - आर्थिक/व्यय दोष)"
+                5, 9 -> "नवपंचम (5/9 - संतान एवं मनोमेल में बाधा)"
+                else -> "षडाष्टक (6/8 - स्वास्थ्य/कलह दोष)"
+            }
             "⚠️ भकूट दोष उपस्थित है ($combo - $boyRashiNameHi एवं $girlRashiNameHi)। पारिवारिक सामंजस्य एवं आर्थिक स्थिरता के लिए सावधानी व महामृत्युंजय जप परामर्श योग्य है।"
         } else {
             "✅ भकूट दोष नहीं है ($boyRashiNameHi व $girlRashiNameHi अनुकूल भाव में हैं)। पारिवारिक सौहार्द एवं समृद्धि के लिए पूर्ण 7 गुण प्राप्त हुए हैं।"
@@ -187,7 +202,11 @@ object KundaliMatchingCalculator {
 
         val bhakootDoshaStatusEn = if (hasBhakootDosha) {
             val rashiDist = ((girlMoonRashiIdx - boyMoonRashiIdx + 12) % 12) + 1
-            val combo = if (rashiDist == 2 || rashiDist == 12) "Dwidwadasha (2/12 - Financial/Expenditure discord)" else "Shadashtaka (6/8 - Health/Relationship friction)"
+            val combo = when (rashiDist) {
+                2, 12 -> "Dwidwadasha (2/12 - Financial/Expenditure discord)"
+                5, 9 -> "Nav-Pancham (5/9 - Strain around children and temperament)"
+                else -> "Shadashtaka (6/8 - Health/Relationship friction)"
+            }
             "⚠️ Bhakoot Dosha Present ($combo between $boyRashiNameEn and $girlRashiNameEn). Prior prayers and Vedic remedies are recommended."
         } else {
             "✅ No Bhakoot Dosha ($boyRashiNameEn & $girlRashiNameEn are harmoniously placed). Full 7 points awarded for marital happiness."
@@ -504,11 +523,23 @@ object KundaliMatchingCalculator {
     }
 
     // 7. Bhakoot (Max 7.0 pts)
-    // 2/12 (Dwidwadasha) and 6/8 (Shadashtaka) = 0.0 pts (Bhakoot Dosha)
-    // Other distance combinations (1/1, 1/7, 3/11, 4/10, 5/9) = 7.0 pts
+    //
+    // There are *three* Bhakoot doshas, not two, and this scored only two of
+    // them. The classical set is 2/12 (Dwirdwadasha), 5/9 (Nav-Pancham) and
+    // 6/8 (Shadashtaka); each is 0 points, everything else is the full 7.
+    // Nav-Pancham was on the wrong side of the list — the comment here used to
+    // name 5/9 among the *scoring* distances — so one couple in six was handed
+    // seven points it should not have had and told "no Bhakoot dosha".
+    //
+    // Seven of thirty-six is enough to carry a match across the 18-point line
+    // people read as the verdict, which is why this is not a rounding matter.
+    //
+    // The distance is measured one way only, so both ends of each pair have to
+    // be listed: girl 2nd from boy is 2 and girl 12th from boy is 12, and the
+    // same for 5/9 and 6/8.
     private fun calculateBhakoot(b: Int, g: Int): Double {
         val dist = ((g - b + 12) % 12) + 1
-        return if (dist in listOf(2, 12, 6, 8)) 0.0 else 7.0
+        return if (dist in BHAKOOT_DOSHA_DISTANCES) 0.0 else 7.0
     }
 
     // 8. Nadi (Max 8.0 pts)

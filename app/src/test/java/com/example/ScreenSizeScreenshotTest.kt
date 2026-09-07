@@ -27,6 +27,7 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.Density
 import com.example.ui.MainViewModel
 import com.example.ui.screens.KundaliScreen
+import com.example.ui.screens.MatchingScreen
 import com.example.ui.screens.PanchangScreen
 import com.example.ui.screens.SettingsScreen
 import com.example.ui.theme.AstroVedaTheme
@@ -82,10 +83,12 @@ class ScreenSizeScreenshotTest {
         widthDp: Int,
         dark: Boolean = false,
         fontScale: Float = 1f,
+        prepare: (MainViewModel) -> Unit = {},
         content: @Composable (MainViewModel) -> Unit
     ) {
         RuntimeEnvironment.setQualifiers("+w${widthDp}dp-h640dp")
         val vm = MainViewModel(RuntimeEnvironment.getApplication())
+        prepare(vm)
         rule.setContent {
             val base = LocalDensity.current
             CompositionLocalProvider(LocalDensity provides Density(base.density, fontScale)) {
@@ -105,6 +108,45 @@ class ScreenSizeScreenshotTest {
 
     @Test fun kundali_320() = shoot("kundali_320", 320) { KundaliScreen(viewModel = it) }
     @Test fun kundali_360() = shoot("kundali_360", 360) { KundaliScreen(viewModel = it) }
+
+    /**
+     * Guna Milan **with the form filled in**, which is the only state in which
+     * its date field can be judged.
+     *
+     * MatchingScreen seeds its local state from the ViewModel on first
+     * composition, so setting the flows before composing renders the real
+     * screen rather than a copy of it — unlike the kundali pair below, this
+     * cannot drift out of step with production.
+     *
+     * What it caught: the boy and girl rows each gave the date `weight(1f)` of
+     * 2.2 at the default 16sp, and "1995-06-15" wrapped to a second line on a
+     * 360dp phone. The screen showed "1995-06" over "-15" for a date the user
+     * had just picked. The same code appeared twice, so the fault did too.
+     */
+    private fun filledMatch(vm: MainViewModel) {
+        vm.matchBoyName.value = "Rahul"
+        vm.matchBoyDob.value = "1995-06-15"
+        vm.matchGirlName.value = "Priya"
+        vm.matchGirlDob.value = "1997-11-22"
+    }
+
+    @Test fun matching_filled_360() =
+        shoot("matching_filled_360", 360, prepare = ::filledMatch) { MatchingScreen(viewModel = it) }
+
+    // 412dp is what most current phones report; 360dp is the narrow end and the
+    // device this app is tested on. Both are here because the point of the
+    // measured threshold is that the row splits on the wide one and stacks on
+    // the narrow one — a single width cannot show that it does either.
+    @Test fun matching_filled_412() =
+        shoot("matching_filled_412", 412, prepare = ::filledMatch) { MatchingScreen(viewModel = it) }
+
+    @Test fun matching_filled_320() =
+        shoot("matching_filled_320", 320, prepare = ::filledMatch) { MatchingScreen(viewModel = it) }
+
+    @Test fun matching_filled_320_large_text() =
+        shoot("matching_filled_320_large_text", 320, fontScale = 1.3f, prepare = ::filledMatch) {
+            MatchingScreen(viewModel = it)
+        }
 
     @Test fun settings_320() = shoot("settings_320", 320) { SettingsScreen(viewModel = it) }
     @Test fun settings_360() = shoot("settings_360", 360) { SettingsScreen(viewModel = it) }

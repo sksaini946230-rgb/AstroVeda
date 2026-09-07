@@ -5,6 +5,12 @@ import com.example.ui.components.DisclaimerScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -170,56 +176,30 @@ fun MatchingScreen(viewModel: MainViewModel) {
                             )
                         }
 
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            OutlinedTextField(
-                                value = boyName,
-                                onValueChange = {
-                                    boyName = it
-                                    viewModel.matchBoyName.value = it
-                                },
-                                label = { Text(LanguageManager.getString("वर का नाम", "Boy Name")) },
-                                colors = tfColors,
-                                modifier = Modifier.weight(1.2f).testTag("input_boy_name")
-                            )
-
-                            Box(modifier = Modifier.weight(1f)) {
-                                OutlinedTextField(
-                                    value = boyDob,
-                                    onValueChange = {
-                                        boyDob = it
-                                        viewModel.matchBoyDob.value = it
-                                    },
-                                    readOnly = true,
-                                    // "जन्म तिथि" does not fit this narrow field and
-                                    // wrapped to two lines, making the box taller than
-                                    // the name field beside it — only in Hindi.
-                                    label = {
-                                        Text(
-                                            LanguageManager.getString("तिथि", "DOB"),
-                                            maxLines = 1,
-                                            softWrap = false
-                                        )
-                                    },
-                                    trailingIcon = {
-                                        Icon(
-                                            imageVector = Icons.Default.CalendarMonth,
-                                            contentDescription = "Select Boy DOB",
-                                            tint = MaterialTheme.colorScheme.primary
-                                        )
-                                    },
-                                    colors = tfColors,
-                                    modifier = Modifier.fillMaxWidth().testTag("input_boy_dob")
-                                )
-                                Box(
-                                    modifier = Modifier
-                                        .matchParentSize()
-                                        .clickable {
-                                            view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                                            showBoyDatePicker = true
-                                        }
-                                )
-                            }
-                        }
+                        NameAndDobFields(
+                            name = boyName,
+                            onNameChange = {
+                                boyName = it
+                                viewModel.matchBoyName.value = it
+                            },
+                            nameLabel = LanguageManager.getString("वर का नाम", "Boy Name"),
+                            dob = boyDob,
+                            onDobChange = {
+                                boyDob = it
+                                viewModel.matchBoyDob.value = it
+                            },
+                            dobContentDescription = LanguageManager.getString(
+                                "वर की जन्म तिथि चुनें", "Select boy's date of birth"
+                            ),
+                            iconTint = MaterialTheme.colorScheme.primary,
+                            onDobClick = {
+                                view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                                showBoyDatePicker = true
+                            },
+                            colors = tfColors,
+                            nameTestTag = "input_boy_name",
+                            dobTestTag = "input_boy_dob"
+                        )
 
                         // Girl Details
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -231,56 +211,30 @@ fun MatchingScreen(viewModel: MainViewModel) {
                             )
                         }
 
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            OutlinedTextField(
-                                value = girlName,
-                                onValueChange = {
-                                    girlName = it
-                                    viewModel.matchGirlName.value = it
-                                },
-                                label = { Text(LanguageManager.getString("कन्या का नाम", "Girl Name")) },
-                                colors = tfColors,
-                                modifier = Modifier.weight(1.2f).testTag("input_girl_name")
-                            )
-
-                            Box(modifier = Modifier.weight(1f)) {
-                                OutlinedTextField(
-                                    value = girlDob,
-                                    onValueChange = {
-                                        girlDob = it
-                                        viewModel.matchGirlDob.value = it
-                                    },
-                                    readOnly = true,
-                                    // "जन्म तिथि" does not fit this narrow field and
-                                    // wrapped to two lines, making the box taller than
-                                    // the name field beside it — only in Hindi.
-                                    label = {
-                                        Text(
-                                            LanguageManager.getString("तिथि", "DOB"),
-                                            maxLines = 1,
-                                            softWrap = false
-                                        )
-                                    },
-                                    trailingIcon = {
-                                        Icon(
-                                            imageVector = Icons.Default.CalendarMonth,
-                                            contentDescription = "Select Girl DOB",
-                                            tint = MaterialTheme.colorScheme.secondary
-                                        )
-                                    },
-                                    colors = tfColors,
-                                    modifier = Modifier.fillMaxWidth().testTag("input_girl_dob")
-                                )
-                                Box(
-                                    modifier = Modifier
-                                        .matchParentSize()
-                                        .clickable {
-                                            view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-                                            showGirlDatePicker = true
-                                        }
-                                )
-                            }
-                        }
+                        NameAndDobFields(
+                            name = girlName,
+                            onNameChange = {
+                                girlName = it
+                                viewModel.matchGirlName.value = it
+                            },
+                            nameLabel = LanguageManager.getString("कन्या का नाम", "Girl Name"),
+                            dob = girlDob,
+                            onDobChange = {
+                                girlDob = it
+                                viewModel.matchGirlDob.value = it
+                            },
+                            dobContentDescription = LanguageManager.getString(
+                                "कन्या की जन्म तिथि चुनें", "Select girl's date of birth"
+                            ),
+                            iconTint = MaterialTheme.colorScheme.secondary,
+                            onDobClick = {
+                                view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                                showGirlDatePicker = true
+                            },
+                            colors = tfColors,
+                            nameTestTag = "input_girl_name",
+                            dobTestTag = "input_girl_dob"
+                        )
 
                         val isCalculating by viewModel.isCalculating.collectAsState()
                         val inputError by viewModel.matchingInputError.collectAsState()
@@ -688,6 +642,121 @@ fun MatchingScreen(viewModel: MainViewModel) {
 
             item {
                 Spacer(modifier = Modifier.height(24.dp))
+            }
+        }
+    }
+}
+
+
+/**
+ * One person's name and date of birth, side by side when they fit and stacked
+ * when they do not.
+ *
+ * The date used to sit in a `weight(1f)` half of the row at the default 16sp,
+ * and "1995-06-15" did not fit: on a 360dp phone it wrapped to a second line,
+ * so the field a user had just filled read "1995-06" over "-15". Both blocks
+ * carried the same code, so the bug existed twice and had to be fixed twice.
+ *
+ * The threshold is measured rather than guessed. A dp cut-off cannot see the
+ * font scale, and 320dp at 1.3x text is a real device: ask how wide the widest
+ * date this field will ever hold actually renders, and compare that with the
+ * room the narrow half leaves once the gap, the field's own padding and the
+ * calendar icon are taken out. Sized this way it stays right when the user
+ * turns text size up, which a fixed breakpoint does not.
+ *
+ * This mirrors what [com.example.ui.screens.KundaliScreen] does for its own
+ * date and time pair; the two screens had the same clipping for the same
+ * reason, and only one of them had been fixed.
+ */
+@Composable
+private fun NameAndDobFields(
+    name: String,
+    onNameChange: (String) -> Unit,
+    nameLabel: String,
+    dob: String,
+    onDobChange: (String) -> Unit,
+    dobContentDescription: String,
+    iconTint: Color,
+    onDobClick: () -> Unit,
+    colors: TextFieldColors,
+    nameTestTag: String,
+    dobTestTag: String
+) {
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        val measurer = rememberTextMeasurer()
+        val valueStyle = LocalTextStyle.current.copy(fontSize = 13.sp)
+        val widestDate = measurer.measure(AnnotatedString("0000-00-00"), valueStyle).size.width
+        // Half the row, less the gap, less the 66dp the field's own horizontal
+        // padding and the trailing icon take. The same arithmetic as
+        // KundaliScreen's date/time pair, deliberately: the two screens hold
+        // the same ten-character date in the same kind of field, so they should
+        // reach the same answer about whether it fits.
+        val roomForDate = with(LocalDensity.current) {
+            (((maxWidth - 8.dp) / 2) - 66.dp).toPx()
+        }
+        val stack = widestDate > roomForDate
+
+        val nameField = @Composable { modifier: Modifier ->
+            OutlinedTextField(
+                value = name,
+                onValueChange = onNameChange,
+                label = { Text(nameLabel, maxLines = 1, softWrap = false) },
+                colors = colors,
+                singleLine = true,
+                modifier = modifier.testTag(nameTestTag)
+            )
+        }
+
+        val dobField = @Composable { modifier: Modifier ->
+            Box(modifier = modifier) {
+                OutlinedTextField(
+                    value = dob,
+                    onValueChange = onDobChange,
+                    readOnly = true,
+                    // "जन्म तिथि" does not fit this narrow field and wrapped to
+                    // two lines, making the box taller than the name field
+                    // beside it — only in Hindi.
+                    label = {
+                        Text(
+                            LanguageManager.getString("तिथि", "DOB"),
+                            maxLines = 1,
+                            softWrap = false
+                        )
+                    },
+                    placeholder = { Text("YYYY-MM-DD", maxLines = 1, softWrap = false) },
+                    textStyle = LocalTextStyle.current.copy(fontSize = 13.sp),
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.CalendarMonth,
+                            contentDescription = dobContentDescription,
+                            tint = iconTint,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    },
+                    colors = colors,
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth().testTag(dobTestTag)
+                )
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .clickable(onClick = onDobClick)
+                )
+            }
+        }
+
+        if (stack) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                nameField(Modifier.fillMaxWidth())
+                dobField(Modifier.fillMaxWidth())
+            }
+        } else {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                nameField(Modifier.weight(1f))
+                dobField(Modifier.weight(1f))
             }
         }
     }
