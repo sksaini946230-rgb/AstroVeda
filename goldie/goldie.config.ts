@@ -13,10 +13,10 @@
  * the match is "Rahul & Priya", and the city is Jaipur.
  */
 const config = {
-  appRoot: "/Users/sksaini/AstroVeda",
+  appRoot: "/Users/sksaini/Revati",
   bundleId: "com.aistudio.astroveda.kpvqzm",
   android: {
-    appPath: "/Users/sksaini/AstroVeda/app/build/outputs/apk/release/app-release.apk",
+    appPath: "/Users/sksaini/Revati/app/build/outputs/apk/release/app-release.apk",
     applicationId: "com.aistudio.astroveda.kpvqzm",
   },
 

@@ -19,6 +19,8 @@ record bugs that shipped once already.
 | Kotlin source package | `com.example.*` |
 | Firebase project | `astroveda-7126b` |
 | Play developer | Msunjay Enterprises |
+| Local checkout | `~/Revati` — renamed from `~/AstroVeda` on 8 Sep 2026 |
+| GitHub repo | `sksaini946230-rgb/AstroVeda` |
 
 The app was called **AstroVeda** until Aug 2026. That name had to go: five apps
 on Play already use it, two with six-figure installs. The rename reached the UI
@@ -33,6 +35,16 @@ So: `namespace ≠ source package`. Two consequences that have already bitten:
 - Manifest components must be **fully qualified** (`com.example.MainActivity`),
   never `.MainActivity` — a leading dot resolves against the namespace, which is
   no longer where the classes are.
+
+The folder and the GitHub repo disagree for the same reason and neither is a
+mistake. The checkout was renamed to `~/Revati` so that nothing on this machine
+still says AstroVeda; the **repo** kept its name because its URL is published —
+`docs/PRIVACY_POLICY.md` points at it, and it is the address anyone who has the
+policy has already followed. Renaming a repo is a redirect, not a break, but it
+is an outward-facing change and belongs to the owner, not to a tidy-up. Nothing
+in the build refers to either name: paths are relative, and the two absolute
+ones that existed — `goldie.config.ts` and `.env`'s `KEYSTORE_PATH` — were
+rewritten with the folder.
 
 Do not "tidy" any of this into agreement. Each half is pinned by something
 external.
