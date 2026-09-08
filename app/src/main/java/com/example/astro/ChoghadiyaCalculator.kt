@@ -121,9 +121,26 @@ object ChoghadiyaCalculator {
         }
     }
 
-    /** Local minutes past midnight for a UT Julian Day, rounded to the minute. */
-    private fun minutesFromMidnight(jd: Double, midnightJd: Double): Int =
-        Math.round((jd - midnightJd) * 1440.0).toInt().coerceIn(0, 1439)
+    /**
+     * Local minutes past midnight for a UT Julian Day.
+     *
+     * Through Calendar, and truncating, because that is exactly what
+     * PanchangCalculator.jdToLocalMinutes does — `Calendar.MINUTE` drops the
+     * seconds. This used to round instead, and the difference showed: for
+     * Mumbai the Panchang printed "Sunrise: 06:24 AM" while the Choghadiya
+     * strip directly beneath it on the same screen opened at 06:25. One
+     * instant, two numbers, a minute apart.
+     *
+     * Going through Calendar rather than arithmetic also keeps the two in step
+     * on anything the zone does to the day, rather than only agreeing when
+     * nothing unusual is happening.
+     */
+    private fun minutesFromMidnight(jd: Double, @Suppress("UNUSED_PARAMETER") midnightJd: Double): Int {
+        val cal = java.util.GregorianCalendar(AstroTime.IST).apply {
+            timeInMillis = AstroTime.millisFromJulianDay(jd)
+        }
+        return cal.get(Calendar.HOUR_OF_DAY) * 60 + cal.get(Calendar.MINUTE)
+    }
 
     private fun formatMins(mins: Int, use24Hour: Boolean = false): String {
         val hrs = mins / 60

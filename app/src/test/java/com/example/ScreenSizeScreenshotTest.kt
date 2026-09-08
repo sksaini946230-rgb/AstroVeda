@@ -204,6 +204,39 @@ class ScreenSizeScreenshotTest {
             MatchingScreen(viewModel = it)
         }
 
+    /**
+     * The Settings location row with a long, GPS-set place name.
+     *
+     * The row's two children had no weight, so the name took whatever width it
+     * wanted and the buttons got the remainder: with the location set by GPS to
+     * "Chak Basantpur (Uttar Pradesh)" — which is a real result from a real
+     * phone, not an invented worst case — "Search city" rendered as a single
+     * column of letters, one per line. The short city names in the shots below
+     * never showed it.
+     */
+    private fun longCity(vm: MainViewModel) {
+        vm.setCity(
+            com.example.data.model.CityLocation(
+                cityName = "Chak Basantpur",
+                cityNameHindi = "चक बसंतपुर",
+                state = "Uttar Pradesh",
+                latitude = 28.8155,
+                longitude = 79.0250
+            )
+        )
+    }
+
+    @Test fun settings_longcity_360() =
+        shoot("settings_longcity_360", 360, prepare = ::longCity) { SettingsScreen(viewModel = it) }
+
+    @Test fun settings_longcity_320() =
+        shoot("settings_longcity_320", 320, prepare = ::longCity) { SettingsScreen(viewModel = it) }
+
+    @Test fun settings_longcity_320_large_text() =
+        shoot("settings_longcity_320_large_text", 320, fontScale = 1.3f, prepare = ::longCity) {
+            SettingsScreen(viewModel = it)
+        }
+
     @Test fun settings_320() = shoot("settings_320", 320) { SettingsScreen(viewModel = it) }
     @Test fun settings_360() = shoot("settings_360", 360) { SettingsScreen(viewModel = it) }
 

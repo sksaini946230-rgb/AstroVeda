@@ -39,12 +39,14 @@ class ChoghadiyaSunriseTest {
         Place("Kanyakumari", 8.0883, 77.5385)
     )
 
+    /** Exactly what PanchangCalculator does: through Calendar, truncating. */
     private fun panchangSunriseMinutes(y: Int, m: Int, d: Int, p: Place): Int {
         val zone = AstroTime.IST
         val midnightJd = AstroTime.julianDayFromLocal(y, m, d, 0, 0, zone)
         val rise = RiseSetCalculator.sunRiseSet(midnightJd, p.lat, p.lon).riseJd
             ?: return -1
-        return Math.round((rise - midnightJd) * 1440.0).toInt()
+        val cal = GregorianCalendar(zone).apply { timeInMillis = AstroTime.millisFromJulianDay(rise) }
+        return cal.get(Calendar.HOUR_OF_DAY) * 60 + cal.get(Calendar.MINUTE)
     }
 
     private fun choghadiyaFirstSlotMinutes(y: Int, m: Int, d: Int, p: Place): Int {
@@ -71,8 +73,10 @@ class ChoghadiyaSunriseTest {
                 val panchang = panchangSunriseMinutes(y, m, d, p)
                 if (panchang < 0) continue
                 val chog = choghadiyaFirstSlotMinutes(y, m, d, p)
-                // One minute for the rounding each side does independently.
-                if (Math.abs(panchang - chog) > 1) {
+                // Exactly equal. They were a minute apart while one side
+                // rounded and the other truncated, which is visible on the
+                // Panchang screen where both numbers appear together.
+                if (panchang != chog) {
                     off += "${p.name} $y-$m-$d: panchang=$panchang chogh=$chog (${chog - panchang} min)"
                 }
             }
@@ -89,8 +93,12 @@ class ChoghadiyaSunriseTest {
         val zone = AstroTime.IST
         val midnightJd = AstroTime.julianDayFromLocal(2026, 9, 7, 0, 0, zone)
         val sun = RiseSetCalculator.sunRiseSet(midnightJd, p.lat, p.lon)
-        val rise = Math.round((sun.riseJd!! - midnightJd) * 1440.0).toInt()
-        val set = Math.round((sun.setJd!! - midnightJd) * 1440.0).toInt()
+        fun toMin(jd: Double): Int {
+            val c = GregorianCalendar(zone).apply { timeInMillis = AstroTime.millisFromJulianDay(jd) }
+            return c.get(Calendar.HOUR_OF_DAY) * 60 + c.get(Calendar.MINUTE)
+        }
+        val rise = toMin(sun.riseJd!!)
+        val set = toMin(sun.setJd!!)
 
         val cal = GregorianCalendar(zone).apply { clear(); set(2026, Calendar.SEPTEMBER, 7, 12, 0, 0) }
         val slots = ChoghadiyaCalculator.getChoghadiyaSlots(
@@ -99,7 +107,7 @@ class ChoghadiyaSunriseTest {
         assertEquals(8, slots.size)
 
         fun mins(s: String) = s.split(":").let { it[0].toInt() * 60 + it[1].toInt() }
-        assertTrue("first slot should start at sunrise", Math.abs(mins(slots.first().startTime) - rise) <= 1)
+        assertEquals("first slot should start at sunrise", rise, mins(slots.first().startTime))
         // Eight eighths, so the last one ends at sunset give or take the rounding.
         assertTrue(
             "last slot should end at sunset, was ${slots.last().endTime} vs $set",

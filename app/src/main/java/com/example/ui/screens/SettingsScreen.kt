@@ -130,6 +130,75 @@ fun SettingsScreen(
     var showLocationModal by remember { mutableStateOf(false) }
     var isRefreshingLocation by remember { mutableStateOf(false) }
 
+    // What this button used to do, in full: set a spinner, wait a second, and
+    // show "Location refreshed: <the city you already had>". Its own comment
+    // said `// Simulate location refresh`. It never touched location services,
+    // so it always reported success and the name it reported was whatever was
+    // already set — which is exactly what a working refresh looks like from the
+    // outside. The app declares ACCESS_FINE_LOCATION and ACCESS_COARSE_LOCATION
+    // and MainViewModel.detectGPSLocation is a complete, correct implementation
+    // — fused provider, geocoder, last-known fallback, permission check. Nobody
+    // had connected the two.
+    //
+    // Found by trying to put a city back after changing it, on a device where
+    // the permission had never been granted: the button said it had refreshed
+    // and nothing happened. PanchangScreen has had the real flow, launcher and
+    // all, the whole time; this is the same flow.
+    fun onGpsResult(success: Boolean) {
+        isRefreshingLocation = false
+        Toast.makeText(
+            context,
+            if (success) {
+                LanguageManager.getString("स्थान अद्यतन हुआ", "Location updated")
+            } else {
+                LanguageManager.getString(
+                    "स्थान प्राप्त नहीं हो सका — शहर खोज कर चुनें",
+                    "Could not get your location — search for a city instead"
+                )
+            },
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    val locationPermissionsLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        contract = androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions()
+    ) { granted ->
+        val ok = granted[android.Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+            granted[android.Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        if (ok) {
+            isRefreshingLocation = true
+            viewModel.detectGPSLocation(context) { success -> onGpsResult(success) }
+        } else {
+            Toast.makeText(
+                context,
+                LanguageManager.getString("अनुमति अस्वीकार कर दी गई", "Permission denied"),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    fun requestGpsLocation() {
+        val hasPermission =
+            androidx.core.content.ContextCompat.checkSelfPermission(
+                context, android.Manifest.permission.ACCESS_FINE_LOCATION
+            ) == android.content.pm.PackageManager.PERMISSION_GRANTED ||
+                androidx.core.content.ContextCompat.checkSelfPermission(
+                    context, android.Manifest.permission.ACCESS_COARSE_LOCATION
+                ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+
+        if (hasPermission) {
+            isRefreshingLocation = true
+            viewModel.detectGPSLocation(context) { success -> onGpsResult(success) }
+        } else {
+            locationPermissionsLauncher.launch(
+                arrayOf(
+                    android.Manifest.permission.ACCESS_FINE_LOCATION,
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+        }
+    }
+
     var showAboutDialog by remember { mutableStateOf(false) }
     var showDeleteAccountDialog by remember { mutableStateOf(false) }
     var webViewUrlToOpen by remember { mutableStateOf<String?>(null) }
@@ -429,7 +498,19 @@ fun SettingsScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        // The name yields, the buttons do not.
+                        //
+                        // Neither side had a weight, so a long city name took
+                        // whatever width it wanted and the two buttons were
+                        // squeezed into what was left: with the location set by
+                        // GPS to "Chak Basantpur (Uttar Pradesh)", "Search city"
+                        // rendered as a single column of letters, one per line.
+                        // A button is a fixed thing and a place name is not, so
+                        // the name is the one that has to give.
+                        Row(
+                            modifier = Modifier.weight(1f),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Icon(
                                 imageVector = Icons.Default.LocationOn,
                                 contentDescription = null,
@@ -443,17 +524,26 @@ fun SettingsScreen(
                                     style = MaterialTheme.typography.titleSmall.copy(
                                         color = MaterialTheme.colorScheme.primary,
                                         fontWeight = FontWeight.Bold
-                                    )
+                                    ),
+                                    maxLines = 1,
+                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                                 )
                                 Text(
                                     text = "${selectedCity.nameLocal} (${selectedCity.state})",
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         fontSize = 11.sp
-                                    )
+                                    ),
+                                    // Two lines, then an ellipsis. A place name
+                                    // is worth wrapping for; it is not worth
+                                    // pushing the buttons off the card for.
+                                    maxLines = 2,
+                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                                 )
                             }
                         }
+
+                        Spacer(modifier = Modifier.width(8.dp))
 
                         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             // Refresh Location Button
@@ -464,12 +554,7 @@ fun SettingsScreen(
                                     .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp))
                                     .clickable {
                                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                        isRefreshingLocation = true
-                                        // Simulate location refresh
-                                        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                                            isRefreshingLocation = false
-                                            Toast.makeText(context, LanguageManager.getString("GPS स्थान रीफ्रेश: ${selectedCity.cityNameHindi}", "Location refreshed: ${selectedCity.cityName}"), Toast.LENGTH_SHORT).show()
-                                        }, 1000)
+                                        requestGpsLocation()
                                     }
                                     .padding(horizontal = 10.dp, vertical = 6.dp)
                                     .testTag("settings_refresh_location")
@@ -516,7 +601,12 @@ fun SettingsScreen(
                                         fontWeight = FontWeight.Normal,
                                         color = MaterialTheme.colorScheme.primary,
                                         fontSize = 11.sp
-                                    )
+                                    ),
+                                    // Belt and braces: the weight above stops
+                                    // this being squeezed, and this stops it
+                                    // stacking one letter per line if it ever is.
+                                    maxLines = 1,
+                                    softWrap = false
                                 )
                             }
                         }
