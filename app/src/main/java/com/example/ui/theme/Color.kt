@@ -60,7 +60,7 @@ private val DarkPalette = AstroColors(
     proBadge = Color(0xFFD4A84B),
     navActive = Color(0xFF2ABF6E),
     // 0xFF3D4A68 here was about 1.7:1 against the bar and read as blank.
-    navInactive = Color(0xFF6B7899),
+    navInactive = Color(0xFF9AA5C0),
     dateTimeAccent = Color(0xFFE8934A),
     shubhSuccess = Color(0xFF2ABF6E),
     rahuKaalDanger = Color(0xFFE85A4A),
@@ -90,7 +90,7 @@ private val LightPalette = AstroColors(
     primaryButtonPressed = Color(0xFF6B520F),
     proBadge = Color(0xFF8A6B18),
     navActive = Color(0xFF11663C),
-    navInactive = Color(0xFF6E6B63),
+    navInactive = Color(0xFF4F4C45),
     dateTimeAccent = Color(0xFFB5601C),
     shubhSuccess = Color(0xFF177A46),
     rahuKaalDanger = Color(0xFFB3261E),

@@ -185,10 +185,19 @@ class ScreenSizeScreenshotTest {
         }
     }
 
+    /**
+     * The selected tab here is deliberately the one with the **widest** label.
+     *
+     * It used to be KUNDALI, whose label is the shortest of the five, so every
+     * shot showed a comfortably-fitting label inside the selection pill while
+     * the device showed "Panchang" running out past both sides of its own pill.
+     * Only the selected tab draws a pill, so only the selected tab's label is
+     * constrained by it — which means a shot of a short one proves nothing.
+     */
     @Composable
     private fun NavBarOnly() {
         com.example.ui.components.BottomNavBar(
-            selectedTab = com.example.ui.AppTab.KUNDALI,
+            selectedTab = com.example.ui.AppTab.RASHIFAL,
             onTabSelected = {}
         )
     }

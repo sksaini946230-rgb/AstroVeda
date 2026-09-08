@@ -416,23 +416,43 @@ None)` and 1.35× line heights. Leave it alone.
 **Themes come from `LocalAstroColors`.** Light and dark both real, following the
 system. Never hardcode a colour that only works in one.
 
-**The bottom navigation bar is a floating capsule, and only the selected tab
-carries a label.** That is not decoration, it is what makes it fit. Five labels
-cannot share a 320dp screen: measured, "Horoscope" needs 60px at 8.5sp once the
-font scale is 1.3x, and five items on that screen have 50px each. An earlier
-version shrank the type until it "fitted" and the words still ran together at
-large font scales, with the selected pill narrower than its own label. One label
-at a time gives it about a third of the bar instead of a fifth.
+**The bottom navigation bar is a floating capsule and every tab carries its
+label under its icon**, with the selected one inside a tinted pill. It follows a
+design the owner supplied. An earlier version showed the label on the selected
+tab only, on the reasoning that five labels cannot share a 320dp screen — which
+was true of the way it was measuring, and is not true of the way it measures
+now. Nothing in this bar is a constant that was chosen by eye; four separate
+things are computed, and each of them was got wrong first:
 
-The label size is measured, not chosen — `rememberTextMeasurer` against the real
-per-item width, stepping 12sp down to 8.5sp, and dropping the label entirely if
-none fits (320dp English at 1.6x). Two mistakes to not repeat: **the widest
-label is not the longest one** — "कुण्डली" has more characters than "राशिफल"
-and is 5px narrower, so picking by `length` measures the wrong string — and
-**the English labels are the long ones**, so a bar checked only in Hindi proves
-nothing. The bar's height comes from the icon and its padding, never the label,
-so it stays 62dp at every font scale and the capsule stays a capsule.
-`navbar_*` and `navbar_en_*` screenshots cover 320/360/412, dark, 1.3x and 1.6x.
+- **Measure every label, not the longest one.** "कुण्डली" has more characters
+  than "राशिफल" and is 5px narrower, so picking by `length` measures the wrong
+  string.
+- **Measure in the style that is drawn.** The labels render SemiBold and were
+  being measured at the default weight, which is narrower — an under-measurement
+  in the one direction that clips.
+- **Measure against the pill, not against the slot.** Only the selected tab
+  draws a pill, so only its label is bounded by one — and near the bottom of a
+  rounded shape there is far less width than the shape's own width. A stadium
+  60dp wide and 47dp tall has 11dp of straight side; the label sits 5dp off the
+  bottom, deep in the curve, and "Panchang" ran out past both sides of its own
+  pill on the device. `cornerInsetAt` computes that loss and the corner radius
+  is 32% of the pill's height rather than 50%, which keeps the sides straight
+  where the label crosses them.
+- **A font scale that does not fit is not a reason to drop the label.** The size
+  ladder runs 12 down to 8.5 twice: first in `sp`, which honours the user's font
+  setting, then — only for a user who enlarged the text — in `dp`, which ignores
+  it. So a 320dp phone at 1.6x shows the label at the size a 320dp phone always
+  shows it, instead of showing no label at all. Icons alone remain the last
+  resort and no configuration in the screenshot set now reaches it.
+
+Two standing traps: **the English labels are the long ones**, so a bar checked
+only in Hindi proves nothing; and **the shot must have the widest label
+selected**. `NavBarOnly` used to select "Kundali", the shortest of the five, so
+every screenshot showed a comfortable fit while the device did not — it selects
+"Horoscope" now. The bar's height follows the measured label, so it grows a
+little with the font scale instead of cropping the Devanagari matras.
+`navbar_*` and `navbar_en_*` screenshots cover 320/360/412, dark, 1.3x and 1.6x;
+confirmed on the device in both languages, both themes and at 1.0x/1.3x/1.6x.
 
 **An AdView reserves its height whether or not it has an ad.** Roughly 50dp of
 empty strip, and it used to hide itself by accident: the banner gave up after
