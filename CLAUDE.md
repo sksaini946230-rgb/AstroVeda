@@ -597,6 +597,18 @@ Firebase Storage is not used by the app, so its rules do not matter.
 ./gradlew installDebug                  # onto a connected device
 ```
 
+The layout screenshots are Roborazzi over Robolectric, and **`testDebugUnitTest`
+does not write them** — it runs `ScreenSizeScreenshotTest` and every capture in
+it is a no-op without the record flag. The task that produces PNGs is:
+
+```bash
+./gradlew recordRoborazziDebug          # writes app/src/test/screenshots/
+```
+
+They assert nothing on purpose; the point is to open them. And a screenshot
+proves something only when the worst case is the one inside it — see the
+narrow-phone and navigation-bar notes above.
+
 `.github/workflows/ci.yml` runs those same two on every push and pull request.
 `gradle.properties` no longer pins `org.gradle.java.home` — it used to hold an
 absolute path to one Mac's Temurin 17, so the repo could not build anywhere else,
@@ -608,18 +620,55 @@ that is how most of the UI bugs in this app were found, not by reading code.
 
 ---
 
+## The Play listing
+
+The store screenshots are generated, not taken by hand. `goldie/goldie.config.ts`
+holds all eight scenes, their headlines, the background and the typeface, and
+`goldie frame` renders them into `goldie/out/screenshots/pixel-10-pro/en-US/` as
+eight 1080x1920 tiles. The config is the source; `goldie/out/` is gitignored.
+`goldie/README.md` has the commands.
+
+The raw screens behind the tiles were captured from the real device rather than
+an emulator — there is no AVD on this machine — and four things about that
+capture show up in the finished tiles when they are got wrong:
+
+- **Render bigger than the phone.** The device is 720x1600 and goldie draws into
+  1280x2856, so a straight capture comes out soft. `wm size 1080x2400` with
+  `wm density 420` gives 411dp, an ordinary modern phone. Reset both after.
+- **Cut the network.** `AdBanner` is `height(0.dp)` until an ad loads, so with
+  wifi and data off there is no banner in any capture and no interstitial
+  landing mid-walk.
+- **Put SystemUI in demo mode**, or a notification badge turns up in a tile.
+- **Sample data only.** The device's saved profiles carry the owner's real name
+  and birth time, and the Kundali form's Recent Searches chips display them.
+  The tiles use "Aarav Sharma", "Rahul & Priya" and Jaipur.
+
+Only `en-US` is rendered so far. A Hindi set needs the raw screens re-captured
+with the app in Hindi — goldie renders every locale from the same captures, and
+only the copy changes.
+
+Release notes, and the rules for writing them, live in `docs/RELEASE_NOTES.md`.
+Play takes 500 characters per language and will not publish with only one of the
+two filled in.
+
+---
+
 ## Where it stands
 
-Live on Play, production. **`versionCode 11` / `2.0` has been uploaded by the
-owner** (on or before 8 Sep 2026), superseding the `versionCode 5` / `1.2` that
-production had been on since 3 Sep — 10 and 11 both went up, which is how the
-versionCode note below came to be written.
+Live on Play, production. **`versionCode 156` / `2.0` was uploaded by the owner
+on 8 Sep 2026**, along with a new set of eight English store screenshots. It
+supersedes `versionCode 11`, which the owner had put up earlier the same day,
+and the `versionCode 5` / `1.2` that production had been on since 3 Sep. That 10
+and 11 both went up inside a day is how the versionCode note below came to be
+written.
 
-The tree is now on **`versionCode 155` / `2.0`** — the number is the commit
-count, see below. It carries the navigation bar rebuilt to a design the owner
-supplied, built, signed with the upload key, and verified on a real device in
-both languages, both themes, portrait and landscape, and at 1.0x/1.3x/1.6x font
-scale. **Not yet uploaded.**
+It carries the navigation bar rebuilt to a design the owner supplied, verified
+on a real device in both languages, both themes, portrait and landscape, and at
+1.0x/1.3x/1.6x font scale.
+
+Nothing is built and waiting to go up. The tree's own number is just its commit
+count and climbs with every commit, so a number higher than 156 here does not
+mean a release is pending.
 
 **`versionCode` is derived, never typed.** It is `git rev-list --count HEAD` —
 the number of commits on the branch — resolved in `app/build.gradle.kts`. That
@@ -639,10 +688,10 @@ that tests and lint still run, and `assembleRelease` and `bundleRelease` refuse
 outright, because the floor is by definition a number Play has already taken.
 CI checks out with `fetch-depth: 0` for the same reason.
 
-### What versionCode 155 changed
+### What versionCode 156 changed
 
 Two things. **`versionCode` is now derived from the commit count**, for the
-reason above — which is why this release is 155 and not 12.
+reason above — which is why this release is 156 and not 12.
 
 The other is **the bottom navigation bar**. Every tab now
 carries its label under its icon, the selected one inside a tinted capsule, on

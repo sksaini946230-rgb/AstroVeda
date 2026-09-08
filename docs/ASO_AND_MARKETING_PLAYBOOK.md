@@ -103,6 +103,38 @@ Revati प्राचीन वैदिक ज्योतिष सिद्�
 | **Screenshot 6** | Numerology Moolank / Bhagyank Wheels | **"अंकशास्त्र — मूलांक, भाग्यांक व शुभ रत्न"**<br>*(Vedic Numerology & Lucky Destiny Numbers)* |
 | **Screenshot 7** | Privacy Shield & Offline Mode Badge | **"100% सुरक्षित, निजी एवं सुपर-फ़ास्ट"**<br>*(100% Private, Secure & Offline-Ready)* |
 
+### What actually went up (8 Sep 2026)
+
+The storyboard above is the plan. The set on the listing today is **eight
+English tiles**, rendered from real screens of the shipped app rather than
+mocked up, and it differs from the plan in two ways worth knowing: there is no
+AI-astrologer tile (the feature is rate-limited and costs money per question —
+not a thing to advertise as the headline), and no privacy-badge tile (a claim
+without a screen behind it — the app has no privacy screen to photograph).
+Choghadiya and the festival calendar took those two slots instead: both are real
+screens, and both are the kind of thing someone opens a Panchang app for.
+
+| # | File | Headline |
+|---|---|---|
+| 1 | `01-panchang.png` | Today's Panchang, on your phone |
+| 2 | `02-elements.png` | Every element, at a glance |
+| 3 | `03-choghadiya.png` | Know the right moment |
+| 4 | `04-horoscope.png` | A reading that is actually yours |
+| 5 | `05-kundali.png` | Your birth chart in seconds |
+| 6 | `06-matching.png` | 36 gunas, honestly scored |
+| 7 | `07-numerology.png` | Numbers, and what they mean |
+| 8 | `08-festivals.png` | Never miss a festival or fast |
+
+They are generated, not drawn: every headline, subhead, colour and typeface is
+in `goldie/goldie.config.ts`, and `goldie frame` re-renders the eight tiles at
+1080x1920. Change the copy there, not in an image editor. `goldie/README.md`
+covers how the raw screens are captured, and CLAUDE.md → "The Play listing" says
+what goes wrong when they are captured carelessly.
+
+**A Hindi set does not exist yet.** goldie renders every locale from the same
+raw captures, so `hi-IN` needs the screens walked again with the app in Hindi —
+about twenty minutes of device work, then a re-render.
+
 ---
 
 ## ⭐ 4. Smart Rating & Review Strategy (Dual-Gate Funnel)
@@ -112,7 +144,7 @@ graph TD
     A["User completes positive action (Generates Kundali / Reads Rashifal)"] --> B["Smart Rate Us Dialog"]
     B --> C{"User selects Stars"}
     C -- 4 or 5 Stars --> D["Launch Google Play In-App Review API (Public 5★ Review)"]
-    C -- 1, 2 or 3 Stars --> E["Open Private Support Form (Sends feedback to support@revati.app)"]
+    C -- 1, 2 or 3 Stars --> E["Open Private Support Form (Sends feedback to supportrevati@gmail.com)"]
 ```
 
 - **फायदा:** पब्लिक स्टोर पर नकारात्मक 1-स्टार रिव्यूज नहीं जाते; 4-5 स्टार संतुष्ट यूज़र्स से ऐप की रेटिंग हमेशा **4.5★+** बनी रहती है।
@@ -133,7 +165,9 @@ graph TD
 ## 🚀 6. Launch Day Execution Checklist
 
 - [x] Google Play Console ऐप लिस्टिंग, टाइटल्स, और डिस्क्रिप्शन अपडेटेड।
-- [x] सभी 7 स्क्रीनशॉट्स और फ़ीचर ग्राफ़िक (1024x500) तैयार।
+- [x] स्क्रीनशॉट्स — 8 अंग्रेज़ी टाइल्स 8 सितम्बर 2026 को लिस्टिंग पर चढ़ गईं (ऊपर देखें)। हिन्दी सेट अभी बाकी।
+- [ ] फ़ीचर ग्राफ़िक (1024x500) — लिस्टिंग पर मौजूद है (Play इसके बिना पब्लिश ही नहीं करता), पर नई स्क्रीनशॉट्स के साथ मिलाकर नहीं देखा गया।
 - [x] Firebase Analytics व Crashlytics लाइव ट्रैक हो रहे हैं।
-- [x] WhatsApp सपोर्ट (`+91 9462308945`) एवं ईमेल (`support@revati.app`) सक्रिय।
+- [x] WhatsApp सपोर्ट (`+91 9462308945`) एवं ईमेल (`supportrevati@gmail.com`) सक्रिय।
+      *(`support@revati.app` कभी अस्तित्व में नहीं था — वह डोमेन रजिस्टर ही नहीं हुआ।)*
 - [x] 10% Staged Rollout के साथ Google Play Production Track पर सबमिट करने हेतु तैयार।

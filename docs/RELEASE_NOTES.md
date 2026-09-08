@@ -62,16 +62,22 @@ Thank you for using Revati.
 
 ## Said so far
 
-### versionCode 11 / 2.0
+### versionCode 156 / 2.0
+
+**Uploaded** by the owner on 8 Sep 2026, together with a new set of eight
+English store screenshots.
 
 One user-visible change, so the notes say one thing. The bottom bar was rebuilt
 to a design the owner supplied: every tab carries its label, on a floating
 capsule. Everything else in this build is the arithmetic that keeps it from
 clipping, which is not something anyone presses Update for.
 
-The version *name* is unchanged — 10 and 11 are both 2.0. Play allows that, and
-it is right here: from a user's side this is the same release with the
-navigation redone. `versionCode` had to move because 10 was already uploaded.
+The version *name* is unchanged — 10, 11 and 156 are all 2.0. Play allows that,
+and it is right here: from a user's side this is the same release with the
+navigation redone. The leap in `versionCode` is not a leap in the app. The
+number is `git rev-list --count HEAD` now, so it is the commit count and nothing
+more; it was typed by hand twice and collided with an upload both times. See
+CLAUDE.md, "`versionCode` is derived, never typed".
 
 ```
 <en-US>
