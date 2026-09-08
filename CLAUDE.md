@@ -448,14 +448,29 @@ things are computed, and each of them was got wrong first:
   width back — 5dp to 6dp there is the difference between a label and no label
   at 320dp in English.
 - **The pill has to stay wider than it is tall, and that is a constraint on the
-  label.** Devanagari's line box is taller than the Latin one at the same size,
-  and Hindi labels are narrow enough that a large size fits — so Hindi picked 12
-  and drew a 53x49 pill, a disc, while English on the same phone drew 53x43.
-  `MIN_PILL_RATIO` is checked before the width now, with a second pass that
+  label.** `MIN_PILL_RATIO` is checked before the width, with a second pass that
   drops the requirement rather than the label. The design's own ratio is 1.6 and
-  is not reachable here: five tabs on a 320dp screen give a 57dp pill, so 1.6
-  would need a 36dp pill around a 32dp stack. The limit is the word
+  is not reachable on a phone: five tabs on a 320dp screen give a 57dp pill, so
+  1.6 would need a 36dp pill around a 32dp stack. The limit is the word
   "Horoscope" — the reference's longest label is "Publish".
+- **Solve for both languages at once, not for the one on screen.** The bar used
+  to change height when the language was switched — 53.5dp in Hindi against
+  51dp in English, measured on the device, growing upward from a fixed bottom
+  edge. Devanagari's line box is about 1dp taller than the Latin one at the same
+  size, and, the larger part, the two were choosing different sizes: "राशिफल" is
+  33px at 11sp and fits, "Horoscope" is 53px at 11sp and does not. Solving them
+  separately and taking the taller pill fixed the height and broke the shape —
+  at 320dp Hindi has no size that satisfies the ratio, so it fell through to the
+  pass that gives up the ratio, took the largest size that merely fits, and
+  handed English a 53x49 disc. One measurement over both label sets is what
+  holds: identical in either language by construction, and sized by "Horoscope",
+  which is the widest string in the app in either script anyway.
+- **`BAR_MAX_WIDTH` is 420dp and no portrait phone reaches it.** The widest
+  common phone is 412dp, which leaves a 388dp bar, so this changes nothing where
+  the app is used. It is there for everything wider: the same phone turned
+  sideways is 800dp, and five tabs sharing that gave a pill 155dp wide against
+  47dp tall — 3.3, against 1.4 in portrait — a stretched band with the labels
+  marooned. Capped and centred it comes out at 1.7.
 - **A font scale that does not fit is not a reason to drop the label.** The size
   ladder runs 12 down to 8 twice: first in `sp`, which honours the user's font
   setting, then — only for a user who enlarged the text — in `dp`, which ignores
@@ -469,8 +484,9 @@ selected**. `NavBarOnly` used to select "Kundali", the shortest of the five, so
 every screenshot showed a comfortable fit while the device did not — it selects
 "Horoscope" now. The bar's height follows the measured label, so it grows a
 little with the font scale instead of cropping the Devanagari matras.
-`navbar_*` and `navbar_en_*` screenshots cover 320/360/412, dark, 1.3x and 1.6x;
-confirmed on the device in both languages, both themes and at 1.0x/1.3x/1.6x.
+`navbar_*` and `navbar_en_*` screenshots cover 320/360/412/600/800, dark, 1.3x
+and 1.6x; confirmed on the device in both languages, both themes, portrait and
+landscape, and at 1.0x/1.3x/1.6x.
 
 **An AdView reserves its height whether or not it has an ad.** Roughly 50dp of
 empty strip, and it used to hide itself by accident: the banner gave up after

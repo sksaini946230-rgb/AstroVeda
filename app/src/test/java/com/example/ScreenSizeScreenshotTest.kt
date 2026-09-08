@@ -152,6 +152,16 @@ class ScreenSizeScreenshotTest {
 
     @Test fun navbar_412() = shoot("navbar_412", 412) { NavBarOnly() }
 
+    // A tablet, and the first width above a phone this bar has ever been looked
+    // at on. Five items sharing 600dp is a very different shape from five
+    // sharing 320dp, and nothing in the layout caps how wide a tab may get.
+    @Test fun navbar_600() = shoot("navbar_600", 600) { NavBarOnly() }
+
+    @Test fun navbar_en_600() = shootEnglish("navbar_en_600", 600, 1f)
+
+    // The width this phone reports when it is turned sideways.
+    @Test fun navbar_en_800() = shootEnglish("navbar_en_800", 800, 1f)
+
     @Test fun navbar_320_large_text() =
         shoot("navbar_320_large_text", 320, fontScale = 1.3f) { NavBarOnly() }
 

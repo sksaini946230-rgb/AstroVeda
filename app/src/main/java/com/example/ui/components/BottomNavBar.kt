@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -79,6 +80,21 @@ data class NavItem(
 
 /** Side margin, so the capsule floats clear of both edges. */
 private val BAR_SIDE_MARGIN = 12.dp
+
+/**
+ * How wide the bar is allowed to get, beyond which it centres instead.
+ *
+ * No phone in portrait reaches this — the widest common one is 412dp, which
+ * leaves a 388dp bar — so this changes nothing on the screens the app is
+ * actually used on. What it fixes is everything wider. The same phone turned
+ * sideways is 800dp, and five tabs sharing that give a pill 155dp wide against
+ * 47dp tall: a ratio of 3.3, where the design being followed is 1.6 and a
+ * portrait phone is 1.4. It read as a stretched band with the labels marooned
+ * far apart. At 420dp the pill comes out at 1.7, which is the design's own
+ * proportion, and the bar sits centred with the content behind it visible on
+ * either side.
+ */
+private val BAR_MAX_WIDTH = 420.dp
 
 /** Gap under the capsule, above the system navigation area. */
 private val BAR_BOTTOM_MARGIN = 12.dp
@@ -253,10 +269,17 @@ fun BottomNavBar(
             .windowInsetsPadding(WindowInsets.navigationBars)
             .padding(start = BAR_SIDE_MARGIN, end = BAR_SIDE_MARGIN, bottom = BAR_BOTTOM_MARGIN)
     ) {
-        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        BoxWithConstraints(
+            modifier = Modifier
+                .widthIn(max = BAR_MAX_WIDTH)
+                .fillMaxWidth()
+                .align(Alignment.Center)
+        ) {
             val measurer = rememberTextMeasurer()
             val density = LocalDensity.current
             val baseStyle = LocalTextStyle.current
+            val labelsHi = remember(items) { items.map { it.titleHi } }
+            val labelsEn = remember(items) { items.map { it.titleEn } }
             val labels = items.map { LanguageManager.getString(it.titleHi, it.titleEn) }
 
             // Every tab gets the same share of the bar; the pill is that share
@@ -273,13 +296,36 @@ fun BottomNavBar(
                 else scaled + with(density) { LABEL_STEPS.map { it.dp.toSp() } }
             }
 
-            val labelFit: LabelFit? = remember(labels, pillWidth, candidates, density, baseStyle) {
+            // Solved once, over both languages at the same time — the widest
+            // label of either and the tallest line box of either.
+            //
+            // Doing it per language made the bar change height when the
+            // language was switched: 53.5dp in Hindi against 51dp in English,
+            // measured on the device, growing upward from a fixed bottom edge.
+            // Two causes, and the obvious one is the smaller: Devanagari's line
+            // box is about 1dp taller than the Latin one at the same size, and,
+            // the larger part, the two languages were choosing different sizes —
+            // "राशिफल" is 33px wide at 11sp and fits, "Horoscope" is 53px at
+            // 11sp and does not, so English dropped to 10.5.
+            //
+            // Solving the two separately and then taking the taller pill fixed
+            // the height and broke the shape: at 320dp Hindi has no size that
+            // satisfies [MIN_PILL_RATIO], so it fell through to the pass that
+            // gives up the ratio, took the largest size that merely fits, and
+            // handed English a 53x49 pill — a disc, which is the one thing the
+            // ratio exists to prevent. One size for both languages is what
+            // actually holds: the bar is then identical in either language by
+            // construction, and it is sized by "Horoscope", which is the widest
+            // string in the app in either script anyway.
+            val allLabels = remember(labelsHi, labelsEn) { labelsHi + labelsEn }
+
+            val labelFit: LabelFit? = remember(allLabels, pillWidth, candidates, density, baseStyle) {
                 fun fit(candidate: TextUnit, keepShape: Boolean): LabelFit? {
                     // Measured in the style that is drawn, weight included.
                     val style = labelStyle(baseStyle, candidate, FontWeight.SemiBold)
                     var widest = 0
                     var tallest = 0
-                    labels.forEach { label ->
+                    allLabels.forEach { label ->
                         val laid = measurer.measure(AnnotatedString(label), style, maxLines = 1)
                         if (laid.size.width > widest) widest = laid.size.width
                         if (laid.size.height > tallest) tallest = laid.size.height
