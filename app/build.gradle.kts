@@ -326,11 +326,16 @@ gradle.taskGraph.whenReady {
 // has already been uploaded — so stop here rather than at the top of the Play
 // upload page ten minutes from now.
 tasks.matching { it.name == "bundleRelease" || it.name == "assembleRelease" }.configureEach {
+    // Both values are read here, at configuration time, and the action below
+    // closes over the copies. Referring to the script's own properties from
+    // inside doFirst would capture the build script itself, which the
+    // configuration cache cannot serialise — the build fails with "2 problems"
+    // and no other explanation.
+    val derived = gitCommitCount != null && gitCommitCount >= VERSION_CODE_FLOOR
+    val complaint = "versionCode would fall back to $VERSION_CODE_FLOOR, a number Play has " +
+        "already taken. `git rev-list --count HEAD` returned ${gitCommitCount ?: "nothing"} — " +
+        "build from a full clone with history."
     doFirst {
-        check(gitCommitCount != null && gitCommitCount >= VERSION_CODE_FLOOR) {
-            "versionCode would be the $VERSION_CODE_FLOOR fallback, which Play has already " +
-                "taken. `git rev-list --count HEAD` returned ${gitCommitCount ?: "nothing"} — " +
-                "build from a full clone with history."
-        }
+        check(derived) { complaint }
     }
 }
