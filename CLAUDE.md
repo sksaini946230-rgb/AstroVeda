@@ -432,14 +432,32 @@ things are computed, and each of them was got wrong first:
   in the one direction that clips.
 - **Measure against the pill, not against the slot.** Only the selected tab
   draws a pill, so only its label is bounded by one — and near the bottom of a
-  rounded shape there is far less width than the shape's own width. A stadium
-  60dp wide and 47dp tall has 11dp of straight side; the label sits 5dp off the
-  bottom, deep in the curve, and "Panchang" ran out past both sides of its own
-  pill on the device. `cornerInsetAt` computes that loss and the corner radius
-  is 32% of the pill's height rather than 50%, which keeps the sides straight
-  where the label crosses them.
+  capsule there is far less width than the shape's own width. A capsule 60dp
+  wide and 47dp tall has 11dp of straight side; the label sits at the bottom,
+  deep in the curve, and "Panchang" ran out past both sides of its own pill on
+  the device. `cornerInsetAt` computes that loss and the size ladder is checked
+  against what is left.
+- **The fix for that is a shorter pill, not a squarer one.** The first attempt
+  dropped the corner radius to 32% of the height, which is a rounded box and was
+  rejected on sight — the design being followed has a capsule. The radius is
+  half the height again, and what changed instead is everything that makes the
+  pill tall: an 18dp icon, a 2dp gap under it, 4dp of ring around the bar. The
+  bar went from 61dp to 51dp and the label fits. The arithmetic is worth
+  keeping: the width lost to the curve is `R - sqrt(R² - (C/2)²)` for a stack of
+  height C, so a *deeper* vertical padding makes the end cap flatter and buys
+  width back — 5dp to 6dp there is the difference between a label and no label
+  at 320dp in English.
+- **The pill has to stay wider than it is tall, and that is a constraint on the
+  label.** Devanagari's line box is taller than the Latin one at the same size,
+  and Hindi labels are narrow enough that a large size fits — so Hindi picked 12
+  and drew a 53x49 pill, a disc, while English on the same phone drew 53x43.
+  `MIN_PILL_RATIO` is checked before the width now, with a second pass that
+  drops the requirement rather than the label. The design's own ratio is 1.6 and
+  is not reachable here: five tabs on a 320dp screen give a 57dp pill, so 1.6
+  would need a 36dp pill around a 32dp stack. The limit is the word
+  "Horoscope" — the reference's longest label is "Publish".
 - **A font scale that does not fit is not a reason to drop the label.** The size
-  ladder runs 12 down to 8.5 twice: first in `sp`, which honours the user's font
+  ladder runs 12 down to 8 twice: first in `sp`, which honours the user's font
   setting, then — only for a user who enlarged the text — in `dp`, which ignores
   it. So a 320dp phone at 1.6x shows the label at the size a 320dp phone always
   shows it, instead of showing no label at all. Icons alone remain the last

@@ -83,16 +83,36 @@ private val BAR_SIDE_MARGIN = 12.dp
 /** Gap under the capsule, above the system navigation area. */
 private val BAR_BOTTOM_MARGIN = 12.dp
 
-/** Ring of space between the capsule's edge and the pills inside it. */
-private val BAR_INNER_PADDING = 7.dp
+/**
+ * Ring of space between the bar's edge and the pills inside it.
+ *
+ * It is also what decides whether the outermost pill can sit against the bar's
+ * rounded end without being clipped by it. Two capsules, the pill inside the
+ * bar: the pill's end cap has radius `pillHeight / 2`, the bar's has
+ * `barHeight / 2`, and the difference between those two radii is exactly this
+ * padding. A circle of radius r sits inside a circle of radius R when their
+ * centres are no more than R - r apart — so the pill's end may start anywhere
+ * from flush with the bar's box to twice this padding in, and at exactly this
+ * padding the gap between the two curves is even the whole way round. That is
+ * the value used, which is why the pill hugs the bar's outer edge instead of
+ * floating in the middle of it.
+ */
+private val BAR_INNER_PADDING = 4.dp
 
-private val ICON_SIZE = 20.dp
+private val ICON_SIZE = 18.dp
 
 /** Between the icon and the label under it. They read as one object. */
-private val ICON_LABEL_GAP = 4.dp
+private val ICON_LABEL_GAP = 2.dp
 
 /**
  * Above the icon and below the label, inside the selected pill.
+ *
+ * Counter-intuitively this cannot be squeezed to nothing, because it is what
+ * makes the pill's end cap *flatter*. The width a capsule loses to its own
+ * curve at the label is `R - sqrt(R^2 - (C/2)^2)`, where C is the icon-plus-gap-
+ * plus-label stack and R is C/2 plus this padding — so a bigger R is a shallower
+ * curve and more usable width. At 320dp in English the difference between 5dp
+ * and 6dp here is the difference between showing the labels and dropping them.
  *
  * Deliberately tight. The pill has to come out wider than it is tall or the
  * 50% corner radius turns it into a circle instead of a capsule — which is
@@ -100,35 +120,49 @@ private val ICON_LABEL_GAP = 4.dp
  * 360dp screen, a green disc with the label spilling past its sides. Every
  * dp taken off here goes straight into that ratio.
  */
-private val PILL_V_PADDING = 5.dp
+private val PILL_V_PADDING = 6.dp
 
 /** Taller, for the icon-only fallback, so the bar does not become a sliver. */
 private val PILL_V_PADDING_NO_LABEL = 10.dp
 
-/** Keeps one pill from touching the next. */
-private val PILL_H_INSET = 2.dp
-
-/** Breathing room between the label and the pill's inner edge. */
-private val LABEL_H_MARGIN = 1.dp
+/**
+ * Keeps one pill from touching the next during the crossfade.
+ *
+ * Deliberately tiny: the pills are meant to fill their share of the bar, as
+ * they do in the design this follows, and every dp here is a dp off the label.
+ */
+private val PILL_H_INSET = 1.dp
 
 /**
- * The selected pill's corner radius, as a fraction of its height.
+ * Extra breathing room between the label and the pill's curve — deliberately
+ * none.
  *
- * Not 50%. A stadium looks right and is what the reference design uses, but it
- * cannot hold this app's labels: at 60dp wide and 47dp tall the radius is
- * 23.5dp, so the straight part of the side is only 11dp long and everything
- * else is curve. The label sits 5dp off the bottom, right in that curve — on
- * the device "Panchang" ran out past both sides of its own pill, while the
- * Robolectric render, where the selected tab happened to be the short
- * "Kundali", showed nothing wrong. Look at the widest label, not a convenient
- * one.
- *
- * At 0.32 the corners are still clearly round and the sides are straight where
- * the label crosses them. [cornerInsetAt] turns this into the width the label
- * may actually use, so the size that gets picked is one that fits the pill
- * rather than one that fits the slot the pill sits in.
+ * [cornerInsetAt] is asked for the width available at the *bottom of the
+ * label's line box*, which sits below the lowest ink in the label: descenders,
+ * and on the Devanagari side the font padding that `Type.kt` adds to protect
+ * the matras. So the figure it returns already understates the room by a
+ * couple of dp, and adding a margin on top of that was costing a whole step of
+ * the size ladder at 320dp — the difference between an 8.5 label and no label.
  */
-private const val PILL_CORNER_FRACTION = 0.32f
+private val LABEL_H_MARGIN = 0.dp
+
+/**
+ * The selected pill is a true capsule — radius exactly half its height.
+ *
+ * Which means the label has to fit inside the curve, not merely inside the
+ * pill's width. Near the bottom of a capsule there is a great deal less width
+ * than the shape has: [cornerInsetAt] computes how much, and the label size is
+ * chosen against what is left. An earlier attempt dodged this by dropping the
+ * radius to 32% of the height, and that is not a capsule — it is a rounded box.
+ *
+ * The way to keep the capsule *and* the label is to make the pill's contents
+ * shorter, which is why the icon is 18dp and the gap under it is 2dp. The
+ * arithmetic, for a 60dp-wide pill on a 360dp screen: with a 37dp-tall stack
+ * the corner eats 9dp a side and 42dp of label width survives; with a 31dp
+ * stack it eats 7dp and 46dp survives. Every dp off the stack is worth about
+ * 1.3dp of label.
+ */
+private const val PILL_CORNER_FRACTION = 0.5f
 
 /**
  * The ladder of label sizes, largest first, in the order they are tried.
@@ -141,7 +175,26 @@ private const val PILL_CORNER_FRACTION = 0.32f
  * far smaller loss than dropping it, and the floor is the same 8.5 either way,
  * so nobody ends up with a label smaller than the narrow-screen default.
  */
-private val LABEL_STEPS = listOf(12f, 11f, 10.5f, 10f, 9.5f, 9f, 8.5f)
+private val LABEL_STEPS = listOf(12f, 11f, 10.5f, 10f, 9.5f, 9f, 8.5f, 8f)
+
+/**
+ * How much wider than tall the selected pill has to be to still read as a
+ * capsule rather than a disc.
+ *
+ * This is a shape requirement expressed as a constraint on the label, because
+ * the label is what makes the pill tall. Without it the two languages came out
+ * as different shapes on the same phone: Devanagari's line box is taller than
+ * the Latin one at the same size, and its labels are narrow enough that a large
+ * size fits — so Hindi picked 12 and produced a 53x49 pill, a circle, while
+ * English picked a smaller size and produced 53x43. Same bar, same screen, two
+ * shapes.
+ *
+ * 1.6 is what the design being followed has, and five tabs of icon-over-label
+ * cannot reach it on a phone: at 320dp the pill is 57dp wide, so 1.6 would mean
+ * a 36dp pill around a 32dp stack. 1.3 is reachable everywhere and is past the
+ * point where the eye stops reading the shape as round.
+ */
+private const val MIN_PILL_RATIO = 1.3f
 
 /** The size that fits, and how tall its line actually is at that size. */
 private data class LabelFit(val size: TextUnit, val heightDp: Dp)
@@ -221,7 +274,7 @@ fun BottomNavBar(
             }
 
             val labelFit: LabelFit? = remember(labels, pillWidth, candidates, density, baseStyle) {
-                candidates.firstNotNullOfOrNull { candidate ->
+                fun fit(candidate: TextUnit, keepShape: Boolean): LabelFit? {
                     // Measured in the style that is drawn, weight included.
                     val style = labelStyle(baseStyle, candidate, FontWeight.SemiBold)
                     var widest = 0
@@ -232,15 +285,21 @@ fun BottomNavBar(
                         if (laid.size.height > tallest) tallest = laid.size.height
                     }
                     val labelHeight = with(density) { tallest.toDp() }
-                    // The pill this size would produce, and how much width is
-                    // still straight where the label crosses its corners.
+                    val pillHeight = pillHeightFor(labelHeight)
+                    if (keepShape && pillWidth.value / pillHeight.value < MIN_PILL_RATIO) return null
+                    // How much width is still straight where the label crosses
+                    // the pill's corners.
                     val inset = cornerInsetAt(
-                        radius = pillHeightFor(labelHeight) * PILL_CORNER_FRACTION,
+                        radius = pillHeight * PILL_CORNER_FRACTION,
                         distanceFromEdge = PILL_V_PADDING
                     )
                     val room = with(density) { (pillWidth - inset * 2 - LABEL_H_MARGIN * 2).toPx() }
-                    if (widest <= room) LabelFit(candidate, labelHeight) else null
+                    return if (widest <= room) LabelFit(candidate, labelHeight) else null
                 }
+                // Shape first. If no size can satisfy both, the label wins: a
+                // slightly round pill is a smaller loss than five bare icons.
+                candidates.firstNotNullOfOrNull { fit(it, keepShape = true) }
+                    ?: candidates.firstNotNullOfOrNull { fit(it, keepShape = false) }
             }
 
             // The pill is exactly as tall as its contents plus its padding, and
@@ -252,12 +311,8 @@ fun BottomNavBar(
             } else {
                 pillHeightFor(labelFit.heightDp)
             }
-            val pillShape = if (labelFit == null) {
-                // Nothing has to fit inside the curve, so it can be a true capsule.
-                RoundedCornerShape(percent = 50)
-            } else {
-                RoundedCornerShape(pillHeight * PILL_CORNER_FRACTION)
-            }
+            // Always a capsule. Everything else here bends so that it can stay one.
+            val pillShape = RoundedCornerShape(percent = 50)
             val barHeight = pillHeight + BAR_INNER_PADDING * 2
 
             Surface(
