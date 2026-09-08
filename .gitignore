@@ -32,3 +32,8 @@ debug.keystore
 # this is the general form of the certificate rule, which used to name one file.
 *.pem
 *.p12
+
+# goldie renders the store assets from goldie/goldie.config.ts and the raw
+# device captures; both the captures and the finished tiles are large binaries
+# that can be regenerated, so only the config is tracked.
+goldie/out/
