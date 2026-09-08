@@ -610,12 +610,49 @@ that is how most of the UI bugs in this app were found, not by reading code.
 
 ## Where it stands
 
-Live on Play, production. `versionCode 5` / `1.2` was uploaded 3 Sep 2026 and
-confirmed installed on a real device. The tree is now on **`versionCode 7` /
-`versionName 1.4`** — the September 2026 full-codebase audit (which was
-versionCode 6), plus profile export/import, the narrow-phone layout fixes and
-the rashifal variation fix below. **Not yet uploaded and not yet checked on a
-device.**
+Live on Play, production. **`versionCode 10` / `2.0` has been uploaded by the
+owner** (on or before 8 Sep 2026), superseding the `versionCode 5` / `1.2` that
+production had been on since 3 Sep. The tree is now on **`versionCode 11` /
+`2.0`** — the navigation bar rebuilt to a design the owner supplied — built,
+signed with the upload key, and verified on a real device in both languages,
+both themes, portrait and landscape, and at 1.0x/1.3x/1.6x font scale. **Not yet
+uploaded.**
+
+**Bump `versionCode` before every release build.** Play takes a number once.
+This was learned the direct way: an AAB was built on 10 after 10 had already
+gone up, and was useless. The number is cheap and the rebuild is ten minutes.
+
+### What versionCode 11 changed
+
+One thing, and its consequences: **the bottom navigation bar**. Every tab now
+carries its label under its icon, the selected one inside a tinted capsule, on
+a floating capsule bar — the layout the owner asked for, matched from a
+screenshot. The full account of how the label is fitted, and of the four
+separate ways it was got wrong first, is in the navigation-bar note under
+"Things that will bite you". The short version, because each is a general
+lesson:
+
+- A screenshot test that selects the *shortest* label proves nothing about a
+  bar where only the selected tab draws a pill.
+- Measuring text at a different weight than you draw it under-measures, in the
+  direction that clips.
+- A label inside a capsule is bounded by the curve, not by the width.
+- Solving for the language on screen makes the bar change size when the
+  language is switched. Solve for both.
+
+The bar is also capped at 420dp and centres beyond that. No portrait phone
+reaches that, but the same phone in landscape is 800dp, where it had never been
+rendered and looked like a stretched band.
+
+### What versionCode 10 changed
+
+The release the September work adds up to: the September 2026 full-codebase
+audit (versionCode 6), profile export/import, the narrow-phone layout fixes and
+the rashifal variation fix, plus what a full pass on a real phone found —
+Guna Milan missing one of the three Bhakoot doshas and never asking for a birth
+time, the night Choghadiya being unreachable, the lucky time repeating across
+four rashis at once, and the recent-search chip on Guna Milan never having
+worked. All four ad formats were confirmed serving on a device in the same pass.
 
 ### What versionCode 6 changed
 
@@ -660,9 +697,11 @@ have their own notes above ("Things that will bite you"); the shape of it:
 - Added `.github/workflows/ci.yml`, and dropped the `org.gradle.java.home` line
   that made the repo unbuildable on any machine but one.
 
-**Before uploading this one:** check the app on a real device in both languages
-and both themes, and specifically confirm a saved profile survives the 5 → 6
-migration on a device that already has data.
+**That release shipped inside versionCode 10.** The 5 → 6 migration it carries
+has since run on a device that already had data, with saved profiles intact —
+so the warning that used to stand here is discharged. The habit it asked for is
+not: check a release on a real device in both languages and both themes before
+uploading it.
 
 `versionCode 4` fixed AdMob serving no ads in production at all: both AdMob
 apps from the rename (old AstroVeda, current Revati) still exist, and `.env`'s

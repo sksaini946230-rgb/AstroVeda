@@ -62,10 +62,51 @@ Thank you for using Revati.
 
 ## Said so far
 
+### versionCode 11 / 2.0
+
+One user-visible change, so the notes say one thing. The bottom bar was rebuilt
+to a design the owner supplied: every tab carries its label, on a floating
+capsule. Everything else in this build is the arithmetic that keeps it from
+clipping, which is not something anyone presses Update for.
+
+The version *name* is unchanged — 10 and 11 are both 2.0. Play allows that, and
+it is right here: from a user's side this is the same release with the
+navigation redone. `versionCode` had to move because 10 was already uploaded.
+
+```
+<en-US>
+Namaste 🙏
+
+A new look for the bottom navigation:
+
+• Every tab now shows its name, not only the one you are on
+• A rounded, floating bar that sits clear of the screen edges
+• Fits properly on small screens and at large text sizes
+• Identical in Hindi and English, and in light and dark
+
+Thank you for using Revati.
+</en-US>
+<hi-IN>
+नमस्ते 🙏
+
+नीचे के नेविगेशन का नया रूप:
+
+• अब हर टैब का नाम दिखता है, केवल चुने हुए का नहीं
+• गोल, तैरता हुआ बार जो किनारों से हटकर बैठता है
+• छोटी स्क्रीन और बड़े टेक्स्ट साइज़ पर भी सही
+• हिन्दी-अंग्रेज़ी और लाइट-डार्क, हर तरह एक जैसा
+
+रेवती चुनने के लिए धन्यवाद।
+</hi-IN>
+```
+
+en-US is 313 characters and hi-IN is 262, against the 500 Play allows.
+
 ### versionCode 10 / 2.0
 
-The one that goes to production. Everything in the 1.4 list below, which was
-never uploaded, plus what a full pass on a real phone found: Guna Milan was
+**Uploaded** by the owner, on or before 8 Sep 2026. Everything in the 1.4 list
+below, which never went up, plus what a full pass on a real phone found: Guna
+Milan was
 missing one of the three Bhakoot doshas and never asked for a birth time, the
 night Choghadiya could not be opened at all, and the lucky time was the same for
 four rashis at once.
