@@ -45,6 +45,37 @@ val canSignRelease = releaseKeystore.exists() &&
 // the one registered in Firebase for Google Sign-In from debug builds.
 val debugKeystore = file("${rootDir}/debug.keystore")
 
+/**
+ * The lowest versionCode this project may ship.
+ *
+ * Raise it if Play ever reports a code as used that this scheme produced — that
+ * can only happen if commits were squashed or dropped and the count went
+ * backwards. Everything at or below 11 has already been uploaded.
+ */
+val VERSION_CODE_FLOOR = 20
+
+/** Commits on HEAD, or null when git cannot answer (no .git, shallow clone). */
+val gitCommitCount: Int? = run {
+    val exec = providers.exec {
+        workingDir = rootProject.projectDir
+        commandLine("git", "rev-list", "--count", "HEAD")
+        isIgnoreExitValue = true
+    }
+    if (exec.result.get().exitValue == 0) {
+        exec.standardOutput.asText.get().trim().toIntOrNull()
+    } else {
+        null
+    }
+}
+
+/**
+ * Falls back to the floor rather than failing, so tests and lint still run
+ * where git cannot answer — a source zip, or a CI checkout with no history.
+ * A *release* built that way is refused outright, below, because the fallback
+ * is by definition a number this scheme has already used.
+ */
+val resolvedVersionCode: Int = gitCommitCount?.takeIf { it >= VERSION_CODE_FLOOR } ?: VERSION_CODE_FLOOR
+
 android {
   // The Kotlin sources still live under com.example; this is the applicationId
   // namespace, which is what R and BuildConfig are generated into.
@@ -59,7 +90,17 @@ android {
     applicationId = "com.aistudio.astroveda.kpvqzm"
     minSdk = 24
     targetSdk = 36
-    versionCode = 11
+    // Never typed by hand. Twice now a release was built on a number Play
+    // had already taken — 10, then 11 — and each time the only symptom was
+    // "Version code N has already been used" at the top of the upload page,
+    // after a ten-minute build. Guessing is the defect: this machine has no
+    // way to know what has gone up, because the owner uploads, not the build.
+    //
+    // The number of commits on HEAD does know. It only ever increases, it
+    // increases on every commit, and every release is committed before it is
+    // built — so a code cannot repeat unless history is rewritten, which is
+    // what VERSION_CODE_FLOOR is for.
+    versionCode = resolvedVersionCode
     versionName = "2.0"
 
     val envProperties = Properties()
@@ -278,4 +319,18 @@ gradle.taskGraph.whenReady {
         "not need them and will run without."
     )
   }
+}
+
+// A release must never carry a guessed versionCode. If git could not be read,
+// or the history is too shallow to count, the fallback above is a number that
+// has already been uploaded — so stop here rather than at the top of the Play
+// upload page ten minutes from now.
+tasks.matching { it.name == "bundleRelease" || it.name == "assembleRelease" }.configureEach {
+    doFirst {
+        check(gitCommitCount != null && gitCommitCount >= VERSION_CODE_FLOOR) {
+            "versionCode would be the $VERSION_CODE_FLOOR fallback, which Play has already " +
+                "taken. `git rev-list --count HEAD` returned ${gitCommitCount ?: "nothing"} — " +
+                "build from a full clone with history."
+        }
+    }
 }

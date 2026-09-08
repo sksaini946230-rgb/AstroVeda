@@ -15,6 +15,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # versionCode is the commit count, so the default shallow checkout
+          # would make it 1. Nothing here builds a release, but a wrong version
+          # in a lint or test report is a wrong report.
+          fetch-depth: 0
 
       - uses: actions/setup-java@v4
         with:

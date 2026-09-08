@@ -610,21 +610,41 @@ that is how most of the UI bugs in this app were found, not by reading code.
 
 ## Where it stands
 
-Live on Play, production. **`versionCode 10` / `2.0` has been uploaded by the
+Live on Play, production. **`versionCode 11` / `2.0` has been uploaded by the
 owner** (on or before 8 Sep 2026), superseding the `versionCode 5` / `1.2` that
-production had been on since 3 Sep. The tree is now on **`versionCode 11` /
-`2.0`** — the navigation bar rebuilt to a design the owner supplied — built,
-signed with the upload key, and verified on a real device in both languages,
-both themes, portrait and landscape, and at 1.0x/1.3x/1.6x font scale. **Not yet
-uploaded.**
+production had been on since 3 Sep — 10 and 11 both went up, which is how the
+versionCode note below came to be written.
 
-**Bump `versionCode` before every release build.** Play takes a number once.
-This was learned the direct way: an AAB was built on 10 after 10 had already
-gone up, and was useless. The number is cheap and the rebuild is ten minutes.
+The tree is now on **`versionCode 155` / `2.0`** — the number is the commit
+count, see below. It carries the navigation bar rebuilt to a design the owner
+supplied, built, signed with the upload key, and verified on a real device in
+both languages, both themes, portrait and landscape, and at 1.0x/1.3x/1.6x font
+scale. **Not yet uploaded.**
 
-### What versionCode 11 changed
+**`versionCode` is derived, never typed.** It is `git rev-list --count HEAD` —
+the number of commits on the branch — resolved in `app/build.gradle.kts`. That
+number only ever goes up, it goes up on every commit, and every release is
+committed before it is built, so a code cannot repeat.
 
-One thing, and its consequences: **the bottom navigation bar**. Every tab now
+It is derived because typing it failed twice in a row. A release was built on
+10 after 10 had gone up; the fix was "bump to 11", and 11 had gone up too. Both
+times the only symptom was *"Version code N has already been used"* at the top
+of the Play upload page, after a ten-minute build — and both times the mistake
+was the same one: this machine cannot know what has been uploaded, because the
+owner uploads, not the build. Guessing was the defect, not the guess.
+
+`VERSION_CODE_FLOOR` is 20, above everything uploaded under the old scheme. If
+git cannot answer — a source zip, a shallow CI checkout — the floor is used so
+that tests and lint still run, and `assembleRelease` and `bundleRelease` refuse
+outright, because the floor is by definition a number Play has already taken.
+CI checks out with `fetch-depth: 0` for the same reason.
+
+### What versionCode 155 changed
+
+Two things. **`versionCode` is now derived from the commit count**, for the
+reason above — which is why this release is 155 and not 12.
+
+The other is **the bottom navigation bar**. Every tab now
 carries its label under its icon, the selected one inside a tinted capsule, on
 a floating capsule bar — the layout the owner asked for, matched from a
 screenshot. The full account of how the label is fitted, and of the four
