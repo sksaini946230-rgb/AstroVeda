@@ -671,8 +671,9 @@ with the app in Hindi — goldie renders every locale from the same captures, an
 only the copy changes.
 
 **The privacy policy is one text in two places.** `docs/PRIVACY_POLICY.md` is
-the URL on the Play listing (*App content → Privacy policy*) and is what a
-reviewer reads; `app/src/main/assets/privacy_policy.html` is what Settings
+the URL on the Play listing and is what a reviewer reads — Play Console →
+*Policy and programs → App content → Actioned → Privacy policy → Manage*, and a
+save there waits in *Publishing overview* until it is submitted for review; `app/src/main/assets/privacy_policy.html` is what Settings
 opens. They used to be written separately, and by Sep 2026 they disagreed on
 almost everything. The published one opened with "An Account Is Required",
 after the sign-in gate had been removed and against the Data safety form, which
@@ -862,14 +863,14 @@ Not working / not finished:
   takes down AI and sign-in, and the failure does not say why.
 
 
-- **Two Play Console items go with the privacy policy.** The listing's
-  privacy-policy URL is still the pre-rename
-  `github.com/sksaini946230-rgb/AstroVeda/blob/main/docs/PRIVACY_POLICY.md`,
-  which works only through GitHub's redirect; it should be the `Revati` path.
-  And the Data safety form does not declare the text of AI questions, which is
+- **The Data safety form does not declare the text of AI questions**, which is
   sent to Firebase AI Logic. *App activity → Other user-generated content*,
-  optional, for app functionality, is the category that fits. That one is a
-  judgement on the owner's attestation to Google, not a fix to make from here.
+  optional, for app functionality, is the category that fits. It is a judgement
+  on the owner's attestation to Google, not a fix to make from here. The other
+  Play Console item that went with the policy is done: the listing's
+  privacy-policy URL was moved from the pre-rename `AstroVeda` path to the
+  `Revati` one and sent for review on 11 Sep 2026; the old path redirects in the
+  meantime.
 - **PRO subscription cannot exist yet.** Play Console refuses the Subscriptions
   page until a Google Payments merchant account is set up. Until then the PRO
   button leads nowhere. Product id the app queries:
