@@ -76,6 +76,13 @@ object AstroAnalytics {
         logEvent("horoscope_view", bundle)
     }
 
+    /**
+     * Not called anywhere, and wiring it is not free. The city is usually the one
+     * the app derived from the phone's GPS, so sending it makes this the only
+     * place the user's location leaves the device. The privacy policy says
+     * location never does, and the Play Data safety form declares no location at
+     * all. Change both — "Approximate location" on the form — in the same pass.
+     */
     fun logPanchangView(city: String) {
         val bundle = Bundle().apply {
             putString("city_name", city)

@@ -205,9 +205,14 @@ quota one user can exhaust for everyone.
 
 **Analytics were almost entirely unwired.** `AstroAnalytics` has eighteen logging
 methods; `init` and `logAppOpen` were the only two ever called, so the live app
-recorded app opens and nothing else. All of them are wired now — screen views,
-onboarding, horoscope views, kundali, matching, numerology, AI queries, login on
-all four paths, the three purchase outcomes, and sharing.
+recorded app opens and nothing else. Fifteen of them are wired now — screen
+views, onboarding, horoscope views, kundali, matching, numerology, AI queries,
+login on all four paths, the three purchase outcomes, and sharing. Three are not:
+`logFirstOpen`, `logOnboardingStep` and `logPanchangView`. The last is not a
+free wiring job. The city it sends is usually the one derived from the phone's
+GPS, which would make it the only place a user's location leaves the device —
+against what the privacy policy says and what the Data safety form declares. Its
+doc comment says what has to change with it.
 
 `recordNonFatal` in particular now sits on every data path that can lose or fail
 to save a profile: background backup, cloud backup, sync, local wipe, export,
@@ -665,6 +670,29 @@ Only `en-US` is rendered so far. A Hindi set needs the raw screens re-captured
 with the app in Hindi — goldie renders every locale from the same captures, and
 only the copy changes.
 
+**The privacy policy is one text in two places.** `docs/PRIVACY_POLICY.md` is
+the URL on the Play listing (*App content → Privacy policy*) and is what a
+reviewer reads; `app/src/main/assets/privacy_policy.html` is what Settings
+opens. They used to be written separately, and by Sep 2026 they disagreed on
+almost everything. The published one opened with "An Account Is Required",
+after the sign-in gate had been removed and against the Data safety form, which
+marks name and email optional, and it called a precise location "approximate".
+The in-app one described push-notification tokens for an app with no push
+messaging, and said the AI receives the time and place of birth, which it does
+not. Neither mentioned Firebase Analytics.
+
+Edit the markdown, then run `python3 docs/render_privacy_policy.py`.
+`PrivacyPolicyTest` fails if the two copies differ by a word, if a Google
+library ships in the app without being named in the policy (or the policy names
+one that does not ship), if `ACCESS_FINE_LOCATION` and "precise location"
+disagree, or if the Tele-MANAS line is dropped. It was confirmed to fail, all
+four ways, against the policy it replaced.
+
+What the policy says about location rests on one fact worth protecting: the
+device's location never leaves it — not to the AI (which gets a name, a date of
+birth and a lagna), not to Firestore, not to Analytics. Only Android's own
+geocoder sees the coordinates, to name the city. See `logPanchangView`.
+
 Release notes, and the rules for writing them, live in `docs/RELEASE_NOTES.md`.
 Play takes 500 characters per language and will not publish with only one of the
 two filled in.
@@ -834,6 +862,14 @@ Not working / not finished:
   takes down AI and sign-in, and the failure does not say why.
 
 
+- **Two Play Console items go with the privacy policy.** The listing's
+  privacy-policy URL is still the pre-rename
+  `github.com/sksaini946230-rgb/AstroVeda/blob/main/docs/PRIVACY_POLICY.md`,
+  which works only through GitHub's redirect; it should be the `Revati` path.
+  And the Data safety form does not declare the text of AI questions, which is
+  sent to Firebase AI Logic. *App activity → Other user-generated content*,
+  optional, for app functionality, is the category that fits. That one is a
+  judgement on the owner's attestation to Google, not a fix to make from here.
 - **PRO subscription cannot exist yet.** Play Console refuses the Subscriptions
   page until a Google Payments merchant account is set up. Until then the PRO
   button leads nowhere. Product id the app queries:

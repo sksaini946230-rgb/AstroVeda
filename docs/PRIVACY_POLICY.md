@@ -1,106 +1,214 @@
 # Privacy Policy for Revati
 
-**Effective Date:** July 24, 2026
-**Last Updated:** September 1, 2026
+**Effective:** July 24, 2026 · **Last updated:** September 11, 2026
 
-Revati ("we", "our", or "us", operated by Msunjay Enterprises) respects your
-privacy and is committed to protecting your personal information. This Privacy
-Policy explains how our application collects, uses, and shares data when you use
-the **Revati : Kundli & Panchang** Android application.
+Revati ("we", "our", "us") is published by Msunjay Enterprises. This policy
+explains what the **Revati : Kundli & Panchang** Android app collects, where it
+goes, and how you can delete it.
 
 *This app was previously published as "AstroVeda". It is the same app under a
 new name.*
 
 ---
 
-## 1. An Account Is Required
+## 1. The Short Version
 
-Revati requires you to create an account, or sign in with Google, before using
-the app. We collect your name and email address at that point. If you do not
-want to provide them, please do not use the app.
-
----
-
-## 2. Information We Collect
-
-* **Account information.** With Google Sign-In we receive your basic public
-  profile (name and email address). With email sign-up we receive the name,
-  email address and password you enter. This is used to authenticate you and to
-  synchronise your saved birth profiles across devices.
-* **Astrological data.** The name, date of birth, time of birth and place of
-  birth you enter to generate Kundali, Dasha, Rashifal and Ashtakoot matching
-  charts.
-* **Location.** Approximate device location, used to calculate sunrise, sunset,
-  Rahu Kaal and Choghadiya for where you are. Granting it is optional — you can
-  pick a city by hand instead. Your location is not tracked over time and is not
-  sold.
-* **Diagnostics.** Anonymous crash logs and performance data via Firebase
-  Crashlytics.
-* **Advertising identifiers.** See section 4.
+- **You do not need an account.** Everything except cloud backup works without
+  one.
+- Panchang, Kundali, Dasha, Guna Milan, Muhurat and numerology are
+  **calculated on your phone**. Your birth details are not sent anywhere to
+  produce them.
+- Your birth details leave your phone only if you back them up to your
+  account, export them yourself, or ask the AI a question while a Kundali is
+  open.
+- The app shows ads from Google AdMob, and uses Google's Firebase services for
+  sign-in, backup, AI answers, usage statistics and crash reports.
+- We do not sell, rent or trade your personal information.
 
 ---
 
-## 3. What Is Computed On Your Device, and What Leaves It
+## 2. Accounts Are Optional
 
-Panchang, Kundali, Dasha, Guna Milan, Muhurat and numerology are calculated
-**entirely on your device**. Your birth details are not sent anywhere to produce
-them, and these features work with no internet connection.
+You can use Revati without creating an account. An account adds one thing: a
+cloud backup of your saved profiles, so they survive a new phone or a
+reinstall.
 
-Two things do leave your device:
-
-* **Cloud backup.** Saved birth profiles are stored in Google Firebase Firestore
-  so you do not lose them, encrypted in transit (TLS) and at rest.
-* **Astrological guidance.** If you ask a question in the guidance feature, your
-  question — along with the chart details attached to it — is sent to Google's
-  Firebase AI Logic service to compose a reply. Do not enter anything in that
-  box you would not want processed by a third-party service.
+If you create one, you can sign in with Google Sign-In or with an email address
+and password, both through Firebase Authentication. We receive your name, your
+email address and an account identifier. Your password goes to Firebase
+Authentication, which stores it in hashed form; we cannot read it. Google
+Sign-In may also pass the address of your profile photo to Firebase; the app
+does not use it.
 
 ---
 
-## 4. Advertising
+## 3. Information the App Handles
 
-Revati shows ads through **Google AdMob**. To serve them, AdMob may collect and
-share your device's advertising identifier and app-activity data with third
-parties. In regions where consent is required (the EEA, the UK and others), we
-ask for it through Google's consent form before any ad loads, and you may
-withdraw or change that choice at any time from the app's settings.
-
-Ads are requested with a general content rating and are not directed at
-children.
-
-We do not sell, rent or trade your personal information.
-
----
-
-## 5. Your Rights and Deleting Your Data
-
-* Delete any saved Kundali profile at any time inside the app.
-* Delete your account and everything in it with **Settings → Delete Account &
-  Data**. This removes your cloud profiles, your on-device profiles and reports,
-  and your sign-in account. It cannot be undone.
-* Or email us at the address below and we will do it for you.
-
-Full instructions: see `ACCOUNT_DELETION.md` in this repository.
-
----
-
-## 6. Children
-
-Revati is not intended for children under 13, and we do not knowingly collect
-information from them. If you believe a child has given us their information,
-email us and we will remove it.
-
----
-
-## 7. Changes
-
-If this policy changes materially, we will update the date at the top and, where
-the change is significant, tell you in the app.
+- **Birth details.** The name, date, time and place of birth you enter for a
+  Kundali, a Guna Milan match or a saved profile. They are stored on your phone
+  and leave it only as described in section 4.
+- **Location, if you allow it.** The app reads your phone's precise location to
+  calculate sunrise, sunset, Rahu Kaal, Choghadiya and the Panchang for where
+  you are. The calculation happens on your phone. To show your city's name, the
+  coordinates are passed to Android's built-in geocoder, which on most phones
+  asks Google's location service. The app keeps only the last city it used, on
+  your phone. It never builds a location history, never reads your location in
+  the background, and never sends it to us. You can refuse and choose a city by
+  hand instead.
+- **Usage statistics.** Firebase Analytics records how the app is used: app
+  opens, the screens you visit and the features you use, with coarse results —
+  the rashi whose horoscope you opened, a Guna Milan score, whether a match has
+  a Manglik mismatch, the single-digit numerology numbers a calculation
+  produced, how you signed in, whether you shared something, and whether a
+  purchase was started, completed or failed. It records that you asked the AI a
+  question and how long the question was, but not what it said. It also
+  receives basic device information, an app-instance identifier, and your
+  language, theme and whether you have PRO. It never receives names, dates,
+  times or places of birth, and it is not linked to your name or email address.
+- **Crash reports.** Firebase Crashlytics collects a report when the app
+  crashes or records an error: the device model, the Android version and a
+  technical trace of what went wrong. Reports do not contain your birth
+  details. If you are signed in, a report carries your account identifier so
+  that a problem you tell us about can be matched to it.
+- **Advertising identifier.** See section 5.
+- **Notifications.** Daily Panchang, festival and Muhurat reminders are
+  scheduled and written on your phone. No push messaging service is used, and
+  no notification token exists.
 
 ---
 
-## 8. Contact
+## 4. What Leaves Your Phone
 
-* **Developer / Organisation:** Msunjay Enterprises
-* **Email:** supportrevati@gmail.com
-* **Repository / support:** https://github.com/sksaini946230-rgb/Revati
+Calculations happen on your phone and work without an internet connection. Your
+personal information is sent elsewhere only in these cases:
+
+- **Cloud backup — only if you sign in.** Your saved profiles are stored in
+  Google's Cloud Firestore under your account. The database's security rules
+  let only your own signed-in account read or change them. They are encrypted
+  in transit (TLS) and encrypted at rest by Google.
+- **Asking the AI — only when you send a question.** Your question is sent to
+  Google's Firebase AI Logic, which uses Gemini models, to compose a reply. If a
+  Kundali is open on screen, that person's name, date of birth and ascendant
+  (lagna) are sent with it so the answer can refer to them. The time and place
+  of birth are not sent. Google processes the question under its own terms for
+  Firebase AI Logic and the Gemini API. Revati does not keep a history of your
+  questions, but do not type anything into the question box that you would not
+  want a third-party service to process.
+- **Rashifal insights.** When you tap for an AI insight on a Rashifal, only the
+  name of the rashi is sent — nothing about you.
+- **Astro news.** The highlights on the More tab are requested from the same
+  service and carry no personal information.
+- **Exporting your profiles.** When you export saved profiles, the app creates a
+  file and hands it to your phone's share sheet. Where it goes is your choice.
+
+AI answers are generated automatically; no human astrologer is involved. They
+are traditional interpretation, not prediction or professional advice, and they
+can be wrong. Revati does not give medical, legal or financial advice. If you
+are in distress, Tele-MANAS (14416) offers free, confidential support in Indian
+languages, 24x7.
+
+---
+
+## 5. Ads
+
+Revati shows ads through Google AdMob: banners, full-screen ads between
+screens, an ad when you return to the app, and an optional video you can choose
+to watch before a PDF report is made — the report is free either way. To serve
+and measure ads, AdMob may collect your device's advertising identifier and
+information about your activity in the app, and may share it with its
+advertising partners.
+
+In the EEA, the UK and other regions where the law requires consent, the app
+asks for it through Google's consent form, the User Messaging Platform, before
+any ad loads. You can change or withdraw that choice at any time from Settings
+→ Legal & Privacy. You can also reset or delete your advertising identifier in
+your phone's Google settings.
+
+Ads are requested with a general-audience content rating, and the app is not
+directed at children.
+
+---
+
+## 6. Purchases and Ratings
+
+If you buy a subscription, payment is handled entirely by Google Play Billing.
+We receive confirmation of the purchase, never your card or bank details.
+
+If you choose to rate the app from inside it, Google Play's In-App Review
+handles it. The rating goes to Google Play, and the app is not told whether you
+left one.
+
+---
+
+## 7. Storage and Security
+
+- Saved profiles, reports and recent searches are kept in the app's private
+  storage on your phone, which other apps cannot read. They are excluded from
+  Android's cloud backup and from device-to-device transfer, so they are not
+  copied to Google Drive or to a new phone without you. To move them, sign in
+  and use cloud backup, or export them.
+- The cloud backup is protected as described in section 4.
+- To stop other software from using our services in Revati's name, the app
+  proves it is genuine through Firebase App Check, which uses Google Play
+  Integrity. That check concerns the app and the device, not your birth details
+  or your account.
+
+---
+
+## 8. Keeping and Deleting Your Data
+
+- You can delete any saved profile inside the app at any time.
+- **If you are signed in,** Settings → Account & data controls → Delete account
+  & all data removes your cloud profiles, the profiles, reports and recent
+  searches on your phone, and your sign-in account. It cannot be undone. For
+  your protection you may be asked to sign in again first; nothing is deleted
+  until that check passes.
+- **If you are not signed in,** the same place offers Delete all saved data,
+  which clears everything the app has stored on your phone. Uninstalling the
+  app does the same.
+- Or email us at the address below and we will delete your account and cloud
+  data for you. Step-by-step instructions:
+  https://github.com/sksaini946230-rgb/Revati/blob/main/docs/ACCOUNT_DELETION.md
+- Usage statistics, crash reports and advertising data are kept by Google under
+  its own retention periods. They are not linked to your name or email address.
+
+---
+
+## 9. Children
+
+Revati is not directed at children and is not intended for anyone under 13. We
+do not knowingly collect information from children under 13. If you believe a
+child has given us their information, email us and we will delete it.
+
+---
+
+## 10. Services We Use
+
+All of these are provided by Google, and each is covered by Google's privacy
+policy at https://policies.google.com/privacy
+
+- **Firebase Authentication** and **Google Sign-In** — optional sign-in
+- **Cloud Firestore** — optional cloud backup
+- **Firebase AI Logic** — AI answers, Rashifal insights and astro news
+- **Firebase Analytics** — usage statistics
+- **Firebase Crashlytics** — crash reports
+- **Firebase App Check** with Google Play Integrity — confirms that requests
+  come from the genuine app
+- **Google AdMob** and the **User Messaging Platform** — ads and ad consent
+- **Google Play Billing** and **In-App Review** — purchases and ratings
+- **Google Play services** — your precise location, if you allow it
+
+---
+
+## 11. Changes
+
+If this policy changes materially, we will update the date at the top and,
+where the change is significant, tell you in the app.
+
+---
+
+## 12. Contact
+
+- **Developer / Organisation:** Msunjay Enterprises
+- **Email:** supportrevati@gmail.com
+- **Source and support:** https://github.com/sksaini946230-rgb/Revati

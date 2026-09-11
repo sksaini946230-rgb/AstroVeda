@@ -65,7 +65,11 @@ delete two things the app has never collected:
 
 * **Deleted immediately:** your account, your cloud-backed birth profiles, and
   everything the app stored on your device.
-* **Anonymous diagnostics:** aggregated, non-identifiable crash and stability
-  data (Firebase Crashlytics) may be retained for reliability analysis. It
-  carries no personal information and cannot be traced back to you once the
-  account is gone.
+* **Usage statistics and crash reports:** Firebase Analytics usage data and
+  Firebase Crashlytics crash reports are kept by Google under its own retention
+  periods. Neither contains your birth details or is linked to your name or
+  email address. A crash report sent while you were signed in carries your
+  account identifier, which points to nothing once the account is deleted.
+* **Advertising data** collected by Google AdMob is governed by Google's own
+  policies; you can reset your advertising identifier in your phone's Google
+  settings.
