@@ -535,10 +535,11 @@ Keys: `ADMOB_APP_ID_ANDROID`, `ADMOB_BANNER_ID`, `ADMOB_INTERSTITIAL_ID`,
 `PLAY_LICENSE_KEY`, `KEYSTORE_PATH`, `STORE_PASSWORD`, `KEY_ALIAS`,
 `KEY_PASSWORD`.
 
-`ADMOB_APP_OPEN_ID` and `ADMOB_REWARDED_ID` are still `NOT_CONFIGURED`. The
-units exist in AdMob; the ids have not been pasted in. Until they are, those two
-placements are absent — no crash, no test ad, nothing on screen. See
-`AdIds.resolve`.
+All five AdMob keys hold real `ca-app-pub-…` ids (checked 11 Sep 2026;
+`ADMOB_APP_OPEN_ID` and `ADMOB_REWARDED_ID` were the last two filled in). A key
+left at `NOT_CONFIGURED` makes its placement absent — no crash, no test ad,
+nothing on screen. See `AdIds.resolve`. `PLAY_LICENSE_KEY` is the only sentinel
+still in `.env`.
 
 Release signing uses `upload-keystore.jks` (alias `upload`). The older
 `astroveda-upload-key.jks` is dead — Play no longer accepts it.
@@ -741,6 +742,10 @@ It carries the navigation bar rebuilt to a design the owner supplied, verified
 on a real device in both languages, both themes, portrait and landscape, and at
 1.0x/1.3x/1.6x font scale.
 
+Android developer verification for the Msunjay Enterprises account is done —
+the owner confirmed it on 11 Sep 2026, ahead of Play's 30 Sep deadline, so the
+"apps not registered will be removed" notification can be ignored if it lingers.
+
 Nothing is built and waiting to go up. The tree's own number is just its commit
 count and climbs with every commit, so a number higher than 156 here does not
 mean a release is pending.
@@ -891,12 +896,6 @@ Not working / not finished:
   takes down AI and sign-in, and the failure does not say why.
 
 
-- **Android developer verification is due by 30 Sep 2026.** A Play Console
-  notification on the Msunjay Enterprises account says Play apps not registered
-  by then "will be removed from Play globally". Registration is on the Android
-  developer verification page in Play Console and is per developer account, so
-  it covers every app on it — Tezzo included, which is not ours to touch. Its
-  status was not checked; the notification was still showing on 11 Sep 2026.
 - **When PRO becomes purchasable, add *Financial info → Purchase history* to
   the Data safety form.** Google's disclosure for Analytics lists in-app
   purchases among what it collects automatically.
