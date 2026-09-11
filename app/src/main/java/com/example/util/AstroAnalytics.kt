@@ -79,9 +79,10 @@ object AstroAnalytics {
     /**
      * Not called anywhere, and wiring it is not free. The city is usually the one
      * the app derived from the phone's GPS, so sending it makes this the only
-     * place the user's location leaves the device. The privacy policy says
-     * location never does, and the Play Data safety form declares no location at
-     * all. Change both — "Approximate location" on the form — in the same pass.
+     * place the app itself sends the user's location off the device. The privacy
+     * policy says the app never does — the approximate location it and the Data
+     * safety form do disclose is what Google's SDKs estimate from the IP address.
+     * Rewrite the policy's location paragraph in the same pass.
      */
     fun logPanchangView(city: String) {
         val bundle = Bundle().apply {

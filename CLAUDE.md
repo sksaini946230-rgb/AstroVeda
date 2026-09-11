@@ -210,9 +210,9 @@ views, onboarding, horoscope views, kundali, matching, numerology, AI queries,
 login on all four paths, the three purchase outcomes, and sharing. Three are not:
 `logFirstOpen`, `logOnboardingStep` and `logPanchangView`. The last is not a
 free wiring job. The city it sends is usually the one derived from the phone's
-GPS, which would make it the only place a user's location leaves the device —
-against what the privacy policy says and what the Data safety form declares. Its
-doc comment says what has to change with it.
+GPS, which would make it the only place the app itself sends a user's location
+off the device — against what the privacy policy says. Its doc comment says what
+has to change with it.
 
 `recordNonFatal` in particular now sits on every data path that can lose or fail
 to save a profile: background backup, cloud backup, sync, local wipe, export,
@@ -692,7 +692,11 @@ four ways, against the policy it replaced.
 What the policy says about location rests on one fact worth protecting: the
 device's location never leaves it — not to the AI (which gets a name, a date of
 birth and a lagna), not to Firestore, not to Analytics. Only Android's own
-geocoder sees the coordinates, to name the city. See `logPanchangView`.
+geocoder sees the coordinates, to name the city. See `logPanchangView`. The
+Data safety form still declares *Approximate location*, and correctly: Google's
+own disclosures say Analytics derives a coarse location from the IP address and
+AdMob collects the IP address to estimate one. That is the SDKs, not the app,
+and the policy says so.
 
 Release notes, and the rules for writing them, live in `docs/RELEASE_NOTES.md`.
 Play takes 500 characters per language and will not publish with only one of the

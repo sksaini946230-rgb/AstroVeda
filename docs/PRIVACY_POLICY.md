@@ -54,7 +54,9 @@ does not use it.
   asks Google's location service. The app keeps only the last city it used, on
   your phone. It never builds a location history, never reads your location in
   the background, and never sends it to us. You can refuse and choose a city by
-  hand instead.
+  hand instead. Separately from this, Google's analytics and advertising
+  services estimate an approximate location, such as your city, from your
+  device's IP address — see the next item and section 5.
 - **Usage statistics.** Firebase Analytics records how the app is used: app
   opens, the screens you visit and the features you use, with coarse results —
   the rashi whose horoscope you opened, a Guna Milan score, whether a match has
@@ -63,8 +65,9 @@ does not use it.
   purchase was started, completed or failed. It records that you asked the AI a
   question and how long the question was, but not what it said. It also
   receives basic device information, an app-instance identifier, and your
-  language, theme and whether you have PRO. It never receives names, dates,
-  times or places of birth, and it is not linked to your name or email address.
+  language, theme and whether you have PRO, and Google derives a coarse
+  location from your device's IP address. It never receives names, dates, times
+  or places of birth, and it is not linked to your name or email address.
 - **Crash reports.** Firebase Crashlytics collects a report when the app
   crashes or records an error: the device model, the Android version and a
   technical trace of what went wrong. Reports do not contain your birth
@@ -114,7 +117,8 @@ languages, 24x7.
 Revati shows ads through Google AdMob: banners, full-screen ads between
 screens, an ad when you return to the app, and an optional video you can choose
 to watch before a PDF report is made — the report is free either way. To serve
-and measure ads, AdMob may collect your device's advertising identifier and
+and measure ads, AdMob may collect your device's advertising identifier, your IP
+address — which can be used to estimate your general location — and
 information about your activity in the app, and may share it with its
 advertising partners.
 
