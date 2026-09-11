@@ -689,6 +689,30 @@ one that does not ship), if `ACCESS_FINE_LOCATION` and "precise location"
 disagree, or if the Tele-MANAS line is dropped. It was confirmed to fail, all
 four ways, against the policy it replaced.
 
+**The Data safety form is the policy's other half**, and was redone on 11 Sep
+2026 against the code and against Google's own SDK disclosures
+(`developers.google.com/admob/android/privacy/play-data-disclosure`,
+`firebase.google.com/docs/android/play-data-disclosure`). It had said accounts
+could only be made through OAuth, though email sign-up exists; pointed both
+deletion links at the pre-rename repo; marked app interactions and device IDs
+*optional* although the app offers no way to turn either off; and declared no
+location and nothing for the AI box. What it declares now, and why:
+
+    Approximate location   collected + shared   analytics, ads, fraud   Analytics derives it from the IP;
+                                                                        AdMob collects the IP to estimate it
+    Other user-generated   collected, optional  app functionality       the typed AI question; Firebase is a
+      content                                                           service provider, so not "shared"
+    App interactions,      required             + ads, fraud            AdMob's stated purposes, on every
+      Device IDs,                                                       type it touches
+      Diagnostics
+    User IDs               optional             + analytics             Crashlytics tags a signed-in user's
+                                                                        crash reports with the uid
+
+Play counts whatever an SDK sends off the device, not only what the app sends.
+*Precise location* is not declared: the GPS fix reaches nothing but Android's
+geocoder. Edit the form and the policy together, in that order of care — the
+form is what users see on the listing.
+
 What the policy says about location rests on one fact worth protecting: the
 device's location never leaves it — not to the AI (which gets a name, a date of
 birth and a lagna), not to Firestore, not to Analytics. Only Android's own
@@ -867,14 +891,15 @@ Not working / not finished:
   takes down AI and sign-in, and the failure does not say why.
 
 
-- **The Data safety form does not declare the text of AI questions**, which is
-  sent to Firebase AI Logic. *App activity → Other user-generated content*,
-  optional, for app functionality, is the category that fits. It is a judgement
-  on the owner's attestation to Google, not a fix to make from here. The other
-  Play Console item that went with the policy is done: the listing's
-  privacy-policy URL was moved from the pre-rename `AstroVeda` path to the
-  `Revati` one and sent for review on 11 Sep 2026; the old path redirects in the
-  meantime.
+- **Android developer verification is due by 30 Sep 2026.** A Play Console
+  notification on the Msunjay Enterprises account says Play apps not registered
+  by then "will be removed from Play globally". Registration is on the Android
+  developer verification page in Play Console and is per developer account, so
+  it covers every app on it — Tezzo included, which is not ours to touch. Its
+  status was not checked; the notification was still showing on 11 Sep 2026.
+- **When PRO becomes purchasable, add *Financial info → Purchase history* to
+  the Data safety form.** Google's disclosure for Analytics lists in-app
+  purchases among what it collects automatically.
 - **PRO subscription cannot exist yet.** Play Console refuses the Subscriptions
   page until a Google Payments merchant account is set up. Until then the PRO
   button leads nowhere. Product id the app queries:
