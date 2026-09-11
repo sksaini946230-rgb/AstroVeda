@@ -307,19 +307,16 @@ The only test touching Choghadiya asserted that eight slots came back. Eight
 always came back. `ChoghadiyaSequenceTest` checks the sequence itself now, and
 was confirmed to fail against the old table before the fix went in.
 
-**Open question, deliberately not changed: the night table uses a different
-progression from the day table.** All seven night rows are consistent rotations
-of one list, and every one starts on the lord of the fifth weekday, which is the
-classical rule and is now covered by a test — and, since the toggle was fixed,
-is finally visible on the device (Monday opens on Char, Shukra's Choghadiya, and
-Friday is the fifth weekday from Monday). But that list steps the Chaldean
-order five at a time where the daytime list steps it one at a time. That may be
-a real convention, or it may be the same class of slip as Sunday's. It was left
-alone because, unlike Sunday, nothing about it is internally inconsistent —
-deciding it needs someone who knows the shastra, not someone reading the table.
+**The night table steps five at a time, and that is right.** All seven night
+rows are rotations of one list that walks the Chaldean cycle five places per slot,
+where the day rows walk it one. It looked like the same class of slip as Sunday's
+and sat here as an open question until it was checked against a published
+panchang: Drik Panchang's Choghadiya for Jaipur, 13-19 Sep 2026, matches all
+fourteen rows, day and night, slot for slot. `ChoghadiyaSequenceTest` pins that
+published table, so making the night step by one now fails a test.
 
-**The night Choghadiya could not be reached at all, and that hid the open
-question above.** Tapping "रात का चौघड़िया" moved the pill and changed nothing
+**The night Choghadiya could not be reached at all, which is why nobody had
+looked hard at the night table above.** Tapping "रात का चौघड़िया" moved the pill and changed nothing
 else — all eight tiles kept the daytime sequence and the daytime hours under a
 control that said night. `choghadiyaSlots` was a plain `get()` reading four
 MutableStateFlows through `.value`, which is not a snapshot read, so Compose
@@ -554,31 +551,35 @@ Google Sign-In matches on that certificate. Getting this wrong took Google
 Sign-In down for every real user of the first release, while it worked fine on
 every device tested locally.
 
-All six fingerprints are registered on `com.aistudio.astroveda.kpvqzm` now:
+Every certificate that can sign this app, copied out of Play Console → *App
+signing* and the keystores on 11 Sep 2026:
 
-| Key | SHA-1 |
-|---|---|
-| Play app signing (what users present) | see below — **the value that used to be here is stale** |
-| Upload key | `77:D9:C2:35:B4:EB:2D:47:8E:89:DB:27:41:A8:D7:E2:06:9A:40:81` |
-| Debug | `D3:46:B8:A4:61:5B:85:6A:4F:AF:5B:F2:64:D2:01:47:2B:F2:31:E1` |
+| Key | SHA-1 | In Firebase? |
+|---|---|---|
+| Play app signing, current, **classical** | `B7:D1:DE:10:DD:F3:5E:FD:56:27:99:FA:F6:C4:D1:D0:38:B4:5C:C5` | yes |
+| Play app signing, current, **post-quantum** | `02:33:B3:63:13:E2:4E:92:9D:6B:5E:B4:F9:73:96:EA:CF:74:85:46` | **no** |
+| Play app signing, **previous** (first used 25 Aug 2026) | `FB:3F:D2:6B:05:B8:71:4E:8B:2D:DB:E5:DB:67:AF:FE:B5:96:52:2F` | yes |
+| Upload key (`upload-keystore.jks`) | `77:D9:C2:35:B4:EB:2D:47:8E:89:DB:27:41:A8:D7:E2:06:9A:40:81` | yes |
+| Debug | `D3:46:B8:A4:61:5B:85:6A:4F:AF:5B:F2:64:D2:01:47:2B:F2:31:E1` | yes |
 
-The upload and debug values above were re-derived from the keystores
-themselves (`keytool -list -v`) and are correct.
+The previous key's SHA-256 is
+`9A:42:6C:10:AD:96:C7:69:0E:A3:FC:4B:62:DC:99:34:BE:E5:DF:C6:D0:95:8D:93:B4:55:E7:EF:7D:9F:49:B9`.
 
-**The Play app signing key was upgraded on 25 Aug 2026**, and this file went on
-recording the old one. Play Console → App signing now shows a *Classical key*, a
-*Post-quantum cryptography key*, and a **Previous app signing keys** section
-first used 25 Aug 2026 — which is what the old
-`B7:D1:DE:10:DD:F3:5E:FD:56:27:99:FA:F6:C4:D1:D0:38:B4:5C:C5` was. Pulling the
-APK Play actually serves and reading its certificate gave
+**An earlier version of this file had the two Play keys the wrong way round.**
+It called `B7:D1` the old key and `FB:3F` the current one, because `FB:3F` is
+what reading the certificate of the APK Play serves gave. That APK does carry the
+previous key: the Play signing key was upgraded on 25 Aug 2026, and an upgraded
+app keeps its original signer and proves the rotation to the new one. The test
+phone presented `FB:3F` on 4 Sep 2026 — Sign-In and App Check failed on it until
+`FB:3F` was registered — and devices that apply the rotation (Android 13 and
+later) can present `B7:D1`. Both are live; neither is stale. The console shows
+the fingerprints only behind copy buttons, which makes them easy to misread.
 
-    SHA-1    FB:3F:D2:6B:05:B8:71:4E:8B:2D:DB:E5:DB:67:AF:FE:B5:96:52:2F
-    SHA-256  9A:42:6C:10:AD:96:C7:69:0E:A3:FC:4B:62:DC:99:34:BE:E5:DF:C6:D0:95:8D:93:B4:55:E7:EF:7D:9F:49:B9
-
-and the SHA-256 there matches what the console shows. Before registering these
-anywhere, copy them from Play Console → App signing rather than from here: there
-are now several certificates (classical, post-quantum, previous) and a user's
-install may present any of them.
+Firebase also lists a SHA-1 `BE:60:FC:75:A5:25:D0:DF:41:2D:B2:19:29:CB:C0:83:42:49:BB:7B`
+that matches none of the above — most likely the dead
+`astroveda-upload-key.jks`. It is harmless and was left. The post-quantum SHA-1
+is not registered; no device presents it yet (its install base is 0.0%), and
+adding it is part of the API-key pass below.
 
 **The Firebase API key has no application restriction.** GitHub secret scanning
 flags `app/google-services.json`, and the honest reading is that the key in it
@@ -590,11 +591,13 @@ Console → Credentials → *Android key (auto created by Firebase)* currently s
     Application restrictions: None
 
 with API restrictions set to 25 APIs, among them Firebase AI Logic and Identity
-Toolkit. So anyone holding the key can call those from anywhere, billed here.
-The fix is Application restrictions → Android apps with the package name and
-**every** SHA-1 above, and it wants a device in hand: get the list wrong and the
-app's AI and Google Sign-In both stop working. Reverting to None is instant if
-they do.
+Toolkit. So anyone holding the key can call those from anywhere. The project is
+on the **Spark plan** — no billing account — so that cannot run up a bill; what
+it can do is spend the free Gemini quota, and then the AI box stops working for
+every real user. The fix is Application restrictions → Android apps with the
+package name and **every** SHA-1 in the table above, all five, and it wants a
+device in hand: get the list wrong and the app's AI and Google Sign-In both stop
+working. Reverting to None is instant if they do.
 
 Find these under Play Console → Test and release → **App signing**. Adding a
 fingerprint takes effect server-side — no new release needed.
@@ -689,6 +692,17 @@ library ships in the app without being named in the policy (or the policy names
 one that does not ship), if `ACCESS_FINE_LOCATION` and "precise location"
 disagree, or if the Tele-MANAS line is dropped. It was confirmed to fail, all
 four ways, against the policy it replaced.
+
+**The legal pages are light-only, and the obvious fix would make them dark for
+everyone.** `privacy_policy.html` and `terms_of_service.html` hard-code a light
+palette, so a dark-mode user gets a white page. A `prefers-color-scheme: dark`
+block is not the fix: with `targetSdk` 33 and up, WebView takes that media query
+from the Activity theme's `isLightTheme`, and `Theme.MyApplication` is
+`android:Theme.DeviceDefault.NoActionBar` — a dark theme — so WebView reports
+dark always and the page would go dark in light mode too. Either give the XML
+theme a DayNight parent, or set `WebSettingsCompat.setAlgorithmicDarkeningAllowed`
+from the Compose theme when the WebView is created. Both change what a device
+shows, so both want a device to check.
 
 **The Data safety form is the policy's other half**, and was redone on 11 Sep
 2026 against the code and against Google's own SDK disclosures
@@ -878,12 +892,12 @@ Not working / not finished:
   in hand.** Google Cloud Console → Credentials → *Android key (auto created by
   Firebase)* says "This key can currently be used with any application", while
   its 25 permitted APIs include Firebase AI Logic and Identity Toolkit. Anyone
-  holding the key — and it is inside every APK — can call those from anywhere,
-  billed here. The steps, in order:
+  holding the key — and it is inside every APK — can call those from anywhere
+  and spend the free Gemini quota the AI box runs on. The steps, in order:
 
-  1. Play Console → **App signing**: copy *every* SHA-1 — classical,
-     post-quantum, and the previous key under "Previous app signing keys".
-     Installs from before the 25 Aug 2026 key upgrade still present the old one.
+  1. The five SHA-1s are in the table under *Signing and Firebase* (copied from
+     Play Console on 11 Sep 2026). Re-check them there if the signing key has
+     been upgraded since. Add the post-quantum one to Firebase at the same time.
   2. Cloud Console → Android key → **Application restrictions → Android apps**.
   3. Add package `com.aistudio.astroveda.kpvqzm` with each SHA-1, and the debug
      SHA-1 too if debug builds should keep working.
@@ -1070,11 +1084,21 @@ Deliberately left alone by the September 2026 audit, with reasons:
   also a large blind refactor of screens whose bugs, by this file's own account,
   are found on a device rather than by reading code. Worth doing deliberately,
   with a device in hand, not in a sweep.
-- **Debug still shares the production Firebase project.** There is no
-  `applicationIdSuffix`, so debug builds read and write live user Firestore data.
-  The fix is `debug { applicationIdSuffix = ".debug" }` plus a second Firebase
-  Android app — but adding the suffix *before* that app exists in the console
-  breaks Google Sign-In and App Check on every debug build. Console step first.
+- **Debug still shares the production Firebase project.** Debug builds sign in
+  against the live Auth user pool and read and write the live Firestore. The
+  security rules keep that to the developer's own `users/{uid}` — nobody else's
+  data is reachable — but a debug build with a bad migration or sync bug writes
+  it into a real account, and debug analytics land in the production stream.
+  **An earlier note here gave the fix as `applicationIdSuffix = ".debug"` plus a
+  second Android app in the same project. That would not separate anything that
+  matters:** Firestore and the Auth users belong to the project, not to the app,
+  so a second app in `astroveda-7126b` still reads and writes the same data. The
+  real fix is a second Firebase *project* for debug — its own
+  `app/src/debug/google-services.json`, Email and Google sign-in enabled, the
+  same Firestore rules, Firebase AI Logic enabled, a debug-only
+  `GOOGLE_WEB_CLIENT_ID`, and the App Check debug token registered — then the
+  suffix. Console first, and a device to check sign-in, sync and the AI answer
+  in the debug build before it is relied on.
 - **The Room database is unencrypted**, and holds names, exact birth times and
   coordinates. Backup and device transfer already exclude it, so this needs
   physical device access. SQLCipher with the key in the Android Keystore is the

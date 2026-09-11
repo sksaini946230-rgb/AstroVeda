@@ -30,6 +30,13 @@ import java.util.Calendar
  *
  * Six of the seven daytime rows obeyed this. Sunday stepped through the cycle
  * three at a time instead of one, which is what a copying slip looks like.
+ *
+ * The night rows step through the same cycle five at a time, not one. That
+ * looked like the same kind of slip and was left alone as an open question until
+ * it could be checked against a published panchang: Drik Panchang's tables for
+ * Jaipur, 13-19 Sep 2026, match all fourteen rows here, day and night, slot for
+ * slot. Five is the convention. The last test pins the published table itself,
+ * so a tidy-up that makes the night step by one fails loudly.
  */
 class ChoghadiyaSequenceTest {
 
@@ -124,6 +131,48 @@ class ChoghadiyaSequenceTest {
 
         assertEquals(
             "night sequences start on the wrong Choghadiya:\n" + wrong.joinToString("\n"),
+            emptyList<String>(), wrong
+        )
+    }
+
+    /**
+     * Drik Panchang, Jaipur, the week of 13 Sep 2026 (a Sunday). One letter per
+     * slot: Udveg, Char, Labh, Amrit, Kaal, Shubh, Rog.
+     */
+    private val published = mapOf(
+        Calendar.SUNDAY to ("UCLAKSRU" to "SACRKLUS"),
+        Calendar.MONDAY to ("AKSRUCLA" to "CRKLUSAC"),
+        Calendar.TUESDAY to ("RUCLAKSR" to "KLUSACRK"),
+        Calendar.WEDNESDAY to ("LAKSRUCL" to "USACRKLU"),
+        Calendar.THURSDAY to ("SRUCLAKS" to "ACRKLUSA"),
+        Calendar.FRIDAY to ("CLAKSRUC" to "RKLUSACR"),
+        Calendar.SATURDAY to ("KSRUCLAK" to "LUSACRKL")
+    )
+
+    private val letter = mapOf(
+        'U' to ChoghadiyaType.UDVEG, 'C' to ChoghadiyaType.CHAR,
+        'L' to ChoghadiyaType.LABH, 'A' to ChoghadiyaType.AMRIT,
+        'K' to ChoghadiyaType.KAAL, 'S' to ChoghadiyaType.SHUBH,
+        'R' to ChoghadiyaType.ROG
+    )
+
+    @Test
+    fun `every day and night sequence matches the published panchang`() {
+        val wrong = mutableListOf<String>()
+        for ((weekday, rows) in published) {
+            for ((isDaytime, row) in listOf(true to rows.first, false to rows.second)) {
+                val expected = row.map { letter.getValue(it) }
+                val actual = ChoghadiyaCalculator.getChoghadiyaSlots(
+                    date = dateOn(weekday), isDaytime = isDaytime
+                ).map { it.type }
+                if (actual != expected) {
+                    wrong += "${weekdayName[weekday]} ${if (isDaytime) "day" else "night"}: " +
+                        "${actual.map { it.nameEn }} != published ${expected.map { it.nameEn }}"
+                }
+            }
+        }
+        assertEquals(
+            "these sequences differ from Drik Panchang:\n" + wrong.joinToString("\n"),
             emptyList<String>(), wrong
         )
     }
