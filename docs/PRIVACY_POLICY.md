@@ -103,4 +103,4 @@ the change is significant, tell you in the app.
 
 * **Developer / Organisation:** Msunjay Enterprises
 * **Email:** supportrevati@gmail.com
-* **Repository / support:** https://github.com/sksaini946230-rgb/AstroVeda
+* **Repository / support:** https://github.com/sksaini946230-rgb/Revati

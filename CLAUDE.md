@@ -20,7 +20,7 @@ record bugs that shipped once already.
 | Firebase project | `astroveda-7126b` |
 | Play developer | Msunjay Enterprises |
 | Local checkout | `~/Revati` — renamed from `~/AstroVeda` on 8 Sep 2026 |
-| GitHub repo | `sksaini946230-rgb/AstroVeda` |
+| GitHub repo | `sksaini946230-rgb/Revati` — renamed from `AstroVeda`; the old URL redirects |
 
 The app was called **AstroVeda** until Aug 2026. That name had to go: five apps
 on Play already use it, two with six-figure installs. The rename reached the UI
@@ -36,15 +36,21 @@ So: `namespace ≠ source package`. Two consequences that have already bitten:
   never `.MainActivity` — a leading dot resolves against the namespace, which is
   no longer where the classes are.
 
-The folder and the GitHub repo disagree for the same reason and neither is a
-mistake. The checkout was renamed to `~/Revati` so that nothing on this machine
-still says AstroVeda; the **repo** kept its name because its URL is published —
-`docs/PRIVACY_POLICY.md` points at it, and it is the address anyone who has the
-policy has already followed. Renaming a repo is a redirect, not a break, but it
-is an outward-facing change and belongs to the owner, not to a tidy-up. Nothing
-in the build refers to either name: paths are relative, and the two absolute
-ones that existed — `goldie.config.ts` and `.env`'s `KEYSTORE_PATH` — were
-rewritten with the folder.
+The checkout and the GitHub repo both say **Revati** now. The folder was
+renamed from `~/AstroVeda` on 8 Sep 2026 and the repo from
+`sksaini946230-rgb/AstroVeda` shortly after, by the owner from GitHub's settings
+page. Nothing in the build refers to either name: paths are relative, and the two
+absolute ones that existed — `goldie.config.ts` and `.env`'s `KEYSTORE_PATH` —
+were rewritten with the folder.
+
+**Never create a repository called `AstroVeda` on this account.** The old URL
+still works only because GitHub redirects it, and it has to keep working: every
+copy of the privacy policy handed out before the rename points at
+`github.com/sksaini946230-rgb/AstroVeda`. That redirect lasts until the name is
+taken again, and a new repo under it breaks every old link at once. The ads site,
+`sksaini946230-rgb.github.io`, is a separate repository and was not affected;
+this repo has no Pages site of its own, which matters because Pages URLs are the
+one kind a rename does not redirect.
 
 Do not "tidy" any of this into agreement. Each half is pinned by something
 external.
