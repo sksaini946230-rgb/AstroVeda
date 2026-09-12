@@ -96,8 +96,18 @@ private val BAR_SIDE_MARGIN = 12.dp
  */
 private val BAR_MAX_WIDTH = 420.dp
 
-/** Gap under the capsule, above the system navigation area. */
-private val BAR_BOTTOM_MARGIN = 12.dp
+/**
+ * Gap under the capsule, *on top of* the system navigation inset.
+ *
+ * It is not the whole gap, which is what made 12dp look like too much: the Box
+ * already takes `windowInsetsPadding(WindowInsets.navigationBars)`, and on a
+ * gesture-navigation phone that inset is 24dp on its own. Measured on the
+ * device at 720x1600 the capsule's lower edge sat 36.5dp off the bottom with
+ * the gesture pill only 14.5dp up, leaving 22dp of empty ground between the two
+ * — a band wide enough to read as a mistake. Four keeps the capsule clear of
+ * the gesture area without floating above it.
+ */
+private val BAR_BOTTOM_MARGIN = 4.dp
 
 /**
  * Ring of space between the bar's edge and the pills inside it.
