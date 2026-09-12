@@ -10,6 +10,26 @@ import java.util.Locale
 object MuhuratCalculator {
 
     /**
+     * Tithis a muhurat is not offered on.
+     *
+     * The Rikta tithis are Chaturthi, Navami and Chaturdashi — the fourth,
+     * ninth and fourteenth of each paksha, "empty" days on which nothing is
+     * begun. This list had the ninth and the fourteenth but not the fourth:
+     * "चतुर्दशी" does not contain "चतुर्थी", so Chaturthi was quietly being
+     * offered as an auspicious day to marry or move house.
+     *
+     * Ashtami and Amavasya are not Rikta and are excluded on the separate,
+     * ordinary ground that neither is used for beginnings.
+     */
+    private val AUSPICIOUS_TITHI_EXCLUSIONS = listOf(
+        "चतुर्थी",    // Rikta
+        "नवमी",      // Rikta
+        "चतुर्दशी",   // Rikta
+        "अष्टमी",
+        "अमावस्या"
+    )
+
+    /**
      * The next auspicious window in each category, from where the user is.
      *
      * The place used to be a Jaipur literal declared inside this function, which
@@ -39,8 +59,7 @@ object MuhuratCalculator {
             val dateStr = sdf.format(cal.time)
             val panchang = PanchangCalculator.calculatePanchang(cal.time, city, use24Hour)
 
-            // Rules for Muhurat selection based on Panchang data
-            val isAuspiciousTithi = !panchang.tithiHindi.contains("अष्टमी") && !panchang.tithiHindi.contains("नवमी") && !panchang.tithiHindi.contains("चतुर्दशी") && !panchang.tithiHindi.contains("अमावस्या")
+            val isAuspiciousTithi = AUSPICIOUS_TITHI_EXCLUSIONS.none { panchang.tithiHindi.contains(it) }
             
             if (!foundWedding && isAuspiciousTithi && (panchang.nakshatraHindi == "रोहिणी" || panchang.nakshatraHindi == "उत्तराफाल्गुनी" || panchang.nakshatraHindi == "स्वाती" || panchang.nakshatraHindi == "अनुराधा" || panchang.nakshatraHindi == "पुष्य")) {
                 muhurats.add(
