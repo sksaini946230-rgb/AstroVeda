@@ -1,5 +1,8 @@
 package com.example.astro
 
+import java.util.Calendar
+import java.util.GregorianCalendar
+
 data class NumerologyValidationResult(
     val isValid: Boolean,
     val nameError: String? = null,
@@ -22,7 +25,16 @@ object NumerologyValidator {
         return null
     }
 
-    fun validateDob(dob: String): String? {
+    /**
+     * The upper bound used to be the literal 2026, which is a date this file
+     * cannot know and was going to be wrong on 1 January 2027 — a baby born that
+     * morning could never be entered, and the message would have told the parent
+     * their child's birth year was out of range. It is today's date now, and a
+     * date that has not happened yet is refused whatever year it falls in.
+     */
+    const val MIN_YEAR = 1900
+
+    fun validateDob(dob: String, today: Calendar = Calendar.getInstance()): String? {
         val trimmed = dob.trim()
         if (trimmed.isEmpty()) {
             return "जन्म तिथि अनिवार्य है (DOB is required)"
@@ -40,8 +52,9 @@ object NumerologyValidator {
         val month = monthStr.toIntOrNull() ?: 0
         val day = dayStr.toIntOrNull() ?: 0
 
-        if (year < 1900 || year > 2026) {
-            return "वर्ष 1900 से 2026 के बीच होना चाहिए (Year between 1900-2026)"
+        val maxYear = today.get(Calendar.YEAR)
+        if (year < MIN_YEAR || year > maxYear) {
+            return "वर्ष $MIN_YEAR से $maxYear के बीच होना चाहिए (Year between $MIN_YEAR-$maxYear)"
         }
 
         // Days in month check
@@ -55,12 +68,28 @@ object NumerologyValidator {
             return "माह $month में अधिकतम $maxDays दिन होते हैं (Invalid day for month)"
         }
 
+        val entered = GregorianCalendar(today.timeZone).apply {
+            clear(); set(year, month - 1, day, 0, 0, 0)
+        }
+        val startOfTomorrow = (today.clone() as Calendar).apply {
+            set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
+            add(Calendar.DAY_OF_MONTH, 1)
+        }
+        if (!entered.before(startOfTomorrow)) {
+            return "जन्म तिथि भविष्य की नहीं हो सकती (Date of birth cannot be in the future)"
+        }
+
         return null
     }
 
-    fun validateInput(name: String, dob: String): NumerologyValidationResult {
+    fun validateInput(
+        name: String,
+        dob: String,
+        today: Calendar = Calendar.getInstance()
+    ): NumerologyValidationResult {
         val nameErr = validateName(name)
-        val dobErr = validateDob(dob)
+        val dobErr = validateDob(dob, today)
         val valid = (nameErr == null && dobErr == null)
         return NumerologyValidationResult(
             isValid = valid,

@@ -241,7 +241,13 @@ fun LanguageSelectOnboardingPage(viewModel: MainViewModel) {
         )
 
         Text(
-            text = "वैदिक पंचांग एवं कुण्डली 2026",
+            // Was "वैदिक पंचांग एवं कुण्डली 2026": a hardcoded year, and the only
+            // Hindi-only line on a page that is otherwise deliberately bilingual
+            // because the user has not chosen a language yet.
+            text = LanguageManager.getString(
+                "वैदिक पंचांग एवं कुण्डली",
+                "Vedic Panchang & Kundali"
+            ),
             style = MaterialTheme.typography.titleMedium.copy(
                 color = MaterialTheme.colorScheme.secondary,
                 fontWeight = FontWeight.Bold,

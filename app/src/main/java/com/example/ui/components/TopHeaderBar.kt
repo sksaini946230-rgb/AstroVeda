@@ -225,8 +225,12 @@ fun TopHeaderBar(
                         if (!isOffline && !isCloudBackupEnabled) {
                             Text(
                             text = LanguageManager.getString(
-                                "वैदिक पंचांग एवं कुण्डली 2026",
-                                "Vedic Panchang & Kundali 2026"
+                                // No year here. A tagline that says 2026 is
+                                // wrong from 1 January and nobody remembers to
+                                // change it; the calendar screen shows the year
+                                // it is actually displaying.
+                                "वैदिक पंचांग एवं कुण्डली",
+                                "Vedic Panchang & Kundali"
                             ),
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,

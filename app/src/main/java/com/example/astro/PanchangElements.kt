@@ -181,6 +181,28 @@ object PanchangElements {
         return (sunSign + 1) % 12
     }
 
+    /**
+     * True if the lunar month containing [jd] is Adhika — the intercalary month
+     * that keeps the lunar year with the solar one.
+     *
+     * A lunar month is Adhika when the Sun changes no sign during it, which is
+     * also why [masaIndex] cannot tell the pair apart on its own: both months
+     * begin with the Sun in the same sign, so both get the same name. Adhika
+     * Jyeshtha 2026 ran 17 May to 14 June and Nija Jyeshtha followed it, and the
+     * Panchang called both of them ज्येष्ठ for fifty-nine days together.
+     *
+     * Festivals are not kept in an Adhika month; they wait for the Nija month of
+     * the same name. [FestivalCalculator] uses this for that, and the Panchang
+     * uses it to say which of the two you are looking at.
+     */
+    fun isAdhikaMasa(jd: Double): Boolean {
+        val start = lastNewMoonJd(jd)
+        val nextStart = lastNewMoonJd(start + 31.0)
+        val signAtStart = (AstroMath.sunSidereal(start) / 30.0).toInt().coerceIn(0, 11)
+        val signAtEnd = (AstroMath.sunSidereal(nextStart - 0.01) / 30.0).toInt().coerceIn(0, 11)
+        return signAtStart == signAtEnd
+    }
+
     /** True while the Moon is waxing (Shukla Paksha). */
     fun isShuklaPaksha(jd: Double): Boolean = tithiNumber(jd) <= 15
 

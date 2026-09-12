@@ -258,21 +258,13 @@ object FestivalCalculator {
     }
 
     /**
-     * True if the lunar month containing [jd] is Adhika — the intercalary month
-     * that keeps the lunar year with the solar one.
-     *
-     * A lunar month is Adhika when the Sun changes no sign during it. Festivals
-     * are not kept in it; they wait for the Nija month of the same name, which
-     * follows. Without this, Gangaur 2029 lands in the Adhika Chaitra of March
-     * instead of the real one in April.
+     * Festivals are not kept in an Adhika month; they wait for the Nija month of
+     * the same name, which follows. Without this, Gangaur 2029 lands in the
+     * Adhika Chaitra of March instead of the real one in April. The test lives
+     * in [PanchangElements] because the Panchang screen needs it too, to say
+     * which of the two months of that name it is showing.
      */
-    private fun isAdhikaMonth(jd: Double): Boolean {
-        val start = PanchangElements.lastNewMoonJd(jd)
-        val nextStart = PanchangElements.lastNewMoonJd(start + 31.0)
-        val signAtStart = (AstroMath.sunSidereal(start) / 30.0).toInt().coerceIn(0, 11)
-        val signAtEnd = (AstroMath.sunSidereal(nextStart - 0.01) / 30.0).toInt().coerceIn(0, 11)
-        return signAtStart == signAtEnd
-    }
+    private fun isAdhikaMonth(jd: Double): Boolean = PanchangElements.isAdhikaMasa(jd)
 
     /** Bhadra is the Vishti karana. */
     private fun isBhadra(jd: Double): Boolean =

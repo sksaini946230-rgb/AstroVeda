@@ -128,9 +128,26 @@ object PanchangCalculator {
         val gulikaKaalStr = slotRange(gulikaSlots[dayOfWeek] ?: 0)
         val yamaKaalStr = slotRange(yamaSlots[dayOfWeek] ?: 0)
 
+        // A muhurta is a fifteenth of the day or of the night, not a fixed
+        // forty-eight minutes. These two were written with the fixed number,
+        // which is the equinox case and only the equinox case: in Jaipur the day
+        // runs from about 10h20m to 13h40m, so a day muhurta is 41 to 55 minutes
+        // and Abhijit was up to three minutes out at both ends — on the one
+        // window in the day people use to decide when to begin something.
+        val nightDurationMin = 1440 - dayDurationMin
+        val dayMuhurtaMin = dayDurationMin / 15
+        val nightMuhurtaMin = nightDurationMin / 15
+
+        // Abhijit is the eighth of the fifteen day muhurtas, so it straddles
+        // local midday.
         val midDay = sunriseMin + dayDurationMin / 2
-        val abhijitStr = "${formatMinutesToTime(midDay - 24, use24Hour)} - ${formatMinutesToTime(midDay + 24, use24Hour)}"
-        val brahmaStr = "${formatMinutesToTime(sunriseMin - 96, use24Hour)} - ${formatMinutesToTime(sunriseMin - 48, use24Hour)}"
+        val abhijitStr = "${formatMinutesToTime(midDay - dayMuhurtaMin / 2, use24Hour)} - " +
+            "${formatMinutesToTime(midDay + dayMuhurtaMin / 2, use24Hour)}"
+
+        // Brahma is the fourteenth of the fifteen night muhurtas: it ends one
+        // muhurta before sunrise and lasts one.
+        val brahmaStr = "${formatMinutesToTime(sunriseMin - 2 * nightMuhurtaMin, use24Hour)} - " +
+            "${formatMinutesToTime(sunriseMin - nightMuhurtaMin, use24Hour)}"
 
         // ---- planets, at sunrise ----
         val ascendant = KundaliCalculator.ascendantDegrees(sunriseJd, city.latitude, city.longitude)
@@ -163,6 +180,13 @@ object PanchangCalculator {
         }
 
         val masaIdx = PanchangElements.masaIndex(sunriseJd)
+        // Adhika Jyeshtha 2026 and the Nija Jyeshtha behind it are both
+        // "Jyeshtha" to masaIndex — a lunar month is Adhika precisely because
+        // the Sun does not change sign during it, so the pair start with the Sun
+        // in the same sign and take the same name. Fifty-nine days of ज्येष्ठ ran
+        // past without the screen ever saying which one. Festivals already knew
+        // the difference; the Panchang did not.
+        val isAdhika = PanchangElements.isAdhikaMasa(sunriseJd)
         val sunDeg = planetDegrees["Sun"] ?: 0.0
         val moonDeg = planetDegrees["Moon"] ?: 0.0
 
@@ -174,8 +198,8 @@ object PanchangCalculator {
             dayOfWeekHindi = AstroNames.VARA_HI[varIdx],
             vikramSamvat = PanchangElements.vikramSamvat(sunriseJd, year),
             sakaSamvat = PanchangElements.sakaSamvat(sunriseJd, year),
-            masaName = AstroNames.MASA_EN[masaIdx],
-            masaNameHindi = AstroNames.MASA_HI[masaIdx],
+            masaName = if (isAdhika) "Adhika ${AstroNames.MASA_EN[masaIdx]}" else AstroNames.MASA_EN[masaIdx],
+            masaNameHindi = if (isAdhika) "अधिक ${AstroNames.MASA_HI[masaIdx]}" else AstroNames.MASA_HI[masaIdx],
             paksha = if (isShukla) AstroNames.SHUKLA_EN else AstroNames.KRISHNA_EN,
             pakshaHindi = if (isShukla) AstroNames.SHUKLA_HI else AstroNames.KRISHNA_HI,
             tithi = tithiEn,

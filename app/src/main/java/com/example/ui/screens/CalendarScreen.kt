@@ -129,6 +129,11 @@ fun CalendarScreen(viewModel: MainViewModel) {
         .filter { it.dateIso >= todayIso }
         .sortedBy { it.dateIso }
 
+    // The subtitle said "2026 Hindu Panchang calendar" as a literal, which stops
+    // being true on 1 January and says the wrong year for every date the user
+    // scrolls to besides. panchang.dateString is "EEEE, dd MMMM yyyy".
+    val calendarYear = panchang.dateString.takeLast(4)
+
     Scaffold(
         // The outer Scaffold in MainActivity already applies the status bar inset
         // through TopHeaderBar's statusBarsPadding(). Letting this inner Scaffold
@@ -167,8 +172,8 @@ fun CalendarScreen(viewModel: MainViewModel) {
                     )
                     Text(
                         text = LanguageManager.getString(
-                            "शक संवत ${panchang.sakaSamvat} • 2026 हिन्दू पंचांग कैलेण्डर",
-                            "Saka Samvat ${panchang.sakaSamvat} • 2026 Hindu Panchang calendar"
+                            "शक संवत ${panchang.sakaSamvat} • $calendarYear हिन्दू पंचांग कैलेण्डर",
+                            "Saka Samvat ${panchang.sakaSamvat} • $calendarYear Hindu Panchang calendar"
                         ),
                         style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
                     )

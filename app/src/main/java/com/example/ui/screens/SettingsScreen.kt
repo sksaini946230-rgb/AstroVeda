@@ -1655,7 +1655,9 @@ fun SettingsScreen(
         AlertDialog(
             onDismissRequest = { showAboutDialog = false },
             title = {
-                Text(text = "Revati 2026", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                // "Revati 2026" — the year was a literal in an About box that
+                // already shows the real version number below it.
+                Text(text = "Revati", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
             },
             text = {
                 Text(

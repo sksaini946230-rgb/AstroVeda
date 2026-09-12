@@ -4,22 +4,28 @@ import com.example.util.LanguageManager
 import com.example.data.model.GunaKootDetail
 import com.example.data.model.GunaMatchingResult
 
+/**
+ * The eight koots and their tables are `internal` rather than private so that
+ * `ClassicalTablesTest` can check each one against the rule it comes from
+ * instead of against a copy of itself. The Bhakoot dosha set was wrong once and
+ * the only test touching Guna Milan at the time counted slots.
+ */
 object KundaliMatchingCalculator {
 
     // Varna names & ranks
-    private val VARNA_RANKS = listOf(3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1, 4) // 4:Brahmin, 3:Kshatriya, 2:Vaishya, 1:Shudra
+    internal val VARNA_RANKS = listOf(3, 2, 1, 4, 3, 2, 1, 4, 3, 2, 1, 4) // 4:Brahmin, 3:Kshatriya, 2:Vaishya, 1:Shudra
     private val VARNA_NAMES_HI = mapOf(4 to "ब्राह्मण", 3 to "क्षत्रिय", 2 to "वैश्य", 1 to "शूद्र")
     private val VARNA_NAMES_EN = mapOf(4 to "Brahmin", 3 to "Kshatriya", 2 to "Vaishya", 1 to "Shudra")
 
     // Vashya groups by Rashi
     // 0:Chatushpad, 1:Manav, 2:Jalchar, 3:Vanchar, 4:Keet
-    private val VASHYA_GROUP = listOf(0, 0, 1, 2, 3, 1, 1, 4, 1, 0, 1, 2)
+    internal val VASHYA_GROUP = listOf(0, 0, 1, 2, 3, 1, 1, 4, 1, 0, 1, 2)
     private val VASHYA_NAMES_HI = listOf("चतुष्पाद", "मानव", "जलचर", "वनचर", "कीट")
     private val VASHYA_NAMES_EN = listOf("Chatushpad (Quadruped)", "Manav (Human)", "Jalchar (Aquatic)", "Vanchar (Wild/Lion)", "Keet (Insect)")
 
     // 27 Nakshatras Yoni Animals (14 Animals)
     // 0:Ashwa, 1:Gaja, 2:Mesha, 3:Sarpa, 4:Shwan, 5:Marjara, 6:Mushaka, 7:Gau, 8:Mahisha, 9:Vyaghra, 10:Mriga, 11:Vanara, 12:Nakula, 13:Simha
-    private val NAKSHATRA_YONI = listOf(
+    internal val NAKSHATRA_YONI = listOf(
         0, 1, 2, 3, 3, 4, 5, 2, 5, 6, 6, 7, 8, 9, 8, 9, 10, 10, 4, 11, 12, 11, 13, 0, 13, 7, 1
     )
     private val YONI_NAMES_HI = listOf(
@@ -34,14 +40,14 @@ object KundaliMatchingCalculator {
     )
 
     // 27 Nakshatras Gana (0:Deva, 1:Manushya, 2:Rakshasa)
-    private val NAKSHATRA_GANA = listOf(
+    internal val NAKSHATRA_GANA = listOf(
         0, 1, 2, 1, 0, 1, 0, 0, 2, 2, 1, 1, 0, 2, 0, 2, 0, 2, 2, 1, 1, 0, 2, 2, 1, 1, 0
     )
     private val GANA_NAMES_HI = listOf("देव (Deva)", "मनुष्य (Manushya)", "राक्षस (Rakshasa)")
     private val GANA_NAMES_EN = listOf("Deva (Divine)", "Manushya (Human)", "Rakshasa (Demonic)")
 
     // 27 Nakshatras Nadi (0:Adi, 1:Madhya, 2:Antya)
-    private val NAKSHATRA_NADI = listOf(
+    internal val NAKSHATRA_NADI = listOf(
         0, 1, 2, 2, 1, 0, 0, 1, 2, 2, 1, 0, 0, 1, 2, 2, 1, 0, 0, 1, 2, 2, 1, 0, 0, 1, 2
     )
     private val NADI_NAMES_HI = listOf("आद्य (Adi / Vata)", "मध्य (Madhya / Pitta)", "अन्त्य (Antya / Kapha)")
@@ -56,7 +62,7 @@ object KundaliMatchingCalculator {
      * and the score cannot disagree about which distances are a dosha —
      * they did, and the label had no branch for Nav-Pancham at all.
      */
-    private val BHAKOOT_DOSHA_DISTANCES = listOf(2, 12, 5, 9, 6, 8)
+    internal val BHAKOOT_DOSHA_DISTANCES = listOf(2, 12, 5, 9, 6, 8)
 
     private val RASHI_NAMES_HI = listOf(
         "मेष (Aries)", "वृषभ (Taurus)", "मिथुन (Gemini)", "कर्क (Cancer)",
@@ -369,7 +375,7 @@ object KundaliMatchingCalculator {
     // Kshatriya (Fire: Aries 0, Leo 4, Sagittarius 8) = 3
     // Vaishya (Earth: Taurus 1, Virgo 5, Capricorn 9) = 2
     // Shudra (Air: Gemini 2, Libra 6, Aquarius 10) = 1
-    private fun calculateVarna(b: Int, g: Int): Double {
+    internal fun calculateVarna(b: Int, g: Int): Double {
         val bVarna = VARNA_RANKS[b]
         val gVarna = VARNA_RANKS[g]
         return if (bVarna >= gVarna) 1.0 else 0.0
@@ -381,7 +387,7 @@ object KundaliMatchingCalculator {
     // 2: Jalchar (Cancer, Pisces, Cap-2nd half)
     // 3: Vanchar (Leo)
     // 4: Keet (Scorpio)
-    private fun calculateVashya(b: Int, g: Int): Double {
+    internal fun calculateVashya(b: Int, g: Int): Double {
         if (b == g) return 2.0
         val bGroup = VASHYA_GROUP[b]
         val gGroup = VASHYA_GROUP[g]
@@ -422,7 +428,7 @@ object KundaliMatchingCalculator {
     // 1-based distance from Boy to Girl % 9, and Girl to Boy % 9
     // Inauspicious taras: 3 (Vipat), 5 (Pratyak), 7 (Naidhana/Vadha) = 0 pt
     // Auspicious taras: 1, 2, 4, 6, 8, 0 (Parama Mitra) = 1.5 pts
-    private fun calculateTara(bNak: Int, gNak: Int): Double {
+    internal fun calculateTara(bNak: Int, gNak: Int): Double {
         val b2g = ((gNak - bNak + 27) % 27) + 1
         val g2b = ((bNak - gNak + 27) % 27) + 1
         val r1 = b2g % 9
@@ -434,7 +440,7 @@ object KundaliMatchingCalculator {
 
     // 4. Yoni (Max 4.0 pts)
     // Full 14x14 Yoni compatibility matrix (4, 3, 2, 1, 0 pts)
-    private fun calculateYoni(bNak: Int, gNak: Int): Double {
+    internal fun calculateYoni(bNak: Int, gNak: Int): Double {
         val bYoni = NAKSHATRA_YONI[bNak]
         val gYoni = NAKSHATRA_YONI[gNak]
 
@@ -477,7 +483,7 @@ object KundaliMatchingCalculator {
     // 5. Graha Maitri (Max 5.0 pts)
     // Moon sign ruling planets:
     // Sun(0), Moon(1), Mars(2), Mercury(3), Jupiter(4), Venus(5), Saturn(6)
-    private fun calculateGrahaMaitri(b: Int, g: Int): Double {
+    internal fun calculateGrahaMaitri(b: Int, g: Int): Double {
         val lords = listOf(2, 5, 3, 1, 0, 3, 5, 2, 4, 6, 6, 4)
         val bLord = lords[b]
         val gLord = lords[g]
@@ -511,7 +517,7 @@ object KundaliMatchingCalculator {
 
     // 6. Gana (Max 6.0 pts)
     // 0:Deva, 1:Manushya, 2:Rakshasa
-    private fun calculateGana(bNak: Int, gNak: Int): Double {
+    internal fun calculateGana(bNak: Int, gNak: Int): Double {
         val bGana = NAKSHATRA_GANA[bNak]
         val gGana = NAKSHATRA_GANA[gNak]
 
@@ -537,7 +543,7 @@ object KundaliMatchingCalculator {
     // The distance is measured one way only, so both ends of each pair have to
     // be listed: girl 2nd from boy is 2 and girl 12th from boy is 12, and the
     // same for 5/9 and 6/8.
-    private fun calculateBhakoot(b: Int, g: Int): Double {
+    internal fun calculateBhakoot(b: Int, g: Int): Double {
         val dist = ((g - b + 12) % 12) + 1
         return if (dist in BHAKOOT_DOSHA_DISTANCES) 0.0 else 7.0
     }
@@ -545,7 +551,7 @@ object KundaliMatchingCalculator {
     // 8. Nadi (Max 8.0 pts)
     // Same Nadi (Adi-Adi, Madhya-Madhya, Antya-Antya) = 0.0 pts (Nadi Dosha)
     // Different Nadi = 8.0 pts
-    private fun calculateNadi(bNak: Int, gNak: Int): Double {
+    internal fun calculateNadi(bNak: Int, gNak: Int): Double {
         val bNadi = NAKSHATRA_NADI[bNak]
         val gNadi = NAKSHATRA_NADI[gNak]
         return if (bNadi != gNadi) 8.0 else 0.0

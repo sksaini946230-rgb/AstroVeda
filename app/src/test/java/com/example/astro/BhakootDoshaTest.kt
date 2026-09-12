@@ -24,12 +24,12 @@ class BhakootDoshaTest {
     /** Distances that carry a dosha, from the shastra: 2/12, 5/9, 6/8. */
     private fun isDoshaDistance(d: Int) = d in setOf(2, 12, 5, 9, 6, 8)
 
-    private fun bhakoot(boyRashi: Int, girlRashi: Int): Double {
-        val m = KundaliMatchingCalculator::class.java
-            .getDeclaredMethod("calculateBhakoot", Int::class.java, Int::class.java)
-        m.isAccessible = true
-        return m.invoke(KundaliMatchingCalculator, boyRashi, girlRashi) as Double
-    }
+    // Reached by reflection until the koots were made `internal` for
+    // ClassicalTablesTest. Reflection by name is the wrong tool here anyway: an
+    // internal function's JVM name carries a module suffix, so the lookup broke
+    // silently on a visibility change rather than on a behaviour change.
+    private fun bhakoot(boyRashi: Int, girlRashi: Int): Double =
+        KundaliMatchingCalculator.calculateBhakoot(boyRashi, girlRashi)
 
     @Test
     fun `every rashi pair scores bhakoot by the classical rule`() {

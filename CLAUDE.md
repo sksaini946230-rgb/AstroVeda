@@ -318,6 +318,89 @@ Reproduce with `./gradlew :app:dependencies --configuration releaseRuntimeClassp
 and `./gradlew buildEnvironment`, then post the resolved coordinates to
 `https://api.osv.dev/v1/querybatch`.
 
+**The Rashifal cache answered a wider question than it was asked.**
+`getAllValidHoroscopes` matched on the period and a seven-day window, and the
+rows are written with the day, week or month they were computed for baked into
+the key — which nothing read back. So yesterday's twelve "TODAY" rows were still
+inside the window this morning and came back as today's: **the daily Rashifal
+actually changed once a week.** Nothing looked wrong, because a stale horoscope
+and a fresh one are the same shape.
+
+The second half is worse. A forced refresh — which is what a language switch
+does — writes a fresh set without displacing the old one, so the table then held
+twenty-four valid rows and the next ordinary load returned all of them. The
+Rashifal list is `items(horoscopes, key = { it.rashiId })`, and a duplicate key
+in a lazy list throws. The read now asks for the twelve exact keys of the
+current period, built by the same function the write uses.
+`AstroCacheRepositoryTest` was confirmed to fail against the old query, once
+with `expected:<12> but was:<24>`.
+
+**The Panchang cache key had the clock format in it and not the language.** Some
+of what the row holds is already localised text — the Tithi and Nakshatra end
+times read "09:57 AM तक" or "until 09:57 AM", and the Sun and Moon signs are
+stored in one language only. A language switch does force *today* to be
+recomputed, and the comment on `onLanguageChanged` says exactly why; what it
+could not do is reach every other date the user had already looked at, which
+came straight back out of the cache in the old language on the next tap of the
+date picker. The language is part of the key now, for the same reason
+`use24Hour` already was.
+
+**Adhika Jyeshtha 2026 and the Nija Jyeshtha behind it were both just
+"ज्येष्ठ".** A lunar month is Adhika precisely because the Sun changes no sign
+during it, so the intercalary month and the real one begin with the Sun in the
+same sign and `masaIndex` gives them the same name — there is no way to tell
+them apart from the index alone. The Panchang screen said ज्येष्ठ for the
+fifty-nine days from 17 May to 14 July 2026 and never said which one.
+`FestivalCalculator` already knew the difference, because festivals are not kept
+in an Adhika month; the test it used is `PanchangElements.isAdhikaMasa` now and
+the Panchang prefixes the name with अधिक / Adhika. The next one is Chaitra 2029.
+
+**A muhurta is a fifteenth of the day, not forty-eight minutes.** Abhijit was
+`midday ± 24` and Brahma `sunrise - 96 … sunrise - 48`, which is the equinox
+case and only the equinox case. In Jaipur the daylight runs from about 10h20m to
+13h40m, so a day muhurta is 41 to 55 minutes and Abhijit was up to three minutes
+out at each end — on the one window in the day people read to decide when to
+begin something. Both are computed from the real day and night lengths now.
+`PanchangDayDivisionsTest` also pins the Rahu Kaal, Gulika and Yamaganda weekday
+tables against the eighth of the daylight each belongs to, over a full week, and
+checks that no two of the three ever claim the same eighth.
+
+**A hardcoded year is a defect with a date on it.** `NumerologyValidator`
+capped the birth year at the literal **2026**: on 1 January 2027 a baby born
+that morning could not have been entered, and the message would have told the
+parent the year was out of range. It follows today now, and a date that has not
+happened yet is refused whatever year it falls in. Four more literal 2026s were
+user-visible text — the calendar subtitle ("2026 Hindu Panchang calendar", which
+was also wrong for any other year the user scrolled to), the tagline in the top
+bar and on the onboarding page, and the About dialog's title. The taglines
+simply do not carry a year any more; the calendar shows the year it is actually
+displaying. The onboarding one was Hindi-only besides, on a page that is
+otherwise deliberately bilingual because the user has not chosen yet.
+
+**Guna Milan reads the Moon back out of the chart by its Hindi name.**
+`KundaliMatchingCalculator` does `RASHI_SHORT_HI.indexOf(chart.moonRashiHi)` and
+`NAKSHATRAS.indexOf(chart.moonNakshatraHi)`, each `.coerceAtLeast(0)`. Both
+tables are the ones the chart was drawn from, so the round trip holds today —
+but a miss does not fail, it returns Mesha and Ashwini, and every match in the
+app would then be computed for the wrong couple with nothing on screen to say
+so. `ClassicalTablesTest` pins the round trip for all twelve rashis and all
+twenty-seven nakshatras. If you ever localise those fields, fix this first.
+
+**The classical tables are checked against the shastra, not against
+themselves.** `ClassicalTablesTest` restates Varna by element, the Vashya
+grouping, Tara's third/fifth/seventh, all twenty-seven Yoni animals and the
+seven sworn-enemy pairs, the Gana of every nakshatra and the asymmetric 6/5/1
+scoring table, all three Bhakoot doshas, every nakshatra's Nadi, the twelve
+rashi lords through Graha Maitri, the Vimshottari order summing to 120, each
+nakshatra's dasha lord, and the sixty-slot Karana cycle. A September 2026 audit
+found every one of them already correct — Varna, Vashya, Tara, Yoni, Graha
+Maitri (lords, the natural friendships, and the 5/4/3/1/0.5/0 scoring), Gana,
+Bhakoot, Nadi, Vimshottari, the Chaldean letter values and their planets, the
+Rahu/Gulika/Yamaganda weekday slots, the twenty-seven Yogas in order, the
+Karana sequence, Amavasya versus Purnima, the Amanta month naming and the
+Vikram/Saka rollover. They are pinned now so that stays a fact rather than a
+memory.
+
 **Sunday's Choghadiya was wrong, and a test that counted slots let it
 through.** Each Choghadiya belongs to a graha — Udveg/Sun, Char/Venus,
 Labh/Mercury, Amrit/Moon, Kaal/Saturn, Shubh/Jupiter, Rog/Mars — and the daytime

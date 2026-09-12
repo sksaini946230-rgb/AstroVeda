@@ -25,7 +25,15 @@ class AstroCacheRepository(
     suspend fun getPanchangWith7DayCache(date: Date, city: CityLocation, use24Hour: Boolean = false, forceRefresh: Boolean = false): PanchangData = withContext(ioDispatcher) {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
         val dateKey = dateFormat.format(date)
-        val cacheKey = "${dateKey}_${city.cityName.replace(" ", "_")}_24h_${use24Hour}"
+        // The language belongs in the key for the same reason the clock format
+        // does: some of what is stored is already localised text. The Tithi and
+        // Nakshatra end times read "09:57 AM तक" or "until 09:57 AM", and the Sun
+        // and Moon signs are stored in one language only. A language switch does
+        // force today's row to be recomputed, but every other date the user had
+        // already looked at stayed in the cache in the old language and came
+        // straight back on the next tap of the date picker.
+        val cacheKey = "${dateKey}_${city.cityName.replace(" ", "_")}_24h_${use24Hour}" +
+            "_lang_${com.example.util.LanguageManager.currentLanguage.name}"
         val now = System.currentTimeMillis()
 
         if (!forceRefresh) {
@@ -133,8 +141,14 @@ class AstroCacheRepository(
         val now = System.currentTimeMillis()
         val validAfter = now - SEVEN_DAYS_MS
 
+        val periodKey = periodKey(period)
+
         if (!forceRefresh) {
-            val cachedEntities = horoscopeCacheDao.getAllValidHoroscopes(period, validAfter)
+            val cachedEntities = horoscopeCacheDao.getValidHoroscopesForKeys(
+                period = period,
+                keys = (1..12).map { horoscopeCacheKey(it, period, periodKey) },
+                validAfter = validAfter
+            )
             if (cachedEntities.size >= 12) {
                 return@withContext cachedEntities.map { entity ->
                     RashifalData(
@@ -175,22 +189,10 @@ class AstroCacheRepository(
 
         // Fresh computation
         val freshHoroscopes = RashifalProvider.getHoroscope(period)
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-        val periodKey = when (period) {
-            "WEEK" -> {
-                val cal = java.util.Calendar.getInstance()
-                "${cal.get(java.util.Calendar.YEAR)}_W${cal.get(java.util.Calendar.WEEK_OF_YEAR)}"
-            }
-            "MONTH" -> {
-                val cal = java.util.Calendar.getInstance()
-                "${cal.get(java.util.Calendar.YEAR)}_M${cal.get(java.util.Calendar.MONTH)}"
-            }
-            else -> dateFormat.format(Date())
-        }
 
         val entities = freshHoroscopes.map { item ->
             HoroscopeCacheEntity(
-                cacheKey = "${item.rashiId}_${period}_$periodKey",
+                cacheKey = horoscopeCacheKey(item.rashiId, period, periodKey),
                 rashiId = item.rashiId,
                 rashiNameEn = item.rashiNameEn,
                 rashiNameHi = item.rashiNameHi,
@@ -222,6 +224,29 @@ class AstroCacheRepository(
         horoscopeCacheDao.insertAllHoroscopes(entities)
         return@withContext freshHoroscopes
     }
+
+    /**
+     * Which day, week or month a horoscope set was computed for.
+     *
+     * The read and the write have to agree on this exactly, so they call the
+     * same function. They did not: only the write built a key, and the read
+     * asked for "any row of this period from the last seven days", which is a
+     * different and much looser question.
+     */
+    private fun periodKey(period: String, now: Date = Date()): String = when (period.uppercase()) {
+        "WEEK" -> {
+            val cal = java.util.Calendar.getInstance().apply { time = now }
+            "${cal.get(java.util.Calendar.YEAR)}_W${cal.get(java.util.Calendar.WEEK_OF_YEAR)}"
+        }
+        "MONTH" -> {
+            val cal = java.util.Calendar.getInstance().apply { time = now }
+            "${cal.get(java.util.Calendar.YEAR)}_M${cal.get(java.util.Calendar.MONTH)}"
+        }
+        else -> SimpleDateFormat("yyyy-MM-dd", Locale.US).format(now)
+    }
+
+    private fun horoscopeCacheKey(rashiId: Int, period: String, periodKey: String) =
+        "${rashiId}_${period}_$periodKey"
 
     private fun entityFieldOr(value: String?): String = value ?: ""
 
