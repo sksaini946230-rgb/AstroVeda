@@ -203,16 +203,32 @@ one instance. Dump the whole set and count the distinct values.
 app and the bill, so an unbounded question box is a direct cost and a shared
 quota one user can exhaust for everyone.
 
-**Analytics were almost entirely unwired.** `AstroAnalytics` has eighteen logging
-methods; `init` and `logAppOpen` were the only two ever called, so the live app
-recorded app opens and nothing else. Fifteen of them are wired now — screen
-views, onboarding, horoscope views, kundali, matching, numerology, AI queries,
-login on all four paths, the three purchase outcomes, and sharing. Three are not:
-`logFirstOpen`, `logOnboardingStep` and `logPanchangView`. The last is not a
-free wiring job. The city it sends is usually the one derived from the phone's
-GPS, which would make it the only place the app itself sends a user's location
-off the device — against what the privacy policy says. Its doc comment says what
-has to change with it.
+**Analytics were almost entirely unwired.** `AstroAnalytics` had eighteen
+logging methods; `init` and `logAppOpen` were the only two ever called, so the
+live app recorded app opens and nothing else. Sixteen of the seventeen that
+remain are wired — screen views, onboarding and its three steps, horoscope
+views, kundali, matching, numerology, AI queries, login on all four paths, the
+three purchase outcomes, and sharing.
+
+`logOnboardingStep` fires from `OnboardingScreen` for each page reached. Skip
+and "Enter Revati" both call `onComplete()`, so `onboarding_complete` alone
+cannot tell a user who read all three pages from one who left on the first; the
+step can. Its names live in `ONBOARDING_STEPS` and are **language-neutral
+tokens**, for the same reason the chart glyphs are: a step logged as "भाषा" in
+Hindi and "language" in English splits one funnel into two halves that never add
+up. `totalPages` is that list's size, and `OnboardingStepsTest` pins both the
+list and the call — a method nobody calls being exactly what was wrong here.
+
+`logFirstOpen` is **deleted**. Firebase logs `first_open` automatically, once
+per install; a hand-rolled second one keyed on SharedPreferences fires again
+after "clear data" and not at all if the write is lost, so the two would
+disagree and neither would be the one to trust.
+
+`logPanchangView` is the one still unwired, and it is not a free wiring job. The
+city it sends is usually the one derived from the phone's GPS, which would make
+it the only place the app itself sends a user's location off the device —
+against what the privacy policy says. Its doc comment says what has to change
+with it.
 
 `recordNonFatal` in particular now sits on every data path that can lose or fail
 to save a profile: background backup, cloud backup, sync, local wipe, export,
@@ -269,12 +285,13 @@ sideways the sub-tab header and bottom nav leave roughly 250dp of content, the
 banner lands mid-screen, and some screens cannot be scrolled to their end. It is
 usable but not good, and it has never been a design pass of its own.
 
-**The Dependabot count is about the build, not the app.** GitHub reports 50
+**The Dependabot count is about the build, not the app.** GitHub reports 52
 vulnerabilities on the default branch and the number is alarming until you look
-at where they are. Checking every dependency by name against OSV:
+at where they are. Checking every dependency by name against OSV — re-run on
+12 Sep 2026, and the shape has not moved:
 
     277 libraries that ship inside the APK   ->  0 vulnerable
-    147 build-time libraries (Gradle plugins) ->  6 vulnerable, 7 advisories
+    141 build-time libraries (Gradle plugins) ->  6 vulnerable, 7 advisories
 
 The six are bcprov-jdk18on, bcpkix-jdk18on, commons-lang3, jose4j, jdom2 and the
 Kotlin Gradle plugin — all of them pulled in by Gradle plugins, all of them
@@ -283,12 +300,20 @@ APK. The threat they describe is someone compromising a build, not a user's
 phone.
 
 The count does not reconcile: this scan finds 7 advisories where GitHub counts
-50. The likely reason is that Automatic dependency submission reports a graph
+52. The likely reason is that Automatic dependency submission reports a graph
 per build variant, so one advisory is counted several times — but that is a
 guess and has not been confirmed against GitHub's own list. What *is* confirmed
 is the half that matters: nothing that reaches a user is vulnerable.
 
-Keeping AGP, Kotlin and KSP current pulls newer versions of all six in time.
+Keeping AGP, Kotlin and KSP current pulls newer versions of all six in time,
+and there is nothing to pull yet: AGP is 9.1.1 and Kotlin 2.2.10, and the one
+advisory that names a direct dependency — GHSA-r937-wjx7-w2jp, unsafe
+deserialization in the Kotlin build cache — is first fixed in `2.4.20-Beta1`.
+Moving the whole build onto a Kotlin beta to close a moderate local-attack
+advisory on the build machine is the worse trade. Forcing new bouncycastle,
+jose4j or jdom2 versions into AGP's own classpath is available and was also left
+alone: it would put untested crypto and XML libraries underneath signing and
+bundletool to quiet a warning about a machine, not a user.
 Reproduce with `./gradlew :app:dependencies --configuration releaseRuntimeClasspath`
 and `./gradlew buildEnvironment`, then post the resolved coordinates to
 `https://api.osv.dev/v1/querybatch`.
@@ -557,7 +582,7 @@ signing* and the keystores on 11 Sep 2026:
 | Key | SHA-1 | In Firebase? |
 |---|---|---|
 | Play app signing, current, **classical** | `B7:D1:DE:10:DD:F3:5E:FD:56:27:99:FA:F6:C4:D1:D0:38:B4:5C:C5` | yes |
-| Play app signing, current, **post-quantum** | `02:33:B3:63:13:E2:4E:92:9D:6B:5E:B4:F9:73:96:EA:CF:74:85:46` | **no** |
+| Play app signing, current, **post-quantum** | `02:33:B3:63:13:E2:4E:92:9D:6B:5E:B4:F9:73:96:EA:CF:74:85:46` | yes, added 12 Sep 2026 |
 | Play app signing, **previous** (first used 25 Aug 2026) | `FB:3F:D2:6B:05:B8:71:4E:8B:2D:DB:E5:DB:67:AF:FE:B5:96:52:2F` | yes |
 | Upload key (`upload-keystore.jks`) | `77:D9:C2:35:B4:EB:2D:47:8E:89:DB:27:41:A8:D7:E2:06:9A:40:81` | yes |
 | Debug | `D3:46:B8:A4:61:5B:85:6A:4F:AF:5B:F2:64:D2:01:47:2B:F2:31:E1` | yes |
@@ -577,9 +602,23 @@ the fingerprints only behind copy buttons, which makes them easy to misread.
 
 Firebase also lists a SHA-1 `BE:60:FC:75:A5:25:D0:DF:41:2D:B2:19:29:CB:C0:83:42:49:BB:7B`
 that matches none of the above — most likely the dead
-`astroveda-upload-key.jks`. It is harmless and was left. The post-quantum SHA-1
-is not registered; no device presents it yet (its install base is 0.0%), and
-adding it is part of the API-key pass below.
+`astroveda-upload-key.jks`. It is harmless and was left.
+
+The post-quantum SHA-1 was registered on 12 Sep 2026, ahead of the API-key pass
+below rather than inside it. The two were bundled together because both are
+about the same list, but they carry opposite risks: adding a fingerprint is
+purely additive — no existing one is removed, no device that works today can
+stop working, and it takes effect server-side without a release — while an
+application restriction is a whitelist, so a missing entry takes down AI and
+sign-in. No device presents the post-quantum certificate yet (install base
+0.0%), so this changes nothing today and removes one way for the API-key pass to
+go wrong. Firebase now lists six SHA-1s: the five in the table plus `BE:60`.
+
+`app/google-services.json` was not re-downloaded, and does not need to be. Its
+`certificate_hash` entries are not what the server matches on — that is the
+console's list — and Google Sign-In here uses `GOOGLE_WEB_CLIENT_ID` from `.env`
+rather than the file's Android OAuth clients. The local copy has been a
+fingerprint or two behind since 4 Sep with nothing broken by it.
 
 **The Firebase API key has no application restriction.** GitHub secret scanning
 flags `app/google-services.json`, and the honest reading is that the key in it
@@ -601,6 +640,15 @@ working. Reverting to None is instant if they do.
 
 Find these under Play Console → Test and release → **App signing**. Adding a
 fingerprint takes effect server-side — no new release needed.
+
+**The project's public-facing name said `project-330378380471`** — the
+placeholder Firebase generates — which is what Firebase Authentication puts in a
+password-reset email and what a consent screen can show beside the account
+picker. A user asked to sign in to "project-330378380471" has no way to tell
+that is Revati. Set to **Revati** on 12 Sep 2026. The project's own display name
+in the console is still "AstroVeda" and was deliberately left: it is not shown
+to users, and the project ID `astroveda-7126b` is permanent anyway, so renaming
+only the label would make the console harder to search, not easier.
 
 A second Firebase app, `app.revati.jyotish`, exists from the abandoned package
 rename. It is unused. Leaving it costs nothing; deleting it is fine too.
@@ -693,16 +741,28 @@ one that does not ship), if `ACCESS_FINE_LOCATION` and "precise location"
 disagree, or if the Tele-MANAS line is dropped. It was confirmed to fail, all
 four ways, against the policy it replaced.
 
-**The legal pages are light-only, and the obvious fix would make them dark for
-everyone.** `privacy_policy.html` and `terms_of_service.html` hard-code a light
-palette, so a dark-mode user gets a white page. A `prefers-color-scheme: dark`
-block is not the fix: with `targetSdk` 33 and up, WebView takes that media query
-from the Activity theme's `isLightTheme`, and `Theme.MyApplication` is
-`android:Theme.DeviceDefault.NoActionBar` — a dark theme — so WebView reports
-dark always and the page would go dark in light mode too. Either give the XML
-theme a DayNight parent, or set `WebSettingsCompat.setAlgorithmicDarkeningAllowed`
-from the Compose theme when the WebView is created. Both change what a device
-shows, so both want a device to check.
+**The legal pages follow the theme now, and the media query was the smaller
+half of it.** `privacy_policy.html` and `terms_of_service.html` hard-coded a
+light palette, so a dark-mode user opened a white page out of a dark app. The
+obvious fix on its own would have been worse than the bug: with `targetSdk` 33
+and up, WebView takes `prefers-color-scheme` from the Activity theme's
+`isLightTheme`, not from the system, and `Theme.MyApplication`'s parent was
+`android:Theme.DeviceDefault` — dark on every device — so both pages would have
+gone dark in light mode too.
+
+So `Theme.MyApplication` is a day/night pair: `android:Theme.DeviceDefault.Light.NoActionBar`
+in `values`, plain `DeviceDefault` in `values-night`, for both the base style
+and the v31 splash variant. Nothing else in the app reads that theme — every
+screen is Compose and takes its colours from `LocalAstroColors` — and
+`enableEdgeToEdge()` decides the status-bar icons itself, so the parent change
+reaches the WebView and little else. The dialog's own backdrop behind the page
+was `Color.White`, which flashed white in front of a dark page, and follows the
+palette now.
+
+`LegalPagesDarkModeTest` holds the two halves together, because each is
+invisible from the other's file: a media query with no night theme is a lie, and
+a night theme with no media query does nothing. **Not yet checked on a device** —
+a theme parent and a media query are both things only a phone can settle.
 
 **The Data safety form is the policy's other half**, and was redone on 11 Sep
 2026 against the code and against Google's own SDK disclosures
@@ -897,7 +957,10 @@ Not working / not finished:
 
   1. The five SHA-1s are in the table under *Signing and Firebase* (copied from
      Play Console on 11 Sep 2026). Re-check them there if the signing key has
-     been upgraded since. Add the post-quantum one to Firebase at the same time.
+     been upgraded since. All five are registered in Firebase — the post-quantum
+     one since 12 Sep 2026 — so the console's own list is a second copy to check
+     against, and it holds a sixth, `BE:60`, that belongs to a dead keystore and
+     does not belong in this whitelist.
   2. Cloud Console → Android key → **Application restrictions → Android apps**.
   3. Add package `com.aistudio.astroveda.kpvqzm` with each SHA-1, and the debug
      SHA-1 too if debug builds should keep working.
