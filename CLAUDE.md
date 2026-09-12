@@ -1311,6 +1311,15 @@ Deliberately left alone by the September 2026 audit, with reasons:
   `GOOGLE_WEB_CLIENT_ID`, and the App Check debug token registered — then the
   suffix. Console first, and a device to check sign-in, sync and the AI answer
   in the debug build before it is relied on.
+
+  **`applicationIdSuffix` is also what makes this safe to do at all, and that
+  was missed once.** Without it a debug build cannot be installed over a
+  release-signed one — Android refuses on the signature — so putting a debug
+  build on the owner's phone means uninstalling the app and taking his saved
+  profiles, reports and recent searches with it. He is not signed in, so there
+  is no cloud copy to restore from. With the suffix the debug build is a
+  different package: it installs *beside* the release build and touches none of
+  its data. Do the suffix and the debug project together, or neither.
 - **The Room database is unencrypted**, and holds names, exact birth times and
   coordinates. Backup and device transfer already exclude it, so this needs
   physical device access. SQLCipher with the key in the Android Keystore is the
