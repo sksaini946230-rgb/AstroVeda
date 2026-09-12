@@ -21,6 +21,12 @@ object MuhuratCalculator {
      * Ashtami and Amavasya are not Rikta and are excluded on the separate,
      * ordinary ground that neither is used for beginnings.
      */
+    /**
+     * All five categories are gated on this. Vehicle and Travel were not, which
+     * is why the device showed a शुभ यात्रा on a Chaturthi the same day this list
+     * gained Chaturthi — the two are separate faults that hide each other, and
+     * only the screen showed the second one.
+     */
     private val AUSPICIOUS_TITHI_EXCLUSIONS = listOf(
         "चतुर्थी",    // Rikta
         "नवमी",      // Rikta
@@ -115,7 +121,7 @@ object MuhuratCalculator {
                 foundBusiness = true
             }
 
-            if (!foundVehicle && (panchang.nakshatraHindi == "श्रवण" || panchang.nakshatraHindi == "धनिष्ठा" || panchang.nakshatraHindi == "शतभिषा" || panchang.nakshatraHindi == "चित्रा" || panchang.nakshatraHindi == "अश्विनी")) {
+            if (!foundVehicle && isAuspiciousTithi && (panchang.nakshatraHindi == "श्रवण" || panchang.nakshatraHindi == "धनिष्ठा" || panchang.nakshatraHindi == "शतभिषा" || panchang.nakshatraHindi == "चित्रा" || panchang.nakshatraHindi == "अश्विनी")) {
                 muhurats.add(
                     MuhuratItem(
                         id = "m4",
@@ -133,7 +139,7 @@ object MuhuratCalculator {
                 foundVehicle = true
             }
 
-            if (!foundTravel && (panchang.nakshatraHindi == "अश्विनी" || panchang.nakshatraHindi == "पुष्य" || panchang.nakshatraHindi == "स्वाती" || panchang.nakshatraHindi == "अनुराधा" || panchang.nakshatraHindi == "रोहिणी")) {
+            if (!foundTravel && isAuspiciousTithi && (panchang.nakshatraHindi == "अश्विनी" || panchang.nakshatraHindi == "पुष्य" || panchang.nakshatraHindi == "स्वाती" || panchang.nakshatraHindi == "अनुराधा" || panchang.nakshatraHindi == "रोहिणी")) {
                 muhurats.add(
                     MuhuratItem(
                         id = "m5",
