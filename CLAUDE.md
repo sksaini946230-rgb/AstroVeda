@@ -751,22 +751,44 @@ to active usage" dialog, which lists Maps and `generativelanguage.googleapis.com
 — that warning is about the *API* restrictions, which were not touched, and it
 appears whether or not you change anything else.
 
-**What was verified on a device, and what could not be.** Google Sign-In was
-checked immediately after: the account picker opens, which is the exact thing
-that broke in production when a certificate was wrong, and it proves the package
-and the upload-key SHA-1 are accepted by the restricted key through Identity
-Toolkit. **The AI answer could not be tested**, and not because of this change:
-App Check refuses a side-loaded upload-key build before the key is ever
-consulted —
+**How this was verified, and why a device could not have done it.** Google
+Sign-In was checked on the phone — the account picker opens, which is the exact
+thing that broke in production when a certificate was wrong. But a phone can
+only ever exercise the *one* certificate the installed build carries, and the
+two that matter most are the Play app signing keys, which no side-loaded build
+presents. The restriction is enforced by Google's API key service against two
+request headers, `X-Android-Package` and `X-Android-Cert` (the SHA-1, uppercase,
+no colons), so every certificate can be tested directly:
 
-    GeminiAstroService: Firebase AI Logic call failed: Firebase App Check token is invalid.
+    curl -X POST -H 'X-Android-Package: com.aistudio.astroveda.kpvqzm' \
+         -H 'X-Android-Cert: <SHA-1 with the colons removed>' \
+         -H 'Content-Type: application/json' \
+         -d '{"identifier":"nobody@example.invalid","continueUri":"http://localhost"}' \
+         'https://identitytoolkit.googleapis.com/v1/accounts:createAuthUri?key=<key>'
 
-— which is the same message this file already recorded as *proof that App Check
-works*. So the AI path stays unverified under the restriction until either the
-next Play build is installed from Play, or a debug build with a registered App
-Check debug token exists. Check the AI box on the first Play install after this,
-and if it fails, set Application restrictions back to **None**; it takes effect
-in minutes.
+Run for all five on 12 Sep 2026, plus two controls:
+
+    Play current classical  B7:D1…   200
+    Play post-quantum       02:33…   200
+    Play previous           FB:3F…   200
+    Upload key              77:D9…   200
+    Debug                   D3:46…   200
+    BE:60 (dead keystore)            403  API_KEY_ANDROID_APP_BLOCKED
+    all zeroes                       403  API_KEY_ANDROID_APP_BLOCKED
+
+**And the AI, which is the thing being protected.** The same two calls against
+`firebasevertexai.googleapis.com/v1beta/projects/astroveda-7126b/models/gemini-3.6-flash:generateContent`:
+
+    no Android headers   403  API_KEY_ANDROID_APP_BLOCKED
+    package + 77:D9      401  Firebase App Check token is invalid
+
+The 403 is the restriction doing its job — the free Gemini quota is no longer
+reachable by anyone holding the key out of an APK, which was the whole point.
+The 401 is the key being *accepted* and App Check refusing an unattested caller,
+so the restriction is not what stops the AI. The side-loaded build fails at the
+same 401, which is why the AI box cannot be exercised end to end without either
+a Play install or a registered App Check debug token — and why that has nothing
+to do with this change.
 
 Find the fingerprints under Play Console → Test and release → **App signing**.
 Adding one takes effect server-side — no new release needed.
@@ -1092,12 +1114,12 @@ Google + email sign-in, AdMob with UMP consent, App Check via Play Integrity.
 
 Not working / not finished:
 
-- **The AI answer has not been exercised under the API key restriction.** The
-  restriction went on 12 Sep 2026 and Google Sign-In was confirmed on a device
-  the same hour, but Firebase AI Logic cannot be reached from a side-loaded
-  upload-key build at all — App Check refuses it first. Check the AI box on the
-  first Play install that carries this, and revert Application restrictions to
-  **None** if it fails. Full account under *Signing and Firebase*.
+- **The AI box has never been exercised end to end on a device**, and cannot be
+  from a side-loaded build: App Check refuses an unattested caller before the
+  model is reached. That is not a gap in the API key restriction, which was
+  proved correct against all five certificates and the AI endpoint itself — see
+  *Signing and Firebase*. It is a gap in what a side-loaded build can show. Open
+  the AI box once on the first Play install that carries this.
 
 
 - **When PRO becomes purchasable, add *Financial info → Purchase history* to
