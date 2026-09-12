@@ -728,26 +728,48 @@ console's list — and Google Sign-In here uses `GOOGLE_WEB_CLIENT_ID` from `.en
 rather than the file's Android OAuth clients. The local copy has been a
 fingerprint or two behind since 4 Sep with nothing broken by it.
 
-**The Firebase API key has no application restriction.** GitHub secret scanning
-flags `app/google-services.json`, and the honest reading is that the key in it
-is not a password — it ships inside every APK and anyone can read it out of a
-Play download. What matters is what the key is allowed to do, and Google Cloud
-Console → Credentials → *Android key (auto created by Firebase)* currently says
+**The Firebase API key is restricted to this app, since 12 Sep 2026.** GitHub
+secret scanning flags `app/google-services.json`, and the honest reading is that
+the key in it is not a password — it ships inside every APK and anyone can read
+it out of a Play download. What matters is what the key is allowed to do, and it
+used to say
 
     Action recommended: This key can currently be used with any application.
     Application restrictions: None
 
 with API restrictions set to 25 APIs, among them Firebase AI Logic and Identity
-Toolkit. So anyone holding the key can call those from anywhere. The project is
-on the **Spark plan** — no billing account — so that cannot run up a bill; what
-it can do is spend the free Gemini quota, and then the AI box stops working for
-every real user. The fix is Application restrictions → Android apps with the
-package name and **every** SHA-1 in the table above, all five, and it wants a
-device in hand: get the list wrong and the app's AI and Google Sign-In both stop
-working. Reverting to None is instant if they do.
+Toolkit, so anyone holding the key could call those from anywhere. The project
+is on the **Spark plan** — no billing account — so that could not run up a bill;
+what it could do is spend the free Gemini quota, and then the AI box stops
+working for every real user.
 
-Find these under Play Console → Test and release → **App signing**. Adding a
-fingerprint takes effect server-side — no new release needed.
+It is now *Application restrictions → Android apps* with package
+`com.aistudio.astroveda.kpvqzm` against **all five** SHA-1s in the table above.
+`BE:60` was deliberately left out: it belongs to the dead keystore and nothing
+signs with it. Saving needs the word UPDATE typed into a "Potential breakage due
+to active usage" dialog, which lists Maps and `generativelanguage.googleapis.com`
+— that warning is about the *API* restrictions, which were not touched, and it
+appears whether or not you change anything else.
+
+**What was verified on a device, and what could not be.** Google Sign-In was
+checked immediately after: the account picker opens, which is the exact thing
+that broke in production when a certificate was wrong, and it proves the package
+and the upload-key SHA-1 are accepted by the restricted key through Identity
+Toolkit. **The AI answer could not be tested**, and not because of this change:
+App Check refuses a side-loaded upload-key build before the key is ever
+consulted —
+
+    GeminiAstroService: Firebase AI Logic call failed: Firebase App Check token is invalid.
+
+— which is the same message this file already recorded as *proof that App Check
+works*. So the AI path stays unverified under the restriction until either the
+next Play build is installed from Play, or a debug build with a registered App
+Check debug token exists. Check the AI box on the first Play install after this,
+and if it fails, set Application restrictions back to **None**; it takes effect
+in minutes.
+
+Find the fingerprints under Play Console → Test and release → **App signing**.
+Adding one takes effect server-side — no new release needed.
 
 **The project's public-facing name said `project-330378380471`** — the
 placeholder Firebase generates — which is what Firebase Authentication puts in a
@@ -870,6 +892,12 @@ palette now.
 `LegalPagesDarkModeTest` holds the two halves together, because each is
 invisible from the other's file: a media query with no night theme is a lie, and
 a night theme with no media query does nothing.
+
+**Confirmed on a device on 12 Sep 2026, both ways round** — which is the only
+check worth anything here, since the failure mode of the naive fix is that the
+page goes dark in light mode too. On the phone in dark mode the policy opens
+dark, and with `cmd uimode night no` it opens white. The dialog's own backdrop
+follows as well.
 
 The CSS half is checked: both pages were served over localhost and rendered at
 320px wide under an emulated light and dark scheme, and in dark they come out
@@ -1064,29 +1092,12 @@ Google + email sign-in, AdMob with UMP consent, App Check via Play Integrity.
 
 Not working / not finished:
 
-- **The Firebase API key has no application restriction — do this with a device
-  in hand.** Google Cloud Console → Credentials → *Android key (auto created by
-  Firebase)* says "This key can currently be used with any application", while
-  its 25 permitted APIs include Firebase AI Logic and Identity Toolkit. Anyone
-  holding the key — and it is inside every APK — can call those from anywhere
-  and spend the free Gemini quota the AI box runs on. The steps, in order:
-
-  1. The five SHA-1s are in the table under *Signing and Firebase* (copied from
-     Play Console on 11 Sep 2026). Re-check them there if the signing key has
-     been upgraded since. All five are registered in Firebase — the post-quantum
-     one since 12 Sep 2026 — so the console's own list is a second copy to check
-     against, and it holds a sixth, `BE:60`, that belongs to a dead keystore and
-     does not belong in this whitelist.
-  2. Cloud Console → Android key → **Application restrictions → Android apps**.
-  3. Add package `com.aistudio.astroveda.kpvqzm` with each SHA-1, and the debug
-     SHA-1 too if debug builds should keep working.
-  4. Wait five minutes, then on a device check **the AI answer and Google
-     Sign-In**. Those are the two that break first.
-  5. Anything broken: set Application restrictions back to **None**. It takes
-     effect in minutes.
-
-  Deliberately not done in the same pass that found it: an incomplete SHA-1 list
-  takes down AI and sign-in, and the failure does not say why.
+- **The AI answer has not been exercised under the API key restriction.** The
+  restriction went on 12 Sep 2026 and Google Sign-In was confirmed on a device
+  the same hour, but Firebase AI Logic cannot be reached from a side-loaded
+  upload-key build at all — App Check refuses it first. Check the AI box on the
+  first Play install that carries this, and revert Application restrictions to
+  **None** if it fails. Full account under *Signing and Firebase*.
 
 
 - **When PRO becomes purchasable, add *Financial info → Purchase history* to
