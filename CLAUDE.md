@@ -761,8 +761,16 @@ palette now.
 
 `LegalPagesDarkModeTest` holds the two halves together, because each is
 invisible from the other's file: a media query with no night theme is a lie, and
-a night theme with no media query does nothing. **Not yet checked on a device** —
-a theme parent and a media query are both things only a phone can settle.
+a night theme with no media query does nothing.
+
+The CSS half is checked: both pages were served over localhost and rendered at
+320px wide under an emulated light and dark scheme, and in dark they come out
+`#0B0E1A` behind a `#131728` card with `#4A8FE8` links, no horizontal overflow
+(`scrollWidth` 320 against a 320 viewport, the long account-deletion URL
+wrapping inside 266px), and light is byte-for-byte what it always was. **What a
+browser cannot settle is the half that matters**: whether WebView on the phone
+reports the scheme the system is actually in, now that the Activity theme is a
+pair. That wants a device.
 
 **The Data safety form is the policy's other half**, and was redone on 11 Sep
 2026 against the code and against Google's own SDK disclosures
