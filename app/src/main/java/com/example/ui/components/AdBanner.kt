@@ -206,12 +206,15 @@ private const val RETRY_BASE_MS = 4_000L
 private val BACKOFF = longArrayOf(1, 3, 9)
 
 /**
- * One request a minute, for a refresh and for a retry alike.
+ * One request every 45 seconds, for a refresh and for a retry alike.
  *
- * Sixty seconds is what Google's banner-refresh guidance uses and is the floor
- * below which frequent reloading reads as invalid traffic. Using the same
- * number for both means a banner that cannot fill never asks more often than
- * one that can.
+ * AdMob's documented range for banner refresh is 30 to 120 seconds and 60 is
+ * the default it suggests; 45 sits inside that and buys about a third more
+ * impressions per session. Thirty is the floor and is not used — a banner asking
+ * as fast as it is allowed to is what invalid-traffic detection looks for, and
+ * the extra impressions are worth less than the account. Using the same number
+ * for the retry means a banner that cannot fill never asks more often than one
+ * that can.
  */
-private const val REFRESH_MS = 60_000L
+private const val REFRESH_MS = 45_000L
 private val ATTEMPT_TAG = "revati_ad_attempt".hashCode()

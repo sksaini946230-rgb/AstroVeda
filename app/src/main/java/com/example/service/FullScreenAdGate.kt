@@ -20,7 +20,7 @@ package com.example.service
 object FullScreenAdGate {
 
     /** No second full-screen ad within this long of the last one, of any kind. */
-    private const val MIN_GAP_MS = 60_000L
+    private const val MIN_GAP_MS = 45_000L
 
     @Volatile
     private var showing = false

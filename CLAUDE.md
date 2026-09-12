@@ -1175,10 +1175,39 @@ Two code faults were found afterwards and fixed, both the same mistake:
 Banner and interstitial were the only ones; App Open and Rewarded were added on
 the owner's instruction after he created the units.
 
-    banner        anchored adaptive, refreshes every 60s while on screen
-    interstitial  tab change, 45s / 120s / 5 per session
-    app open      return to the foreground, never on a cold start
+    banner        anchored adaptive, refreshes every 45s while on screen
+    interstitial  tab AND sub-tab change, 30s / 75s / 8 per session
+    app open      return to the foreground after 30s away, never on a cold start
     rewarded      opt-in, in front of the Guna Milan PDF
+
+**The ad load was raised twice on the owner's instruction, and the second time
+the useful change was not the numbers.** The bottom-bar tab was the only
+interstitial trigger, so a user who opened Kundali and then moved between जन्म
+कुण्डली, गुण मिलान, अंकशास्त्र and गोचर all session saw none at all. The sub-tab
+pills are the same thing as the bottom bar — a deliberate tap on a navigation
+control, arriving at a form or a list — so they are triggers too now. They are
+only candidates; the three limits still decide, so what changed is that those
+limits are now reachable.
+
+Three things are deliberately not done, because they are what closes an AdMob
+account rather than merely annoying people, and all three are named in Play's
+disruptive-ads policy or AdMob's own guidance:
+
+- **no full-screen ad on a cold start** — the app-open ad still needs 30 seconds
+  in the background first, and Google's own guidance is that an app-open ad
+  belongs over a loading screen someone is already waiting through
+- **nothing between a tap and the result it asked for** — this is why the
+  Rashifal's Today/Week/Month chips and the rashi selector are *not* triggers,
+  and why the old "fire when the Kundali is generated" trigger was removed
+- **never two stacked** — `FullScreenAdGate`, now a 45-second floor
+
+The banner sits at 45s rather than AdMob's 30s minimum for the same reason: a
+banner asking as fast as it is allowed to is what invalid-traffic detection
+looks for, and the extra impressions are worth less than the account.
+
+The next real increase is not another turn of these dials — it is **more
+rewarded placements**, which the user opts into and which carry no policy risk
+at all. The Guna Milan PDF is the only one today.
 
 All four were confirmed serving on a real device on 7 Sep 2026: the banner
 filled in landscape and refreshed on the minute, the interstitial appeared on a

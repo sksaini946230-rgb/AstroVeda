@@ -31,14 +31,21 @@ class FullScreenAdGateTest {
         assertFalse(FullScreenAdGate.canShow(1_000_001L))
     }
 
+    /**
+     * Forty-five seconds, down from sixty when the owner asked for more ad
+     * inventory. The floor is not about pace — the three limits in MainActivity
+     * do that — it is about two full-screen ads arriving back to back, which is
+     * the thing Play's disruptive-ads policy names outright. Any positive floor
+     * prevents that; this one is deliberately still far above zero.
+     */
     @Test
-    fun `a second ad has to wait a minute after the first is dismissed`() {
+    fun `a second ad has to wait forty-five seconds after the first is dismissed`() {
         FullScreenAdGate.onShown(1_000_000L)
         FullScreenAdGate.onDismissed()
 
         assertFalse("three seconds later", FullScreenAdGate.canShow(1_003_000L))
-        assertFalse("fifty-nine seconds later", FullScreenAdGate.canShow(1_059_000L))
-        assertTrue("a minute later", FullScreenAdGate.canShow(1_060_000L))
+        assertFalse("forty-four seconds later", FullScreenAdGate.canShow(1_044_000L))
+        assertTrue("forty-five seconds later", FullScreenAdGate.canShow(1_045_000L))
     }
 
     @Test

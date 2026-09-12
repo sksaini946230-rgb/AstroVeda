@@ -349,17 +349,37 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun setPanchangSubTab(subTab: Int) {
-        _panchangSubTab.value = subTab
+    /**
+     * The sub-tab rows count as breaks too, and that is where the extra ad
+     * inventory came from.
+     *
+     * A tab tap on the bottom bar was the only trigger, so a user who opened
+     * Kundali and then moved between जन्म कुण्डली, गुण मिलान, अंकशास्त्र and
+     * गोचर all session never saw a single interstitial. Those pills are the
+     * same thing as the bottom bar — a deliberate tap on a navigation control,
+     * arriving at a form or a list rather than at a result the user is waiting
+     * for — which is the case Google's guidance names as acceptable.
+     *
+     * These are only *candidates*. The three limits in MainActivity still
+     * decide, so adding them does not make the app noisier than those numbers
+     * allow; it makes those numbers actually reachable.
+     *
+     * The chips that are **not** here are the ones that fetch: the Rashifal's
+     * Today/Week/Month and the rashi selector. An ad over a reading the user
+     * just asked for is exactly the interruption that got the old
+     * "fire on the result" trigger removed.
+     */
+    private fun setSubTab(current: MutableStateFlow<Int>, subTab: Int) {
+        val previous = current.value
+        current.value = subTab
+        if (previous != subTab) triggerInterstitial()
     }
 
-    fun setKundaliSubTab(subTab: Int) {
-        _kundaliSubTab.value = subTab
-    }
+    fun setPanchangSubTab(subTab: Int) = setSubTab(_panchangSubTab, subTab)
 
-    fun setMoreSubTab(subTab: Int) {
-        _moreSubTab.value = subTab
-    }
+    fun setKundaliSubTab(subTab: Int) = setSubTab(_kundaliSubTab, subTab)
+
+    fun setMoreSubTab(subTab: Int) = setSubTab(_moreSubTab, subTab)
 
     fun navigateToPanchang(subTab: Int = 0) {
         _panchangSubTab.value = subTab

@@ -524,13 +524,19 @@ class MainActivity : ComponentActivity() {
         // for ten seconds to read a tithi. That was pulled back hard: 90 seconds
         // before the first, three minutes between, three a session.
         //
-        // The owner has since asked for more inventory, so they sit between the
-        // two: 45 seconds before the first, two minutes between, five a session.
-        // Two minutes is a common setting and a tab change is a natural break,
-        // which is what Play's disruptive-ads policy asks for — an ad must not
-        // arrive unannounced or interrupt something. What would cross the line
-        // is showing one on launch or between a tap and its result, and neither
-        // happens here.
+        // The owner has asked for more inventory twice. They now sit at 30
+        // seconds before the first, 75 between, eight a session — and, which
+        // matters more than any of those numbers, the *sub*-tab rows count as
+        // breaks too, so a user who never leaves the Kundali tab is no longer
+        // worth nothing.
+        //
+        // What is deliberately not done, because it is what gets an AdMob
+        // account closed rather than merely disliked: no full-screen ad on a
+        // cold start, none between a tap and the result it asked for, and never
+        // two stacked. Play's disruptive-ads policy and AdMob's own guidance
+        // both name those three. Every ad here still lands on a deliberate tap
+        // on a navigation control, which is the case Google gives as the
+        // acceptable one.
         //
         // If retention or reviews turn, these three numbers are the dial.
         if (currentTime - sessionStartTime < FIRST_INTERSTITIAL_DELAY_MS) return
@@ -576,9 +582,9 @@ class MainActivity : ComponentActivity() {
     }
 
     private companion object {
-        const val FIRST_INTERSTITIAL_DELAY_MS = 45_000L
-        const val INTERSTITIAL_MIN_GAP_MS = 120_000L
-        const val MAX_INTERSTITIALS_PER_SESSION = 5
+        const val FIRST_INTERSTITIAL_DELAY_MS = 30_000L
+        const val INTERSTITIAL_MIN_GAP_MS = 75_000L
+        const val MAX_INTERSTITIALS_PER_SESSION = 8
 
         /** 30s, 60s, 90s, 120s. Bounded, because an interstitial nobody can be
          *  shown yet is not worth requesting forever. */
