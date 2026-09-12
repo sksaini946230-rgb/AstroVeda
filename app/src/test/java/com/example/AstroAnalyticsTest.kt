@@ -18,8 +18,7 @@ class AstroAnalyticsTest {
         AstroAnalytics.init(context)
 
         AstroAnalytics.logAppOpen()
-        AstroAnalytics.logFirstOpen()
-        AstroAnalytics.logOnboardingStep(1, "BirthDetails")
+        AstroAnalytics.logOnboardingStep(1, "rashi")
         AstroAnalytics.logOnboardingComplete()
         AstroAnalytics.logLogin("Google", true)
         AstroAnalytics.logKundaliGenerated(true, "KundaliScreen")

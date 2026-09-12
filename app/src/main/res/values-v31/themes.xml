@@ -2,11 +2,14 @@
 <resources>
     <!--
         Android 12+ draws its own splash before the activity exists, so the app
-        used to show two: a bare icon on the default ground, then the AstroVeda
+        used to show two: a bare icon on the default ground, then the Revati
         splash. The system one cannot be turned off — this makes it identical to
         the one that follows, so the user sees a single splash.
+
+        The parent follows values/themes.xml and has a values-night-v31 twin;
+        the reason is written there.
     -->
-    <style name="Theme.MyApplication" parent="android:Theme.DeviceDefault.NoActionBar">
+    <style name="Theme.MyApplication" parent="android:Theme.DeviceDefault.Light.NoActionBar">
         <item name="android:windowBackground">@color/app_background</item>
         <item name="android:windowSplashScreenBackground">@color/app_background</item>
         <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_logo</item>

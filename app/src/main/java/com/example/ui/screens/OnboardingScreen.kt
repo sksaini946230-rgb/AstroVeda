@@ -39,6 +39,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -63,7 +64,19 @@ import com.example.ui.components.GlassCard
 import com.example.ui.components.GoldGlowButton
 import com.example.ui.theme.ShubhSuccessColor
 import com.example.util.AppLanguage
+import com.example.util.AstroAnalytics
 import com.example.util.LanguageManager
+
+/**
+ * The onboarding funnel, one language-neutral token per page, in the order they
+ * are shown. These are analytics parameter values, so they must never be
+ * localised — the same step logged as "भाषा" in Hindi and "language" in English
+ * splits one funnel into two, which is the same mistake the chart glyphs made
+ * before they were stored as neutral tokens. `totalPages` is this list's size:
+ * a new page needs a name here, and `OnboardingStepsTest` pins the list so that
+ * adding one without a page (which renders nothing) has to be deliberate.
+ */
+internal val ONBOARDING_STEPS = listOf("language", "rashi", "location_notifications")
 
 @Composable
 fun OnboardingScreen(
@@ -72,7 +85,14 @@ fun OnboardingScreen(
 ) {
     val context = LocalContext.current
     var pageIndex by remember { mutableIntStateOf(0) }
-    val totalPages = 3
+    val totalPages = ONBOARDING_STEPS.size
+
+    // The funnel: which of the three pages a user reaches before they leave.
+    // "Skip" and "Enter Revati" both call onComplete(), so `onboarding_complete`
+    // alone cannot tell a skip from a finish — the last step reached can.
+    LaunchedEffect(pageIndex) {
+        AstroAnalytics.logOnboardingStep(pageIndex, ONBOARDING_STEPS[pageIndex])
+    }
 
     val selectedRashiId by viewModel.selectedRashiId.collectAsState()
     val selectedCity by viewModel.selectedCity.collectAsState()

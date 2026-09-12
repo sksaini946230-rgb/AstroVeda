@@ -2,13 +2,28 @@
 <resources>
 
     <!--
-        AstroVeda is a dark-only app, but this style used to be an empty
-        DeviceDefault with no windowBackground, so the window was painted in the
-        device's default colour before Compose drew anything. On a phone in light
-        mode that meant a white flash on every cold start, ahead of the dark
-        splash. Painting the window in the app's own background removes it.
+        Two jobs, and the second one is not obvious.
+
+        1. The window background is painted before Compose starts. This style
+           used to be an empty DeviceDefault with no windowBackground, so the
+           window came up in the device's default colour: a white flash on every
+           cold start ahead of the dark splash. @color/app_background has a
+           values-night twin, so it now matches whichever palette Compose is
+           about to draw.
+
+        2. The parent has to follow day and night, because a WebView reads
+           `prefers-color-scheme` from the Activity theme's isLightTheme, not
+           from the system. The parent was android:Theme.DeviceDefault, which is
+           dark on every device — so the two bundled legal pages would have gone
+           dark in light mode as well, which is why they were left light-only for
+           everyone instead. Light here, plain DeviceDefault in values-night, and
+           the media query in privacy_policy.html / terms_of_service.html tells
+           the truth in both.
+
+        Nothing else in the app reads this theme: every screen is Compose and
+        takes its colours from LocalAstroColors.
     -->
-    <style name="Theme.MyApplication" parent="android:Theme.DeviceDefault.NoActionBar">
+    <style name="Theme.MyApplication" parent="android:Theme.DeviceDefault.Light.NoActionBar">
         <item name="android:windowBackground">@color/app_background</item>
     </style>
 

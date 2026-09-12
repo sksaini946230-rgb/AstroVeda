@@ -87,6 +87,7 @@ import com.example.ui.components.AstroLoadingIndicator
 import com.example.ui.components.GlassBadge
 import com.example.ui.components.GlassCard
 import com.example.ui.components.SectionHeader
+import com.example.ui.theme.LocalAstroColors
 import com.example.ui.theme.PrimaryButtonPressed
 import com.example.ui.theme.PrimaryButtonText
 import com.example.ui.theme.ProBadgeColor
@@ -1695,12 +1696,18 @@ fun SettingsScreen(
                 }
             },
             text = {
+                // The page paints itself a beat after the WebView is attached, so
+                // whatever is behind it is what the user sees first. Color.White
+                // here meant a white flash in front of a dark page in dark mode.
+                // These are privacy_policy.html's own two body colours.
+                val legalPageBackground =
+                    if (LocalAstroColors.current.isLight) Color(0xFFF7FAFC) else Color(0xFF0B0E1A)
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(380.dp)
                         .clip(RoundedCornerShape(8.dp))
-                        .background(Color.White)
+                        .background(legalPageBackground)
                 ) {
                     AndroidView(
                         factory = { ctx ->

@@ -33,10 +33,18 @@ object AstroAnalytics {
         logEvent(FirebaseAnalytics.Event.APP_OPEN)
     }
 
-    fun logFirstOpen() {
-        logEvent("first_open_install")
-    }
+    // logFirstOpen() lived here and logged "first_open_install". It had no call
+    // sites, and wiring it would have duplicated work Firebase already does:
+    // `first_open` is one of the events the SDK logs automatically, once per
+    // install, without an app-side flag to get wrong. A hand-rolled second one
+    // keyed on SharedPreferences fires again after "clear data" and not at all
+    // if the write is lost, so the two would disagree and neither would be the
+    // one to trust.
 
+    /**
+     * Called from `OnboardingScreen` for each page the user reaches. `stepName`
+     * comes from `ONBOARDING_STEPS` and is deliberately language-neutral.
+     */
     fun logOnboardingStep(stepIndex: Int, stepName: String) {
         val bundle = Bundle().apply {
             putInt("step_index", stepIndex)
