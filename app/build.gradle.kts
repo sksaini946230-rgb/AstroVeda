@@ -135,6 +135,38 @@ android {
   }
 
   buildTypes {
+    debug {
+      // The debug build is a *different app*: com.aistudio.astroveda.kpvqzm.debug,
+      // on its own Firebase project (revati-debug), with its own Firestore, its
+      // own Auth user pool and its own Gemini quota.
+      //
+      // Before this, a debug build signed in against the live Auth pool and read
+      // and wrote the live Firestore. The security rules kept that to the
+      // developer's own users/{uid} — nobody else's data was reachable — but a
+      // debug build with a bad migration or a sync bug wrote it into a real
+      // account, and debug analytics landed in the production stream.
+      //
+      // An earlier note here said the fix was a second Android app inside
+      // astroveda-7126b. It is not: Firestore and the Auth users belong to the
+      // project, not to the app, so a second app there reads and writes exactly
+      // the same data.
+      //
+      // The suffix is also what makes this safe to install. Without it a debug
+      // build cannot go over a release-signed one — Android refuses on the
+      // signature — so putting one on a phone that has the real app means
+      // uninstalling it and taking the saved profiles with it. As a different
+      // package it simply sits beside the release build.
+      applicationIdSuffix = ".debug"
+
+      // The web OAuth client is *not* overridden here. The secrets plugin sets
+      // GOOGLE_WEB_CLIENT_ID from .env for every variant and wins over a
+      // buildType field, so an override here is silently ignored — it was tried.
+      // FirebaseAuthService reads `default_web_client_id` instead, which the
+      // Google Services plugin generates per variant from that variant's own
+      // google-services.json, so debug gets the debug project's client without
+      // a second copy of it anywhere.
+    }
+
     release {
       isCrunchPngs = false
       isMinifyEnabled = true

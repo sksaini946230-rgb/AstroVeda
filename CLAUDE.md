@@ -1325,7 +1325,8 @@ Deliberately left alone by the September 2026 audit, with reasons:
   also a large blind refactor of screens whose bugs, by this file's own account,
   are found on a device rather than by reading code. Worth doing deliberately,
   with a device in hand, not in a sweep.
-- **Debug still shares the production Firebase project.** Debug builds sign in
+- ~~**Debug still shares the production Firebase project.**~~ **Done, 13 Sep
+  2026 — `revati-debug`.** Debug builds sign in
   against the live Auth user pool and read and write the live Firestore. The
   security rules keep that to the developer's own `users/{uid}` — nobody else's
   data is reachable — but a debug build with a bad migration or sync bug writes
@@ -1348,7 +1349,32 @@ Deliberately left alone by the September 2026 audit, with reasons:
   profiles, reports and recent searches with it. He is not signed in, so there
   is no cloud copy to restore from. With the suffix the debug build is a
   different package: it installs *beside* the release build and touches none of
-  its data. Do the suffix and the debug project together, or neither.
+  its data. That is why the suffix and the debug project are one piece of work.
+
+  **What exists now.** Project `revati-debug` (number 130912941752, Spark plan,
+  no Analytics), one Android app `com.aistudio.astroveda.kpvqzm.debug` carrying
+  the debug SHA-1 `D3:46…`, Email/Password and Google sign-in enabled, Firestore
+  with the *same* rules as production — `users/{userId}/{document=**}` behind
+  `request.auth.uid == userId` — and Firebase AI Logic on the Gemini Developer
+  API. `app/src/debug/google-services.json` is committed for the same reason the
+  production one is: the key inside it ships in every APK and is not a password.
+
+  **The web OAuth client is not in `.env` and must not be.** The secrets plugin
+  sets `GOOGLE_WEB_CLIENT_ID` from `.env` for every variant and wins over a
+  `buildConfigField` on the debug buildType — an override there is silently
+  ignored, which was tried and produced a debug build holding the *production*
+  client id. `FirebaseAuthService` reads `R.string.default_web_client_id`
+  instead, which the Google Services plugin generates per variant out of that
+  variant's own `google-services.json`; BuildConfig remains the fallback for a
+  build with no config file. A release client id used against the debug project
+  fails as "No Google account found on this device" — the same misleading
+  message a certificate mismatch produced in production once.
+
+  **Still to do, and it needs the phone:** install the debug build (it goes on
+  beside the release one), read the App Check debug token out of logcat, and
+  register it under App Check in `revati-debug`. Until then the debug build's AI
+  question falls back to the offline bulletins, exactly as a side-loaded release
+  build does.
 - **The Room database is unencrypted**, and holds names, exact birth times and
   coordinates. Backup and device transfer already exclude it, so this needs
   physical device access. SQLCipher with the key in the Android Keystore is the
