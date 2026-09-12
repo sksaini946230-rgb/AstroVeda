@@ -986,9 +986,27 @@ Android developer verification for the Msunjay Enterprises account is done —
 the owner confirmed it on 11 Sep 2026, ahead of Play's 30 Sep deadline, so the
 "apps not registered will be removed" notification can be ignored if it lingers.
 
-Nothing is built and waiting to go up. The tree's own number is just its commit
-count and climbs with every commit, so a number higher than 156 here does not
-mean a release is pending.
+**Twenty-five commits of unreleased work sit on top of 156, and some of it is
+the sort a user notices.** Nothing is built and waiting to go up — the tree's own
+number is just its commit count — but the gap is no longer cosmetic. What the
+next release will carry, beyond the notes elsewhere in this file:
+
+- the daily Rashifal changing daily rather than weekly, and not throwing on a
+  duplicate key after a language switch
+- Muhurat computed for the reader's own city rather than Jaipur, and off the
+  main thread
+- Adhika months labelled
+- Abhijit and Brahma muhurta as real muhurtas rather than a flat 48 minutes
+- a birth-year bound that does not expire on 1 January 2027
+- the legal pages following the system theme
+- the onboarding funnel recorded
+- more ad inventory
+- a tab bar that does not float 36dp off the bottom
+
+Two of those want a look on a device before the release goes up: the ad
+frequency (never yet seen serving — the test phone's hotspot blackholes
+`googleads.g.doubleclick.net`, see the reference memory) and the Muhurat screen,
+which now starts empty and fills from `Dispatchers.IO`.
 
 **`versionCode` is derived, never typed.** It is `git rev-list --count HEAD` —
 the number of commits on the branch — resolved in `app/build.gradle.kts`. That
