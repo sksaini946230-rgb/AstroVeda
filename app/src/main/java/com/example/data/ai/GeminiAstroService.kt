@@ -252,26 +252,37 @@ object GeminiAstroService {
         }
     }
 
+    /**
+     * The bulletins shown when the model cannot be reached.
+     *
+     * They must not be *news*. This copy used to say "Jupiter moves from Gemini
+     * into Cancer this month" and "the annular solar eclipse ahead in 2026" —
+     * two dated claims baked into the binary, both already false by September
+     * 2026: Jupiter had not yet left Gemini, and that eclipse was in February.
+     * A release can sit on a phone for a year, so anything here has to be true
+     * whenever it is read. Describe what a transit or an eclipse *means*, and
+     * leave what is happening today to the model.
+     */
     fun getOfflineAstroNews(): String = LanguageManager.getString(
         """
-            • 🪐 गुरु ग्रह का अतिचारी गोचर:
-              देवगुरु बृहस्पति इस माह मिथुन राशि से कर्क राशि में प्रवेश करेंगे। उच्च के गुरु से हंस महापुरुष योग निर्मित होगा, जिससे ज्ञान व शिक्षा क्षेत्र में उन्नति होगी।
+            • 🪐 गुरु का गोचर:
+              देवगुरु बृहस्पति लगभग एक वर्ष एक राशि में रहते हैं। जब वे कर्क राशि में उच्च के होते हैं तो हंस महापुरुष योग बनता है, जिसे ज्ञान, शिक्षा एवं गुरुजनों की कृपा का सूचक माना गया है।
 
-            • 🌘 सूर्य ग्रहण एवं खगोलीय स्थिति:
-              वर्ष 2026 का आगामी कंकणाकृति सूर्य ग्रहण अत्यंत दुर्लभ होगा। खगोलशास्त्रियों एवं ज्योतिषियों के अनुसार इस दौरान आकाश में 'रिंग ऑफ फायर' का भव्य नज़ारा देखने को मिलेगा।
+            • 🌘 ग्रहण का अर्थ:
+              कंकणाकृति सूर्य ग्रहण में चन्द्रमा सूर्य को पूर्णतः नहीं ढकता और आकाश में 'रिंग ऑफ फायर' दिखाई देती है। परंपरा में ग्रहण काल जप, ध्यान एवं संयम का समय माना जाता है, नए कार्य आरंभ करने का नहीं।
 
-            • 🌌 नासा जेम्स वेब टेलीस्कोप की खोज:
-              हाल ही में खगोलशास्त्रियों ने दीप अंतरिक्ष में नवजात नक्षत्र मंडल की खोज की है, जो वैदिक ब्रह्मांड विज्ञान के 'हिरण्यगर्भ' सिद्धांत की पुष्टि करता है।
+            • 🌌 आकाश और परंपरा:
+              दूरबीनों से मिलने वाले नवजात तारा-मंडलों के चित्र वैदिक ब्रह्मांड विज्ञान के 'हिरण्यगर्भ' — सृष्टि के बीज — के विचार के साथ अक्सर पढ़े जाते हैं।
         """.trimIndent(),
         """
             • 🪐 Jupiter's transit:
-              Jupiter moves from Gemini into Cancer this month. Exalted there, it forms the Hamsa Mahapurusha yoga, held to favour learning and education.
+              Jupiter spends about a year in each sign. Exalted in Cancer it forms the Hamsa Mahapurusha yoga, read as a mark of learning, teaching and the goodwill of elders.
 
-            • 🌘 Solar eclipse:
-              The annular solar eclipse ahead in 2026 is a rare one. Astronomers and astrologers alike expect the "ring of fire" to be visible at its peak.
+            • 🌘 What an eclipse means:
+              In an annular solar eclipse the Moon does not quite cover the Sun and a "ring of fire" is left in the sky. Tradition treats the hours of an eclipse as time for prayer and restraint rather than for beginning anything.
 
-            • 🌌 From the James Webb telescope:
-              Astronomers recently found a newborn cluster of stars in deep space — an image many read alongside the Vedic Hiranyagarbha idea of a cosmic seed.
+            • 🌌 The sky and the tradition:
+              Telescope images of newborn clusters of stars are often read alongside the Vedic Hiranyagarbha — the seed from which creation unfolds.
         """.trimIndent()
     )
 }

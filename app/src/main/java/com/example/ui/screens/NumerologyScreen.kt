@@ -91,9 +91,12 @@ fun NumerologyScreen(viewModel: MainViewModel) {
 
     var userQuestion by remember { mutableStateOf("") }
 
+    // "इस वर्ष" rather than a year. The second of these read "2026", which is a
+    // suggestion that ages: the same chip would have offered to ask about a year
+    // already gone, and the model would have answered about it.
     val quickQuestions = listOf(
         LanguageManager.getString("मेरी नौकरी में पदोन्नति कब होगी?", "When will I get a promotion at work?"),
-        LanguageManager.getString("क्या मेरा विवाह 2026 में संभव है?", "Is marriage likely for me in 2026?"),
+        LanguageManager.getString("क्या मेरा विवाह इस वर्ष संभव है?", "Is marriage likely for me this year?"),
         LanguageManager.getString("धन लाभ हेतु कौन सा उपाय करें?", "Which remedy helps with money?"),
         LanguageManager.getString("राहु दशा शांति के सरल उपाय क्या हैं?", "Simple remedies to calm a Rahu dasha?")
     )
