@@ -9,11 +9,23 @@ import java.util.Locale
 
 object MuhuratCalculator {
 
-    fun getUpcomingMuhurats(): List<MuhuratItem> {
+    /**
+     * The next auspicious window in each category, from where the user is.
+     *
+     * The place used to be a Jaipur literal declared inside this function, which
+     * is the same mistake Guna Milan's Manglik reading made with the string
+     * "Default". Every window is a sunrise-to-sunset span, and sunrise in
+     * Guwahati is the better part of an hour before Jaipur's — so a reader in
+     * Assam was told to begin at a time that had already passed, and one in
+     * Kerala at a time that had not arrived. The tithi and nakshatra are read at
+     * sunrise too, so near a boundary the day itself could be the wrong one.
+     *
+     * It is sixty full Panchang computations, so call it off the main thread.
+     */
+    fun getUpcomingMuhurats(city: CityLocation, use24Hour: Boolean = false): List<MuhuratItem> {
         val muhurats = mutableListOf<MuhuratItem>()
         val cal = Calendar.getInstance()
         val sdf = SimpleDateFormat("dd MMMM yyyy", Locale.ENGLISH)
-        val defaultCity = CityLocation("Jaipur", "जयपुर", "Rajasthan", 26.9124, 75.7873)
 
         // Find upcoming good days by scanning next 60 days
         var foundWedding = false
@@ -25,7 +37,7 @@ object MuhuratCalculator {
         for (i in 1..60) {
             cal.add(Calendar.DAY_OF_YEAR, 1)
             val dateStr = sdf.format(cal.time)
-            val panchang = PanchangCalculator.calculatePanchang(cal.time, defaultCity)
+            val panchang = PanchangCalculator.calculatePanchang(cal.time, city, use24Hour)
 
             // Rules for Muhurat selection based on Panchang data
             val isAuspiciousTithi = !panchang.tithiHindi.contains("अष्टमी") && !panchang.tithiHindi.contains("नवमी") && !panchang.tithiHindi.contains("चतुर्दशी") && !panchang.tithiHindi.contains("अमावस्या")
@@ -126,7 +138,7 @@ object MuhuratCalculator {
             val fallbackCal = Calendar.getInstance()
             fallbackCal.add(Calendar.DAY_OF_YEAR, 2)
             val dateStr = sdf.format(fallbackCal.time)
-            val panchang = PanchangCalculator.calculatePanchang(fallbackCal.time, defaultCity)
+            val panchang = PanchangCalculator.calculatePanchang(fallbackCal.time, city, use24Hour)
             muhurats.add(
                 MuhuratItem(
                     id = "m1",

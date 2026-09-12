@@ -33,6 +33,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import android.view.HapticFeedbackConstants
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -59,7 +60,14 @@ fun MuhuratScreen(viewModel: MainViewModel) {
     val view = LocalView.current
     val isDaytime by viewModel.choghadiyaDaytime.collectAsState()
     val slots by viewModel.choghadiyaSlots.collectAsState()
-    val muhurats = viewModel.upcomingMuhurats
+    val muhurats by viewModel.upcomingMuhurats.collectAsState()
+    val muhuratCity by viewModel.selectedCity.collectAsState()
+
+    // Sixty full Panchang computations, so they are worked out when this screen
+    // is opened rather than while the ViewModel is being constructed — and again
+    // if the user changes city, because every window is that city's sunrise to
+    // its sunset.
+    LaunchedEffect(muhuratCity.cityName) { viewModel.refreshMuhurats() }
 
     Scaffold(
         // The outer Scaffold in MainActivity already applies the status bar inset

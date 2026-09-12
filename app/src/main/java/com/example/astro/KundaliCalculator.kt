@@ -39,11 +39,14 @@ object KundaliCalculator {
         )
         val lstDeg = AstroTime.norm360(gmstDeg + longitude)
 
-        val eps = Math.toRadians(
-            AstroMath.meanObliquity(t) +
-                // Apparent obliquity: nutation moves it by a fraction of an arcsecond.
-                AstroMath.nutationInLongitude(t) * 0.0
-        )
+        // Mean obliquity, deliberately. This used to add
+        // `nutationInLongitude(t) * 0.0`, which is nutation in *longitude* — the
+        // wrong quantity for an obliquity — multiplied by zero, under a comment
+        // claiming apparent obliquity was being used. Nothing was being added
+        // and nothing should be: nutation in obliquity peaks near 9 arcseconds,
+        // which moves the ascendant by well under an arcminute, far inside what
+        // a whole-sign chart can show.
+        val eps = Math.toRadians(AstroMath.meanObliquity(t))
         val lst = Math.toRadians(lstDeg)
         val lat = Math.toRadians(latitude.coerceIn(-89.9, 89.9))
 

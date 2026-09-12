@@ -310,8 +310,20 @@ class CalculatorsTest {
             assertFalse(slot.rulerPlanetHi.isEmpty())
         }
 
-        val upcomingMuhurats = MuhuratCalculator.getUpcomingMuhurats()
+        val upcomingMuhurats = MuhuratCalculator.getUpcomingMuhurats(city)
         assertNotNull(upcomingMuhurats)
         assertTrue("Upcoming muhurats list should contain auspicious dates", upcomingMuhurats.isNotEmpty())
+
+        // The place is a parameter now, not a Jaipur literal inside the
+        // function, and every window is that place's sunrise to its sunset.
+        // Guwahati is about 16 degrees east of Jaipur, which is roughly an hour.
+        val guwahati = CityLocation("Guwahati", "गुवाहाटी", "Assam", 26.1445, 91.7362)
+        val eastern = MuhuratCalculator.getUpcomingMuhurats(guwahati)
+        assertTrue(eastern.isNotEmpty())
+        assertNotEquals(
+            "muhurat windows were Jaipur's wherever the reader was",
+            upcomingMuhurats.first().startTime,
+            eastern.first().startTime
+        )
     }
 }

@@ -86,6 +86,14 @@ independent implementation, not by reading the code. `EphemerisAccuracyTest`
 pins eight golden values to 0.02°. If you touch `astro/`, run it, and if you
 change anything about how longitudes are produced, re-do the year-long diff.
 
+**The ascendant uses mean obliquity, and that is a decision.** It used to read
+`meanObliquity(t) + nutationInLongitude(t) * 0.0` under a comment saying
+apparent obliquity was being used: nutation in *longitude* is the wrong quantity
+for an obliquity, and it was multiplied by zero besides, so nothing was being
+added. Nothing should be — nutation in obliquity peaks near 9 arcseconds, which
+moves the Lagna by well under an arcminute, far inside what a whole-sign chart
+can show. The dead term is gone and the comment says what is true.
+
 **Every ephemeris entry point takes Universal Time, not IST.** `AstroTime.kt`
 does the conversion, once. Passing local time silently moves the Moon ~3°.
 
@@ -354,6 +362,23 @@ fifty-nine days from 17 May to 14 July 2026 and never said which one.
 `FestivalCalculator` already knew the difference, because festivals are not kept
 in an Adhika month; the test it used is `PanchangElements.isAdhikaMasa` now and
 the Panchang prefixes the name with अधिक / Adhika. The next one is Chaitra 2029.
+
+**Every Muhurat was Jaipur's.** `getUpcomingMuhurats()` took no place and
+declared `val defaultCity = CityLocation("Jaipur", …)` inside itself — the same
+mistake Guna Milan's Manglik reading made with the literal string "Default".
+Each window is that city's sunrise to its sunset, and Guwahati's sunrise is the
+better part of an hour before Jaipur's, so a reader in Assam was told to begin
+at a time that had already gone and one in Kerala at one that had not come. The
+tithi and nakshatra are read at sunrise too, so near a boundary the *day* could
+be wrong. It takes the selected city now, and the 12/24-hour setting with it.
+
+Two more things were wrong about the same line. `upcomingMuhurats` was a plain
+`val` on `MainViewModel`, so **sixty full Panchang computations ran
+synchronously while the ViewModel was being constructed** — every launch, for a
+screen most sessions never open. And being a `val`, the list never changed
+afterwards, so switching city or clock format left it as it was. It is a
+`StateFlow` filled from `Dispatchers.IO`, refreshed when the Muhurat screen is
+opened and whenever the city changes.
 
 **A muhurta is a fifteenth of the day, not forty-eight minutes.** Abhijit was
 `midday ± 24` and Brahma `sunrise - 96 … sunrise - 48`, which is the equinox

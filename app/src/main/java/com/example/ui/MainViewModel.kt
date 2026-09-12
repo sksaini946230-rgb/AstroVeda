@@ -144,7 +144,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 val defaultCity = CityLocation("New Delhi", "नई दिल्ली", "Delhi", 28.6139, 77.2090)
                 PanchangCalculator.calculatePanchang(Date(), defaultCity)
                 RashifalProvider.getDailyHoroscope()
-                MuhuratCalculator.getUpcomingMuhurats()
                 
                 // Add a small delay to simulate network/db caching of ephemeris
                 kotlinx.coroutines.delay(2000)
@@ -469,6 +468,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             .putString("city_state", city.state)
             .apply()
         recalculatePanchang()
+        refreshMuhurats()
         com.example.widget.PanchangWidgetProvider.triggerUpdate(getApplication())
         com.example.widget.TithiNakshatraWidgetProvider.triggerUpdate(getApplication())
     }
@@ -562,6 +562,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _use24HourFormat.value = newValue
         sharedPrefs.edit().putBoolean("use_24_hour_format", newValue).apply()
         recalculatePanchang(forceRefresh = true)
+        refreshMuhurats()
         com.example.widget.PanchangWidgetProvider.triggerUpdate(getApplication())
         com.example.widget.TithiNakshatraWidgetProvider.triggerUpdate(getApplication())
     }
@@ -571,6 +572,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             _use24HourFormat.value = enable24Hour
             sharedPrefs.edit().putBoolean("use_24_hour_format", enable24Hour).apply()
             recalculatePanchang(forceRefresh = true)
+            refreshMuhurats()
             com.example.widget.PanchangWidgetProvider.triggerUpdate(getApplication())
             com.example.widget.TithiNakshatraWidgetProvider.triggerUpdate(getApplication())
         }
@@ -731,7 +733,30 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     // Muhurats
-    val upcomingMuhurats: List<MuhuratItem> = MuhuratCalculator.getUpcomingMuhurats()
+    //
+    // This was a plain `val` initialised in the constructor, which made it two
+    // problems in one line: sixty full Panchang computations ran synchronously
+    // while the ViewModel was being built, and the list was then fixed for the
+    // life of the screen — computed for Jaipur, in 12-hour time, whatever the
+    // user had chosen. It follows the city and the clock format now, off the
+    // main thread.
+    private val _upcomingMuhurats = MutableStateFlow<List<MuhuratItem>>(emptyList())
+    val upcomingMuhurats: StateFlow<List<MuhuratItem>> = _upcomingMuhurats.asStateFlow()
+
+    fun refreshMuhurats() {
+        viewModelScope.launch {
+            try {
+                val list = withContext(Dispatchers.IO) {
+                    MuhuratCalculator.getUpcomingMuhurats(_selectedCity.value, _use24HourFormat.value)
+                }
+                _upcomingMuhurats.value = list
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                reportError(e)
+            }
+        }
+    }
 
     // Kundali Generator Input State - Starts empty (no hardcoded dummy data)
     var kundaliName = MutableStateFlow("")
