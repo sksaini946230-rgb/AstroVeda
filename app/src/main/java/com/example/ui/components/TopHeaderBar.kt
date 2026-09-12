@@ -229,8 +229,19 @@ fun TopHeaderBar(
                                 // wrong from 1 January and nobody remembers to
                                 // change it; the calendar screen shows the year
                                 // it is actually displaying.
-                                "वैदिक पंचांग एवं कुण्डली",
-                                "Vedic Panchang & Kundali"
+                                //
+                                // And it is the Play listing's own phrase rather
+                                // than "वैदिक पंचांग एवं कुण्डली", because English
+                                // is the long one here as it is everywhere else
+                                // in this app: the Hindi fitted at 11sp and the
+                                // English came out "Vedic Panchang & K…" on a
+                                // 360dp phone, sharing this row with the logo,
+                                // the language chip, PRO and the gear. Seventeen
+                                // characters fit where twenty-four did not, and
+                                // "Revati" sits directly above, so the header now
+                                // reads as the listing does.
+                                "कुण्डली एवं पंचांग",
+                                "Kundli & Panchang"
                             ),
                             style = MaterialTheme.typography.labelSmall.copy(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
